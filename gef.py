@@ -2,7 +2,7 @@ import io
 import re
 import numpy as np
 import pandas as pd
-from soil import GROUND_CLASS, det_ground_pressure
+from pygef.soil import GROUND_CLASS, det_ground_pressure
 
 
 class ParseGEF:
