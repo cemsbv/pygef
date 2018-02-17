@@ -5,8 +5,9 @@ Simple parser for *.gef files. These are ASCII based files used for soil measure
 ## Installation
 `$ pip install git+https://github.com/ritchie46/pygef.git`
 
+## Usage
 ```python
-for pygef import ParseCPT, ParseBRO
+from pygef import ParseCPT, ParseBRO
 
 gef = ParseCPT("./my-gef-file.cpt")
 print(gef.df)
