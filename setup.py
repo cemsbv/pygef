@@ -6,7 +6,7 @@ setup(
     author="Ritchie Vink",
     author_email='ritchie46@gmail.com',
     url="https://www.ritchievink.com",
-    lincense="mit",
+    license="mit",
     packages="pygef",
     install_requires=[
         "pandas",
