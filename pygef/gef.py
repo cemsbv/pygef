@@ -6,7 +6,7 @@ from pygef.soil import GROUND_CLASS, det_ground_pressure
 
 
 class ParseGEF:
-    def __init__(self, path):
+    def __init__(self, path=None, string=None):
         """
         Base class of gef parser. Is inherited for both CPT and Borehole gef files.
         :param path: (str) Path to gef file.
@@ -16,9 +16,11 @@ class ParseGEF:
         self.x = None
         self.y = None
         self.type = None
+        self.s = string
 
-        with open(path) as f:
-            self.s = f.read()
+        if self.s is None:
+            with open(path) as f:
+                self.s = f.read()
 
         g = re.search(r"#ZID.+", self.s)
         if g:
@@ -71,7 +73,7 @@ class ParseGEF:
 
 
 class ParseCPT(ParseGEF):
-    def __init__(self, path, data=True, clean=("l", "qc", "fs"), remove_others=True):
+    def __init__(self, path=None, string=None, data=True, clean=("l", "qc", "fs"), remove_others=True):
         """
         Parse CPT files.
 
@@ -80,7 +82,7 @@ class ParseCPT(ParseGEF):
         :param clean:
         :param remove_others:
         """
-        ParseGEF.__init__(self, path)
+        ParseGEF.__init__(self, path, string)
         self.columns = None
         self.units = []
         self.header = []
@@ -241,14 +243,14 @@ class ParseCPT(ParseGEF):
 
 
 class ParseBRO(ParseGEF):
-    def __init__(self, path, data=True):
+    def __init__(self, path=None, string=None, data=True):
         """
         Parse borehole gef files.
 
         :param path: (str)
         :param data: (bool) Parse the data. Otherwise only the header will be parsed.
         """
-        ParseGEF.__init__(self, path)
+        ParseGEF.__init__(self, path, string)
         self.depth_top = []
         self.depth_btm = []
         self.main_soil = []
