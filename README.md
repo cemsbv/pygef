@@ -3,6 +3,8 @@
 Simple parser for *.gef files. These are ASCII based files used for soil measurements.
 
 ## Installation
+`$ pip install pygef`
+
 `$ pip install git+https://github.com/ritchie46/pygef.git`
 
 ## Usage
