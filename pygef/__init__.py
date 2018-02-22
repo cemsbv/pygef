@@ -1,1 +1,1 @@
-from pygef.gef import ParseCPT, ParseBRO
+from pygef.gef import ParseCPT, ParseBRO, ParseGEF
