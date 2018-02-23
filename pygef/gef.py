@@ -45,8 +45,8 @@ class ParseGEF:
         g = re.search(r"#XYID.+", self.s)
         if g:
             g = g.group().split(",")
-            self.x = int(g[1])
-            self.y = int(g[2])
+            self.x = int(g[1].split('.')[0])
+            self.y = int(g[2].split('.')[0])
 
     def det_data_and_sep(self):
         g = re.search(r"(?<=#COLUMN\D.)\d+|(?<=#COLUMN\D..)\d+|(?<=#COLUMN\D)\d+", self.s)
