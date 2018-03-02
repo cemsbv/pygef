@@ -17,6 +17,7 @@ class ParseGEF:
         self.y = None
         self.type = None
         self.s = string
+        self.end_depth_of_penetration_test = None
 
         if self.s is None:
             with open(path) as f:
@@ -48,6 +49,10 @@ class ParseGEF:
             self.x = int(g[1].split('.')[0])
             self.y = int(g[2].split('.')[0])
 
+        g = re.search(r'#MEASUREMENTVAR[= ]+16[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.end_depth_of_penetration_test = g.group(1)
+
     def det_data_and_sep(self):
         g = re.search(r"(?<=#COLUMN\D.)\d+|(?<=#COLUMN\D..)\d+|(?<=#COLUMN\D)\d+", self.s)
         col_index = None
@@ -70,6 +75,11 @@ class ParseGEF:
             sep = "\t"
 
         return g, sep, col_index
+
+    def det_end_depth_of_penetration_test(self):
+        g = re.search(r'#MEASUREMENTVAR[= ]+16[, ]+(\d+.\d*)', self.s)
+        if g:
+            return g.group(1)
 
 
 class ParseCPT(ParseGEF):
