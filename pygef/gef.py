@@ -20,7 +20,7 @@ class ParseGEF:
         self.end_depth_of_penetration_test = None
 
         if self.s is None:
-            with open(path) as f:
+            with open(path, encoding='utf-8', errors='ignore') as f:
                 self.s = f.read()
 
         g = re.search(r"#ZID.+", self.s)
@@ -75,11 +75,6 @@ class ParseGEF:
             sep = "\t"
 
         return g, sep, col_index
-
-    def det_end_depth_of_penetration_test(self):
-        g = re.search(r'#MEASUREMENTVAR[= ]+16[, ]+(\d+.\d*)', self.s)
-        if g:
-            return g.group(1)
 
 
 class ParseCPT(ParseGEF):
