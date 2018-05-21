@@ -310,7 +310,11 @@ class ParseBRO(ParseGEF):
                         c = 0
                         for subsoil in matches:
                             if subsoil and len(subsoil) == 1:
-                                subsoil += "1"
+                                subsoil += "1"  # change code of 'z' to 'z1'
+
+                            # Filter flawed codes the subsoils may not be the same as the mail soil. Like 'Kk1'
+                            if subsoil and subsoil[0] == s[0].lower():
+                                subsoil = None
                             if c == 0:
                                 self.sub_soil.append(subsoil)
                                 c += 1
