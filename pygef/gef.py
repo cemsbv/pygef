@@ -1,8 +1,23 @@
-import io
 import re
 import numpy as np
 import pandas as pd
 from pygef.soil import GROUND_CLASS, det_ground_pressure
+from pygef import extension
+
+
+class ParseSon:
+    def __init__(self, path=None, string=None):
+        self.path = path
+        self.s = string
+        self.z0 = None  # ground level
+        self.x = None
+        self.y = None
+        self.type = 'cpt'
+        self.end_depth_of_penetration_test = None
+
+        if self.s is None:
+            with open(path, encoding='utf-8', errors='ignore') as f:
+                self.s = f.read()
 
 
 class ParseGEF:
@@ -77,7 +92,7 @@ class ParseGEF:
         return g, sep, col_index
 
 
-class ParseCPT(ParseGEF):
+class ParseCPT(ParseGEF, ParseSon):
     def __init__(self, path=None, string=None, data=True, clean=("l", "qc", "fs"), remove_others=True):
         """
         Parse CPT files.
@@ -87,95 +102,20 @@ class ParseCPT(ParseGEF):
         :param clean:
         :param remove_others:
         """
-        ParseGEF.__init__(self, path, string)
         self.columns = None
         self.units = []
         self.header = []
         self.df = None
         self.contains = False
 
-        try:
-            # Find column information
-            g = re.findall(r"#COLUMNINFO.+", self.s)
-
-            a = None
-            for i in g:
-                a = i.split(",")
-                self.units.append(a[1])
-                self.header.append(a[2])
-
-            if a is not None:
-                self.columns = list(range(1, int(a[0][-1]) + 1))
-            if data and a is not None:
-                g, sep, _ = self.det_data_and_sep()
-
-                flag = 2
-                for i in range(len(self.header)):
-                    name = self.header[i].lower()
-                    if re.search("(conus|tip|punt|cone)", name, flags=flag) is not None:
-                        self.header[i] = "qc"
-                    elif re.search("tijd", name, flags=flag) is not None:
-                        self.header[i] = "t"
-                    elif re.search("(lengte|length|diepte|depth)", name, flags=flag) is not None:
-                        self.header[i] = "l"
-                    elif re.search("(wrijvingsweerstand|plaatselijke.wrijving|lokale.wrijving|sleeve|sleeve.friction)",
-                                   name, flags=flag) is not None:
-                        self.header[i] = "fs"
-                    elif re.search("(u2|waterdruk schouder)", name, flags=flag) is not None:
-                        self.header[i] = "u2"
-                    elif re.search("u1", name, flags=flag) is not None:
-                        self.header[i] = "u1"
-                    elif re.search("gecorrigeerd", name, flags=flag) is not None:
-                        self.header[i] = "correction"
-                    elif re.search(r"helling(?! [xynzow])", name, flags=flag) is not None:
-                        self.header[i] = "slope"  # total slope
-                    elif re.search(r"helling[ x_]+|helling.+zuid",  name, flags=flag):
-                        self.header[i] = "helling_x"
-                    elif re.search(r"helling[ y_]+|helling.+west", name, flags=flag):
-                        self.header[i] = "helling_y"
-                    elif re.search(r"wrijvin.+getal", name, flags=flag):
-                        self.header[i] = "Rf"
-
-                if sep == " ":
-                    g = re.sub(r"[^\S\n]+", ";", g)
-                    sep = ";"
-                    g = re.sub(r"(?<=\n);", "", g)
-                    g = re.sub(r"^;", "", g, 1)
-
-                try:
-                    self.df = pd.read_table(io.StringIO(g), sep=sep, names=self.header, index_col=False, dtype=np.float32)
-                except IndexError:
-                    self.df = pd.read_table(io.StringIO(g), sep=sep, names=self.header)
-
-                if 'l' in self.df.columns:
-                    self.df["l"] = np.abs(self.df["l"].values)
-                    if self.z0:
-                        self.df["nap"] = self.z0 - self.df.l.values
-
-                # determine helling result
-                if "helling_y" in self.df.columns \
-                    and "helling_x" in self.df.columns \
-                        and "slope" not in self.df.columns:
-                    self.df["slope"] = np.sqrt(self.df.helling_x.values**2 + self.df.helling_y.values**2)
-
-                if clean:
-                    if set(clean).issubset(self.df):
-                        if remove_others:
-                            self.df = self.df[list(clean)]
-                        if "t" in self.df.columns:
-                            del self.df["t"]
-
-                        self.df = self.df[self.df < 980]
-                        self.df = self.df[self.df > - 980]
-                        self.df = self.df.dropna()
-                        self.contains = True
-                    else:
-                        self.contains = False
-                        print(clean, "not in df")
-
-        except ValueError or AttributeError as e:
-            print("Parsing error", e)
-            self.df = None
+        if path:
+            g = re.search(r'son|nen$', path.lower())
+            if g:
+                ParseSon.__init__(self, path, string)
+                extension.parse_cpt_son(self)
+            else:
+                ParseGEF.__init__(self, path, string)
+                extension.parse_cpt_dino(self, data, clean, remove_others)
 
     def det_soil(self, bro):
         """
@@ -401,5 +341,3 @@ class ParseBRO(ParseGEF):
             if s3_int is not None:
                 self.percentage_print[i, s3_int] = s3_p
             i += 1
-
-
