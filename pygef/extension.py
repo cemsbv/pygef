@@ -91,6 +91,10 @@ def parse_cpt_dino(obj, data, clean, remove_others):
 
 def parse_cpt_son(obj):
     obj.header = ['l', 'qc', 'fs', 'Rs']
+    g = re.search(r'(-?\d*.\d*)\s*:\s*maaiveld', obj.s)
+    if g:
+        obj.z0 = float(g.group(1))
+
     g = re.search(r'sondering :.+\n\s+\d+|\d+\s+:\s*aantal data-regels\s*\n', obj.s, flags=re.IGNORECASE)
 
     if g:
