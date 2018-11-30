@@ -45,7 +45,7 @@ class ParseGEF:
         if g:
             self.file_date = parse(g.group(1))
 
-        g = re.search(r'PROJECTID[\s=]*(\d*)', self.s)
+        g = re.search(r'PROJECTID[\s=a-zA-Z,]*(\d*)', self.s)
         if g:
             self.project_id = int(g.group(1))
 
