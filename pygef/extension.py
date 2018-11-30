@@ -60,8 +60,8 @@ def parse_cpt_dino(obj, data, clean, remove_others):
 
             if 'l' in obj.df.columns:
                 obj.df["l"] = np.abs(obj.df["l"].values)
-                if obj.z0:
-                    obj.df["nap"] = obj.z0 - obj.df.l.values
+                if obj.zid:
+                    obj.df["nap"] = obj.zid - obj.df.l.values
 
             # determine helling result
             if "helling_y" in obj.df.columns \
@@ -93,7 +93,7 @@ def parse_cpt_son(obj):
     obj.header = ['l', 'qc', 'fs', 'Rs']
     g = re.search(r'(-?\d*.\d*)\s*:\s*maaiveld', obj.s, flags=re.IGNORECASE)
     if g:
-        obj.z0 = float(g.group(1))
+        obj.zid = float(g.group(1))
 
     g = re.search(r'sondering :.+\n\s+\d+|\d+\s+:\s*aantal data-regels\s*\n', obj.s, flags=re.IGNORECASE)
 

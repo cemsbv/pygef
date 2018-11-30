@@ -1,4 +1,5 @@
 import re
+from dateutil.parser import parse
 import numpy as np
 import pandas as pd
 from pygef.soil import GROUND_CLASS, det_ground_pressure
@@ -27,10 +28,12 @@ class ParseGEF:
         :param path: (str) Path to gef file.
         """
         self.path = path
-        self.z0 = None  # ground level
+        self.zid = None  # ground level
         self.x = None
         self.y = None
         self.type = None
+        self.file_date = None
+        self.project_id = None
         self.s = string
         self.end_depth_of_penetration_test = None
 
@@ -38,9 +41,17 @@ class ParseGEF:
             with open(path, encoding='utf-8', errors='ignore') as f:
                 self.s = f.read()
 
-        g = re.search(r"#ZID.+", self.s)
+        g = re.search(r'FILEDATE[\s=]*((\d|[,-])*)', self.s)
         if g:
-            self.z0 = float(g.group().split(",")[1])
+            self.file_date = parse(g.group(1))
+
+        g = re.search(r'PROJECTID[\s=]*(\d*)', self.s)
+        if g:
+            self.project_id = int(g.group(1))
+
+        g = re.search(r"#ZID[\s=]*.*?, *((\d|\.)*)", self.s)
+        if g:
+            self.zid = float(g.group(1))
 
         g = re.search(r"REPORTCODE[^a-zA-Z]+[\w-]+", self.s)
         if g:
@@ -58,15 +69,14 @@ class ParseGEF:
             elif "bore" in proc_code:
                 self.type = "bore"
 
-        g = re.search(r"#XYID.+", self.s)
+        g = re.search(r"#XYID[ =]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", self.s)
         if g:
-            g = g.group().split(",")
-            self.x = int(g[1].split('.')[0])
-            self.y = int(g[2].split('.')[0])
+            self.x = float(g.group(1))
+            self.y = float(g.group(3))
 
         g = re.search(r'#MEASUREMENTVAR[= ]+16[, ]+(\d+\.?\d*)', self.s)
         if g:
-            self.end_depth_of_penetration_test = g.group(1)
+            self.end_depth_of_penetration_test = float(g.group(1))
 
     def det_data_and_sep(self):
         g = re.search(r"(?<=#COLUMN\D.)\d+|(?<=#COLUMN\D..)\d+|(?<=#COLUMN\D)\d+", self.s)
@@ -75,19 +85,11 @@ class ParseGEF:
             col_index = int(g.group())
 
         # Parse measure data and determine the separator.
-        g = re.search(r"#EOH(\n|.)+", self.s)
-        g = g.group().replace(";!", "")
-        g = "\n".join(g.split("\n")[1:])
-        g = g.replace(" \n ", "\n")
-        g = g.replace("|", "")
-        g = g.replace("!", "")
+        g = re.search(r"#EOH.*?\n((.|[\r\n])*)", self.s)
+        g = re.sub(r'[|!];!', '', g.group(1))
+        g = re.sub(r'[;!|]\n', '\n', g)
 
-        if ";" in g:
-            sep = ";"
-        elif " " in g:
-            sep = " "
-        elif "\t" in g:
-            sep = "\t"
+        sep = re.search(r'[; \t]', g).group(0)
 
         return g, sep, col_index
 
@@ -133,12 +135,12 @@ class ParseCPT(ParseGEF, ParseSon):
 
         # Check if there is enough data to determine the soil layers.
         if bro.percentage_print.size == 0 \
-                or self.z0 is None:
+                or self.zid is None:
             self.df = pd.DataFrame()
             return
 
         for i in range(self.df.shape[0]):
-            z = self.z0 - self.df.l.values[i]
+            z = self.zid - self.df.l.values[i]
 
             for j in range(len(bro.depth_btm)):
                 top = bro.z0 - bro.depth_top[j]
