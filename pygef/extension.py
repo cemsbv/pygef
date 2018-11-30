@@ -82,7 +82,6 @@ def parse_cpt_dino(obj, data, clean, remove_others):
                     obj.contains = True
                 else:
                     obj.contains = False
-                    print(clean, "not in df")
 
     except ValueError or AttributeError as e:
         print("Parsing error", e)

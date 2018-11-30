@@ -1,4 +1,5 @@
 import re
+import logging
 from dateutil.parser import parse
 import numpy as np
 import pandas as pd
@@ -43,15 +44,24 @@ class ParseGEF:
 
         g = re.search(r'FILEDATE[\s=]*((\d|[,-])*)', self.s)
         if g:
-            self.file_date = parse(g.group(1))
+            try:
+                self.file_date = parse(g.group(1).replace(',', '-'))
+            except ValueError as e:
+                logging.error(f'Could not parse file_date: {e}')
 
         g = re.search(r'PROJECTID[\s=a-zA-Z,]*(\d*)', self.s)
         if g:
-            self.project_id = int(g.group(1))
+            try:
+                self.project_id = int(g.group(1))
+            except ValueError as e:
+                logging.error(f'Could not cast project_id to int: {e}')
 
         g = re.search(r"#ZID[\s=]*.*?, *((\d|\.)*)", self.s)
         if g:
-            self.zid = float(g.group(1))
+            try:
+                self.zid = float(g.group(1))
+            except ValueError as e:
+                logging.error(f'Could not cast z_id to float: {e}')
 
         g = re.search(r"REPORTCODE[^a-zA-Z]+[\w-]+", self.s)
         if g:
@@ -71,8 +81,11 @@ class ParseGEF:
 
         g = re.search(r"#XYID[ =]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", self.s)
         if g:
-            self.x = float(g.group(1))
-            self.y = float(g.group(3))
+            try:
+                self.x = float(g.group(1))
+                self.y = float(g.group(3))
+            except ValueError as e:
+                logging.error(f'Could not cast x, y coordinates to float: {e}')
 
         g = re.search(r'#MEASUREMENTVAR[= ]+16[, ]+(\d+\.?\d*)', self.s)
         if g:
