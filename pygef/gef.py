@@ -36,7 +36,40 @@ class ParseGEF:
         self.file_date = None
         self.project_id = None
         self.s = string
+
+        self.nom_surface_area_cone_tip = None
+        self.nom_surface_area_friction_element = None
+        self.net_surface_area_quotient_of_the_cone_tip = None
+        self.net_surface_area_quotient_of_the_friction_casing = None
+        self.distance_between_cone_and_centre_of_friction_casing = None
+        self.friction_present = None
+        self.ppt_u1_present = None
+        self.ppt_u2_present = None
+        self.ppt_u3_present = None
+        self.inclination_measurement_present = None
+        self.pre_excavated_depth = None
+        self.groundwater_level = None
+        self.water_depth_offshore_activities = None
         self.end_depth_of_penetration_test = None
+        self.stop_criteria = None
+        self.zero_measurement_cone_before_penetration_test = None
+        self.zero_measurement_cone_after_penetration_test = None
+        self.zero_measurement_friction_before_penetration_test = None
+        self.zero_measurement_friction_after_penetration_test = None
+        self.zero_measurement_ppt_u1_before_penetration_test = None
+        self.zero_measurement_ppt_u2_before_penetration_test = None
+        self.zero_measurement_ppt_u3_before_penetration_test = None
+        self.zero_measurement_ppt_u1_after_penetration_test = None
+        self.zero_measurement_ppt_u2_after_penetration_test = None
+        self.zero_measurement_ppt_u3_after_penetration_test = None
+        self.zero_measurement_inclination_before_penetration_test = None
+        self.zero_measurement_inclination_after_penetration_test = None
+        self.zero_measurement_cone_after_penetration_test = None
+        self.zero_measurement_inclination_ns_before_penetration_test = None
+        self.zero_measurement_inclination_ns_after_penetration_test = None
+        self.zero_measurement_inclination_ew_before_penetration_test = None
+        self.zero_measurement_inclination_ew_after_penetration_test = None
+        self.mileage = None
 
         if self.s is None:
             with open(path, encoding='utf-8', errors='ignore') as f:
@@ -87,9 +120,141 @@ class ParseGEF:
             except ValueError as e:
                 logging.error(f'Could not cast x, y coordinates to float: {e}')
 
+        g = re.search(r'#MEASUREMENTVAR[= ]+1[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.nom_surface_area_cone_tip = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+2[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.nom_surface_area_friction_element = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+3[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.net_surface_area_quotient_of_the_cone_tip = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+4[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.net_surface_area_quotient_of_the_friction_casing = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+5[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.distance_between_cone_and_centre_of_friction_casing = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+6[, ]+(\d)', self.s)
+        if g:
+            self.friction_present = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+7[, ]+(\d+)', self.s)
+        if g:
+            self.ppt_u1_present = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+8[, ]+(\d+)', self.s)
+        if g:
+            self.ppt_u2_present = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+9[, ]+(\d+)', self.s)
+        if g:
+            self.ppt_u3_present = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+10[, ]+(\d+)', self.s)
+        if g:
+            self.inclination_measurement_present = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+11[, ]+(\d+)', self.s)
+        if g:
+            self.use_of_back_flow_compensator = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+12[, ]+(\d+)', self.s)
+        if g:
+            self.type_of_cone_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+13[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.pre_excavated_depth = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+14[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.groundwater_level = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+15[, ]+(\d+\.?\d*)', self.s)
+        if g:
+            self.water_depth_offshore_activities = float(g.group(1))
+
         g = re.search(r'#MEASUREMENTVAR[= ]+16[, ]+(\d+\.?\d*)', self.s)
         if g:
             self.end_depth_of_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+17[, ]+(\d+)', self.s)
+        if g:
+            self.stop_criteria = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+20[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_cone_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+21[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_cone_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+22[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_friction_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+23[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_friction_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+24[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_ppt_u1_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+25[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_ppt_u1_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+26[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_ppt_u2_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+27[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_ppt_u2_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+28[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_ppt_u3_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+29[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_ppt_u3_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+30[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_inclination_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+31[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_inclination_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+32[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_inclination_ns_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+33[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_inclination_ns_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+34[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_inclination_ew_before_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+35[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.zero_measurement_inclination_ew_after_penetration_test = float(g.group(1))
+
+        g = re.search(r'#MEASUREMENTVAR[= ]+41[, ]+([\d-]+\.?\d*)', self.s)
+        if g:
+            self.mileage = float(g.group(1))
 
     def det_data_and_sep(self):
         g = re.search(r"(?<=#COLUMN\D.)\d+|(?<=#COLUMN\D..)\d+|(?<=#COLUMN\D)\d+", self.s)
