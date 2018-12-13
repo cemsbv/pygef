@@ -48,7 +48,7 @@ def parse_measurement_var_as_float(s, var_number):
 
 def parse_project_type_as_int(s):
     """
-    Function that returns the project type as a int.
+    Function that returns the project type as an int.
 
     :param s: (str) String from which the project type is parsed.
     :return: Project type number.
@@ -110,3 +110,38 @@ def parse_file_date(s):
             logging.error(f'Could not parse file_date: {e}')
             return None
         return datetime.strptime(file_date, "%Y-%m-%d")
+
+
+def parse_columns_number(s):
+
+    """
+    Function that returns the columns number as an int.
+    :param s: (str) String from which the yid is parsed.
+    :return: Columns number value.
+    """
+    return parse_regex_cast(r'#COLUMN[= ]+(\d*)', s, int, 1)
+
+
+def parse_quantity_number(s, column_number):
+    """
+    Function that parses the quantity number of a column info.
+    :param s:
+    :return:
+    """
+    return parse_regex_cast(r'#COLUMNINFO[= ]+{}[, ]+\S+[, ][^,]*[, ]+(\d+)'.format(column_number), s, int, 1)
+
+
+def parse_column_info(s, column_number, dictionary):
+    """
+    Function that returns the column info assigned to a quantity number.
+    :param s:
+    :param column_number:
+    :param dictionary:
+    :return:
+    """
+    quantity_number = parse_quantity_number(s, column_number)
+    column_info = dictionary[quantity_number]
+
+    return column_info
+
+

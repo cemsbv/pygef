@@ -5,6 +5,28 @@ import pandas as pd
 from pygef.soil import GROUND_CLASS, det_ground_pressure
 from pygef import extension
 
+COLUMN_NAMES = ["penetration length",
+                "measure cone resistance q_c",
+                "friction resistance f_s",
+                "friction number",
+                "pore pressure u_1",
+                "pore pressure u_2",
+                "pore pressure u_3",
+                "inclination",
+                "inclination NS",
+                "corrected depth",
+                "time",
+                "corrected cone resistance",
+                "net cone resistance",
+                "pore ratio",
+                "cone resistance number",
+                "weight per unit volume",
+                "initial pore pressure",
+                "total vertical soil pressure",
+                "effective vertical soil pressure"]
+
+MAP_QUANTITY_NUMBER_COLUMN_NAME = dict(enumerate(COLUMN_NAMES, 1))
+
 
 class ParseSon:
     def __init__(self, path=None, string=None):
@@ -35,7 +57,9 @@ class ParseGEF:
         self.file_date = None
         self.project_id = None
         self.s = string
+        self.columns_number = None
 
+        # List of all the possible measurement variables
         self.nom_surface_area_cone_tip = None
         self.nom_surface_area_friction_element = None
         self.net_surface_area_quotient_of_the_cone_tip = None
@@ -121,6 +145,13 @@ class ParseGEF:
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 35)
 
         self.mileage = utils.parse_measurement_var_as_float(self.s, 41)
+
+        columns_number = utils.parse_columns_number(self.s)
+        # Return columns info list:
+        columns_info = []
+        for column_number in range(1, columns_number + 1):
+            column_info = utils.parse_column_info(self.s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME)
+            columns_info.append(column_info)
 
     def det_data_and_sep(self):
         g = re.search(r"(?<=#COLUMN\D.)\d+|(?<=#COLUMN\D..)\d+|(?<=#COLUMN\D)\d+", self.s)

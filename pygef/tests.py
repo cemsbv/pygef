@@ -1,6 +1,7 @@
 import unittest
 import pygef.utils as utils
 from datetime import datetime
+from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME
 
 
 class GefTest(unittest.TestCase):
@@ -61,6 +62,35 @@ class GefTest(unittest.TestCase):
         y = utils.parse_yid_as_float(s)
         self.assertEqual(x, 132127.181)
         self.assertEqual(y, 458102.351)
+
+    def test_columns_number(self):
+        s = r'#COLUMN= 4'
+        v = utils.parse_columns_number(s)
+        self.assertEqual(v, 4)
+
+    def test_quantity_number(self):
+        s = r'#COLUMNINFO= 1, m, Sondeerlengte, 1'
+        v = utils.parse_quantity_number(s,1)
+        self.assertEqual(v, 1)
+
+        s = r'#COLUMNINFO= 7, m, Gecorrigeerde diepte, 11'
+        v = utils.parse_quantity_number(s, 7)
+        self.assertEqual(v, 11)
+
+        s = r'#COLUMNINFO= 4, %, Wrijvingsgetal Rf, 4'
+        v = utils.parse_quantity_number(s, 4)
+        self.assertEqual(v, 4)
+
+        s = r'#COLUMNINFO= 4, Graden(deg), Helling, 8'
+        v = utils.parse_quantity_number(s, 4)
+        self.assertEqual(v, 8)
+
+    def test_column_info(self):
+        s = r'#COLUMNINFO= 1, m, Sondeerlengte, 1'
+        v = utils.parse_column_info(s, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME)
+        self.assertEqual(v, "penetration length")
+
+
 
 
 
