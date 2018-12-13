@@ -4,26 +4,29 @@ import numpy as np
 import pandas as pd
 from pygef.soil import GROUND_CLASS, det_ground_pressure
 from pygef import extension
+import io
+import csv
 
-COLUMN_NAMES = ["penetration length",
-                "measure cone resistance q_c",
-                "friction resistance f_s",
-                "friction number",
-                "pore pressure u_1",
-                "pore pressure u_2",
-                "pore pressure u_3",
-                "inclination",
-                "inclination NS",
-                "corrected depth",
-                "time",
-                "corrected cone resistance",
-                "net cone resistance",
-                "pore ratio",
-                "cone resistance number",
-                "weight per unit volume",
-                "initial pore pressure",
-                "total vertical soil pressure",
-                "effective vertical soil pressure"]
+COLUMN_NAMES = ["penetration length",  # 1
+                "qc",  # 2
+                "fs",  # 3
+                "friction_number",  # 4
+                "u1",  # 5
+                "u2",  # 6
+                "u3",  # 7
+                "inclination",  # 8
+                "inclination_NS",  # 9
+                "inclination_EW",  # 10
+                "corrected_depth",  # 11
+                "time",  # 12
+                "corrected_qc",  # 13
+                "net_cone_resistance",  # 14
+                "pore_ratio",  # 15
+                "cone_resistance_number",  # 16
+                "weight_per_unit_volume",  # 17
+                "initial_pore_pressure",  # 18
+                "total_vertical_soil_pressure",  # 19
+                "effective_vertical_soil_pressure"]  # 20
 
 MAP_QUANTITY_NUMBER_COLUMN_NAME = dict(enumerate(COLUMN_NAMES, 1))
 
@@ -100,73 +103,69 @@ class ParseGEF:
             with open(path, encoding='utf-8', errors='ignore') as f:
                 self.s = f.read()
 
-        self.file_date = utils.parse_file_date(self.s)
-        self.project_id = utils.parse_project_type_as_int(self.s)
-        self.zid = utils.parse_zid_as_float(self.s)
+        end_of_header = utils.parse_end_of_header(self.s)
+        header_s, data_s = self.s.split(end_of_header)
 
-        self.type = utils.parse_gef_type(self.s)
+        self.file_date = utils.parse_file_date(header_s)
+        self.project_id = utils.parse_project_type_as_int(header_s)
+        self.zid = utils.parse_zid_as_float(header_s)
+        self.type = utils.parse_gef_type(header_s)
+        self.x = utils.parse_xid_as_float(header_s)
+        self.y = utils.parse_yid_as_float(header_s)
+        self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(header_s, 1)
+        self.nom_surface_area_friction_element = utils.parse_measurement_var_as_float(header_s, 2)
+        self.net_surface_area_quotient_of_the_cone_tip = utils.parse_measurement_var_as_float(header_s, 3)
+        self.net_surface_area_quotient_of_the_friction_casing = utils.parse_measurement_var_as_float(header_s, 4)
+        self.distance_between_cone_and_centre_of_friction_casing = utils.parse_measurement_var_as_float(header_s, 5)
+        self.friction_present = utils.parse_measurement_var_as_float(header_s, 6)
+        self.ppt_u1_present = utils.parse_measurement_var_as_float(header_s, 7)
+        self.ppt_u2_present = utils.parse_measurement_var_as_float(header_s, 8)
+        self.ppt_u3_present = utils.parse_measurement_var_as_float(header_s, 9)
+        self.inclination_measurement_present = utils.parse_measurement_var_as_float(header_s, 10)
+        self.use_of_back_flow_compensator = utils.parse_measurement_var_as_float(header_s, 11)
+        self.type_of_cone_penetration_test = utils.parse_measurement_var_as_float(header_s, 12)
+        self.pre_excavated_depth = utils.parse_measurement_var_as_float(header_s, 13)
+        self.groundwater_level = utils.parse_measurement_var_as_float(header_s, 14)
+        self.water_depth_offshore_activities = utils.parse_measurement_var_as_float(header_s, 15)
+        self.end_depth_of_penetration_test = utils.parse_measurement_var_as_float(header_s, 16)
+        self.stop_criteria = utils.parse_measurement_var_as_float(header_s, 17)
+        self.zero_measurement_cone_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 20)
+        self.zero_measurement_cone_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 21)
+        self.zero_measurement_friction_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 22)
+        self.zero_measurement_friction_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 23)
+        self.zero_measurement_ppt_u1_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 24)
+        self.zero_measurement_ppt_u1_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 25)
+        self.zero_measurement_ppt_u2_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 26)
+        self.zero_measurement_ppt_u2_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 27)
+        self.zero_measurement_ppt_u3_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 28)
+        self.zero_measurement_ppt_u3_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 29)
+        self.zero_measurement_inclination_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 30)
+        self.zero_measurement_inclination_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 31)
+        self.zero_measurement_inclination_ns_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 32)
+        self.zero_measurement_inclination_ns_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 33)
+        self.zero_measurement_inclination_ew_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 34)
+        self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
+        self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
-        self.x = utils.parse_xid_as_float(self.s)
-        self.y = utils.parse_yid_as_float(self.s)
+        self.df = self.parse_data(header_s, data_s, path)
 
-        self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(self.s, 1)
-        self.nom_surface_area_friction_element = utils.parse_measurement_var_as_float(self.s, 2)
-        self.net_surface_area_quotient_of_the_cone_tip = utils.parse_measurement_var_as_float(self.s, 3)
-        self.net_surface_area_quotient_of_the_friction_casing = utils.parse_measurement_var_as_float(self.s, 4)
-        self.distance_between_cone_and_centre_of_friction_casing = utils.parse_measurement_var_as_float(self.s, 5)
-        self.friction_present = utils.parse_measurement_var_as_float(self.s, 6)
-        self.ppt_u1_present = utils.parse_measurement_var_as_float(self.s, 7)
-        self.ppt_u2_present = utils.parse_measurement_var_as_float(self.s, 8)
-        self.ppt_u3_present = utils.parse_measurement_var_as_float(self.s, 9)
-        self.inclination_measurement_present = utils.parse_measurement_var_as_float(self.s, 10)
-        self.use_of_back_flow_compensator = utils.parse_measurement_var_as_float(self.s, 11)
-        self.type_of_cone_penetration_test = utils.parse_measurement_var_as_float(self.s, 12)
-        self.pre_excavated_depth = utils.parse_measurement_var_as_float(self.s, 13)
-        self.groundwater_level = utils.parse_measurement_var_as_float(self.s, 14)
-        self.water_depth_offshore_activities = utils.parse_measurement_var_as_float(self.s, 15)
-        self.end_depth_of_penetration_test = utils.parse_measurement_var_as_float(self.s, 16)
-        self.stop_criteria = utils.parse_measurement_var_as_float(self.s, 17)
+    @staticmethod
+    def parse_data(header_s, data_s, path, columns_number=None, columns_info=None):
+        if path:
+            cpt = re.search(r'gef', path.lower())
+            if cpt and columns_number is None and columns_info is None:
+                columns_number = utils.parse_columns_number(header_s)
+                # Return columns info list:
+                columns_info = []
+                for column_number in range(1, columns_number + 1):
+                    column_info = utils.parse_column_info(header_s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME)
+                    columns_info.append(column_info)
 
-        self.zero_measurement_cone_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 20)
-        self.zero_measurement_cone_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 21)
-        self.zero_measurement_friction_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 22)
-        self.zero_measurement_friction_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 23)
-        self.zero_measurement_ppt_u1_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 24)
-        self.zero_measurement_ppt_u1_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 25)
-        self.zero_measurement_ppt_u2_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 26)
-        self.zero_measurement_ppt_u2_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 27)
-        self.zero_measurement_ppt_u3_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 28)
-        self.zero_measurement_ppt_u3_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 29)
-        self.zero_measurement_inclination_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 30)
-        self.zero_measurement_inclination_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 31)
-        self.zero_measurement_inclination_ns_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 32)
-        self.zero_measurement_inclination_ns_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 33)
-        self.zero_measurement_inclination_ew_before_penetration_test = utils.parse_measurement_var_as_float(self.s, 34)
-        self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(self.s, 35)
+            sep = csv.Sniffer().sniff(data_s).delimiter
+            return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False)
 
-        self.mileage = utils.parse_measurement_var_as_float(self.s, 41)
-
-        columns_number = utils.parse_columns_number(self.s)
-        # Return columns info list:
-        columns_info = []
-        for column_number in range(1, columns_number + 1):
-            column_info = utils.parse_column_info(self.s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME)
-            columns_info.append(column_info)
-
-    def det_data_and_sep(self):
-        g = re.search(r"(?<=#COLUMN\D.)\d+|(?<=#COLUMN\D..)\d+|(?<=#COLUMN\D)\d+", self.s)
-        col_index = None
-        if g is not None:
-            col_index = int(g.group())
-
-        # Parse measure data and determine the separator.
-        g = re.search(r"#EOH.*?\n((.|[\r\n])*)", self.s)
-        g = re.sub(r'[|!];!', '', g.group(1))
-        g = re.sub(r'[;!|]\n', '\n', g)
-
-        sep = re.search(r'[; \t]', g).group(0)
-
-        return g, sep, col_index
+#        if bore:
+#            need to reimplement.
 
 
 class ParseCPT(ParseGEF, ParseSon):

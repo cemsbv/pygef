@@ -35,6 +35,15 @@ def parse_regex_cast(regex_string, s, f, group_number):
         return None
 
 
+def parse_end_of_header(s):
+    """
+    Function that parses the end of the header.
+    :param s:
+    :return:
+    """
+    return parse_regex_cast(r'(#EOH[= ]+)', s, str, 1)
+
+
 def parse_measurement_var_as_float(s, var_number):
     """
     Function that returns a measurement variable as a float.
@@ -119,7 +128,7 @@ def parse_columns_number(s):
     :param s: (str) String from which the yid is parsed.
     :return: Columns number value.
     """
-    return parse_regex_cast(r'#COLUMN[= ]+(\d*)', s, int, 1)
+    return max(map(int, re.findall(r'#COLUMNINFO[= ]+(\d*)', s)))
 
 
 def parse_quantity_number(s, column_number):
@@ -143,5 +152,7 @@ def parse_column_info(s, column_number, dictionary):
     column_info = dictionary[quantity_number]
 
     return column_info
+
+
 
 

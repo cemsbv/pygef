@@ -2,6 +2,9 @@ import unittest
 import pygef.utils as utils
 from datetime import datetime
 from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME
+from pygef.gef import ParseGEF as gef
+import pandas as pd
+from pandas.util.testing import assert_frame_equal
 
 
 class GefTest(unittest.TestCase):
@@ -89,6 +92,22 @@ class GefTest(unittest.TestCase):
         s = r'#COLUMNINFO= 1, m, Sondeerlengte, 1'
         v = utils.parse_column_info(s, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME)
         self.assertEqual(v, "penetration length")
+
+    def test_end_of_the_header(self):
+        s = r'#EOH='
+        v = utils.parse_end_of_header(s)
+        self.assertEqual(v, '#EOH=')
+
+    def test_parse_data(self):
+        header_s = r'This is an header'
+        df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [1, 2, 3], 'col3': [1, 2, 3]})
+        data_s = '\n1,1,1\n2,2,2\n3,3,3'.replace(',', ' ')
+        path = 'just/a/path.gef'
+        df_parsed = gef.parse_data(header_s, data_s, path, columns_number=3, columns_info=['col1', 'col2', 'col3'])
+        assert_frame_equal(df_parsed, df)
+
+
+
 
 
 
