@@ -260,10 +260,13 @@ class ParseBORE:
         record_separator = utils.parse_record_separator(header_s)
         data_s_rows = data_s.split(record_separator)
         data_rows_soil = self.extract_soil_info(data_s_rows, columns_number, column_separator)
-        self.df_column_info = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
-        self.df_soil_type = self.parse_data_soil_type(data_rows_soil)
-        self.additional_info = self.parse_add_info_as_string(data_rows_soil)
-        self.df_bore = pd.concat([self.df_column_info, self.df_soil_type, self.additional_info], axis=1,
+        df_column_info = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
+        df_soil_type = self.parse_data_soil_type(data_rows_soil)
+        df_soil_code = self.parse_data_soil_code(data_rows_soil)
+        df_soil_quantified = self.data_soil_quantified(data_rows_soil)
+        df_additional_info = self.parse_add_info_as_string(data_rows_soil)
+        self.df_bore = pd.concat([df_column_info, df_soil_code, df_soil_type, df_soil_quantified,
+                                  df_additional_info], axis=1,
                                  sort=False)
 
     @staticmethod
@@ -305,8 +308,32 @@ class ParseBORE:
         for row in data_rows_soil:
             for i in range(len(row)):
                 if i == 0:
-                    soil_type = utils.create_soil_type(row[i])
-                    lst.append(soil_type)
-        df_soil_type = pd.DataFrame(lst, columns=['Soil_type_NEN'])
+                    soil_quantified = utils.create_soil_type(row[i])
+                    lst.append(soil_quantified)
+        df_soil_type = pd.DataFrame(lst, columns=['Soil_type'])
         return df_soil_type
+
+    @staticmethod
+    def parse_data_soil_code(data_rows_soil):
+        lst = []
+        for row in data_rows_soil:
+            for i in range(len(row)):
+                if i == 0:
+                    soil_type = utils.parse_soil_code(row[i])
+                    lst.append(soil_type)
+        df_soil_code = pd.DataFrame(lst, columns=['Soil_code'])
+        return df_soil_code
+
+    @staticmethod
+    def data_soil_quantified(data_rows_soil):
+        lst = []
+        for row in data_rows_soil:
+            for i in range(len(row)):
+                if i == 0:
+                    soil_quantified = utils.soil_quantification(row[i])
+                    lst.append(soil_quantified)
+        df_soil_quantified = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
+        return df_soil_quantified
+
+
 

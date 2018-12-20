@@ -179,6 +179,16 @@ def parse_record_separator(s):
     return parse_regex_cast(r"#RECORDSEPARATOR+[= ]+(.)", s, str, 1)
 
 
+def parse_soil_code(s):
+    """
+
+    :param s:
+    :return:
+    """
+    string_noquote = s.replace("'", '')
+    return string_noquote
+
+
 def create_soil_type(s):
     """
 
@@ -194,30 +204,88 @@ def create_soil_type(s):
                  "L": "loam",
                  "V": "peat",
                  "Z": "sand"}
-    dict_addition = {"z": "sandy",
-                     "s": "silty",
-                     "m": "minerals",
-                     "k": "clayy",
-                     "g": "grindig",
+    dict_addition = {"z": "sand",
+                     "s": "silt",
+                     "m": "mineral",
+                     "k": "clay",
+                     "g": "gravel",
                      "h": "humeus"}
-    dict_intensity = {"1": "weak",
-                      "2": "moderate",
-                      "3": "strong",
-                      "4": "extreme"}
+    dict_intensity = {"1": 5,
+                      "2": 10,
+                      "3": 15,
+                      "4": 20}
     dict_exceptions = {"GM": "layer information missing",
                        "NBE": "soil cannot be classified properly"}
     soil_name = ""
     if string_noquote in dict_exceptions:
         soil_name = soil_name + dict_exceptions[string_noquote]
     else:
-        for i in range(len(split_letters)):
-            if split_letters[i] in dict_name:
-                soil_name = soil_name + ' ' + dict_name[split_letters[i]]
-            elif split_letters[i] in dict_addition:
-                soil_name = soil_name + ' ' + dict_addition[split_letters[i]]
+        sum_addition = 0
+        percentage_main_component = 100
+        main_component = dict_name[split_letters[0]]
+        soil_additions = ''
+        for i in range(1, len(split_letters)):
+            if split_letters[i] in dict_addition:
+                soil_additions = soil_additions + ' with ' + dict_addition[split_letters[i]]
             elif split_letters[i] in dict_intensity:
-                soil_name = soil_name + ' ' + dict_intensity[split_letters[i]]
+                soil_additions = soil_additions + ' ' + str(dict_intensity[split_letters[i]])+'%'
+                sum_addition = sum_addition + dict_intensity[split_letters[i]]
+        if sum_addition > 0:
+            percentage_main_component = (percentage_main_component - sum_addition)
+        soil_name = main_component + ' ' + str(percentage_main_component) + '%' + soil_additions
     return soil_name
+
+
+def soil_quantification(s):
+    """
+
+    :param s:
+    :return:
+    """
+    string_noquote = s.replace("'", '')
+    split_letters = list(string_noquote)
+    delete = ['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt']
+
+    # split_soil_string = list(soil_string)
+    dict_name = {"G": 0,
+                 "Z": 1,
+                 "K": 2,
+                 "L": 3,
+                 "V": 4
+                 }
+    dict_addition = {"g": 0,
+                     "z": 1,
+                     "k": 2,
+                     "s": 5,
+                     "m": 1,
+                     "h": 4
+                     }
+    dict_intensity = {"1": 0.05,
+                      "2": 0.10,
+                      "3": 0.15,
+                      "4": 0.20}
+    dict_exceptions = {"GM": "layer information missing",
+                       "NBE": "soil cannot be classified properly"}
+    soil_components = [0, 0, 0, 0, 0, 0]
+    if string_noquote in dict_exceptions:
+        pass
+    else:
+        sum_addition = 0
+        percentage_main_component = 1
+        for i in range(1, (len(split_letters))):
+            if split_letters[i] in dict_addition:
+                pos_to_change = dict_addition[split_letters[i]]
+                if i+1 <= (len(split_letters)-1):
+                    if split_letters[i+1] in dict_intensity:
+                        soil_components[pos_to_change] = dict_intensity[split_letters[i+1]]
+                        sum_addition = sum_addition + dict_intensity[split_letters[i+1]]
+                else:
+                    soil_components[pos_to_change] = 0.05
+                    sum_addition = sum_addition + 0.05
+        if sum_addition > 0:
+            percentage_main_component = percentage_main_component - sum_addition
+        soil_components[dict_name[split_letters[0]]] = percentage_main_component
+    return soil_components
 
 
 def parse_add_info(s):

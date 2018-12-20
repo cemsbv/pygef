@@ -128,7 +128,7 @@ class GefTest(unittest.TestCase):
     def test_create_soil_type(self):
         s = "'Kz'"
         v = utils.create_soil_type(s)
-        self.assertEqual(v, " clay sandy")  # add always a space before the name
+        self.assertEqual(v, "clay 100% with sand")
 
     def test_parse_data_column_info(self):
         header_s = 'This is an header'
@@ -140,7 +140,7 @@ class GefTest(unittest.TestCase):
         assert_frame_equal(df_parsed, df)
 
     def test_parse_data_soil_type(self):
-        df = pd.DataFrame({'Soil_type_NEN': [' clay sandy', ' clay sandy weak', ' clay sandy moderate']})
+        df = pd.DataFrame({'Soil_type': ['clay 100% with sand', 'clay 95% with sand 5%', 'clay 90% with sand 10%']})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
         df_parsed = bore.parse_data_soil_type(data_s)
         assert_frame_equal(df_parsed, df)
