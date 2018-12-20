@@ -185,8 +185,7 @@ def create_soil_type(s):
     :param s:
     :return:
     """
-    # soil_string = parse_soil_type(s)
-    string_noquote = s[1:-1]
+    string_noquote = s.replace("'", '')
     split_letters = list(string_noquote)
 
     # split_soil_string = list(soil_string)

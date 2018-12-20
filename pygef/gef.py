@@ -66,7 +66,6 @@ class ParseSon:
         self.y = None
         self.type = None
         self.end_depth_of_penetration_test = None
-        self.columns_number = None
         self.project_id = None
 
         # List of all the possible measurement variables
@@ -90,7 +89,6 @@ class ParseGEF:
         self.y = None
         self.type = None
         self.end_depth_of_penetration_test = None
-        self.columns_number = None
         self.project_id = None
 
         # List of all the possible measurement variables
@@ -123,7 +121,6 @@ class ParseCPT:
         self.file_date = None
         self.project_id = None
         self.s = string
-        self.columns_number = None
 
         # List of all the possible measurement variables
         self.nom_surface_area_cone_tip = None
@@ -218,7 +215,6 @@ class ParseCPT:
             gef = re.search(r'gef', path.lower())
             if gef and type_gef == 'cpt' and columns_number is None and columns_info is None:
                 columns_number = utils.parse_columns_number(header_s)
-                # Return columns info list:
                 columns_info = []
                 for column_number in range(1, columns_number + 1):
                     column_info = utils.parse_column_info(header_s, column_number,
@@ -237,14 +233,12 @@ class ParseBORE:
         self.y = None
         self.type = None
         self.end_depth_of_penetration_test = None
-        self.columns_number = None
         self.project_id = None
         self.column_separator = None
         self.record_separator = None
         self.file_date = None
         self.project_id = None
         self.type = None
-        self.data_s_rows = None
 
         # List of all the possible measurement variables
 
@@ -255,23 +249,21 @@ class ParseBORE:
         end_of_header = utils.parse_end_of_header(self.s)
         header_s, data_s = self.s.split(end_of_header)
 
-        self.column_separator = utils.parse_column_separator(header_s)
-        self.record_separator = utils.parse_record_separator(header_s)
-        self.columns_number = utils.parse_columns_number(header_s)
+        columns_number = utils.parse_columns_number(header_s)
         self.file_date = utils.parse_file_date(header_s)
         self.project_id = utils.parse_project_type(header_s, self.type)
         self.type = utils.parse_gef_type(header_s)
         self.x = utils.parse_xid_as_float(header_s)
         self.y = utils.parse_yid_as_float(header_s)
         self.zid = utils.parse_zid_as_float(header_s)
-        self.data_s_rows = data_s.split(self.record_separator)
-        self.data_rows_soil = self.extract_soil_info(self.data_s_rows, self.columns_number, self.column_separator)
-        self.df_column_info = self.parse_data_column_info(header_s, data_s, path, self.type, self.column_separator,
-                                                          self.columns_number)
-        self.df_soil_type = self.parse_data_soil_type(self.data_rows_soil, path, self.type)
-#        self.df_soil_color = self.parse_soil_color(self.data_rows_soil)
-        self.add_info = self.parse_add_info_as_string(self.data_rows_soil)
-        self.df_bore = pd.concat([self.df_column_info, self.df_soil_type, self.add_info], axis=1,
+        column_separator = utils.parse_column_separator(header_s)
+        record_separator = utils.parse_record_separator(header_s)
+        data_s_rows = data_s.split(record_separator)
+        data_rows_soil = self.extract_soil_info(data_s_rows, columns_number, column_separator)
+        self.df_column_info = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
+        self.df_soil_type = self.parse_data_soil_type(data_rows_soil)
+        self.additional_info = self.parse_add_info_as_string(data_rows_soil)
+        self.df_bore = pd.concat([self.df_column_info, self.df_soil_type, self.additional_info], axis=1,
                                  sort=False)
 
     @staticmethod
@@ -291,39 +283,30 @@ class ParseBORE:
     def extract_soil_info(data_s_rows, columns_number, column_separator):
         data_rows_soil = []
         for row in data_s_rows:
-            full_row = row.split(column_separator)
-            new_row = full_row[columns_number:]
+            new_row = row.split(column_separator)[columns_number:-1]
             data_rows_soil.append(new_row)
-        return data_rows_soil
+        return data_rows_soil[:-1]
 
     @staticmethod
-    def parse_data_column_info(header_s, data_s, path, type_gef, sep, columns_number, columns_info=None):
-        if path:
-            gef = re.search(r'gef', path.lower())
-            if gef and type_gef == 'bore' and columns_info is None:
-                # Return columns info list:
-                columns_info = []
-                for column_number in range(1, columns_number + 1):
-                    column_info = utils.parse_column_info(header_s, column_number,
-                                                          MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE)
-                    columns_info.append(column_info)
-            df_column_info = pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
-                                         usecols=columns_info)
-            return df_column_info
+    def parse_data_column_info(header_s, data_s, sep, columns_number, columns_info=None):
+        if columns_info is None:
+            columns_info = []
+            for column_number in range(1, columns_number + 1):
+                column_info = utils.parse_column_info(header_s, column_number,
+                                                      MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE)
+                columns_info.append(column_info)
+        df_column_info = pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
+                                     usecols=columns_info)
+        return df_column_info
 
     @staticmethod
-    def parse_data_soil_type(data_rows_soil, path, type_gef):
-        if path:
-            gef = re.search(r'gef', path.lower())
-            if gef and type_gef == 'bore':
-                # create an empty data frame
-                soil_type_cols = ['Soil_type_NEN']
-                lst = []
-                for row in data_rows_soil:
-                    for i in range(len(row) - 1):
-                        if i == 0:
-                            soil_type = utils.create_soil_type(row[i])
-                            lst.append(soil_type)
-                df_soil_type = pd.DataFrame(lst, columns=soil_type_cols)
-                return df_soil_type
+    def parse_data_soil_type(data_rows_soil):
+        lst = []
+        for row in data_rows_soil:
+            for i in range(len(row)):
+                if i == 0:
+                    soil_type = utils.create_soil_type(row[i])
+                    lst.append(soil_type)
+        df_soil_type = pd.DataFrame(lst, columns=['Soil_type_NEN'])
+        return df_soil_type
 

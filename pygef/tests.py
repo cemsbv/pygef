@@ -98,7 +98,7 @@ class GefTest(unittest.TestCase):
     def test_column_info(self):
         s = r'#COLUMNINFO= 1, m, Sondeerlengte, 1'
         v = utils.parse_column_info(s, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
-        self.assertEqual(v, "penetration length")
+        self.assertEqual(v, "penetration_length")
 
     def test_end_of_the_header(self):
         s = r'#EOH='
@@ -134,19 +134,15 @@ class GefTest(unittest.TestCase):
         header_s = 'This is an header'
         df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [1, 2, 3], 'col3': [1, 2, 3]})
         data_s = '\n1;1;1\n2;2;2\n3;3;3'
-        path = 'just/a/path.gef'
-        type_gef = 'bore'
         sep = ';'
-        df_parsed = bore.parse_data_column_info(header_s, data_s, path, type_gef, sep, 3,
+        df_parsed = bore.parse_data_column_info(header_s, data_s, sep, 3,
                                                 columns_info=['col1', 'col2', 'col3'])
         assert_frame_equal(df_parsed, df)
 
     def test_parse_data_soil_type(self):
         df = pd.DataFrame({'Soil_type_NEN': [' clay sandy', ' clay sandy weak', ' clay sandy moderate']})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
-        path = 'just/a/path.gef'
-        type_gef = 'bore'
-        df_parsed = bore.parse_data_soil_type(data_s, path, type_gef)
+        df_parsed = bore.parse_data_soil_type(data_s)
         assert_frame_equal(df_parsed, df)
 
     def test_parse_add_info(self):
