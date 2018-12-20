@@ -1,4 +1,3 @@
-import re
 import pygef.utils as utils
 import pandas as pd
 import io
@@ -57,24 +56,6 @@ COLUMN_NAMES_BORE_CHILD = ["depth_top",  # 1
 MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE_CHILD = dict(enumerate(COLUMN_NAMES_BORE_CHILD, 1))
 
 
-class ParseSon:
-    def __init__(self, path=None, string=None):
-        self.path = path
-        self.s = string
-        self.z0 = None  # ground level
-        self.x = None
-        self.y = None
-        self.type = None
-        self.end_depth_of_penetration_test = None
-        self.project_id = None
-
-        # List of all the possible measurement variables
-
-        if self.s is None:
-            with open(path, encoding='utf-8', errors='ignore') as f:
-                self.s = f.read()
-
-
 class ParseGEF:
     def __init__(self, path=None, string=None):
         """
@@ -84,26 +65,22 @@ class ParseGEF:
         """
         self.path = path
         self.s = string
-        self.z0 = None  # ground level
-        self.x = None
-        self.y = None
         self.type = None
-        self.end_depth_of_penetration_test = None
-        self.project_id = None
-
-        # List of all the possible measurement variables
 
         if self.s is None:
             with open(path, encoding='utf-8', errors='ignore') as f:
                 self.s = f.read()
 
-#        self.type = utils.parse_gef_type(self.s)
-#        if self.type == "cpt":
-#            obj = ParseCPT()
-#        elif self.type == "bore":
-#            obj = ParseBORE()
-#        else:
-#            print("The selected gef file is not a cpt nor a borehole. Check the REPORTCODE or the PROCEDURECODE.")
+        self.type = utils.parse_gef_type(self.s)
+        if self.type == "cpt":
+            parsed = ParseCPT(string=self.s)
+        elif self.type == "bore":
+            parsed = ParseBORE(string=self.s)
+        else:
+            raise ValueError("The selected gef file is not a cpt nor a borehole. "
+                             "Check the REPORTCODE or the PROCEDURECODE.")
+
+        self.__dict__.update(parsed.__dict__)
 
 
 class ParseCPT:
@@ -207,21 +184,19 @@ class ParseCPT:
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
-        self.df = self.parse_data(header_s, data_s, path, self.type)
+        self.df = self.parse_data(header_s, data_s)
 
     @staticmethod
-    def parse_data(header_s, data_s, path, type_gef, columns_number=None, columns_info=None):
-        if path:
-            gef = re.search(r'gef', path.lower())
-            if gef and type_gef == 'cpt' and columns_number is None and columns_info is None:
-                columns_number = utils.parse_columns_number(header_s)
-                columns_info = []
-                for column_number in range(1, columns_number + 1):
-                    column_info = utils.parse_column_info(header_s, column_number,
-                                                          MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
-                    columns_info.append(column_info)
-            sep = csv.Sniffer().sniff(data_s).delimiter
-            return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False)
+    def parse_data(header_s, data_s, columns_number=None, columns_info=None):
+        if columns_number is None and columns_info is None:
+            columns_number = utils.parse_columns_number(header_s)
+            columns_info = []
+            for column_number in range(1, columns_number + 1):
+                column_info = utils.parse_column_info(header_s, column_number,
+                                                      MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
+                columns_info.append(column_info)
+        sep = csv.Sniffer().sniff(data_s).delimiter
+        return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False)
 
 
 class ParseBORE:
