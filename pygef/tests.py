@@ -1,8 +1,9 @@
 import unittest
 import pygef.utils as utils
 from datetime import datetime
-from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME
-from pygef.gef import ParseGEF as gef
+from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+from pygef.gef import ParseCPT as gef
+from pygef.gef import ParseBORE as bore
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
@@ -46,15 +47,19 @@ class GefTest(unittest.TestCase):
 
     def test_project_id(self):
         s = r'#PROJECTID= CPT, 146203'
-        v = utils.parse_project_type_as_int(s)
+        v = utils.parse_project_type(s, "cpt")
         self.assertEqual(v, 146203)
+
+        s = r'#PROJECTID = DINO-BOR'
+        v = utils.parse_project_type(s, "bore")
+        self.assertEqual(v, "DINO-BOR")
 
     def test_zid(self):
         s = r'#ZID= 31000, 1.3, 0.0'
         v = utils.parse_zid_as_float(s)
         self.assertEqual(v, 1.3)
 
-    def test_proc_code(self):
+    def test_parse_gef_type(self):
         s = r"#PROCEDURECODE= GEF-CPT-Report"
         v = utils.parse_gef_type(s)
         self.assertEqual(v, 'cpt')
@@ -67,13 +72,15 @@ class GefTest(unittest.TestCase):
         self.assertEqual(y, 458102.351)
 
     def test_columns_number(self):
-        s = r'#COLUMN= 4'
+        s = r"#COLUMNINFO = 1, m, Diepte bovenkant laag, 1 #COLUMNINFO = 2, m, Diepte onderkant laag, 2" \
+            r"#COLUMNINFO = 3, mm, Zandmediaan, 8" \
+            r"#COLUMNINFO = 4, mm, Grindmediaan, 9"
         v = utils.parse_columns_number(s)
         self.assertEqual(v, 4)
 
     def test_quantity_number(self):
         s = r'#COLUMNINFO= 1, m, Sondeerlengte, 1'
-        v = utils.parse_quantity_number(s,1)
+        v = utils.parse_quantity_number(s, 1)
         self.assertEqual(v, 1)
 
         s = r'#COLUMNINFO= 7, m, Gecorrigeerde diepte, 11'
@@ -90,7 +97,7 @@ class GefTest(unittest.TestCase):
 
     def test_column_info(self):
         s = r'#COLUMNINFO= 1, m, Sondeerlengte, 1'
-        v = utils.parse_column_info(s, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME)
+        v = utils.parse_column_info(s, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
         self.assertEqual(v, "penetration length")
 
     def test_end_of_the_header(self):
@@ -99,12 +106,105 @@ class GefTest(unittest.TestCase):
         self.assertEqual(v, '#EOH=')
 
     def test_parse_data(self):
-        header_s = r'This is an header'
+        header_s = 'This is an header'
         df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [1, 2, 3], 'col3': [1, 2, 3]})
         data_s = '\n1,1,1\n2,2,2\n3,3,3'.replace(',', ' ')
         path = 'just/a/path.gef'
-        df_parsed = gef.parse_data(header_s, data_s, path, columns_number=3, columns_info=['col1', 'col2', 'col3'])
+        type_gef = 'cpt'
+        df_parsed = gef.parse_data(header_s, data_s, path, type_gef, columns_number=3,
+                                   columns_info=['col1', 'col2', 'col3'])
         assert_frame_equal(df_parsed, df)
+
+    def test_parse_column_separator(self):
+        s = r'#COLUMNSEPARATOR = ;'
+        v = utils.parse_column_separator(s)
+        self.assertEqual(v, ";")
+
+    def test_parse_record_separator(self):
+        s = r'#RECORDSEPARATOR = !'
+        v = utils.parse_record_separator(s)
+        self.assertEqual(v, "!")
+
+    def test_create_soil_type(self):
+        s = "'Kz'"
+        v = utils.create_soil_type(s)
+        self.assertEqual(v, " clay sandy")  # add always a space before the name
+
+    def test_parse_data_column_info(self):
+        header_s = 'This is an header'
+        df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [1, 2, 3], 'col3': [1, 2, 3]})
+        data_s = '\n1;1;1\n2;2;2\n3;3;3'
+        path = 'just/a/path.gef'
+        type_gef = 'bore'
+        sep = ';'
+        df_parsed = bore.parse_data_column_info(header_s, data_s, path, type_gef, sep, 3,
+                                                columns_info=['col1', 'col2', 'col3'])
+        assert_frame_equal(df_parsed, df)
+
+    def test_parse_data_soil_type(self):
+        df = pd.DataFrame({'Soil_type_NEN': [' clay sandy', ' clay sandy weak', ' clay sandy moderate']})
+        data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
+        path = 'just/a/path.gef'
+        type_gef = 'bore'
+        df_parsed = bore.parse_data_soil_type(data_s, path, type_gef)
+        assert_frame_equal(df_parsed, df)
+
+    def test_parse_add_info(self):
+        s = "'SCH1'"
+        v = utils.parse_add_info(s)
+        self.assertEqual(v, "spoor schelpmateriaal <1%|")
+
+        s = "'DO TOL RO'"
+        v = utils.parse_add_info(s)
+        self.assertEqual(v, "dark olive-red|")
+
+        s = "'BIO'"
+        v = utils.parse_add_info(s)
+        self.assertEqual(v, "bioturbatie|")
+
+        s = "'KEL DR'"
+        v = utils.parse_add_info(s)
+        self.assertEqual(v, "keileem|Formatie van Drente|")
+
+    def test_parse_add_info_as_string(self):
+        df = pd.DataFrame({'additional_info': ['spoor schelpmateriaal <1%|', 'dark olive-red|',
+                                               'keileem|Formatie van Drente|']})
+        data_s = [["'Kz'", "'SCH1'", "''"], ["'Kz1'", "'DO TOL RO'", "''"], ["'Kz2'", "'KEL DR'", "''"]]
+        df_parsed = bore.parse_add_info_as_string(data_s)
+        assert_frame_equal(df_parsed, df)
+
+
+#    def test_create_color(self):
+#        s = r"'GR'"
+#        v = utils.create_color(s)
+#        self.assertEqual(v, " gray")  # add always a space before the name
+#
+#        s = r"'LI GR'"
+#        v = utils.create_color(s)
+#        self.assertEqual(v, " light gray")  # add always a space before the name
+#
+#        s = r"'LI TOL GR'"
+#        v = utils.create_color(s)
+#        self.assertEqual(v, " light olive- gray")  # add always a space before the name
+#
+#    def test_is_color(self):
+#        s = r"'GR'"
+#        v = utils.is_color(s)
+#        self.assertEqual(v, True)
+#
+#        s = r"'blalblalba'"
+#        v = utils.is_color(s)
+#        self.assertEqual(v, False)
+
+#    def test_parse_soil_color(self):
+#        df = pd.DataFrame({'soil_type_Nen': [' clay sandy', ' clay sandy weak', ' clay sandy moderate']})
+#        data_s = ["0.00;0.00;'Kz';", "!0.00;0.00;'Kz1';", "0.00;0.00;'Kz2';"]
+#        path = 'just/a/path.gef'
+#        type_gef = 'bore'
+#        df_parsed = bore.parse_data_soil_type(data_s, path, type_gef)
+#        assert_frame_equal(df_parsed, df)
+
+
 
 
 
