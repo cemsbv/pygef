@@ -265,9 +265,11 @@ class ParseBORE:
         df_soil_code = self.parse_data_soil_code(data_rows_soil)
         df_soil_quantified = self.data_soil_quantified(data_rows_soil)
         df_additional_info = self.parse_add_info_as_string(data_rows_soil)
-        self.df_bore = pd.concat([df_column_info, df_soil_code, df_soil_type, df_soil_quantified,
-                                  df_additional_info], axis=1,
-                                 sort=False)
+        df_bore_more_info = pd.concat([df_column_info, df_soil_code, df_soil_type, df_soil_quantified,
+                                       df_additional_info], axis=1, sort=False)
+        self.df = df_bore_more_info[['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
+                                          'Loam', 'Peat', 'Silt']]
+        self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'S']
 
     @staticmethod
     def parse_add_info_as_string(data_rows_soil):

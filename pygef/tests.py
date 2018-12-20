@@ -169,6 +169,34 @@ class GefTest(unittest.TestCase):
         df_parsed = bore.parse_add_info_as_string(data_s)
         assert_frame_equal(df_parsed, df)
 
+    def test_soil_quantification(self):
+        s = "'Kz'"
+        v = utils.soil_quantification(s)
+        self.assertEqual(v, [0, 0.05, 0.95, 0, 0, 0])
+
+        s = "'Kz1'"
+        v = utils.soil_quantification(s)
+        self.assertEqual(v, [0, 0.05, 0.95, 0, 0, 0])
+
+        s = "'Kz1s1'"
+        v = utils.soil_quantification(s)
+        self.assertEqual(v, [0, 0.05, 0.9, 0, 0, 0.05])
+
+    def test_parse_data_soil_code(self):
+        df = pd.DataFrame({'Soil_code': ['Kz', 'Kz1', 'Kz2']})
+        data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
+        df_parsed = bore.parse_data_soil_code(data_s)
+        assert_frame_equal(df_parsed, df)
+
+    def test_data_soil_quantified(self):
+        lst = [[0, 0.05, 0.95, 0, 0, 0], [0, 0.05, 0.95, 0, 0, 0]]
+        df = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
+        data_s = [["'Kz'", "''"], ["'Kz1'", "''"]]
+        df_parsed = bore.data_soil_quantified(data_s)
+        assert_frame_equal(df_parsed, df)
+
+
+
 
 
 
