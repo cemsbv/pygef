@@ -179,15 +179,6 @@ def parse_record_separator(s):
     return parse_regex_cast(r"#RECORDSEPARATOR+[= ]+(.)", s, str, 1)
 
 
-#def parse_soil_type(row):
-#    """
-#
-#    :param row:
-#    :return:
-#    """
-#    return parse_regex_cast(r"^[^']+'(\w+)", row, str, 1)
-
-
 def create_soil_type(s):
     """
 
@@ -228,53 +219,6 @@ def create_soil_type(s):
             elif split_letters[i] in dict_intensity:
                 soil_name = soil_name + ' ' + dict_intensity[split_letters[i]]
     return soil_name
-
-
-#def create_color(s):
-#    dict_intensity = {"DO": "dark",
-#                      "LI": "light"}
-#    dict_main_color = {"BL": "blue",
-#                       "BR": "brown",
-#                       "GE": "yellow",
-#                       "GN": "green",
-#                       "GR": "gray",
-#                       "OL": "olive",
-#                       "OR": "orange",
-#                       "PA": "violet",
-#                       "RO": "red",
-#                       "WI": "white",
-#                       "RZ": "pink",
-#                       "ZW": "black"}
-#    dict_second_color = {"TBL": "blue-",
-#                         "TBR": "brown-",
-#                         "TGE": "yellow-",
-#                         "TGN": "green-",
-#                         "TGR": "gray-",
-#                         "TOL": "olive-",
-#                         "TOR": "orange-",
-#                         "TPA": "violet-",
-#                         "TRO": "red-",
-#                         "TWI": "white-",
-#                         "TRZ": "pink-",
-#                         "TZW": "black-"}
-#    string_noquote = s[1:-1]
-#    soil_color = ""
-#    split_string_noquote = string_noquote.split(" ")
-#    for i in range(len(split_string_noquote)):
-#        if split_string_noquote[i] in dict_intensity:
-#            soil_color = soil_color + ' ' + dict_intensity[split_string_noquote[i]]
-#        elif split_string_noquote[i] in dict_second_color:
-#            soil_color = soil_color + ' ' + dict_second_color[split_string_noquote[i]]
-#        elif split_string_noquote[i] in dict_main_color:
-#            soil_color = soil_color + ' ' + dict_main_color[split_string_noquote[i]]
-#    return soil_color
-#
-#
-#def is_color(s):
-#    if create_color(s):
-#        return True
-#    else:
-#        return False
 
 
 def parse_add_info(s):

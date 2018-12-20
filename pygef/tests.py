@@ -174,35 +174,6 @@ class GefTest(unittest.TestCase):
         assert_frame_equal(df_parsed, df)
 
 
-#    def test_create_color(self):
-#        s = r"'GR'"
-#        v = utils.create_color(s)
-#        self.assertEqual(v, " gray")  # add always a space before the name
-#
-#        s = r"'LI GR'"
-#        v = utils.create_color(s)
-#        self.assertEqual(v, " light gray")  # add always a space before the name
-#
-#        s = r"'LI TOL GR'"
-#        v = utils.create_color(s)
-#        self.assertEqual(v, " light olive- gray")  # add always a space before the name
-#
-#    def test_is_color(self):
-#        s = r"'GR'"
-#        v = utils.is_color(s)
-#        self.assertEqual(v, True)
-#
-#        s = r"'blalblalba'"
-#        v = utils.is_color(s)
-#        self.assertEqual(v, False)
-
-#    def test_parse_soil_color(self):
-#        df = pd.DataFrame({'soil_type_Nen': [' clay sandy', ' clay sandy weak', ' clay sandy moderate']})
-#        data_s = ["0.00;0.00;'Kz';", "!0.00;0.00;'Kz1';", "0.00;0.00;'Kz2';"]
-#        path = 'just/a/path.gef'
-#        type_gef = 'bore'
-#        df_parsed = bore.parse_data_soil_type(data_s, path, type_gef)
-#        assert_frame_equal(df_parsed, df)
 
 
 
