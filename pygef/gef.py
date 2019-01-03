@@ -221,8 +221,21 @@ class ParseCPT:
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
-        self.df = self.parse_data(header_s, data_s)
-#        if self.pre_excavated_depth is not None:
+        self.df_no_correction = self.parse_data(header_s, data_s)
+        self.df = self.correct_pre_excavated_depth(self.df_no_correction, self.pre_excavated_depth)
+
+
+    @staticmethod
+    def correct_pre_excavated_depth(df, pre_excavated_depth):
+        new_df = df
+        if pre_excavated_depth is not None:
+             for value in df['penetration_length']:
+                 if value == pre_excavated_depth:
+                    i_list = df.index[df['penetration_length'] == pre_excavated_depth].tolist()
+                    i = i_list[0]
+                    new_df = df.iloc[i:]
+        return new_df
+
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
@@ -238,6 +251,7 @@ class ParseCPT:
                 df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*',
                                  names=columns_info, index_col=False, engine='python')
         return df
+
 
 
 class ParseBORE:
