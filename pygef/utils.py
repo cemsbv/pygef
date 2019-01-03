@@ -38,10 +38,21 @@ def parse_regex_cast(regex_string, s, f, group_number):
 def parse_end_of_header(s):
     """
     Function that parses the end of the header.
-    :param s:
-    :return:
+
+    :param s:(str) String to search for regex pattern.
+    :return:(str) End of the header.
     """
-    return parse_regex_cast(r'(#EOH[= ]+)', s, str, 1)
+    return parse_regex_cast(r'(#EOH[=\s+]+)', s, str, 1)
+
+
+def parse_column_void(s):
+    """
+    Function that parses the column void.
+
+    :param s:(str) String to search for regex pattern.
+    :return:(str) Column void.
+    """
+    return parse_regex_cast(r'#COLUMNVOID[=\s+]+1[,\s+]+([\d-]+\.?\d*)', s, str, 1)
 
 
 def parse_measurement_var_as_float(s, var_number):
@@ -52,7 +63,11 @@ def parse_measurement_var_as_float(s, var_number):
     :param var_number: (int) Variable number.
     :return: Variable value.
     """
-    return parse_regex_cast(r'#MEASUREMENTVAR[= ]+{}[, ]+([\d-]+\.?\d*)'.format(var_number), s, float, 1)
+    try:
+        measurement_var = parse_regex_cast(r'#MEASUREMENTVAR[=\s+]+{}[, ]+([\d-]+\.?\d*)'.format(var_number), s, float, 1)
+    except ValueError:
+        measurement_var = None
+    return measurement_var
 
 
 def parse_project_type(s, gef_type):
@@ -78,7 +93,7 @@ def parse_zid_as_float(s):
     :param s: (str) String from which the zid is parsed.
     :return: ZID number.
     """
-    return parse_regex_cast(r"#ZID[\s=]*.*?, *((\d|\.)*)", s, float, 1)
+    return parse_regex_cast(r"#ZID[=\s+]*.*?, *((\d|\.)*)", s, float, 1)
 
 
 def parse_xid_as_float(s):
@@ -88,7 +103,7 @@ def parse_xid_as_float(s):
     :param s:(str) String from which the xid is parsed.
     :return: xid value.
     """
-    return parse_regex_cast(r"#XYID[ =]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", s, float, 1)
+    return parse_regex_cast(r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", s, float, 1)
 
 
 def parse_yid_as_float(s):
@@ -98,12 +113,21 @@ def parse_yid_as_float(s):
     :param s: (str) String from which the yid is parsed.
     :return: yid value.
     """
-    return parse_regex_cast(r"#XYID[ =]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", s, float, 3)
+    return parse_regex_cast(r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", s, float, 3)
 
 
 def parse_gef_type(s):
-    proc_code = parse_regex_cast(r"#(REPORTCODE|PROCEDURECODE)[^a-zA-Z]+([\w-]+)", s,
-                                 lambda x: x.lower(), 2)
+    """
+    Function that returns the gef type.
+
+    :param s: (str) String to search for regex pattern.
+    :return: (str) Gef type.
+    """
+    if parse_regex_cast(r"#PROCEDURECODE[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 1) and \
+            parse_regex_cast(r"#REPORTCODE[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 1):
+        proc_code = parse_regex_cast(r"#REPORTCODE[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 1)
+    else:
+        proc_code = parse_regex_cast(r"#(REPORTCODE|PROCEDURECODE)[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 2)
 
     if "cpt" in proc_code or "dis" in proc_code:
         gef_type = "cpt"
@@ -116,74 +140,97 @@ def parse_gef_type(s):
 
 
 def parse_file_date(s):
-    g = re.search(r'FILEDATE[\s=]*((\d|[, -])*)', s)
+    """
+    Fuction to parse the file date.
+
+    :param s: (str) String to search for regex pattern.
+    :return: File date.
+    """
+    g = re.search(r'#FILEDATE[\s=]*(\d+[,\s+]+\d+[,\s+]+\d+)', s)
 
     if g:
         try:
-            file_date = g.group(1).replace(',', '-').replace(' ', '')
+            file_date = g.group(1).replace(',', '-').replace(' ', '').replace('\t', '')
         except ValueError as e:
             logging.error(f'Could not parse file_date: {e}')
             return None
-        return datetime.strptime(file_date, "%Y-%m-%d")
+        try:
+            date = datetime.strptime(file_date, "%Y-%m-%d")
+        except ValueError:
+            date = None
+        return date
 
 
 def parse_columns_number(s):
 
     """
     Function that returns the columns number as an int.
+
     :param s: (str) String from which the yid is parsed.
     :return: Columns number value.
     """
-    return max(map(int, re.findall(r'#COLUMNINFO[= ]+(\d*)', s)))
+    columns_number = None
+    g = re.findall(r'#COLUMNINFO[=\s+]+(\d*)', s)
+    if g:
+        columns_number = max(map(int, re.findall(r'#COLUMNINFO[=\s+]+(\d*)', s)))
+    return columns_number
 
 
 def parse_quantity_number(s, column_number):
     """
+    Function to parse the quantity number.
 
-    :param s:
-    :param column_number:
-    :return:
+    :param s: (str) String from which the yid is parsed.
+    :param column_number: (int) Number of the column.
+    :return: Quantity number.
     """
-    return parse_regex_cast(r'#COLUMNINFO[= ]+{}[, ]+\S+[, ][^,]*[, ]+(\d+)'.format(column_number), s, int, 1)
+    return parse_regex_cast(r'#COLUMNINFO[=\s+]+{}+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)'.format(column_number), s, int, 1)
 
 
 def parse_column_info(s, column_number, dictionary):
     """
     Function that returns the column info assigned to a quantity number.
-    :param s:
-    :param column_number:
-    :param dictionary:
-    :return:
+
+    :param s: (str) String to search for regex pattern.
+    :param column_number: (int) Number of the column.
+    :param dictionary: (dict) Dictionary in which the quantity number is searched as a key.
+    :return: Column info (value) of each quantity number (key).
     """
-    quantity_number = parse_quantity_number(s, column_number)
-    column_info = dictionary[quantity_number]
+    try:
+        quantity_number = parse_quantity_number(s, column_number)
+        column_info = dictionary[quantity_number]
+    except KeyError:
+        column_info = 'column_code=' + str(column_number)
 
     return column_info
 
 
 def parse_column_separator(s):
     """
+    Function to parse the column separator. It is used only in the borehole class.
 
-    :param s:
-    :return:
+    :param s: (str) String to search for regex pattern.
+    :return: Column separator.
     """
-    return parse_regex_cast(r"#COLUMNSEPARATOR+[= ]+(.)", s, str, 1)
+    return parse_regex_cast(r"#COLUMNSEPARATOR+[=\s+]+(.)", s, str, 1)
 
 
 def parse_record_separator(s):
     """
+    Function to parse the record separator(end of the line). It is used only in the borehole class.
     
-    :param s: 
-    :return: 
+    :param s: (str) String to search for regex pattern.
+    :return: Record separator.
     """""
-    return parse_regex_cast(r"#RECORDSEPARATOR+[= ]+(.)", s, str, 1)
+    return parse_regex_cast(r"#RECORDSEPARATOR+[=\s+]+(.)", s, str, 1)
 
 
 def parse_soil_code(s):
     """
+    Function to parse the soil code.
 
-    :param s:
-    :return:
+    :param s: (str) String with the soil code.
+    :return: Soil code.
     """
     string_noquote = s.replace("'", '')
     return string_noquote
@@ -191,9 +238,10 @@ def parse_soil_code(s):
 
 def create_soil_type(s):
     """
+    Function to create the description of the soil type.
 
-    :param s:
-    :return:
+    :param s: (str) Soil code.
+    :return: (str) Description of the soil code.
     """
     string_noquote = s.replace("'", '')
     split_letters = list(string_noquote)
@@ -217,30 +265,37 @@ def create_soil_type(s):
     dict_exceptions = {"GM": "layer information missing",
                        "NBE": "soil cannot be classified properly"}
     soil_name = ""
-    if string_noquote in dict_exceptions:
-        soil_name = soil_name + dict_exceptions[string_noquote]
-    else:
-        sum_addition = 0
-        percentage_main_component = 100
-        main_component = dict_name[split_letters[0]]
-        soil_additions = ''
-        for i in range(1, len(split_letters)):
-            if split_letters[i] in dict_addition:
-                soil_additions = soil_additions + ' with ' + dict_addition[split_letters[i]]
-            elif split_letters[i] in dict_intensity:
-                soil_additions = soil_additions + ' ' + str(dict_intensity[split_letters[i]])+'%'
-                sum_addition = sum_addition + dict_intensity[split_letters[i]]
-        if sum_addition > 0:
-            percentage_main_component = (percentage_main_component - sum_addition)
-        soil_name = main_component + ' ' + str(percentage_main_component) + '%' + soil_additions
+    try:
+        if string_noquote is not "":
+            if string_noquote in dict_exceptions:
+                soil_name = soil_name + dict_exceptions[string_noquote]
+            else:
+                sum_addition = 0
+                percentage_main_component = 100
+                main_component = dict_name[split_letters[0]]
+                soil_additions = ''
+                for i in range(1, len(split_letters)):
+                    if split_letters[i] in dict_addition:
+                        soil_additions = soil_additions + ' with ' + dict_addition[split_letters[i]]
+                    elif split_letters[i] in dict_intensity:
+                        soil_additions = soil_additions + ' ' + str(dict_intensity[split_letters[i]])+'%'
+                        sum_addition = sum_addition + dict_intensity[split_letters[i]]
+                if sum_addition > 0:
+                    percentage_main_component = (percentage_main_component - sum_addition)
+                soil_name = main_component + ' ' + str(percentage_main_component) + '%' + soil_additions
+        else:
+            soil_name = "soil_not_defined"
+    except KeyError:
+        soil_name = "soil_not_according_with_NEN_classification"
     return soil_name
 
 
 def soil_quantification(s):
     """
+    Function to create the quantification of the soil type.
 
-    :param s:
-    :return:
+    :param s:(str) Soil code.
+    :return: Quantification of the soil code.
     """
     string_noquote = s.replace("'", '')
     split_letters = list(string_noquote)
@@ -267,28 +322,40 @@ def soil_quantification(s):
     dict_exceptions = {"GM": "layer information missing",
                        "NBE": "soil cannot be classified properly"}
     soil_components = [0, 0, 0, 0, 0, 0]
-    if string_noquote in dict_exceptions:
+    try:
+        if string_noquote is not "":
+            if string_noquote in dict_exceptions:
+                pass
+            else:
+                sum_addition = 0
+                percentage_main_component = 1
+                for i in range(1, (len(split_letters))):
+                    if split_letters[i] in dict_addition:
+                        pos_to_change = dict_addition[split_letters[i]]
+                        if i+1 <= (len(split_letters)-1):
+                            if split_letters[i+1] in dict_intensity:
+                                soil_components[pos_to_change] = dict_intensity[split_letters[i+1]]
+                                sum_addition = sum_addition + dict_intensity[split_letters[i+1]]
+                        else:
+                            soil_components[pos_to_change] = 0.05
+                            sum_addition = sum_addition + 0.05
+                if sum_addition > 0:
+                    percentage_main_component = percentage_main_component - sum_addition
+                soil_components[dict_name[split_letters[0]]] = percentage_main_component
+        else:
+            pass
+    except KeyError:
         pass
-    else:
-        sum_addition = 0
-        percentage_main_component = 1
-        for i in range(1, (len(split_letters))):
-            if split_letters[i] in dict_addition:
-                pos_to_change = dict_addition[split_letters[i]]
-                if i+1 <= (len(split_letters)-1):
-                    if split_letters[i+1] in dict_intensity:
-                        soil_components[pos_to_change] = dict_intensity[split_letters[i+1]]
-                        sum_addition = sum_addition + dict_intensity[split_letters[i+1]]
-                else:
-                    soil_components[pos_to_change] = 0.05
-                    sum_addition = sum_addition + 0.05
-        if sum_addition > 0:
-            percentage_main_component = percentage_main_component - sum_addition
-        soil_components[dict_name[split_letters[0]]] = percentage_main_component
     return soil_components
 
 
 def parse_add_info(s):
+    """
+    Function to parse all the additional informations.
+
+    :param s: (str) String that contain the addtional information and the soil code.
+    :return: (str) Additional informations.
+    """
     dict_add_info = {"DO": "dark ",
                      "LI": "light ",
                      "TBL": "blue-",

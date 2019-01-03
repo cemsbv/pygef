@@ -1,7 +1,6 @@
 import pygef.utils as utils
 import pandas as pd
 import io
-import csv
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
@@ -24,7 +23,41 @@ COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "total_vertical_soil_pressure",  # 19
                     "effective_vertical_soil_pressure"]  # 20
 
-MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = dict(enumerate(COLUMN_NAMES_CPT, 1))
+MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
+                                       2: "qc",  # 2
+                                       3: "fs",  # 3
+                                       4: "friction_number",  # 4
+                                       5: "u1",  # 5
+                                       6: "u2",  # 6
+                                       7: "u3",  # 7
+                                       8: "inclination",  # 8
+                                       9: "inclination_NS",  # 9
+                                       10: "inclination_EW",  # 10
+                                       11: "corrected_depth",  # 11
+                                       12: "time",  # 12
+                                       13: "corrected_qc",  # 13
+                                       14: "net_cone_resistance",  # 14
+                                       15: "pore_ratio",  # 15
+                                       16: "cone_resistance_number",  # 16
+                                       17: "weight_per_unit_volume",  # 17
+                                       18: "initial_pore_pressure",  # 18
+                                       19: "total_vertical_soil_pressure",  # 19
+                                       20: "effective_vertical_soil_pressure",
+                                       21: "Inclination_in_X_direction",
+                                       22: "Inclination_in_Y_direction",
+                                       23: "Electric_conductivity",
+                                       31: "magnetic_field_x",
+                                       32: "magnetic_field_y",
+                                       33: "magnetic_field_z",
+                                       34: "total_magnetic_field",
+                                       35: "magnetic_inclination",
+                                       36: "magnetic_declination",
+                                       99: "Classification_zone_Robertson_1990",
+                                       # found in:#COMPANYID= Fugro GeoServices B.V., NL005621409B08, 31
+                                       131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
+                                       135: "Temperature_C",  # found in:#COMPANYID= Inpijn-Blokpoel,
+                                       250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
+                                       251: "magneto_slope_x"}  # found in:OMPANYID= Danny, Tjaden, 31
 
 COLUMN_NAMES_BORE = ["depth_top",  # 1
                      "depth_bottom",  # 2
@@ -59,9 +92,10 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE_CHILD = dict(enumerate(COLUMN_NAMES_BORE_CH
 class ParseGEF:
     def __init__(self, path=None, string=None):
         """
-        Base class of gef parser. Is inherited for both CPT and Borehole gef files.
-        :param path:
-        :param string:
+        Base class of gef parser. It switches between the cpt or borehole parser.
+
+        :param path:(str) Path of the .gef file to parse.
+        :param string:(str) String to parse.
         """
         self.path = path
         self.s = string
@@ -86,9 +120,10 @@ class ParseGEF:
 class ParseCPT:
     def __init__(self, path=None, string=None):
         """
+        Parser of the cpt file.
 
-        :param path:
-        :param string:
+        :param path:(str) Path of the .gef file to parse.
+        :param string:(str) String to parse.
         """
         self.path = path
         self.zid = None  # ground level
@@ -98,6 +133,7 @@ class ParseCPT:
         self.file_date = None
         self.project_id = None
         self.s = string
+        self.column_void = None
 
         # List of all the possible measurement variables
         self.nom_surface_area_cone_tip = None
@@ -149,6 +185,7 @@ class ParseCPT:
         self.type = utils.parse_gef_type(header_s)
         self.x = utils.parse_xid_as_float(header_s)
         self.y = utils.parse_yid_as_float(header_s)
+        self.column_void = utils.parse_column_void(header_s)
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(header_s, 1)
         self.nom_surface_area_friction_element = utils.parse_measurement_var_as_float(header_s, 2)
         self.net_surface_area_quotient_of_the_cone_tip = utils.parse_measurement_var_as_float(header_s, 3)
@@ -185,22 +222,32 @@ class ParseCPT:
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
         self.df = self.parse_data(header_s, data_s)
+#        if self.pre_excavated_depth is not None:
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
+        df = {}
         if columns_number is None and columns_info is None:
             columns_number = utils.parse_columns_number(header_s)
-            columns_info = []
-            for column_number in range(1, columns_number + 1):
-                column_info = utils.parse_column_info(header_s, column_number,
-                                                      MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
-                columns_info.append(column_info)
-        sep = csv.Sniffer().sniff(data_s).delimiter
-        return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False)
+            if columns_number is not None:
+                columns_info = []
+                for column_number in range(1, columns_number + 1):
+                    column_info = utils.parse_column_info(header_s, column_number,
+                                                          MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
+                    columns_info.append(column_info)
+                df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*',
+                                 names=columns_info, index_col=False, engine='python')
+        return df
 
 
 class ParseBORE:
     def __init__(self, path=None, string=None):
+        """
+        Parser of the borehole file.
+
+        :param path:(str) Path of the .gef file to parse.
+        :param string:(str) String to parse.
+        """
         self.path = path
         self.s = string
         self.zid = None  # ground level
@@ -243,7 +290,7 @@ class ParseBORE:
         df_bore_more_info = pd.concat([df_column_info, df_soil_code, df_soil_type, df_soil_quantified,
                                        df_additional_info], axis=1, sort=False)
         self.df = df_bore_more_info[['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
-                                          'Loam', 'Peat', 'Silt']]
+                                    'Loam', 'Peat', 'Silt']]
         self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'S']
 
     @staticmethod
