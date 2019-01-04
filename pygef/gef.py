@@ -1,6 +1,7 @@
 import pygef.utils as utils
 import pandas as pd
 import io
+import numpy as np
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
@@ -221,9 +222,34 @@ class ParseCPT:
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
-        self.df_no_correction = self.parse_data(header_s, data_s)
-        self.df = self.correct_pre_excavated_depth(self.df_no_correction, self.pre_excavated_depth)
+        self.df_first = self.parse_data(header_s, data_s)
+        self.df_second = self.correct_pre_excavated_depth(self.df_first, self.pre_excavated_depth)
+        df_depth = pd.DataFrame(np.zeros(len(self.df_second.index)), columns=['depth'])
+        df_nap_zeros = pd.DataFrame(np.zeros(len(self.df_second.index)), columns=['elevation_respect_to_NAP'])
+        self.df_with_depth = pd.concat([self.df_second, df_depth], axis=1, sort=False)
+        self.df_correct_depth_with_inclination = self.correct_depth_with_inclination(self.df_with_depth)
+        df_nap = self.calculate_elevation_respect_to_nap(df_nap_zeros, self.zid, self.df_correct_depth_with_inclination['depth'], len(self.df_second.index))
+        self.df = pd.concat([self.df_correct_depth_with_inclination, df_nap], axis=1, sort=False)
 
+    @staticmethod
+    def calculate_elevation_respect_to_nap(df, zid, depth, lenght):
+        new_df = df
+        if zid is not None:
+            depth_lst = np.array(depth.tolist())
+            lst_zid = np.array([zid]*lenght)
+            new_df = pd.DataFrame(lst_zid - depth_lst, columns=['elevation_respect_to_NAP'])
+        return new_df
+
+    @staticmethod
+    def correct_depth_with_inclination(df):
+        new_df = df
+        if 'corrected_depth' in df.columns:
+            new_df['depth'] = new_df['corrected_depth']
+        elif 'inclination' in df.columns:
+            new_df['depth'] = new_df['penetration_length']*np.cos(df['inclination'])
+        else:
+            new_df['depth'] = new_df['penetration_length']
+        return new_df
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
@@ -233,9 +259,9 @@ class ParseCPT:
                  if value == pre_excavated_depth:
                     i_list = df.index[df['penetration_length'] == pre_excavated_depth].tolist()
                     i = i_list[0]
-                    new_df = df.iloc[i:]
+                    new_df_1 = df.iloc[i:]
+                    new_df = new_df_1.reset_index(drop=True)
         return new_df
-
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
@@ -251,7 +277,6 @@ class ParseCPT:
                 df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*',
                                  names=columns_info, index_col=False, engine='python')
         return df
-
 
 
 class ParseBORE:
