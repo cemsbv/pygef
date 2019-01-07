@@ -108,7 +108,7 @@ class GefTest(unittest.TestCase):
     def test_parse_data(self):
         header_s = 'This is an header'
         df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [1, 2, 3], 'col3': [1, 2, 3]})
-        data_s = '\n1,1,1\n2,2,2\n3,3,3'.replace(',', ' ')
+        data_s = '\n1,1,1\n2,2,2\n3,3,3'
         df_parsed = gef.parse_data(header_s, data_s, columns_number=3,
                                    columns_info=['col1', 'col2', 'col3'])
         assert_frame_equal(df_parsed, df)
