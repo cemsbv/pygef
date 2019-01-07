@@ -270,6 +270,7 @@ class ParseCPT:
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
+        df = {}
         if columns_number is None and columns_info is None:
             columns_number = utils.parse_columns_number(header_s)
             if columns_number is not None:
@@ -278,7 +279,8 @@ class ParseCPT:
                     column_info = utils.parse_column_info(header_s, column_number,
                                                           MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
                     columns_info.append(column_info)
-        df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*', names=columns_info, index_col=False, engine='python')
+                df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*',
+                                 names=columns_info, index_col=False, engine='python')
         return df
 
 

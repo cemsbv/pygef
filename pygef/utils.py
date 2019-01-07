@@ -184,7 +184,7 @@ def parse_quantity_number(s, column_number):
     :param column_number: (int) Number of the column.
     :return: Quantity number.
     """
-    return parse_regex_cast(r'#COLUMNINFO[=\s+]+{}\s*,.*,\s*(\d+)'.format(column_number), s, int, 1)
+    return parse_regex_cast(r'#COLUMNINFO[=\s+]+{}+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)'.format(column_number), s, int, 1)
 
 
 def parse_column_info(s, column_number, dictionary):
