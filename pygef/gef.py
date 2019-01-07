@@ -222,12 +222,17 @@ class ParseCPT:
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
+        # first dataframe with only the parsed data
         self.df_first = self.parse_data(header_s, data_s)
+        # second dataframe with the correction of the pre excavated depth
         self.df_second = self.correct_pre_excavated_depth(self.df_first, self.pre_excavated_depth)
+        # definition of the zeros dataframe and addition of the depth to the main dataframe
         df_depth = pd.DataFrame(np.zeros(len(self.df_second.index)), columns=['depth'])
         df_nap_zeros = pd.DataFrame(np.zeros(len(self.df_second.index)), columns=['elevation_respect_to_NAP'])
         self.df_with_depth = pd.concat([self.df_second, df_depth], axis=1, sort=False)
+        # correction of the depth with the inclination if present
         self.df_correct_depth_with_inclination = self.correct_depth_with_inclination(self.df_with_depth)
+        # definition of the elevation respect to the nap and concatenation with the previous dataframe
         df_nap = self.calculate_elevation_respect_to_nap(df_nap_zeros, self.zid, self.df_correct_depth_with_inclination['depth'], len(self.df_second.index))
         self.df = pd.concat([self.df_correct_depth_with_inclination, df_nap], axis=1, sort=False)
 
