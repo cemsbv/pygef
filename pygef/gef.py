@@ -279,8 +279,7 @@ class ParseCPT:
                     column_info = utils.parse_column_info(header_s, column_number,
                                                           MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
                     columns_info.append(column_info)
-                df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*',
-                                 names=columns_info, index_col=False, engine='python')
+        df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*', names=columns_info, index_col=False, engine='python')
         return df
 
 
