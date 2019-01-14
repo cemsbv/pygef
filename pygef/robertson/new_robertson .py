@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 
-class Robertson:
+class Newrobertson:
     def __init__(self, path=None):
         self.path = path
 
@@ -12,6 +12,7 @@ class Robertson:
 
         # INPUT: insert manually the water level
         water_level = 0  # (m) respect to the ground floor, insert a positive value
+        p_a = 0.1  # MPa
 
         def get_qc(df):
             try:
@@ -116,9 +117,9 @@ class Robertson:
             sigma_v0_eff = sigma_v0 - u
             return sigma_v0_eff
 
-        def normalized_cone_resistance(qt, sigma_v0, sigma_v0_eff):
+        def normalized_cone_resistance_n(qt, sigma_v0, sigma_v0_eff, n, p_a):
             if sigma_v0_eff > 0 and (qt - sigma_v0*(10**-3)) > 0:
-              Qt = (qt - sigma_v0*(10**-3)) / (sigma_v0_eff*(10**-3))
+              Qt = ((qt - sigma_v0*(10**-3)) /p_a)*(p_a/sigma_v0_eff*(10**-3))**n
             else:
               Qt = 1
             return Qt
@@ -138,12 +139,18 @@ class Robertson:
             sigma_v0 = sig0 + delta_sigma_v0
             return sigma_v0
 
-        def type_index(fs, qt, sigma_v0, u):
+        def type_index(fs, qt, sigma_v0, u, n, p_a):
             sigma_v0_eff = effective_stress(sigma_v0, u)
-            Qt = normalized_cone_resistance(qt, sigma_v0, sigma_v0_eff)
+            Qt = normalized_cone_resistance_n(qt, sigma_v0, sigma_v0_eff, n, p_a)
             Fr = normalized_friction_ratio(fs, qt, sigma_v0)
             I_c = ((3.47 - np.log10(Qt))**2+(np.log10(Fr) + 1.22)**2)**0.5
             return I_c
+
+        def n_exponent(Ic, sigma_v0, p_a):
+            sigma_v0_eff = effective_stress(sigma_v0, u)
+            n1 = 0.381*Ic + 0.05*(sigma_v0_eff/p_a) - 0.15
+            n = min(n1, 1)
+            return n
 
         # calculation of sigma_v and u
         u = hydrostatic_water_pressure(water_level, df['depth'])
@@ -169,15 +176,19 @@ class Robertson:
                 gamma1 = 20
                 delta_sigma_v0i = delta_vertical_stress(depth1, depth2, gamma1)
                 sigma_v0i = vertical_stress(sig0i, delta_sigma_v0i)
-                ic = type_index(fsi, qti, sigma_v0i, ui)
+                n1 = 0.5
+                ic = type_index(fsi, qti, sigma_v0i, ui, n1, p_a)
+                n2 = n_exponent(Ic, sigma_v0i, p_a)
                 gamma2 = get_gamma(ic, depth_i)
                 ii = 0
-                max_it = 8
-                while gamma2 != gamma1 and ii < max_it:
+                max_it = 6
+                while gamma2 != gamma1 and n2 != n1 and ii < max_it:
                     gamma1 = gamma2
+                    n1 = n2
                     delta_sigma_v0i = delta_vertical_stress(depth1, depth2, gamma1)
                     sigma_v0i = vertical_stress(sig0i, delta_sigma_v0i)
-                    ic = type_index(fsi, qti, sigma_v0i, ui)
+                    ic = type_index(fsi, qti, sigma_v0i, ui, n1, p_a)
+                    n2 = n_exponent(Ic, sigma_v0i, p_a)
                     gamma2 = get_gamma(ic, depth_i)
                     ii += 1
 

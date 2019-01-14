@@ -270,7 +270,6 @@ class ParseCPT:
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
-        df = {}
         if columns_number is None and columns_info is None:
             columns_number = utils.parse_columns_number(header_s)
             if columns_number is not None:
