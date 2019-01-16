@@ -2,6 +2,9 @@ from pygef.gef import ParseGEF
 import numpy as np
 import pandas as pd
 
+# INPUT: insert manually the water level
+water_level_NAP = -1.56  # (m) respect to the NAP
+
 
 class Robertson:
     def __init__(self, path=None):
@@ -9,9 +12,6 @@ class Robertson:
 
         gef = ParseGEF(path)
         df = gef.df
-
-        # INPUT: insert manually the water level
-        water_level = 0  # (m) respect to the ground floor, insert a positive value
 
         def get_qc(df):
             try:
@@ -41,6 +41,8 @@ class Robertson:
         depth = get_depth(df)
         fs = get_fs(df)
         pre_excavated_depth = gef.pre_excavated_depth
+        zid = gef.zid
+        water_level = water_level_NAP - zid
 
         # qt
         if gef.net_surface_area_quotient_of_the_cone_tip is not None and 'qc' in df.columns and 'u2' in df.columns:
@@ -116,11 +118,12 @@ class Robertson:
             sigma_v0_eff = sigma_v0 - u
             return sigma_v0_eff
 
-        def normalized_cone_resistance(qt, sigma_v0, sigma_v0_eff):
-            if sigma_v0_eff > 0 and (qt - sigma_v0*(10**-3)) > 0:
-              Qt = (qt - sigma_v0*(10**-3)) / (sigma_v0_eff*(10**-3))
+        def normalized_cone_resistance(qt, sigma_v0, u):
+            sigma_v0_eff = effective_stress(sigma_v0, u)
+            if sigma_v0_eff > 0 and (qt - sigma_v0 * (10 ** -3)) > 0:
+                Qt = (qt - sigma_v0 * (10 ** -3)) / (sigma_v0_eff * (10 ** -3))
             else:
-              Qt = 1
+                Qt = 1
             return Qt
 
         def normalized_friction_ratio(fs, qt, sigma_v0):
@@ -139,8 +142,7 @@ class Robertson:
             return sigma_v0
 
         def type_index(fs, qt, sigma_v0, u):
-            sigma_v0_eff = effective_stress(sigma_v0, u)
-            Qt = normalized_cone_resistance(qt, sigma_v0, sigma_v0_eff)
+            Qt = normalized_cone_resistance(qt, sigma_v0, u)
             Fr = normalized_friction_ratio(fs, qt, sigma_v0)
             I_c = ((3.47 - np.log10(Qt))**2+(np.log10(Fr) + 1.22)**2)**0.5
             return I_c
@@ -150,6 +152,8 @@ class Robertson:
         soil_type_robertson = []
         Ic = []
         sig0 = []
+        series_Qt = []
+        series_Fr = []
         for depth_i in depth:
             i = depth[depth == depth_i].index[0]
             qti = qt[i]
@@ -180,7 +184,11 @@ class Robertson:
                     ic = type_index(fsi, qti, sigma_v0i, ui)
                     gamma2 = get_gamma(ic, depth_i)
                     ii += 1
+            Qti = normalized_cone_resistance(qti, sigma_v0i, ui)
+            Fri = normalized_friction_ratio(fsi, qti, sigma_v0i)
 
+            series_Qt.append(Qti)
+            series_Fr.append(Fri)
             sig0.append(sigma_v0i)
             Ic.append(ic)
             soil_type = type_index_to_soil_type(ic)
@@ -190,7 +198,9 @@ class Robertson:
         df_soil_type = pd.DataFrame(soil_type_robertson, columns=['soil_type_Robertson'])
         df_robertson = pd.concat([df_Ic, df_soil_type], axis=1, sort=False)
         df_u = pd.DataFrame(u, columns=['hydrostatic_pore_pressure'])
-        self.df_complete = pd.concat([df, df_u, df_robertson], axis=1, sort=False)
+        df_Qt = pd.DataFrame(series_Qt, columns=['normalized_Qt'])
+        df_Fr = pd.DataFrame(series_Fr, columns=['normalized_Fr'])
+        self.df_complete = pd.concat([df, df_u, df_robertson, df_Qt, df_Fr], axis=1, sort=False)
 
 
 class NewRobertson:
@@ -199,7 +209,6 @@ class NewRobertson:
         gef = ParseGEF(path)
         df = gef.df
         # INPUT: insert manually the water level
-        water_level = 0  # (m) respect to the ground floor, insert a positive value
         p_a = 0.1  # MPa
 
         def get_qc(df):
@@ -225,10 +234,14 @@ class NewRobertson:
             except KeyError:
                 print("This file does not contain the fs")
                 raise SystemExit
+
         qc = get_qc(df)
         depth = get_depth(df)
         fs = get_fs(df)
         pre_excavated_depth = gef.pre_excavated_depth
+        zid = gef.zid
+        water_level = water_level_NAP - zid
+
         # qt
         if gef.net_surface_area_quotient_of_the_cone_tip is not None and 'qc' in df.columns and 'u2' in df.columns:
             qt = qc + df['u2'] * (1 - gef.net_surface_area_quotient_of_the_cone_tip)
@@ -305,7 +318,7 @@ class NewRobertson:
 
         def normalized_cone_resistance_n(qt, sigma_v0, sigma_v0_eff, n, p_a):
             if sigma_v0_eff > 0 and (qt - sigma_v0 * (10 ** -3)) > 0:
-                Qt = ((qt - sigma_v0 * (10 ** -3)) / p_a) * (p_a / sigma_v0_eff * (10 ** -3)) ** n
+                Qt = (qt - sigma_v0 * (10 ** -3)) / p_a * (p_a / (sigma_v0_eff * (10 ** -3))) ** n
             else:
                 Qt = 1
             return Qt
@@ -342,6 +355,8 @@ class NewRobertson:
         soil_type_robertson = []
         Ic = []
         sig0 = []
+        series_Qt = []
+        series_Fr = []
         for depth_i in depth:
             i = depth[depth == depth_i].index[0]
             qti = qt[i]
@@ -356,7 +371,7 @@ class NewRobertson:
                 ic = type_index(fsi, qti, sigma_v0i, ui, n1, p_a)
                 n2 = n_exponent(ic, sigma_v0i, p_a, ui)
                 ii = 0
-                max_it = 6
+                max_it = 5
                 while n2 != n1 and ii < max_it:
                     n1 = n2
                     ic = type_index(fsi, qti, sigma_v0i, ui, n1, p_a)
@@ -375,8 +390,8 @@ class NewRobertson:
                 n2 = n_exponent(ic, sigma_v0i, p_a, ui)
                 gamma2 = get_gamma(ic, depth_i)
                 ii = 0
-                max_it = 6
-                while gamma2 != gamma1 and n2 != n1 and ii < max_it:
+                max_it = 5
+                while (gamma2 != gamma1 or n2 != n1) and ii < max_it:
                     gamma1 = gamma2
                     n1 = n2
                     delta_sigma_v0i = delta_vertical_stress(depth1, depth2, gamma1)
@@ -385,6 +400,11 @@ class NewRobertson:
                     n2 = n_exponent(ic, sigma_v0i, p_a, ui)
                     gamma2 = get_gamma(ic, depth_i)
                     ii += 1
+            Qti = normalized_cone_resistance_n(qti, sigma_v0i, ui, n1, p_a)
+            Fri = normalized_friction_ratio(fsi, qti, sigma_v0i)
+
+            series_Qt.append(Qti)
+            series_Fr.append(Fri)
             sig0.append(sigma_v0i)
             Ic.append(ic)
             soil_type = type_index_to_soil_type(ic)
@@ -393,6 +413,8 @@ class NewRobertson:
         df_soil_type = pd.DataFrame(soil_type_robertson, columns=['soil_type_Robertson'])
         df_robertson = pd.concat([df_Ic, df_soil_type], axis=1, sort=False)
         df_u = pd.DataFrame(u, columns=['hydrostatic_pore_pressure'])
-        self.df_complete = pd.concat([df, df_u, df_robertson], axis=1, sort=False)
+        df_Qt = pd.DataFrame(series_Qt, columns=['normalized_Qt'])
+        df_Fr = pd.DataFrame(series_Fr, columns=['normalized_Fr'])
+        self.df_complete = pd.concat([df, df_u, df_robertson, df_Qt, df_Fr], axis=1, sort=False)
 
 

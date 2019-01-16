@@ -251,7 +251,21 @@ class ParseCPT:
         if 'corrected_depth' in df.columns:
             new_df['depth'] = new_df['corrected_depth']
         elif 'inclination' in df.columns:
-            new_df['depth'] = new_df['penetration_length']*np.cos(df['inclination'])
+            pen_len = new_df['penetration_length']
+            incl = df['inclination']
+            new_df_incl = []
+            pen0 = []
+            for pen_i in pen_len:
+                i = pen_len[pen_len == pen_i].index[0]
+                if i == 0:
+                    depth_i = pen_i
+                else:
+                    incl_i = incl[i]
+                    delta_depth_i = (pen_i - pen0[i - 1]) * np.cos(incl_i)
+                    depth_i = pen0[i - 1] + delta_depth_i
+                pen0.append(depth_i)
+                new_df_incl.append(pen_i)
+            new_df['depth'] = new_df_incl
         else:
             new_df['depth'] = new_df['penetration_length']
         return new_df

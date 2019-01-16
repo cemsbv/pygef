@@ -14,13 +14,15 @@ def scan_folder(parent):
                 ciao_rob = Robertson(path)
                 ciao_new_rob = NewRobertson(path)
                 df = ciao_rob.df_complete
-                print(df)
+                df2 = ciao_new_rob.df_complete
+                df_difference = (df != df2)
+                print(df_difference)
 
 
-#scan_folder("/home/martina/Documents/gef_files/2013/")
+scan_folder("/home/martina/Documents/gef_files/2016/")
 #rob = Robertson("/home/martina/Documents/gef_files/2018/18337/18337_AA17425_42.GEF")
-rob2 = NewRobertson("/home/martina/Documents/gef_files/2018/18337/18337_AA17425_42.GEF")
+#rob2 = NewRobertson("/home/martina/Documents/gef_files/2018/18337/18337_AA17425_42.GEF")
 #df = rob.df_complete
-df2 = rob2.df_complete
-#print(df)
-print(df2)
+#df2 = rob2.df_complete
+#df_difference = (df != df2)
+#print(df != df2)
