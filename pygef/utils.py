@@ -224,14 +224,15 @@ def parse_record_separator(s):
     return parse_regex_cast(r"#RECORDSEPARATOR+[=\s+]+(.)", s, str, 1)
 
 
-def find_separator(data_s):
+def find_separator(header_s):
     """
 
     :param data_s:
     :return:
     """
-    if parse_column_separator(data_s) is not None:
-        separator = parse_column_separator(data_s)
+    try_sep = parse_column_separator(header_s)
+    if try_sep is not None:
+        separator = parse_column_separator(header_s)
     else:
         separator = r';|\s+|,|\|\s*'
     return separator
