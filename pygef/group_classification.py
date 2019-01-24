@@ -154,9 +154,6 @@ class GroupClassification:
                     final_store_thickness = 0
                     final_store_thickness += sig_layer_thickness[n]
 
-
-
-
         df_final_layers = pd.DataFrame(final_layers, columns=['final_layers'])
         df_final_z_in = pd.DataFrame(final_z_in, columns=['final_z_in'])
         df_final_zf = pd.DataFrame(final_zf, columns=['final_zf'])

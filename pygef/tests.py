@@ -123,6 +123,14 @@ class GefTest(unittest.TestCase):
         v = utils.parse_record_separator(s)
         self.assertEqual(v, "!")
 
+    def test_find_separator(self):
+        s = r'#COLUMNSEPARATOR = ;'
+        v = utils.find_separator(s)
+        self.assertEqual(v, ";")
+        s = r"I'm sorry the column separator is not in this gef file, even if he wanted to be there."
+        v = utils.find_separator(s)
+        self.assertEqual(v, r';|\s+|,|\|\s*')
+
     def test_create_soil_type(self):
         s = "'Kz'"
         v = utils.create_soil_type(s)
@@ -193,10 +201,42 @@ class GefTest(unittest.TestCase):
         df_parsed = bore.data_soil_quantified(data_s)
         assert_frame_equal(df_parsed, df)
 
+    def test_calculate_elevation_respect_to_NAP(self):
+        df1 = pd.DataFrame({'elevation_respect_to_NAP': [0, 0, 0, 0, 0]})
+        zid = -3
+        depth = pd.Series([0, 1, 2, 3, 4], name='depth')
+        lenght = 5
+        df_calculated = gef.calculate_elevation_respect_to_nap(df1, zid, depth, lenght)
+        df = pd.DataFrame({'elevation_respect_to_NAP': [-3, -4, -5, -6, -7]})
+        assert_frame_equal(df_calculated, df)
 
+    def test_correct_depth_with_inclination(self):
+        df1 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0, 0, 0, 0]})
+        df_calculated = gef.correct_depth_with_inclination(df1)
+        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.2, 0.4, 0.6, 0.8]})
+        assert_frame_equal(df_calculated, df)
 
+        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0, 0, 0, 0],
+                            'inclination': [45, 45, 45, 45, 45]})
+        df_calculated = gef.correct_depth_with_inclination(df2)
+        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.10506439776354595,
+                           0.2600005549035549, 0.43860973959854394, 0.6284559899319941], 'inclination':
+                           [45, 45, 45, 45, 45]})
+        assert_frame_equal(df_calculated, df)
 
+        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0, 0, 0, 0], 'corrected_depth':
+                            [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
+        df_calculated = gef.correct_depth_with_inclination(df2)
+        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.10, 0.25, 0.40, 0.60],
+                           'corrected_depth': [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
+        assert_frame_equal(df_calculated, df)
 
+    def test_pre_excavated_depth(self):
+        df1 = pd.DataFrame({'penetration_length': [0, 1, 2, 3, 4], 'qc': [0.5, 0.5, 0.6, 0.7, 0.8]})
+        pre_excavated_depth = 2
+        df_calculated = gef.correct_pre_excavated_depth(df1, pre_excavated_depth)
+        df = pd.DataFrame({'penetration_length': [2, 3, 4], 'qc': [0.6, 0.7, 0.8]})
+        assert_frame_equal(df_calculated, df)
 
 
 

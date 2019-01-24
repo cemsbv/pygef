@@ -140,7 +140,7 @@ def parse_gef_type(s):
 
 def parse_file_date(s):
     """
-    Fuction to parse the file date.
+    Function to parse the file date.
 
     :param s: (str) String to search for regex pattern.
     :return: File date.

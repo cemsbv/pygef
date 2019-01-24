@@ -264,7 +264,7 @@ class ParseCPT:
                     delta_depth_i = (pen_i - pen0[i - 1]) * np.cos(incl_i)
                     depth_i = pen0[i - 1] + delta_depth_i
                 pen0.append(depth_i)
-                new_df_incl.append(pen_i)
+                new_df_incl.append(depth_i)
             new_df['depth'] = new_df_incl
         else:
             new_df['depth'] = new_df['penetration_length']
@@ -274,8 +274,8 @@ class ParseCPT:
     def correct_pre_excavated_depth(df, pre_excavated_depth):
         new_df = df
         if pre_excavated_depth is not None:
-             for value in df['penetration_length']:
-                 if value == pre_excavated_depth:
+            for value in df['penetration_length']:
+                if value == pre_excavated_depth:
                     i_list = df.index[df['penetration_length'] == pre_excavated_depth].tolist()
                     i = i_list[0]
                     new_df_1 = df.iloc[i:]
@@ -416,6 +416,3 @@ class ParseBORE:
                     lst.append(soil_quantified)
         df_soil_quantified = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
         return df_soil_quantified
-
-
-
