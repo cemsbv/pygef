@@ -2,6 +2,7 @@ import pygef.utils as utils
 import pandas as pd
 import io
 import numpy as np
+from pygef.robertson import RobertsonClassifier
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
@@ -251,7 +252,21 @@ class ParseCPT:
         if 'corrected_depth' in df.columns:
             new_df['depth'] = new_df['corrected_depth']
         elif 'inclination' in df.columns:
-            new_df['depth'] = new_df['penetration_length']*np.cos(df['inclination'])
+            pen_len = new_df['penetration_length']
+            incl = df['inclination']
+            new_df_incl = []
+            pen0 = []
+            for pen_i in pen_len:
+                i = pen_len[pen_len == pen_i].index[0]
+                if i == 0:
+                    depth_i = pen_i
+                else:
+                    incl_i = incl[i]
+                    delta_depth_i = (pen_i - pen0[i - 1]) * np.cos(incl_i)
+                    depth_i = pen0[i - 1] + delta_depth_i
+                pen0.append(depth_i)
+                new_df_incl.append(depth_i)
+            new_df['depth'] = new_df_incl
         else:
             new_df['depth'] = new_df['penetration_length']
         return new_df
@@ -260,8 +275,8 @@ class ParseCPT:
     def correct_pre_excavated_depth(df, pre_excavated_depth):
         new_df = df
         if pre_excavated_depth is not None:
-             for value in df['penetration_length']:
-                 if value == pre_excavated_depth:
+            for value in df['penetration_length']:
+                if value == pre_excavated_depth:
                     i_list = df.index[df['penetration_length'] == pre_excavated_depth].tolist()
                     i = i_list[0]
                     new_df_1 = df.iloc[i:]
@@ -289,9 +304,19 @@ class ParseCPT:
                     column_info = utils.parse_column_info(header_s, column_number,
                                                           MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
                     columns_info.append(column_info)
-        df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*',
-                                 names=columns_info, index_col=False, engine='python')
+
+        new_data = data_s.replace('!', '')
+        separator = utils.find_separator(header_s)
+        df = pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
         return df
+
+    def classify_robertson(self, new=True):
+        m = RobertsonClassifier(self)
+        if new:
+            self.df = m.classify_new_robertson()
+        else:
+            self.df = m.classify_old_robertson()
+        return m
 
 
 class ParseBORE:
@@ -412,6 +437,3 @@ class ParseBORE:
                     lst.append(soil_quantified)
         df_soil_quantified = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
         return df_soil_quantified
-
-
-

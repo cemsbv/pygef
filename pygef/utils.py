@@ -13,8 +13,7 @@ def cast_string(f, s):
     """
     try:
         return f(s)
-    except ValueError as e:
-        logging.error(f'Could not parse {f}. Message: {e}')
+    except ValueError:
         return None
 
 
@@ -141,7 +140,7 @@ def parse_gef_type(s):
 
 def parse_file_date(s):
     """
-    Fuction to parse the file date.
+    Function to parse the file date.
 
     :param s: (str) String to search for regex pattern.
     :return: File date.
@@ -223,6 +222,20 @@ def parse_record_separator(s):
     :return: Record separator.
     """""
     return parse_regex_cast(r"#RECORDSEPARATOR+[=\s+]+(.)", s, str, 1)
+
+
+def find_separator(header_s):
+    """
+
+    :param data_s:
+    :return:
+    """
+    try_sep = parse_column_separator(header_s)
+    if try_sep is not None:
+        separator = parse_column_separator(header_s)
+    else:
+        separator = r';|\s+|,|\|\s*'
+    return separator
 
 
 def parse_soil_code(s):
