@@ -283,16 +283,6 @@ class ParseCPT:
                     new_df = new_df_1.reset_index(drop=True)
         return new_df
 
-    def parse_data(header_s, data_s, columns_number=None, columns_info=None):
-        if columns_number is None and columns_info is None:
-            columns_number = utils.parse_columns_number(header_s)
-            columns_info = []
-            for column_number in range(1, columns_number + 1):
-                column_info = utils.parse_column_info(header_s, column_number,
-                                                      MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
-                columns_info.append(column_info)
-        sep = csv.Sniffer().sniff(data_s).delimiter
-        return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False)
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
