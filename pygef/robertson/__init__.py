@@ -10,6 +10,13 @@ class RobertsonClassifier:
     def __init__(self, gef):
         self.gef = None
         self.df_complete = None
+        self.depth = None
+        self.fs = None
+        self.pre_excavated_depth = None
+        self.water_level = None
+        self.p_a = None
+        self.qt = None
+        self.df_complete = None
 
         self.gef = gef
         qc = gef.df['qc']
@@ -17,7 +24,7 @@ class RobertsonClassifier:
         self.fs = gef.df['fs']
         self.pre_excavated_depth = gef.pre_excavated_depth
         zid = gef.zid
-        self.water_level = water_level_NAP - zid
+        self.water_level = zid - water_level_NAP
         self.p_a = p_a
 
         # qt
@@ -35,8 +42,7 @@ class RobertsonClassifier:
         sig0 = []
         series_Qt = []
         series_Fr = []
-        for depth_i in self.depth:
-            i = self.depth[self.depth == depth_i].index[0]
+        for i, depth in enumerate(self.depth):
             qti = self.qt[i]
             fsi = self.fs[i]
             ui = u[i]
@@ -60,7 +66,7 @@ class RobertsonClassifier:
                     ic = self.type_index(fsi, qti, sigma_v0i, ui)
             else:
                 depth1 = self.depth.iloc[i - 1]
-                depth2 = depth_i
+                depth2 = depth
                 sig0i = sig0[i - 1]
                 # iteration: it starts assuming gamma of the sand and iterate until the real gamma is found.
                 gamma1 = 20
@@ -72,7 +78,8 @@ class RobertsonClassifier:
                     n2 = self.n_exponent(ic, sigma_v0i, p_a, ui)
                 else:
                     ic = self.type_index(fsi, qti, sigma_v0i, ui)
-                gamma2 = self.get_gamma(ic, depth_i)
+
+                gamma2 = self.get_gamma(ic, depth)
                 ii = 0
                 max_it = 5
                 if new:
@@ -83,7 +90,7 @@ class RobertsonClassifier:
                         sigma_v0i = self.vertical_stress(sig0i, delta_sigma_v0i)
                         ic = self.type_index_n(fsi, qti, sigma_v0i, ui, n1, p_a)
                         n2 = self.n_exponent(ic, sigma_v0i, p_a, ui)
-                        gamma2 = self.get_gamma(ic, depth_i)
+                        gamma2 = self.get_gamma(ic, depth)
                         ii += 1
                 else:
                     while gamma2 != gamma1 and ii < max_it:
@@ -91,7 +98,7 @@ class RobertsonClassifier:
                         delta_sigma_v0i = self.delta_vertical_stress(depth1, depth2, gamma1)
                         sigma_v0i = self.vertical_stress(sig0i, delta_sigma_v0i)
                         ic = self.type_index(fsi, qti, sigma_v0i, ui)
-                        gamma2 = self.get_gamma(ic, depth_i)
+                        gamma2 = self.get_gamma(ic, depth)
                         ii += 1
             if new:
                 Qti = self.normalized_cone_resistance_n(qti, sigma_v0i, ui, n1, p_a)
@@ -202,7 +209,8 @@ class RobertsonClassifier:
         n = min(n1, 1)
         return n
 
-    def normalized_cone_resistance_n(self, qt, sigma_v0, sigma_v0_eff, n, p_a):
+    @staticmethod
+    def normalized_cone_resistance_n(qt, sigma_v0, sigma_v0_eff, n, p_a):
         if sigma_v0_eff > 0 and (qt - sigma_v0 * (10 ** -3)) > 0:
             Qt = (qt - sigma_v0 * (10 ** -3)) / p_a * (p_a / (sigma_v0_eff * (10 ** -3))) ** n
         else:
