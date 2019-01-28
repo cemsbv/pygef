@@ -2,7 +2,6 @@ import unittest
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 from pygef.robertson import RobertsonClassifier as rob
-from unittest.mock import MagicMock
 from pygef.gef import ParseCPT
 
 
@@ -13,12 +12,10 @@ class RobertsonTest(unittest.TestCase):
                                     #FILEOWNER= Wagen 2
                                     #FILEDATE= 2004, 1, 14
                                     #PROJECTID= CPT, 146203
-                                    #COLUMN= 5
+                                    #COLUMN= 3
                                     #COLUMNINFO= 1, m, Sondeerlengte, 1
                                     #COLUMNINFO= 2, MPa, Conuswaarde, 2
-                                    #COLUMNINFO= 3, MPa, Wrijvingsweerstand, 3
-                                    #COLUMNINFO= 4, MPa, Helling, 8
-                                    #COLUMNINFO= 5, %, Wrijvingsgetal, 4
+                                    #COLUMNINFO= 3, MPa, Wrijvingsweerstand, 3                                    
                                     #XYID= 31000, 132127.181, 458102.351, 0.000, 0.000
                                     #ZID= 31000, 1.3, 0.0
                                     #MEASUREMENTTEXT= 4, 030919, Conusnummer
@@ -32,18 +29,12 @@ class RobertsonTest(unittest.TestCase):
                                     #PROJECTNAME= Uitbreiding Rijksweg 2
                                     #OS= DOS
                                     #EOH=
-                                    0.0000e+000 0.0000e+000 0.0000e+000 0.0000e+000 0.0000e+000 
-                                    1.0200e+000 7.1000e-001 4.6500e-002 1.2000e-001 6.5493e+000 
-                                    1.0400e+000 7.3000e-001 4.2750e-002 1.5000e-001 5.8562e+000 
-                                    1.0600e+000 6.9000e-001 3.9000e-002 1.5000e-001 5.6522e+000 
-                                    1.0800e+000 6.1000e-001 3.6500e-002 1.2000e-001 5.9836e+000 
-                                    1.1200e+000 6.5000e-001 4.5500e-002 1.2000e-001 7.0000e+000 
-                                    1.1600e+000 6.1000e-001 6.7000e-002 9.0000e-002 1.0984e+001 
-                                    1.1800e+000 8.3000e-001 6.0500e-002 1.5000e-001 7.2892e+000 
-                                    1.2000e+000 1.7500e+000 6.2000e-002 1.2000e-001 3.5429e+000 
-                                    1.2200e+000 7.0000e+000 9.3000e-002 1.5000e-001 1.3286e+000 
-                                    1.2600e+000 2.6540e+001 1.0400e-001 1.8000e-001 3.9186e-001 
-                                    1.2800e+000 4.1290e+001 1.0400e-001 1.8000e-001 2.5188e-001 
+                                    0.0000e+000 0.0000e+000 0.0000e+000 
+                                    1.0200e+000 7.1000e-001 4.6500e-002 
+                                    1.0400e+000 7.3000e-001 4.2750e-002 
+                                    1.0600e+000 6.9000e-001 3.9000e-002 
+                                    1.0800e+000 6.1000e-001 3.6500e-002 
+                                    1.1200e+000 6.5000e-001 4.5500e-002                                    
                                     """)
 
     def test_hydrostatic_water_pressure(self):
@@ -160,5 +151,28 @@ class RobertsonTest(unittest.TestCase):
         type_index_calc = rob.type_index_n(obj, fs, qt, sigma_v0, u, n, p_a)
         type_index = 4.206696226993901
         self.assertEqual(type_index_calc, type_index)
+
+    def test_classify(self):
+        obj = rob(self.gef)
+        df_calc = rob.classify(obj)
+        df = pd.DataFrame({'penetration_length':
+                            [0.0000e+000, 1.0200e+000, 1.0400e+000, 1.0600e+000, 1.0800e+000, 1.1200e+000],
+                           'qc': [0.0000e+000, 7.1000e-001, 7.3000e-001, 6.9000e-001, 6.1000e-001, 6.5000e-001],
+                           'fs': [0.0000e+000, 4.6500e-002, 4.2750e-002, 3.9000e-002, 3.6500e-002, 4.5500e-002],
+                           'depth': [0.0000e+000, 1.0200e+000, 1.0400e+000, 1.0600e+000, 1.0800e+000, 1.1200e+000],
+                           'elevation_respect_to_NAP': [1.3, 0.28, 0.26, 0.24, 0.22, 0.17999999999999994],
+                           'hydrostatic_pore_pressure': [0, 0, 0, 0, 0, 0],
+                           'Ic': [3.476967069156681, 2.822213205390442, 2.7902205405302007, 2.800900469717346,
+                                  2.853978458064875, 2.886830989476405],
+                           'soil_type_Robertson': ['Clays - silty clay to clay',
+                                                   'Silt mixtures - clayey silt to silty clay',
+                                                   'Silt mixtures - clayey silt to silty clay',
+                                                   'Silt mixtures - clayey silt to silty clay',
+                                                   'Silt mixtures - clayey silt to silty clay',
+                                                   'Silt mixtures - clayey silt to silty clay'],
+                           'normalized_Qt': [1, 1, 1, 1, 1, 1],
+                           'normalized_Fr': [0.10, 6.723150772077961, 6.010291305814869, 5.812913611160794,
+                                             6.180574370089407, 7.2240569033405295]})
+        assert_frame_equal(df_calc, df)
 
 
