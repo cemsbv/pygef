@@ -2,7 +2,6 @@ import pygef.utils as utils
 import pandas as pd
 import io
 import numpy as np
-from pygef.robertson import RobertsonClassifier
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
@@ -283,7 +282,6 @@ class ParseCPT:
                     new_df = new_df_1.reset_index(drop=True)
         return new_df
 
-
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
         if columns_number is None and columns_info is None:
@@ -294,19 +292,10 @@ class ParseCPT:
                     column_info = utils.parse_column_info(header_s, column_number,
                                                           MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
                     columns_info.append(column_info)
-
         new_data = data_s.replace('!', '')
         separator = utils.find_separator(header_s)
         df = pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
         return df
-
-    def classify_robertson(self, new=True):
-        m = RobertsonClassifier(self)
-        if new:
-            self.df = m.classify_new_robertson()
-        else:
-            self.df = m.classify_old_robertson()
-        return m
 
 
 class ParseBORE:
