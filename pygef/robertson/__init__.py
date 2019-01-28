@@ -27,63 +27,6 @@ class RobertsonClassifier:
         else:
             self.qt = qc
 
- #   def classify_old_robertson(self):
- #       # calculation of sigma_v and u
- #       u = self.hydrostatic_water_pressure(self.water_level, self.gef.df['depth'])
- #       soil_type_robertson = []
- #       Ic = []
- #       sig0 = []
- #       series_Qt = []
- #       series_Fr = []
- #       for depth_i in self.depth:
- #           i = self.depth[self.depth == depth_i].index[0]
- #           qti = self.qt[i]
- #           fsi = self.fs[i]
- #           ui = u[i]
- #           if i == 0:  # add the check for the pre-excavation
- #               if self.pre_excavated_depth is not None:
- #                   sigma_v0i = 18*self.pre_excavated_depth  # use of a standard gamma=18 for the excavated soil
- #               else:
- #                   sigma_v0i = 0
- #               ic = self.type_index(fsi, qti, sigma_v0i, ui)
- #           else:
- #               depth1 = self.depth.iloc[i-1]
- #               depth2 = depth_i
- #               sig0i = sig0[i-1]
- #               # iteration: it starts assuming gamma of the sand and iterate until the real gamma is found.
- #               gamma1 = 20
- #               delta_sigma_v0i = self.delta_vertical_stress(depth1, depth2, gamma1)
- #               sigma_v0i = self.vertical_stress(sig0i, delta_sigma_v0i)
- #               ic = self.type_index(fsi, qti, sigma_v0i, ui)
- #               gamma2 = self.get_gamma(ic, depth_i)
- #               ii = 0
- #               max_it = 8
- #               while gamma2 != gamma1 and ii < max_it:
- #                   gamma1 = gamma2
- #                   delta_sigma_v0i = self.delta_vertical_stress(depth1, depth2, gamma1)
- #                   sigma_v0i = self.vertical_stress(sig0i, delta_sigma_v0i)
- #                   ic = self.type_index(fsi, qti, sigma_v0i, ui)
- #                   gamma2 = self.get_gamma(ic, depth_i)
- #                   ii += 1
- #           Qti = self.normalized_cone_resistance(qti, sigma_v0i, ui)
- #           Fri = self.normalized_friction_ratio(fsi, qti, sigma_v0i)
-#
- #           series_Qt.append(Qti)
- #           series_Fr.append(Fri)
- #           sig0.append(sigma_v0i)
- #           Ic.append(ic)
- #           soil_type = self.type_index_to_soil_type(ic)
- #           soil_type_robertson.append(soil_type)
-#
- #       df_Ic = pd.DataFrame(Ic, columns=['Ic'])
- #       df_soil_type = pd.DataFrame(soil_type_robertson, columns=['soil_type_Robertson'])
- #       df_robertson = pd.concat([df_Ic, df_soil_type], axis=1, sort=False)
- #       df_u = pd.DataFrame(u, columns=['hydrostatic_pore_pressure'])
- #       df_Qt = pd.DataFrame(series_Qt, columns=['normalized_Qt'])
- #       df_Fr = pd.DataFrame(series_Fr, columns=['normalized_Fr'])
- #       self.df_complete = pd.concat([self.gef.df, df_u, df_robertson, df_Qt, df_Fr], axis=1, sort=False)
- #       return self.df_complete
-
     def classify(self, new=True):  # set new =True to use the new robertson classification
         # calculation of sigma_v and u
         u = self.hydrostatic_water_pressure(self.water_level, self.gef.df['depth'])
@@ -150,8 +93,12 @@ class RobertsonClassifier:
                         ic = self.type_index(fsi, qti, sigma_v0i, ui)
                         gamma2 = self.get_gamma(ic, depth_i)
                         ii += 1
-            Qti = self.normalized_cone_resistance_n(qti, sigma_v0i, ui, n1, p_a)
-            Fri = self.normalized_friction_ratio(fsi, qti, sigma_v0i)
+            if new:
+                Qti = self.normalized_cone_resistance_n(qti, sigma_v0i, ui, n1, p_a)
+                Fri = self.normalized_friction_ratio(fsi, qti, sigma_v0i)
+            else:
+                Qti = self.normalized_cone_resistance(qti, sigma_v0i, ui)
+                Fri = self.normalized_friction_ratio(fsi, qti, sigma_v0i)
 
             series_Qt.append(Qti)
             series_Fr.append(Fri)
