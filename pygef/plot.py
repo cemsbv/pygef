@@ -2,7 +2,7 @@ from pygef.group_classification import GroupClassification
 from pygef.gef import ParseCPT
 import os
 from bokeh.plotting import figure
-from bokeh.models import ColumnDataSource, Button, Slider
+from bokeh.models import ColumnDataSource, Button, Slider, ColorBar, LinearColorMapper
 from bokeh.io import show
 import pandas as pd
 from bokeh.layouts import column, row
@@ -43,11 +43,13 @@ robertson_classification = figure(x_axis_label='-', y_axis_label='Z(m)', title="
            plot_width=500, plot_height=1000, y_range=(depth_max, depth_min))
 qc.line(x='qc', y='depth', source=s2)
 fs.line(x='fs', y='depth', source=s2)
-#robertson_classification.multi_polygons(xs=[0, 100]*number_layers,ys=[group['z_in'], group['zf']],color=group['colour'])
 
 robertson_classification.hbar(y=cpt['depth'], height=height, left=0, right=50, color=cpt['colour'])
-
-
+color_mapper = LinearColorMapper(palette=['darkred', 'indianred', 'peru', 'goldenrod', 'sandybrown', 'navajowhite'],
+                                tags=['Peat', 'Clays - silty clay to clay', 'Silt mixtures - clayey silt to silty clay',
+                                                'Sand mixtures - silty sand to sandy silt', 'Sands - clean sand to silty sand', 'Gravelly sand to dense sand'])
+color_bar = ColorBar(color_mapper=color_mapper)
+robertson_classification.add_layout(color_bar, 'right')
 layout = row(qc, fs, robertson_classification)
 
 show(layout)
