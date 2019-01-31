@@ -298,7 +298,7 @@ class ParseCPT:
         df = pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
         return df
 
-    def classify_robertson(self, new=True):
+    def classify_robertson(self, new=True):  # True to use the new robertson
         m = RobertsonClassifier(self)
         if new:
             self.df = m.classify()
