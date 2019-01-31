@@ -59,7 +59,7 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
                                        131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
                                        135: "Temperature_C",  # found in:#COMPANYID= Inpijn-Blokpoel,
                                        250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
-                                       251: "magneto_slope_x"}  # found in:OMPANYID= Danny, Tjaden, 31
+                                       251: "magneto_slope_x"}  # found in:COMPANYID= Danny, Tjaden, 31
 
 COLUMN_NAMES_BORE = ["depth_top",  # 1
                      "depth_bottom",  # 2
@@ -236,6 +236,10 @@ class ParseCPT:
         # definition of the elevation respect to the nap and concatenation with the previous dataframe
         df_nap = self.calculate_elevation_respect_to_nap(df_nap_zeros, self.zid, self.df_correct_depth_with_inclination['depth'], len(self.df_second.index))
         self.df = pd.concat([self.df_correct_depth_with_inclination, df_nap], axis=1, sort=False)
+        # clean data df from column void
+        self.df_clean = self.df.replace(float(self.column_void), np.nan).interpolate(method='linear')
+        print(self.df_clean)
+
 
     @staticmethod
     def calculate_elevation_respect_to_nap(df, zid, depth, lenght):
