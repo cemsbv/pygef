@@ -17,7 +17,6 @@ class RobertsonClassifier:
         self.p_a = None
         self.qt = None
         self.df_complete = None
-
         self.gef = gef
         qc = gef.df['qc']
         self.depth = gef.df['depth']
