@@ -5,11 +5,13 @@ from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource, Button, Slider
 from bokeh.io import show
 import pandas as pd
+from bokeh.layouts import column, row
+
 
 path = "/home/martina/Documents/gef_files/2016/16428/16428_S-WEG-038A-P_000.GEF"
 classification = GroupClassification("/home/martina/Documents/gef_files/2016/16428/16428_S-WEG-038A-P_000.GEF")
 gef = ParseCPT(path)
-cpt = gef.df
+cpt = gef.classify_robertson().df_complete
 group = classification.df_soil_grouped
 colours = {'Peat': 'darkred',
            'Clays - silty clay to clay': 'indianred',
@@ -20,13 +22,32 @@ colours = {'Peat': 'darkred',
            }
 
 group['colour'] = group.apply(lambda row: colours[row.layer], axis=1)
+cpt['colour'] = cpt.apply(lambda row: colours[row.soil_type_Robertson], axis=1)
 
 s1 = ColumnDataSource(group)
 s2 = ColumnDataSource(cpt)
-p = figure(x_axis_label='qc / fs (kPa)', y_axis_label='Z(m)', title="title",
-           tools='pan,wheel_zoom,box_zoom,reset,box_select, xwheel_zoom,undo,redo', active_scroll='xwheel_zoom',
-           plot_width=1000, plot_height=1000)
-#p.line(x='qc', y='depth', source=s2)
-p.line(x='fs', y='depth', source=s2)
 
-show(p)
+number_layers = len(group['z_in'])
+height = cpt['depth'][1]-cpt['depth'][0]
+depth_max = cpt['depth'].max()
+depth_min = cpt['depth'].min()
+
+qc = figure(x_axis_label='qc (MPa)', y_axis_label='Z(m)', title="qc",
+           tools='pan,wheel_zoom,box_zoom,reset,box_select,xwheel_zoom,undo,redo', active_scroll='xwheel_zoom',
+           plot_width=500, plot_height=1000, y_range=(depth_max, depth_min))
+fs = figure(x_axis_label='fs (MPa)', y_axis_label='Z(m)', title="fs",
+           tools='pan,wheel_zoom,box_zoom,reset,box_select,xwheel_zoom,undo,redo', active_scroll='xwheel_zoom',
+           plot_width=500, plot_height=1000, y_range=(depth_max, depth_min))
+robertson_classification = figure(x_axis_label='-', y_axis_label='Z(m)', title="Robertson classification",
+           tools='pan,wheel_zoom,box_zoom,reset,box_select,xwheel_zoom,undo,redo', active_scroll='xwheel_zoom',
+           plot_width=500, plot_height=1000, y_range=(depth_max, depth_min))
+qc.line(x='qc', y='depth', source=s2)
+fs.line(x='fs', y='depth', source=s2)
+#robertson_classification.multi_polygons(xs=[0, 100]*number_layers,ys=[group['z_in'], group['zf']],color=group['colour'])
+
+robertson_classification.hbar(y=cpt['depth'], height=height, left=0, right=50, color=cpt['colour'])
+
+
+layout = row(qc, fs, robertson_classification)
+
+show(layout)

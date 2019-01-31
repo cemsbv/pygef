@@ -17,10 +17,11 @@ class RobertsonClassifier:
         self.p_a = None
         self.qt = None
         self.df_complete = None
+
         self.gef = gef
-        qc = gef.df['qc']
-        self.depth = gef.df['depth']
-        self.fs = gef.df['fs']
+        qc = gef.df_clean['qc']
+        self.depth = gef.df_clean['depth']
+        self.fs = gef.df_clean['fs']
         self.pre_excavated_depth = gef.pre_excavated_depth
         zid = gef.zid
         self.water_level = zid - water_level_NAP
@@ -28,14 +29,14 @@ class RobertsonClassifier:
 
         # qt
         if self.gef.net_surface_area_quotient_of_the_cone_tip is not None and 'qc' \
-                in self.gef.df.columns and 'u2' in self.gef.df.columns:
-            self.qt = qc + gef.df['u2'] * (1 - gef.net_surface_area_quotient_of_the_cone_tip)
+                in self.gef.df_clean.columns and 'u2' in self.gef.df_clean.columns:
+            self.qt = qc + gef.df_clean['u2'] * (1 - gef.net_surface_area_quotient_of_the_cone_tip)
         else:
             self.qt = qc
 
     def classify(self, new=True):  # set new =True to use the new robertson classification
         # calculation of sigma_v and u
-        u = self.hydrostatic_water_pressure(self.water_level, self.gef.df['depth'])
+        u = self.hydrostatic_water_pressure(self.water_level, self.gef.df_clean['depth'])
         soil_type_robertson = []
         Ic = []
         sig0 = []
@@ -118,7 +119,7 @@ class RobertsonClassifier:
         df_u = pd.DataFrame(u, columns=['hydrostatic_pore_pressure'])
         df_Qt = pd.DataFrame(series_Qt, columns=['normalized_Qt'])
         df_Fr = pd.DataFrame(series_Fr, columns=['normalized_Fr'])
-        self.df_complete = pd.concat([self.gef.df, df_u, df_robertson, df_Qt, df_Fr], axis=1, sort=False)
+        self.df_complete = pd.concat([self.gef.df_clean, df_u, df_robertson, df_Qt, df_Fr], axis=1, sort=False)
         return self.df_complete
 
     @staticmethod

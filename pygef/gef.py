@@ -238,7 +238,7 @@ class ParseCPT:
         self.df = pd.concat([self.df_correct_depth_with_inclination, df_nap], axis=1, sort=False)
         # clean data df from column void
         self.df_clean = self.df.replace(float(self.column_void), np.nan).interpolate(method='linear')
-        print(self.df_clean)
+
 
     @staticmethod
     def calculate_elevation_respect_to_nap(df, zid, depth, lenght):
@@ -304,9 +304,9 @@ class ParseCPT:
     def classify_robertson(self, new=True):  # True to use the new robertson
         m = RobertsonClassifier(self)
         if new:
-            self.df = m.classify()
+            self.df_clean = m.classify()
         else:
-            self.df = m.classify(new=False)
+            self.df_clean = m.classify(new=False)
         return m
 
 
