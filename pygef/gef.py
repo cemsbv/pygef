@@ -237,7 +237,10 @@ class ParseCPT:
         df_nap = self.calculate_elevation_respect_to_nap(df_nap_zeros, self.zid, self.df_correct_depth_with_inclination['depth'], len(self.df_second.index))
         self.df = pd.concat([self.df_correct_depth_with_inclination, df_nap], axis=1, sort=False)
         # clean data df from column void
-        self.df_clean = self.df.replace(float(self.column_void), np.nan).interpolate(method='linear')
+        if self.column_void is not None:
+            self.df_clean = self.df.replace(float(self.column_void), np.nan).interpolate(method='linear')
+        else:
+            self.df_clean = self.df.replace([99999.00, -99999.00], np.nan).interpolate(method='linear')
 
 
     @staticmethod
