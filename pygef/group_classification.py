@@ -35,6 +35,9 @@ class GroupClassification:
                 layer.append(layer_i)
                 add_all_layer.append(layer_i)
                 z_in.append(zii)
+            elif i == len(depth)-1:
+                zfi = depth[i]
+                zf.append(zfi)
             else:
                 layer_i_check = soil_type[i]
                 if layer_i_check == add_all_layer[i-1]:
@@ -47,7 +50,7 @@ class GroupClassification:
                     zfi = depth[i]
                     zf.append(zfi)
 
-        for j in range(len(layer)-1):
+        for j in range(len(layer)):
             layer_thickness_i = zf[j] - z_in[j]
             layer_thickness.append(layer_thickness_i)
 
