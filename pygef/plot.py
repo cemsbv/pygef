@@ -7,6 +7,8 @@ from bokeh.io import show
 from bokeh.layouts import row
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import OrderedDict
+
 
 def scan_folder(parent):
     # iterate over all the files and directories in the directory 'parent'
@@ -93,9 +95,15 @@ fs.set_ylabel('Z (m)')
 plt.ylim(depth_max, depth_min)
 
 rob = fig.add_subplot(1, 3, 3)
-fs.set_xlabel('-')
-fs.set_ylabel('Z (m)')
+for i in range(len(group['z_centr'])):
+  plt.barh(y=group['z_centr'][i], height=group['layer_thickness'][i], width=5, color=group['colour'][i], label=group['layer'][i])
+rob.set_xlabel('-')
+rob.set_ylabel('Z (m)')
 plt.ylim(depth_max, depth_min)
+
+handles, labels = plt.gca().get_legend_handles_labels()
+by_label = OrderedDict(zip(labels, handles))
+plt.legend(by_label.values(), by_label.keys(), loc='upper right')
 
 plt.show()
 
