@@ -5,7 +5,8 @@ from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource, ColorBar, LinearColorMapper
 from bokeh.io import show
 from bokeh.layouts import row
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 def scan_folder(parent):
     # iterate over all the files and directories in the directory 'parent'
@@ -55,5 +56,47 @@ def scan_folder(parent):
 
                 show(layout)
 
-scan_folder("/home/martina/Documents/gef_files/2016/")
+#scan_folder("/home/martina/Documents/gef_files/2016/")
+path = "/home/martina/Documents/gef_files/2016/16428/16428_S-WEG-038A-P_000.GEF"
+
+classification = GroupClassification(path)
+gef = ParseCPT(path)
+
+cpt = gef.classify_robertson().df_complete
+group = classification.df_soil_grouped
+colours = {'Peat': 'darkred',
+           'Clays - silty clay to clay': 'indianred',
+           'Silt mixtures - clayey silt to silty clay': 'peru',
+           'Sand mixtures - silty sand to sandy silt': 'goldenrod',
+           'Sands - clean sand to silty sand': 'sandybrown',
+           'Gravelly sand to dense sand': 'navajowhite'
+           }
+
+cpt['colour'] = cpt.apply(lambda row: colours[row.soil_type_Robertson], axis=1)
+group['colour'] = group.apply(lambda row: colours[row.layer], axis=1)
+
+depth_max = cpt['depth'].max()
+depth_min = cpt['depth'].min()
+
+fig = plt.figure(1, figsize=(15, 30))
+
+qc = fig.add_subplot(1, 3, 1)
+plt.plot(cpt['qc'], cpt['depth'], 'b')
+qc.set_xlabel('qc (MPa)')
+qc.set_ylabel('Z (m)')
+plt.ylim(depth_max, depth_min)
+
+fs = fig.add_subplot(1, 3, 2)
+plt.plot(cpt['fs'], cpt['depth'], 'b')
+fs.set_xlabel('fs (MPa)')
+fs.set_ylabel('Z (m)')
+plt.ylim(depth_max, depth_min)
+
+rob = fig.add_subplot(1, 3, 3)
+fs.set_xlabel('-')
+fs.set_ylabel('Z (m)')
+plt.ylim(depth_max, depth_min)
+
+plt.show()
+
 
