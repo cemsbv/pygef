@@ -56,6 +56,7 @@ class GroupClassification:
         df_zf = pd.DataFrame(zf, columns=['zf'])
         df_layer_thickness = pd.DataFrame(layer_thickness, columns=['layer_thickness'])
         self.df_soil_grouped = pd.concat([df_layer, df_z_in, df_zf, df_layer_thickness], axis=1, sort=False)
+        self.df_soil_grouped['z_centr'] = self.df_soil_grouped.apply(lambda row: (row.z_in+row.zf)/2, axis=1)
 
         # Create significant layers
 
