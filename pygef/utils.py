@@ -51,7 +51,10 @@ def parse_column_void(s):
     :param s:(str) String to search for regex pattern.
     :return:(str) List of all the possible column void.
     """
-    column_void = list(map(float, re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)))
+    column_void = None
+    g = re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)
+    if g:
+        column_void = list(map(float, re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)))
     return column_void
 
 

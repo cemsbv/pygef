@@ -21,6 +21,7 @@ class Plot:
 
     @staticmethod
     def plot_cpt(path):
+        print(path)
         classification = GroupClassification(path)
         gef = ParseCPT(path)
         cpt = gef.classify_robertson().df_complete

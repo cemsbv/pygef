@@ -242,8 +242,6 @@ class ParseCPT:
         else:
             self.df_clean = self.df
 
-
-
     @staticmethod
     def calculate_elevation_respect_to_nap(df, zid, depth, lenght):
         new_df = df
