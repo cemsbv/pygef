@@ -239,6 +239,8 @@ class ParseCPT:
         # clean data df from column void
         if self.column_void is not None:
             self.df_clean = self.df.replace(self.column_void, np.nan).interpolate(method='linear')
+        else:
+            self.df_clean = self.df
 
 
 
