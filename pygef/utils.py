@@ -49,9 +49,10 @@ def parse_column_void(s):
     Function that parses the column void.
 
     :param s:(str) String to search for regex pattern.
-    :return:(str) Column void.
+    :return:(str) List of all the possible column void.
     """
-    return parse_regex_cast(r'#COLUMNVOID[=\s+]+1[,\s+]+([\d-]+\.?\d*)', s, str, 1)
+    column_void = list(map(float, re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)))
+    return column_void
 
 
 def parse_measurement_var_as_float(s, var_number):
