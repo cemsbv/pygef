@@ -3,7 +3,7 @@ import pandas as pd
 ########
 # INPUT
 UseNewRobertson = True
-MinimumThickness = 0.10
+MinimumThickness = 0.15
 ########
 
 dict_soil_type = {'Peat': 1,
@@ -81,7 +81,7 @@ class GroupClassification:
                 sig_zf.append(sig_zf_i)
                 num_sign_layers += 1
                 store_thickness = 0
-            elif m == len(layer):
+            elif m == len(layer)-1:
                 sig_layer_i = layer[m]
                 sig_layer_thickness_i = layer_thickness[m] + store_thickness
                 sig_zf_i = zf[m]
