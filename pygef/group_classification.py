@@ -143,18 +143,21 @@ class GroupClassification:
                 final_layers.append(final_layer_i)
                 final_add_all_layer.append(final_layer_i)
                 final_store_thickness += sig_layer_thickness[n]
+            elif n == (len(significant_layers) - 1):
+                final_layer_i = significant_layers[n]
+                final_z_in.append(sig_z_in[n] - final_store_thickness)
+                final_zf.append(sig_z_in[n])
+                final_add_all_layer.append(final_layer_i)
+                final_layer_thickness.append(final_store_thickness)
+                final_layers.append(final_layer_i)
+                final_z_in.append(sig_z_in[n])
+                final_zf.append(sig_zf[n])
+                final_layer_thickness.append(sig_layer_thickness[n])
             else:
                 layer_check = significant_layers[n]
                 if layer_check == final_add_all_layer[n-1] and n != (len(significant_layers) - 1):
                     final_add_all_layer.append(layer_check)
                     final_store_thickness += sig_layer_thickness[n]
-                elif n == (len(significant_layers) - 1):
-                    final_z_in_i = sig_z_in[n] - final_store_thickness
-                    final_z_f_i = sig_zf[n]
-                    final_z_in.append(final_z_in_i)
-                    final_zf.append(final_z_f_i)
-                    final_store_thickness += sig_layer_thickness[n]
-                    final_layer_thickness.append(final_store_thickness)
                 else:
                     final_z_in_i = sig_z_in[n] - final_store_thickness
                     final_z_f_i = sig_z_in[n]
