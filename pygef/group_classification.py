@@ -69,8 +69,19 @@ class GroupClassification:
         sig_layer_thickness = []
         num_sign_layers = 0
         store_thickness = 0
-        for m in range(len(layer)-1):
+        for m in range(len(layer)):
             if m == 0:
+                sig_layer_i = layer[m]
+                sig_layer_thickness_i = layer_thickness[m] + store_thickness
+                sig_zf_i = zf[m]
+                sig_z_in_i = z_in[m] - store_thickness
+                sig_layer_thickness.append(sig_layer_thickness_i)
+                significant_layers.append(sig_layer_i)
+                sig_z_in.append(sig_z_in_i)
+                sig_zf.append(sig_zf_i)
+                num_sign_layers += 1
+                store_thickness = 0
+            elif m == len(layer):
                 sig_layer_i = layer[m]
                 sig_layer_thickness_i = layer_thickness[m] + store_thickness
                 sig_zf_i = zf[m]
@@ -161,4 +172,5 @@ class GroupClassification:
         df_final_layer_thickness = pd.DataFrame(final_layer_thickness, columns=['final_layer_thickness'])
         self.df_soil_grouped_final = pd.concat([df_final_layers, df_final_z_in, df_final_zf,
                                                 df_final_layer_thickness], axis=1, sort=False)
+        self.df_soil_grouped_final['z_centr'] = self.df_soil_grouped_final.apply(lambda row: (row.final_z_in + row.final_zf) / 2, axis=1)
 
