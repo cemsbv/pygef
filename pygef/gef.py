@@ -135,6 +135,7 @@ class ParseCPT:
         self.project_id = None
         self.s = string
         self.column_void = None
+        self.df = None
 
         # List of all the possible measurement variables
         self.nom_surface_area_cone_tip = None
@@ -222,75 +223,68 @@ class ParseCPT:
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
-        # first dataframe with only the parsed data
-        self.df_first = self.parse_data(header_s, data_s)
-        # second dataframe with the correction of the pre excavated depth
-        self.df_second = self.correct_pre_excavated_depth(self.df_first, self.pre_excavated_depth)
-        # definition of the zeros dataframe and addition of the depth to the main dataframe
-        df_depth = pd.DataFrame(np.zeros(len(self.df_second.index)), columns=['depth'])
-        df_nap_zeros = pd.DataFrame(np.zeros(len(self.df_second.index)), columns=['elevation_respect_to_NAP'])
-        self.df_with_depth = pd.concat([self.df_second, df_depth], axis=1, sort=False)
+        # dataframe with only the parsed data
+        df = self.parse_data(header_s, data_s)
+        # dataframe with the correction of the pre excavated depth
+        df = self.correct_pre_excavated_depth(df, self.pre_excavated_depth)
         # correction of the depth with the inclination if present
-        self.df_correct_depth_with_inclination = self.correct_depth_with_inclination(self.df_with_depth)
-        # definition of the elevation respect to the nap and concatenation with the previous dataframe
-        df_nap = self.calculate_elevation_respect_to_nap(df_nap_zeros, self.zid, self.df_correct_depth_with_inclination['depth'], len(self.df_second.index))
-        self.df = pd.concat([self.df_correct_depth_with_inclination, df_nap], axis=1, sort=False)
+        df = self.correct_depth_with_inclination(df)
+        # definition of the elevation respect to the nap
+        df = self.calculate_elevation_respect_to_nap(df, self.zid)
         # clean data df from column void
-        if self.column_void is not None:
-            self.df_clean = self.df.replace(self.column_void, np.nan).interpolate(method='linear')
-        else:
-            self.df_clean = self.df
-
-        if 'friction_number' in self.df_clean.columns:
-            self.df_clean['Fr'] = self.df_clean['friction_number']
-        else:
-            self.df_clean['Fr'] = self.df_clean['fs']/self.df_clean['qc']*100
+        df = self.replace_column_void(df, self.column_void)
+        # add the friction number to the data frame
+        self.df = self.calculate_friction_number(df)
 
     @staticmethod
-    def calculate_elevation_respect_to_nap(df, zid, depth, lenght):
-        new_df = df
+    def replace_column_void(df, column_void):
+        df = df.copy()
+        if column_void is not None:
+            return df.replace(column_void, np.nan).interpolate(method='linear')
+        return df
+
+    @staticmethod
+    def calculate_friction_number(df):
+        df = df.copy()
+        if 'friction_number' in df.columns:
+            df['Fr'] = df['friction_number']
+        else:
+            df['Fr'] = df['fs']/df['qc']*100
+        return df
+
+    @staticmethod
+    def calculate_elevation_respect_to_nap(df, zid):
+        df = df.copy()
         if zid is not None:
-            depth_lst = np.array(depth.tolist())
-            lst_zid = np.array([zid]*lenght)
-            new_df = pd.DataFrame(lst_zid - depth_lst, columns=['elevation_respect_to_NAP'])
-        return new_df
+            depth_lst = np.array(df['depth'].tolist())
+            lst_zid = np.array([zid]*len(df['depth']))
+            df['elevation_respect_to_NAP'] = lst_zid - depth_lst
+            return df
+        return df
 
     @staticmethod
     def correct_depth_with_inclination(df):
-        new_df = df
+        df = df.copy()
         if 'corrected_depth' in df.columns:
-            new_df['depth'] = new_df['corrected_depth']
-        elif 'inclination' in df.columns:
-            pen_len = new_df['penetration_length']
-            incl = df['inclination']
-            new_df_incl = []
-            pen0 = []
-            for pen_i in pen_len:
-                i = pen_len[pen_len == pen_i].index[0]
-                if i == 0:
-                    depth_i = pen_i
-                else:
-                    incl_i = incl[i]
-                    delta_depth_i = (pen_i - pen0[i - 1]) * np.cos(incl_i)
-                    depth_i = pen0[i - 1] + delta_depth_i
-                pen0.append(depth_i)
-                new_df_incl.append(depth_i)
-            new_df['depth'] = new_df_incl
+            df['depth'] = df['corrected_depth']
+            return df
+        if 'inclination' in df.columns:
+            diff_t_depth = np.diff(df['penetration_length'].values) * np.cos(np.radians(df['inclination'].values[:-1]))
+            # corrected depth
+            df['depth'] = np.concatenate([np.array([df['penetration_length'].iloc[0]]), np.cumsum(diff_t_depth)])
+            return df
         else:
-            new_df['depth'] = new_df['penetration_length']
-        return new_df
+            df['depth'] = df['penetration_length']
+            return df
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
-        new_df = df
+        df = df.copy()
         if pre_excavated_depth is not None:
-             for value in df['penetration_length']:
-                 if value == pre_excavated_depth:
-                    i_list = df.index[df['penetration_length'] == pre_excavated_depth].tolist()
-                    i = i_list[0]
-                    new_df_1 = df.iloc[i:]
-                    new_df = new_df_1.reset_index(drop=True)
-        return new_df
+            mask = df['penetration_length'] == pre_excavated_depth
+            i = df[mask].index[0]
+            return df[i:].reset_index(drop=True)
+        return df
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
@@ -308,7 +302,7 @@ class ParseCPT:
         return df
 
     def plot_cpt(self):
-        plot = PlotCPT(self)
+        plot = PlotCPT(self.df)
         return plot.plot_cpt()
 
 
@@ -353,6 +347,7 @@ class ParseBORE:
         column_separator = utils.parse_column_separator(header_s)
         record_separator = utils.parse_record_separator(header_s)
         data_s_rows = data_s.split(record_separator)
+
         data_rows_soil = self.extract_soil_info(data_s_rows, columns_number, column_separator)
         df_column_info = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
         df_soil_type = self.parse_data_soil_type(data_rows_soil)

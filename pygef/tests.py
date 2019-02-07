@@ -5,6 +5,7 @@ from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 from pygef.gef import ParseCPT as gef
 from pygef.gef import ParseBORE as bore
 import pandas as pd
+import numpy as np
 from pandas.util.testing import assert_frame_equal
 
 
@@ -202,35 +203,29 @@ class GefTest(unittest.TestCase):
         assert_frame_equal(df_parsed, df)
 
     def test_calculate_elevation_respect_to_NAP(self):
-        df1 = pd.DataFrame({'elevation_respect_to_NAP': [0, 0, 0, 0, 0]})
+        df1 = pd.DataFrame({'depth': [0, 1, 2, 3, 4]})
         zid = -3
-        depth = pd.Series([0, 1, 2, 3, 4], name='depth')
-        lenght = 5
-        df_calculated = gef.calculate_elevation_respect_to_nap(df1, zid, depth, lenght)
-        df = pd.DataFrame({'elevation_respect_to_NAP': [-3, -4, -5, -6, -7]})
+        df_calculated = gef.calculate_elevation_respect_to_nap(df1, zid)
+        df = pd.DataFrame({'depth': [0, 1, 2, 3, 4], 'elevation_respect_to_NAP': [-3, -4, -5, -6, -7]})
         assert_frame_equal(df_calculated, df)
 
     def test_correct_depth_with_inclination(self):
-        df1 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0, 0, 0, 0]})
+        df1 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8]})
         df_calculated = gef.correct_depth_with_inclination(df1)
         df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.2, 0.4, 0.6, 0.8]})
         assert_frame_equal(df_calculated, df)
 
-        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0, 0, 0, 0],
-                            'inclination': [45, 45, 45, 45, 45]})
+        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'inclination': [45, 45, 45, 45, 45]})
         df_calculated = gef.correct_depth_with_inclination(df2)
-        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.10506439776354595,
-                                                                                    0.2600005549035549,
-                                                                                    0.43860973959854394,
-                                                                                    0.6284559899319941], 'inclination':
-                               [45, 45, 45, 45, 45]})
+        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'inclination': [45, 45, 45, 45, 45],
+                           'depth': [0.0, 0.14142135623730953, 0.28284271247461906, 0.42426406871192857, 0.5656854249492381]})
         assert_frame_equal(df_calculated, df)
 
-        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0, 0, 0, 0], 'corrected_depth':
+        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'corrected_depth':
             [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
         df_calculated = gef.correct_depth_with_inclination(df2)
-        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.10, 0.25, 0.40, 0.60],
-                           'corrected_depth': [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
+        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'corrected_depth': [0, 0.10, 0.25, 0.40, 0.60],
+                           'inclination': [45, 45, 45, 45, 45], 'depth': [0, 0.10, 0.25, 0.40, 0.60]})
         assert_frame_equal(df_calculated, df)
 
     def test_pre_excavated_depth(self):
@@ -239,6 +234,56 @@ class GefTest(unittest.TestCase):
         df_calculated = gef.correct_pre_excavated_depth(df1, pre_excavated_depth)
         df = pd.DataFrame({'penetration_length': [2, 3, 4], 'qc': [0.6, 0.7, 0.8]})
         assert_frame_equal(df_calculated, df)
+
+    def test_replace_column_void(self):
+        df1 = pd.DataFrame({'penetration_length': [999, 1, 2, 3, 4], 'qc': [999, 0.5, 0.6, 0.7, 0.8]})
+        column_void = 999
+        df_calculated = gef.replace_column_void(df1, column_void)
+        df = pd.DataFrame({'penetration_length': [np.nan, 1, 2, 3, 4], 'qc': [np.nan, 0.5, 0.6, 0.7, 0.8]})
+        assert_frame_equal(df_calculated, df)
+
+    def test_calculate_friction_number(self):
+        df1 = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08]})
+        df_calculated = gef.calculate_friction_number(df1)
+        df = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08], 'Fr': [0., 10., 10., 10., 10.]})
+        assert_frame_equal(df_calculated, df)
+
+    def test_parse_cpt(self):
+        cpt = gef(string="""#GEFID= 1, 1, 0
+                                 #FILEOWNER= Wagen 2
+                                 #FILEDATE= 2004, 1, 14
+                                 #PROJECTID= CPT, 146203
+                                 #COLUMN= 3
+                                 #COLUMNINFO= 1, m, Sondeerlengte, 1
+                                 #COLUMNINFO= 2, MPa, Conuswaarde, 2
+                                 #COLUMNINFO= 3, MPa, Wrijvingsweerstand, 3                                    
+                                 #XYID= 31000, 132127.181, 458102.351, 0.000, 0.000
+                                 #ZID= 31000, 1.3, 0.0
+                                 #MEASUREMENTTEXT= 4, 030919, Conusnummer
+                                 #MEASUREMENTTEXT= 6, NEN 5140, Norm
+                                 #MEASUREMENTTEXT= 9, MV, fixed horizontal level
+                                 #MEASUREMENTVAR= 20, 0.000000, MPa, Nulpunt conus voor sondering
+                                 #MEASUREMENTVAR= 22, 0.000000, MPa, Nulpunt kleef voor sondering
+                                 #MEASUREMENTVAR= 30, 0.000000, deg, Nulpunt helling voor sondering
+                                 #PROCEDURECODE= GEF-CPT-Report, 1, 0, 0, -
+                                 #TESTID= 4
+                                 #PROJECTNAME= Uitbreiding Rijksweg 2
+                                 #OS= DOS
+                                 #EOH=
+                                 0.0000e+000 0.0000e+000 0.0000e+000 
+                                 1.0200e+000 7.1000e-001 4.6500e-002 
+                                 1.0400e+000 7.3000e-001 4.2750e-002 
+                                 1.0600e+000 6.9000e-001 3.9000e-002                                                                      
+                                 """)
+        df_calculated = cpt.df
+        df = pd.DataFrame({"penetration_length": [0.0000e+000, 1.0200e+000, 1.0400e+000, 1.0600e+000],
+                           "qc": [0.0000e+000, 7.1000e-001, 7.3000e-001, 6.9000e-001],
+                           "fs": [0.0000e+000, 4.6500e-002, 4.2750e-002, 3.9000e-002],
+                           "depth": [0.0000e+000, 1.0200e+000, 1.0400e+000, 1.0600e+000],
+                           'elevation_respect_to_NAP': [1.3 , 0.28, 0.26, 0.24],
+                           'Fr': [np.nan, 6.54929577, 5.85616438, 5.65217391]} )
+        assert_frame_equal(df_calculated, df)
+
 
 
 

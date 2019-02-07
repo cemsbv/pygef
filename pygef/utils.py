@@ -236,10 +236,9 @@ def find_separator(header_s):
     """
     try_sep = parse_column_separator(header_s)
     if try_sep is not None:
-        separator = parse_column_separator(header_s)
+        return parse_column_separator(header_s)
     else:
-        separator = r';|\s+|,|\|\s*'
-    return separator
+        return r';|\s+|,|\|\s*'
 
 
 def parse_soil_code(s):
@@ -249,8 +248,7 @@ def parse_soil_code(s):
     :param s: (str) String with the soil code.
     :return: Soil code.
     """
-    string_noquote = s.replace("'", '')
-    return string_noquote
+    return s.replace("'", '')
 
 
 def create_soil_type(s):
