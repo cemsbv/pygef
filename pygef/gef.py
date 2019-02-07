@@ -2,7 +2,6 @@ import pygef.utils as utils
 import pandas as pd
 import io
 import numpy as np
-from pygef.robertson import RobertsonClassifier
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
@@ -59,7 +58,7 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
                                        131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
                                        135: "Temperature_C",  # found in:#COMPANYID= Inpijn-Blokpoel,
                                        250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
-                                       251: "magneto_slope_x"}  # found in:COMPANYID= Danny, Tjaden, 31
+                                       251: "magneto_slope_x"}  # found in:OMPANYID= Danny, Tjaden, 31
 
 COLUMN_NAMES_BORE = ["depth_top",  # 1
                      "depth_bottom",  # 2
@@ -115,7 +114,6 @@ class ParseGEF:
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
-
         self.__dict__.update(parsed.__dict__)
 
 
@@ -236,11 +234,7 @@ class ParseCPT:
         # definition of the elevation respect to the nap and concatenation with the previous dataframe
         df_nap = self.calculate_elevation_respect_to_nap(df_nap_zeros, self.zid, self.df_correct_depth_with_inclination['depth'], len(self.df_second.index))
         self.df = pd.concat([self.df_correct_depth_with_inclination, df_nap], axis=1, sort=False)
-        # clean data df from column void
-        if self.column_void is not None:
-            self.df_clean = self.df.replace(self.column_void, np.nan).interpolate(method='linear')
-        else:
-            self.df_clean = self.df
+
 
     @staticmethod
     def calculate_elevation_respect_to_nap(df, zid, depth, lenght):
@@ -257,21 +251,7 @@ class ParseCPT:
         if 'corrected_depth' in df.columns:
             new_df['depth'] = new_df['corrected_depth']
         elif 'inclination' in df.columns:
-            pen_len = new_df['penetration_length']
-            incl = df['inclination']
-            new_df_incl = []
-            pen0 = []
-            for pen_i in pen_len:
-                i = pen_len[pen_len == pen_i].index[0]
-                if i == 0:
-                    depth_i = pen_i
-                else:
-                    incl_i = incl[i]
-                    delta_depth_i = (pen_i - pen0[i - 1]) * np.cos(incl_i)
-                    depth_i = pen0[i - 1] + delta_depth_i
-                pen0.append(depth_i)
-                new_df_incl.append(depth_i)
-            new_df['depth'] = new_df_incl
+            new_df['depth'] = new_df['penetration_length']*np.cos(df['inclination'])
         else:
             new_df['depth'] = new_df['penetration_length']
         return new_df
@@ -280,8 +260,8 @@ class ParseCPT:
     def correct_pre_excavated_depth(df, pre_excavated_depth):
         new_df = df
         if pre_excavated_depth is not None:
-            for value in df['penetration_length']:
-                if value == pre_excavated_depth:
+             for value in df['penetration_length']:
+                 if value == pre_excavated_depth:
                     i_list = df.index[df['penetration_length'] == pre_excavated_depth].tolist()
                     i = i_list[0]
                     new_df_1 = df.iloc[i:]
@@ -290,6 +270,7 @@ class ParseCPT:
 
     @staticmethod
     def parse_data(header_s, data_s, columns_number=None, columns_info=None):
+        df = {}
         if columns_number is None and columns_info is None:
             columns_number = utils.parse_columns_number(header_s)
             if columns_number is not None:
@@ -298,18 +279,9 @@ class ParseCPT:
                     column_info = utils.parse_column_info(header_s, column_number,
                                                           MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
                     columns_info.append(column_info)
-        new_data = data_s.replace('!', '')
-        separator = utils.find_separator(header_s)
-        df = pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
+                df = pd.read_csv(io.StringIO(data_s.replace('!', '')), sep=r';|\s+|,|\|\s*',
+                                 names=columns_info, index_col=False, engine='python')
         return df
-
-    def classify_robertson(self, new=True):  # True to use the new robertson
-        m = RobertsonClassifier(self)
-        if new:
-            self.df_clean = m.classify()
-        else:
-            self.df_clean = m.classify(new=False)
-        return m
 
 
 class ParseBORE:
@@ -430,3 +402,6 @@ class ParseBORE:
                     lst.append(soil_quantified)
         df_soil_quantified = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
         return df_soil_quantified
+
+        # List of all the possible measurement variables
+

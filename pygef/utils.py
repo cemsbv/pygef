@@ -13,7 +13,8 @@ def cast_string(f, s):
     """
     try:
         return f(s)
-    except ValueError:
+    except ValueError as e:
+        logging.error(f'Could not parse {f}. Message: {e}')
         return None
 
 
@@ -49,13 +50,10 @@ def parse_column_void(s):
     Function that parses the column void.
 
     :param s:(str) String to search for regex pattern.
-    :return:(str) List of all the possible column void.
+
+    :return:(str) Column void.
     """
-    column_void = None
-    g = re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)
-    if g:
-        column_void = list(map(float, re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)))
-    return column_void
+    return parse_regex_cast(r'#COLUMNVOID[=\s+]+1[,\s+]+([\d-]+\.?\d*)', s, str, 1)
 
 
 def parse_measurement_var_as_float(s, var_number):
@@ -144,7 +142,7 @@ def parse_gef_type(s):
 
 def parse_file_date(s):
     """
-    Function to parse the file date.
+    Fuction to parse the file date.
 
     :param s: (str) String to search for regex pattern.
     :return: File date.
@@ -165,7 +163,6 @@ def parse_file_date(s):
 
 
 def parse_columns_number(s):
-
     """
     Function that returns the columns number as an int.
 
@@ -226,20 +223,6 @@ def parse_record_separator(s):
     :return: Record separator.
     """""
     return parse_regex_cast(r"#RECORDSEPARATOR+[=\s+]+(.)", s, str, 1)
-
-
-def find_separator(header_s):
-    """
-
-    :param data_s:
-    :return:
-    """
-    try_sep = parse_column_separator(header_s)
-    if try_sep is not None:
-        separator = parse_column_separator(header_s)
-    else:
-        separator = r';|\s+|,|\|\s*'
-    return separator
 
 
 def parse_soil_code(s):
