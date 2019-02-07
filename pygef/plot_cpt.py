@@ -1,22 +1,18 @@
-from pygef.gef import ParseCPT
 import matplotlib.pyplot as plt
-from collections import OrderedDict
 
 
 class PlotCPT:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, gef):
+        self.gef = gef
 
-    @staticmethod
-    def plot_cpt(path):
-        gef = ParseCPT(path)
-        cpt = gef.classify_robertson().df_complete
+    def plot_cpt(self):
+        cpt = self.gef.classify_robertson().df_complete
 
         depth_max = cpt['depth'].max()
         depth_min = cpt['depth'].min()
-        fig = plt.figure(path, figsize=(15, 30))
+        fig = plt.figure(figsize=(15, 30))
 
-        qc = fig.add_subplot(1, 4, 1)
+        qc = fig.add_subplot(1, 4, 1)  # Plot qc
         plt.plot(cpt['qc'], cpt['depth'], 'b')
         qc.set_xlabel('qc (MPa)')
         qc.set_ylabel('Z (m)')

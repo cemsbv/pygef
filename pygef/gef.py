@@ -3,6 +3,7 @@ import pandas as pd
 import io
 import numpy as np
 from pygef.robertson import RobertsonClassifier
+from pygef.plot_cpt import PlotCPT
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
@@ -310,8 +311,10 @@ class ParseCPT:
         else:
             self.df_clean = m.classify(new=False)
         return m
-    def plot_cpt(self):
 
+    def plot_cpt(self):
+        plot = PlotCPT(self)
+        return plot.plot_cpt()
 
 
 class ParseBORE:
