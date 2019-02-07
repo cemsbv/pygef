@@ -243,6 +243,11 @@ class ParseCPT:
         else:
             self.df_clean = self.df
 
+        if 'friction_number' in self.df_clean.columns:
+            self.df_clean['Fr'] = self.df_clean['friction_number']
+        else:
+            self.df_clean['Fr'] = self.df_clean['fs']/self.df_clean['qc']*100
+
     @staticmethod
     def calculate_elevation_respect_to_nap(df, zid, depth, lenght):
         new_df = df

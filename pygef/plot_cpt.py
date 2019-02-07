@@ -18,10 +18,10 @@ class PlotCPT:
         qc.set_ylabel('Z (m)')
         plt.ylim(depth_max, depth_min)
 
-        fs = fig.add_subplot(1, 4, 2)
-        plt.plot(cpt['fs'], cpt['depth'], 'b')
-        fs.set_xlabel('fs (MPa)')
-        fs.set_ylabel('Z (m)')
+        Fr = fig.add_subplot(1, 4, 2)
+        plt.plot(cpt['Fr'], cpt['depth'], 'b')
+        Fr.set_xlabel('Fr (%)')
+        Fr.set_ylabel('Z (m)')
         plt.ylim(depth_max, depth_min)
         return plt.show()
 
