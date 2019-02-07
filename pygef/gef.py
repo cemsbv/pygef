@@ -310,6 +310,8 @@ class ParseCPT:
         else:
             self.df_clean = m.classify(new=False)
         return m
+    def plot_cpt(self):
+
 
 
 class ParseBORE:
