@@ -108,7 +108,7 @@ class GefTest(unittest.TestCase):
     def test_parse_data(self):
         header_s = 'This is an header'
         df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [1, 2, 3], 'col3': [1, 2, 3]})
-        data_s = '\n1,1,1\n2,2,2\n3,3,3'
+        data_s = '\n1,1,1\n2,2,2\n3,3,3'.replace(',', ' ')
         df_parsed = gef.parse_data(header_s, data_s, columns_number=3,
                                    columns_info=['col1', 'col2', 'col3'])
         assert_frame_equal(df_parsed, df)
@@ -220,12 +220,14 @@ class GefTest(unittest.TestCase):
                             'inclination': [45, 45, 45, 45, 45]})
         df_calculated = gef.correct_depth_with_inclination(df2)
         df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.10506439776354595,
-                           0.2600005549035549, 0.43860973959854394, 0.6284559899319941], 'inclination':
-                           [45, 45, 45, 45, 45]})
+                                                                                    0.2600005549035549,
+                                                                                    0.43860973959854394,
+                                                                                    0.6284559899319941], 'inclination':
+                               [45, 45, 45, 45, 45]})
         assert_frame_equal(df_calculated, df)
 
         df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0, 0, 0, 0], 'corrected_depth':
-                            [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
+            [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
         df_calculated = gef.correct_depth_with_inclination(df2)
         df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'depth': [0, 0.10, 0.25, 0.40, 0.60],
                            'corrected_depth': [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
@@ -237,6 +239,9 @@ class GefTest(unittest.TestCase):
         df_calculated = gef.correct_pre_excavated_depth(df1, pre_excavated_depth)
         df = pd.DataFrame({'penetration_length': [2, 3, 4], 'qc': [0.6, 0.7, 0.8]})
         assert_frame_equal(df_calculated, df)
+
+
+
 
 
 

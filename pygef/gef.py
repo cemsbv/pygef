@@ -59,7 +59,7 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
                                        131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
                                        135: "Temperature_C",  # found in:#COMPANYID= Inpijn-Blokpoel,
                                        250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
-                                       251: "magneto_slope_x"}  # found in:COMPANYID= Danny, Tjaden, 31
+                                       251: "magneto_slope_x"}  # found in:OMPANYID= Danny, Tjaden, 31
 
 COLUMN_NAMES_BORE = ["depth_top",  # 1
                      "depth_bottom",  # 2
@@ -115,7 +115,6 @@ class ParseGEF:
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
-
         self.__dict__.update(parsed.__dict__)
 
 
@@ -285,8 +284,8 @@ class ParseCPT:
     def correct_pre_excavated_depth(df, pre_excavated_depth):
         new_df = df
         if pre_excavated_depth is not None:
-            for value in df['penetration_length']:
-                if value == pre_excavated_depth:
+             for value in df['penetration_length']:
+                 if value == pre_excavated_depth:
                     i_list = df.index[df['penetration_length'] == pre_excavated_depth].tolist()
                     i = i_list[0]
                     new_df_1 = df.iloc[i:]
@@ -431,3 +430,4 @@ class ParseBORE:
                     lst.append(soil_quantified)
         df_soil_quantified = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
         return df_soil_quantified
+

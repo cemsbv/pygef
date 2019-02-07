@@ -13,7 +13,8 @@ def cast_string(f, s):
     """
     try:
         return f(s)
-    except ValueError:
+    except ValueError as e:
+        logging.error(f'Could not parse {f}. Message: {e}')
         return None
 
 
@@ -144,7 +145,7 @@ def parse_gef_type(s):
 
 def parse_file_date(s):
     """
-    Function to parse the file date.
+    Fuction to parse the file date.
 
     :param s: (str) String to search for regex pattern.
     :return: File date.
@@ -165,7 +166,6 @@ def parse_file_date(s):
 
 
 def parse_columns_number(s):
-
     """
     Function that returns the columns number as an int.
 
