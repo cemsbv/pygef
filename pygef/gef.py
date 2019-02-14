@@ -266,7 +266,8 @@ class ParseCPT:
         if 'inclination' in df.columns:
             diff_t_depth = np.diff(df['penetration_length'].values) * np.cos(np.radians(df['inclination'].values[:-1]))
             # corrected depth
-            return df.assign(depth=np.concatenate([np.array([df['penetration_length'].iloc[0]]), np.cumsum(diff_t_depth)]))
+            return df.assign(depth=np.concatenate([np.array([df['penetration_length'].iloc[0]]),
+                                                   np.cumsum(diff_t_depth)]))
         else:
             return df.assign(depth=df['penetration_length'])
 
@@ -343,78 +344,45 @@ class ParseBORE:
         data_s_rows = data_s.split(record_separator)
 
         data_rows_soil = self.extract_soil_info(data_s_rows, columns_number, column_separator)
-        df_column_info = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
-        df_soil_type = self.parse_data_soil_type(data_rows_soil)
-        df_soil_code = self.parse_data_soil_code(data_rows_soil)
+
+        df_complete = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
+        df_complete = self.parse_data_soil_code(df_complete, data_rows_soil)
+        df_complete = self.parse_data_soil_type(df_complete, data_rows_soil)
         df_soil_quantified = self.data_soil_quantified(data_rows_soil)
-        df_additional_info = self.parse_add_info_as_string(data_rows_soil)
-        df_bore_more_info = pd.concat([df_column_info, df_soil_code, df_soil_type, df_soil_quantified,
-                                       df_additional_info], axis=1, sort=False)
+        df_complete = self.parse_add_info_as_string(df_complete, data_rows_soil)
+        df_bore_more_info = pd.concat([df_complete, df_soil_quantified], axis=1, sort=False)
         self.df = df_bore_more_info[['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
                                     'Loam', 'Peat', 'Silt']]
         self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'S']
 
     @staticmethod
-    def parse_add_info_as_string(data_rows_soil):
-        add_infos = ['additional_info']
-        lst = []
-        for row in data_rows_soil:
-            add_info = ""
-            for i in range(len(row)-1):
-                if i >= 1:
-                    add_info = add_info + utils.parse_add_info(row[i])
-            lst.append(add_info)
-        df_add_infos = pd.DataFrame(lst, columns=add_infos)
-        return df_add_infos
+    def parse_add_info_as_string(df, data_rows_soil):
+        return df.assign(additional_info=[''.join(map(utils.parse_add_info, row[1:-1])) for row in data_rows_soil])
 
     @staticmethod
     def extract_soil_info(data_s_rows, columns_number, column_separator):
-        data_rows_soil = []
-        for row in data_s_rows:
-            data_rows_soil.append(row.split(column_separator)[columns_number:-1])
-        return data_rows_soil[:-1]
+        return list(map(lambda x: x.split(column_separator)[columns_number:-1], data_s_rows[:-1]))
 
     @staticmethod
     def parse_data_column_info(header_s, data_s, sep, columns_number, columns_info=None):
         if columns_info is None:
-            columns_info = []
-            for column_number in range(columns_number):
-                column_info = utils.parse_column_info(header_s, column_number,
-                                                      MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE)
-                columns_info.append(column_info)
-        return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
+            return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
+                           usecols=list(map(lambda x: utils.parse_column_info(header_s, x,
+                                                                              MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE),
+                                            range(1, columns_number+1))))
+        else:
+            return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
                                      usecols=columns_info)
 
     @staticmethod
-    def parse_data_soil_type(data_rows_soil):
-        lst = []
-        for row in data_rows_soil:
-            for i in range(len(row)):
-                if i == 0:
-                    soil_quantified = utils.create_soil_type(row[i])
-                    lst.append(soil_quantified)
-        df_soil_type = pd.DataFrame(lst, columns=['Soil_type'])
-        return df_soil_type
+    def parse_data_soil_type(df, data_rows_soil):
+        return df.assign(Soil_type=list(map(lambda x: utils.create_soil_type(x[0]), data_rows_soil)))
 
     @staticmethod
-    def parse_data_soil_code(data_rows_soil):
-        lst = []
-        for row in data_rows_soil:
-            for i in range(len(row)):
-                if i == 0:
-                    soil_type = utils.parse_soil_code(row[i])
-                    lst.append(soil_type)
-        df_soil_code = pd.DataFrame(lst, columns=['Soil_code'])
-        return df_soil_code
+    def parse_data_soil_code(df, data_rows_soil):
+        return df.assign(Soil_code=list(map(lambda x: utils.parse_soil_code(x[0]),data_rows_soil)))
 
     @staticmethod
     def data_soil_quantified(data_rows_soil):
-        lst = []
-        for row in data_rows_soil:
-            for i in range(len(row)):
-                if i == 0:
-                    soil_quantified = utils.soil_quantification(row[i])
-                    lst.append(soil_quantified)
-        df_soil_quantified = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
-        return df_soil_quantified
-
+        return pd.DataFrame(list(map(lambda x: utils.soil_quantification(x[0]), data_rows_soil)),
+                            columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])

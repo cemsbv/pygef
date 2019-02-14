@@ -149,7 +149,7 @@ class GefTest(unittest.TestCase):
     def test_parse_data_soil_type(self):
         df = pd.DataFrame({'Soil_type': ['clay 100% with sand', 'clay 95% with sand 5%', 'clay 90% with sand 10%']})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
-        df_parsed = bore.parse_data_soil_type(data_s)
+        df_parsed = bore.parse_data_soil_type(pd.DataFrame({}), data_s)
         assert_frame_equal(df_parsed, df)
 
     def test_parse_add_info(self):
@@ -173,7 +173,8 @@ class GefTest(unittest.TestCase):
         df = pd.DataFrame({'additional_info': ['spoor schelpmateriaal <1%|', 'dark olive-red|',
                                                'keileem|Formatie van Drente|']})
         data_s = [["'Kz'", "'SCH1'", "''"], ["'Kz1'", "'DO TOL RO'", "''"], ["'Kz2'", "'KEL DR'", "''"]]
-        df_parsed = bore.parse_add_info_as_string(data_s)
+
+        df_parsed = bore.parse_add_info_as_string(pd.DataFrame({}), data_s)
         assert_frame_equal(df_parsed, df)
 
     def test_soil_quantification(self):
@@ -192,7 +193,7 @@ class GefTest(unittest.TestCase):
     def test_parse_data_soil_code(self):
         df = pd.DataFrame({'Soil_code': ['Kz', 'Kz1', 'Kz2']})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
-        df_parsed = bore.parse_data_soil_code(data_s)
+        df_parsed = bore.parse_data_soil_code(pd.DataFrame({}), data_s)
         assert_frame_equal(df_parsed, df)
 
     def test_data_soil_quantified(self):
@@ -283,16 +284,5 @@ class GefTest(unittest.TestCase):
                            'elevation_respect_to_NAP': [1.3 , 0.28, 0.26, 0.24],
                            'Fr': [np.nan, 6.54929577, 5.85616438, 5.65217391]} )
         assert_frame_equal(df_calculated, df)
-
-
-
-
-
-
-
-
-
-
-
 
 
