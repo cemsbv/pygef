@@ -238,51 +238,45 @@ class ParseCPT:
 
     @staticmethod
     def replace_column_void(df, column_void):
-        df = df.copy()
         if column_void is not None:
             return df.replace(column_void, np.nan).interpolate(method='linear')
         return df
 
     @staticmethod
     def calculate_friction_number(df):
-        df = df.copy()
         if 'friction_number' in df.columns:
-            df['Fr'] = df['friction_number']
+            return df.assign(Fr=df['friction_number'])
+        elif 'fs' in df.columns and 'qc' in df.columns:
+            return df.assign(Fr=(df['fs']/df['qc']*100))
         else:
-            df['Fr'] = df['fs']/df['qc']*100
-        return df
+            return df
 
     @staticmethod
     def calculate_elevation_respect_to_nap(df, zid):
-        df = df.copy()
         if zid is not None:
             depth_lst = np.array(df['depth'].tolist())
             lst_zid = np.array([zid]*len(df['depth']))
-            df['elevation_respect_to_NAP'] = lst_zid - depth_lst
-            return df
+            return df.assign(elevation_respect_to_NAP=(lst_zid - depth_lst))
         return df
 
     @staticmethod
     def correct_depth_with_inclination(df):
-        df = df.copy()
         if 'corrected_depth' in df.columns:
-            df['depth'] = df['corrected_depth']
-            return df
+            return df.assign(depth=df['corrected_depth'])
         if 'inclination' in df.columns:
             diff_t_depth = np.diff(df['penetration_length'].values) * np.cos(np.radians(df['inclination'].values[:-1]))
             # corrected depth
-            df['depth'] = np.concatenate([np.array([df['penetration_length'].iloc[0]]), np.cumsum(diff_t_depth)])
-            return df
+            return df.assign(depth=np.concatenate([np.array([df['penetration_length'].iloc[0]]), np.cumsum(diff_t_depth)]))
         else:
-            df['depth'] = df['penetration_length']
-            return df
+            return df.assign(depth=df['penetration_length'])
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
-        df = df.copy()
-        if pre_excavated_depth is not None:
+        if pre_excavated_depth is not None and \
+                np.any(np.isclose(df['penetration_length'].values - pre_excavated_depth, 0)):
             mask = df['penetration_length'] == pre_excavated_depth
-            i = df[mask].index[0]
+            mask2 = df[mask].reset_index(drop=False)
+            i = mask2['index'][0]
             return df[i:].reset_index(drop=True)
         return df
 
@@ -377,21 +371,19 @@ class ParseBORE:
     def extract_soil_info(data_s_rows, columns_number, column_separator):
         data_rows_soil = []
         for row in data_s_rows:
-            new_row = row.split(column_separator)[columns_number:-1]
-            data_rows_soil.append(new_row)
+            data_rows_soil.append(row.split(column_separator)[columns_number:-1])
         return data_rows_soil[:-1]
 
     @staticmethod
     def parse_data_column_info(header_s, data_s, sep, columns_number, columns_info=None):
         if columns_info is None:
             columns_info = []
-            for column_number in range(1, columns_number + 1):
+            for column_number in range(columns_number):
                 column_info = utils.parse_column_info(header_s, column_number,
                                                       MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE)
                 columns_info.append(column_info)
-        df_column_info = pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
+        return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
                                      usecols=columns_info)
-        return df_column_info
 
     @staticmethod
     def parse_data_soil_type(data_rows_soil):
