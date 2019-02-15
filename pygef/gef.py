@@ -366,10 +366,10 @@ class ParseBORE:
     @staticmethod
     def parse_data_column_info(header_s, data_s, sep, columns_number, columns_info=None):
         if columns_info is None:
-            return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
-                           usecols=list(map(lambda x: utils.parse_column_info(header_s, x,
-                                                                              MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE),
-                                            range(1, columns_number+1))))
+            col = list(map(lambda x: utils.parse_column_info(header_s, x, MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE),
+                       range(1, columns_number+1)))
+            return pd.read_csv(io.StringIO(data_s), sep=sep, names=col, index_col=False,
+                           usecols=col)
         else:
             return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
                                      usecols=columns_info)
@@ -386,3 +386,8 @@ class ParseBORE:
     def data_soil_quantified(data_rows_soil):
         return pd.DataFrame(list(map(lambda x: utils.soil_quantification(x[0]), data_rows_soil)),
                             columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
+
+        # return df.assign({k: v for k, v in
+        #                 zip(['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'],
+        #                     np.array(list(map(lambda x: utils.soil_quantification(x[0]), data_rows_soil))).T)
+        #                 })
