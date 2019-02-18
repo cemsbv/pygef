@@ -217,9 +217,11 @@ class ParseCPT:
         self.zero_measurement_ppt_u3_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 29)
         self.zero_measurement_inclination_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 30)
         self.zero_measurement_inclination_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 31)
-        self.zero_measurement_inclination_ns_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 32)
+        self.zero_measurement_inclination_ns_before_penetration_test = utils.parse_measurement_var_as_float(header_s,
+                                                                                                            32)
         self.zero_measurement_inclination_ns_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 33)
-        self.zero_measurement_inclination_ew_before_penetration_test = utils.parse_measurement_var_as_float(header_s, 34)
+        self.zero_measurement_inclination_ew_before_penetration_test = utils.parse_measurement_var_as_float(header_s,
+                                                                                                            34)
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
@@ -247,7 +249,7 @@ class ParseCPT:
         if 'friction_number' in df.columns:
             return df.assign(Fr=df['friction_number'])
         elif 'fs' in df.columns and 'qc' in df.columns:
-            return df.assign(Fr=(df['fs']/df['qc']*100))
+            return df.assign(Fr=(df['fs'] / df['qc'] * 100))
         else:
             return df
 
@@ -255,7 +257,7 @@ class ParseCPT:
     def calculate_elevation_respect_to_nap(df, zid):
         if zid is not None:
             depth_lst = np.array(df['depth'].tolist())
-            lst_zid = np.array([zid]*len(df['depth']))
+            lst_zid = np.array([zid] * len(df['depth']))
             return df.assign(elevation_respect_to_NAP=(lst_zid - depth_lst))
         return df
 
@@ -352,7 +354,7 @@ class ParseBORE:
         df_complete = self.parse_add_info_as_string(df_complete, data_rows_soil)
         df_bore_more_info = pd.concat([df_complete, df_soil_quantified], axis=1, sort=False)
         self.df = df_bore_more_info[['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
-                                    'Loam', 'Peat', 'Silt']]
+                                     'Loam', 'Peat', 'Silt']]
         self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'S']
 
     @staticmethod
@@ -367,12 +369,12 @@ class ParseBORE:
     def parse_data_column_info(header_s, data_s, sep, columns_number, columns_info=None):
         if columns_info is None:
             col = list(map(lambda x: utils.parse_column_info(header_s, x, MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE),
-                       range(1, columns_number+1)))
+                           range(1, columns_number + 1)))
             return pd.read_csv(io.StringIO(data_s), sep=sep, names=col, index_col=False,
-                           usecols=col)
+                               usecols=col)
         else:
             return pd.read_csv(io.StringIO(data_s), sep=sep, names=columns_info, index_col=False,
-                                     usecols=columns_info)
+                               usecols=columns_info)
 
     @staticmethod
     def parse_data_soil_type(df, data_rows_soil):
@@ -380,14 +382,9 @@ class ParseBORE:
 
     @staticmethod
     def parse_data_soil_code(df, data_rows_soil):
-        return df.assign(Soil_code=list(map(lambda x: utils.parse_soil_code(x[0]),data_rows_soil)))
+        return df.assign(Soil_code=list(map(lambda x: utils.parse_soil_code(x[0]), data_rows_soil)))
 
     @staticmethod
     def data_soil_quantified(data_rows_soil):
         return pd.DataFrame(list(map(lambda x: utils.soil_quantification(x[0]), data_rows_soil)),
                             columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
-
-        # return df.assign({k: v for k, v in
-        #                 zip(['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'],
-        #                     np.array(list(map(lambda x: utils.soil_quantification(x[0]), data_rows_soil))).T)
-        #                 })
