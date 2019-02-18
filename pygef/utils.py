@@ -50,9 +50,13 @@ def parse_column_void(s):
     Function that parses the column void.
 
     :param s:(str) String to search for regex pattern.
-    :return:(str) Column void.
+    :return:(str) List of all the possible column void.
     """
-    return parse_regex_cast(r'#COLUMNVOID[=\s+]+1[,\s+]+([\d-]+\.?\d*)', s, str, 1)
+    column_void = None
+    g = re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)
+    if g:
+        column_void = list(map(float, re.findall(r'#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)', s)))
+    return column_void
 
 
 def parse_measurement_var_as_float(s, var_number):
@@ -162,7 +166,6 @@ def parse_file_date(s):
 
 
 def parse_columns_number(s):
-
     """
     Function that returns the columns number as an int.
 
@@ -225,6 +228,19 @@ def parse_record_separator(s):
     return parse_regex_cast(r"#RECORDSEPARATOR+[=\s+]+(.)", s, str, 1)
 
 
+def find_separator(header_s):
+    """
+
+    :param data_s:
+    :return:
+    """
+    try_sep = parse_column_separator(header_s)
+    if try_sep is not None:
+        return parse_column_separator(header_s)
+    else:
+        return r';|\s+|,|\|\s*'
+
+
 def parse_soil_code(s):
     """
     Function to parse the soil code.
@@ -232,8 +248,7 @@ def parse_soil_code(s):
     :param s: (str) String with the soil code.
     :return: Soil code.
     """
-    string_noquote = s.replace("'", '')
-    return string_noquote
+    return s.replace("'", '')
 
 
 def create_soil_type(s):
