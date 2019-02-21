@@ -129,7 +129,9 @@ class ParseCPT:
         """
         Parser of the cpt file.
 
-        :param string:(str) String to parse.
+        :param header_s: (str) Header of the file
+        :param data_s: (str) Data of the file
+        :param zid: (flt) Z attribute.
         """
 
         self.type = 'cpt'
@@ -172,18 +174,13 @@ class ParseCPT:
         self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(header_s, 35)
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
-        # dataframe with only the parsed data
-        df = self.parse_data(header_s, data_s)
-        # dataframe with the correction of the pre excavated depth
-        df = self.correct_pre_excavated_depth(df, self.pre_excavated_depth)
-        # correction of the depth with the inclination if present
-        df = self.correct_depth_with_inclination(df)
-        # definition of the elevation respect to the nap
-        df = self.calculate_elevation_respect_to_nap(df, zid)
-        # clean data df from column void
-        df = self.replace_column_void(df, self.column_void)
-        # add the friction number to the data frame
-        self.df = self.calculate_friction_number(df)
+        self.df = (self.parse_data(header_s, data_s)
+                   .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
+                   .pipe(self.correct_depth_with_inclination)
+                   .pipe(self.calculate_elevation_respect_to_nap, zid)
+                   .pipe(self.replace_column_void, self.column_void)
+                   .pipe(self.calculate_friction_number)
+        )
 
     @staticmethod
     def replace_column_void(df, column_void):
@@ -255,7 +252,8 @@ class ParseBORE:
         """
         Parser of the borehole file.
 
-
+        :param header_s: (str) Header of the file
+        :param data_s: (str) Data of the file
         """
         self.type = 'bore'
         self.project_id = utils.parse_project_type(header_s, 'bore')
@@ -264,7 +262,6 @@ class ParseBORE:
         column_separator = utils.parse_column_separator(header_s)
         record_separator = utils.parse_record_separator(header_s)
         data_s_rows = data_s.split(record_separator)
-
         data_rows_soil = self.extract_soil_info(data_s_rows, columns_number, column_separator)
 
         df_complete = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
