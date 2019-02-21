@@ -264,14 +264,15 @@ class ParseBORE:
         data_s_rows = data_s.split(record_separator)
         data_rows_soil = self.extract_soil_info(data_s_rows, columns_number, column_separator)
 
-        df_complete = self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
-        df_complete = self.parse_data_soil_code(df_complete, data_rows_soil)
-        df_complete = self.parse_data_soil_type(df_complete, data_rows_soil)
-        df_soil_quantified = self.data_soil_quantified(data_rows_soil)
-        df_complete = self.parse_add_info_as_string(df_complete, data_rows_soil)
-        df_bore_more_info = pd.concat([df_complete, df_soil_quantified], axis=1, sort=False)
-        self.df = df_bore_more_info[['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
-                                     'Loam', 'Peat', 'Silt']]
+        self.df = (self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
+                   .pipe(self.parse_data_soil_code, data_rows_soil)
+                   .pipe(self.parse_data_soil_type, data_rows_soil)
+                   .pipe(self.parse_add_info_as_string, data_rows_soil)
+                   ).join(self.data_soil_quantified(data_rows_soil))[
+            ['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
+             'Loam', 'Peat', 'Silt']
+        ]
+
         self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']
 
     @staticmethod
