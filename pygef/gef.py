@@ -100,18 +100,24 @@ class ParseGEF:
         :param string:(str) String to parse.
         """
         self.path = path
-        self.s = string
-        self.type = None
 
-        if self.s is None:
+        if string is None:
             with open(path, encoding='utf-8', errors='ignore') as f:
-                self.s = f.read()
+                string = f.read()
+        self.s = string
 
-        self.type = utils.parse_gef_type(self.s)
-        if self.type == "cpt":
-            parsed = ParseCPT(string=self.s)
-        elif self.type == "bore":
-            parsed = ParseBORE(string=self.s)
+        end_of_header = utils.parse_end_of_header(self.s)
+        header_s, data_s = self.s.split(end_of_header)
+        self.zid = utils.parse_zid_as_float(header_s)
+        self.x = utils.parse_xid_as_float(header_s)
+        self.y = utils.parse_yid_as_float(header_s)
+        self.file_date = utils.parse_file_date(header_s)
+
+        t = utils.parse_gef_type(string)
+        if t == "cpt":
+            parsed = ParseCPT(header_s, data_s, self.zid)
+        elif t == "bore":
+            parsed = ParseBORE(header_s, data_s)
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
@@ -119,29 +125,15 @@ class ParseGEF:
 
 
 class ParseCPT:
-    def __init__(self, path=None, string=None):
+    def __init__(self, header_s, data_s, zid):
         """
         Parser of the cpt file.
 
-        :param path:(str) Path of the .gef file to parse.
         :param string:(str) String to parse.
         """
-        self.path = path
-        self.s = string
 
-        if self.s is None:
-            with open(path, encoding='utf-8', errors='ignore') as f:
-                self.s = f.read()
-
-        end_of_header = utils.parse_end_of_header(self.s)
-        header_s, data_s = self.s.split(end_of_header)
-
-        self.file_date = utils.parse_file_date(header_s)
-        self.project_id = utils.parse_project_type(header_s, self.type)
-        self.zid = utils.parse_zid_as_float(header_s)
-        self.type = utils.parse_gef_type(header_s)
-        self.x = utils.parse_xid_as_float(header_s)
-        self.y = utils.parse_yid_as_float(header_s)
+        self.type = 'cpt'
+        self.project_id = utils.parse_project_type(header_s, 'cpt')
         self.column_void = utils.parse_column_void(header_s)
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(header_s, 1)
         self.nom_surface_area_friction_element = utils.parse_measurement_var_as_float(header_s, 2)
@@ -187,7 +179,7 @@ class ParseCPT:
         # correction of the depth with the inclination if present
         df = self.correct_depth_with_inclination(df)
         # definition of the elevation respect to the nap
-        df = self.calculate_elevation_respect_to_nap(df, self.zid)
+        df = self.calculate_elevation_respect_to_nap(df, zid)
         # clean data df from column void
         df = self.replace_column_void(df, self.column_void)
         # add the friction number to the data frame
@@ -259,43 +251,16 @@ class ParseCPT:
 
 
 class ParseBORE:
-    def __init__(self, path=None, string=None):
+    def __init__(self, header_s, data_s):
         """
         Parser of the borehole file.
 
-        :param path:(str) Path of the .gef file to parse.
-        :param string:(str) String to parse.
+
         """
-        self.path = path
-        self.s = string
-        self.zid = None  # ground level
-        self.x = None
-        self.y = None
-        self.type = None
-        self.end_depth_of_penetration_test = None
-        self.project_id = None
-        self.column_separator = None
-        self.record_separator = None
-        self.file_date = None
-        self.project_id = None
-        self.type = None
-
-        # List of all the possible measurement variables
-
-        if self.s is None:
-            with open(path, encoding='utf-8', errors='ignore') as f:
-                self.s = f.read()
-
-        end_of_header = utils.parse_end_of_header(self.s)
-        header_s, data_s = self.s.split(end_of_header)
+        self.type = 'bore'
+        self.project_id = utils.parse_project_type(header_s, 'bore')
 
         columns_number = utils.parse_columns_number(header_s)
-        self.file_date = utils.parse_file_date(header_s)
-        self.project_id = utils.parse_project_type(header_s, self.type)
-        self.type = utils.parse_gef_type(header_s)
-        self.x = utils.parse_xid_as_float(header_s)
-        self.y = utils.parse_yid_as_float(header_s)
-        self.zid = utils.parse_zid_as_float(header_s)
         column_separator = utils.parse_column_separator(header_s)
         record_separator = utils.parse_record_separator(header_s)
         data_s_rows = data_s.split(record_separator)
