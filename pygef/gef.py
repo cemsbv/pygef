@@ -272,6 +272,7 @@ class ParseBORE:
             ['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
              'Loam', 'Peat', 'Silt']
         ]
+
         self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']
 
     @staticmethod

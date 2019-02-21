@@ -1,0 +1,12 @@
+image: python:3-slim
+
+before_script:
+  - pip3 install  --no-cache-dir -r requirements.txt
+
+test_module:
+  script:
+    - python -m unittest pygef/tests.py
+
+test_installation:
+  script:
+    - python setup.py install && echo "import pygef" | python
