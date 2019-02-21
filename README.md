@@ -35,4 +35,4 @@ gef.y # y coordinate respect to the reference system
 
 ```
 
-![](img/gef-only.png)
+![](img/gef-only_.png)

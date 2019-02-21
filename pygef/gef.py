@@ -100,6 +100,7 @@ class ParseGEF:
         :param string:(str) String to parse.
         """
         self.path = path
+        self.df = None
 
         if string is None:
             with open(path, encoding='utf-8', errors='ignore') as f:
@@ -122,6 +123,10 @@ class ParseGEF:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
         self.__dict__.update(parsed.__dict__)
+
+    def plot_cpt(self):
+        plot = PlotCPT(self.df)
+        return plot.plot_cpt()
 
 
 class ParseCPT:
@@ -241,10 +246,6 @@ class ParseCPT:
         separator = utils.find_separator(header_s)
         df = pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
         return df
-
-    def plot_cpt(self):
-        plot = PlotCPT(self.df)
-        return plot.plot_cpt()
 
 
 class ParseBORE:
