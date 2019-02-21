@@ -284,4 +284,56 @@ class GefTest(unittest.TestCase):
                            'Fr': [np.nan, 6.54929577, 5.85616438, 5.65217391]} )
         assert_frame_equal(df_calculated, df)
 
+    def test_parse_bore(self):
+        cpt = ParseGEF(string="""#GEFID = 1,1,0
+                                 #COLUMNTEXT = 1, aan
+                                 #COLUMNSEPARATOR = ;
+                                 #RECORDSEPARATOR = !
+                                 #FILEOWNER = DINO
+                                 #FILEDATE = 2010,9,1
+                                 #PROJECTID = DINO-BOR
+                                 #COLUMN = 9
+                                 #COLUMNINFO = 1, m, Diepte bovenkant laag, 1
+                                 #COLUMNINFO = 2, m, Diepte onderkant laag, 2
+                                 #COLUMNINFO = 3, mm, Zandmediaan, 8
+                                 #COLUMNINFO = 4, mm, Grindmediaan, 9
+                                 #COLUMNINFO = 5, %, Lutum percentage, 3
+                                 #COLUMNINFO = 6, %, Silt percentage, 4
+                                 #COLUMNINFO = 7, %, Zand percentage, 5
+                                 #COLUMNINFO = 8, %, Grind percentage, 6
+                                 #COLUMNINFO = 9, %, Organische stof percentage, 7
+                                 #COLUMNVOID = 1, -9999.99
+                                 #COLUMNVOID = 2, -9999.99
+                                 #COLUMNVOID = 3, -9999.99
+                                 #COLUMNVOID = 4, -9999.99
+                                 #COLUMNVOID = 5, -9999.99
+                                 #COLUMNVOID = 6, -9999.99
+                                 #COLUMNVOID = 7, -9999.99
+                                 #COLUMNVOID = 8, -9999.99
+                                 #COLUMNVOID = 9, -9999.99
+                                 #LASTSCAN = 44
+                                 #REPORTCODE = GEF-BORE-Report,1,0,0
+                                 #MEASUREMENTCODE = Onbekend
+                                 #TESTID = B25G0304
+                                 #XYID = 31000,120870,483400
+                                 #ZID = 31000,2.0                                
+                                 #MEASUREMENTVAR = 19, 1, -, aantal peilbuizen
+                                 #EOH = 
+                                 0.00;1.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zgh2';'TGR GE';'ZMFO';'CA3';!
+                                 1.20;3.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zg';'ON';'ZMGO';'FN2';'CA2';!
+                                 3.10;5.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vz';'TBR ZW';'ZMO';'CA1';!                                                                      
+                                 """)
+        df_calculated = cpt.df
+        df = pd.DataFrame({"depth_top": [0.0, 1.2, 3.1],
+                           "depth_bottom": [1.2, 3.1, 5.0],
+                           "soil_code": ["Zgh2", "Zg", "Vz"],
+                           "G": [0.00, 0.05, 0.00],
+                           'S': [0.90, 0.95, 0.05],
+                           'C': [0, 0, 0],
+                           'L': [0, 0, 0],
+                           'P': [0.10, 0.00, 0.95],
+                           'SI': [0, 0, 0],
+                           })
+        assert_frame_equal(df_calculated, df)
+
 
