@@ -127,52 +127,7 @@ class ParseCPT:
         :param string:(str) String to parse.
         """
         self.path = path
-        self.zid = None  # ground level
-        self.x = None
-        self.y = None
-        self.type = None
-        self.file_date = None
-        self.project_id = None
         self.s = string
-        self.column_void = None
-        self.df = None
-
-        # List of all the possible measurement variables
-        self.nom_surface_area_cone_tip = None
-        self.nom_surface_area_friction_element = None
-        self.net_surface_area_quotient_of_the_cone_tip = None
-        self.net_surface_area_quotient_of_the_friction_casing = None
-        self.distance_between_cone_and_centre_of_friction_casing = None
-        self.friction_present = None
-        self.ppt_u1_present = None
-        self.ppt_u2_present = None
-        self.ppt_u3_present = None
-        self.inclination_measurement_present = None
-        self.use_of_back_flow_compensator = None
-        self.type_of_cone_penetration_test = None
-        self.pre_excavated_depth = None
-        self.groundwater_level = None
-        self.water_depth_offshore_activities = None
-        self.end_depth_of_penetration_test = None
-        self.stop_criteria = None
-        self.zero_measurement_cone_before_penetration_test = None
-        self.zero_measurement_cone_after_penetration_test = None
-        self.zero_measurement_friction_before_penetration_test = None
-        self.zero_measurement_friction_after_penetration_test = None
-        self.zero_measurement_ppt_u1_before_penetration_test = None
-        self.zero_measurement_ppt_u2_before_penetration_test = None
-        self.zero_measurement_ppt_u3_before_penetration_test = None
-        self.zero_measurement_ppt_u1_after_penetration_test = None
-        self.zero_measurement_ppt_u2_after_penetration_test = None
-        self.zero_measurement_ppt_u3_after_penetration_test = None
-        self.zero_measurement_inclination_before_penetration_test = None
-        self.zero_measurement_inclination_after_penetration_test = None
-        self.zero_measurement_cone_after_penetration_test = None
-        self.zero_measurement_inclination_ns_before_penetration_test = None
-        self.zero_measurement_inclination_ns_after_penetration_test = None
-        self.zero_measurement_inclination_ew_before_penetration_test = None
-        self.zero_measurement_inclination_ew_after_penetration_test = None
-        self.mileage = None
 
         if self.s is None:
             with open(path, encoding='utf-8', errors='ignore') as f:
