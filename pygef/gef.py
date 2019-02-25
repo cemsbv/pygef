@@ -124,9 +124,9 @@ class ParseGEF:
                              "Check the REPORTCODE or the PROCEDURECODE.")
         self.__dict__.update(parsed.__dict__)
 
-    def plot_cpt(self):
+    def plot_cpt(self, **kwargs):
         plot = PlotCPT(self.df)
-        return plot.plot_cpt()
+        return plot.plot_cpt(**kwargs)
 
 
 class ParseCPT:
