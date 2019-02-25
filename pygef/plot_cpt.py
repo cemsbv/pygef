@@ -9,7 +9,6 @@ class PlotCPT:
         depth_max = self.df['depth'].max()
         depth_min = self.df['depth'].min()
         fig = plt.figure(figsize=figsize)
-
         n = 0
         for c, unit in zip(['qc', 'Fr'], ['[MPa]', '[%]']):
             n += 1
@@ -19,7 +18,6 @@ class PlotCPT:
             qc.set_ylabel('Z [m]')
             plt.grid()
             plt.ylim(depth_max, depth_min)
-
         if show:
             return plt.show()
         return fig
