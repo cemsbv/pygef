@@ -128,6 +128,9 @@ class ParseGEF:
         plot = PlotCPT(self.df)
         return plot.plot_cpt()
 
+    def __str__(self):
+        return self.df.__str__()
+
 
 class ParseCPT:
     def __init__(self, header_s, data_s, zid):
