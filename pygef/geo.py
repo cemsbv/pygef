@@ -1,17 +1,11 @@
 import numpy as np
 
 
-def delta_depth(df, pre_excavated_depth=None):  # todo: change for loop
+def delta_depth(df, pre_excavated_depth=None):
     if pre_excavated_depth is not None and df['depth'][0] == 0:
         df['depth'] = df['depth'] + pre_excavated_depth
-
-    delta_depth = []
-    for i, depth in enumerate(df['depth']):
-        if i == 0:
-            delta_depth.append(0)
-        else:
-            delta_depth.append(df['depth'][i]-df['depth'][i-1])
-    return df.assign(delta_depth=delta_depth)
+    return df.assign(delta_depth=[df['depth'][i]-df['depth'][i-1]
+                                  if i != 0 else 0 for i, depth in enumerate(df['depth'])])
 
 
 def soil_pressure(df):

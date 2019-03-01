@@ -23,8 +23,8 @@ def type_index(df):
 
 def ic_to_gamma(df, water_level):
     return df.assign(gamma_predict=df.apply(
-        lambda row: type_index_to_gamma(row['type_index'] if row['depth'] > water_level
-                                        else type_index_to_gamma_sat(row['type_index'])), axis=1))
+        lambda row: type_index_to_gamma(row['type_index']) if row['depth'] > water_level
+                                        else type_index_to_gamma_sat(row['type_index']), axis=1))
 
 
 def ic_to_soil_type(df):
@@ -121,7 +121,7 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
             if new:
                 n = df['n']
 
-    return df
+    return df.pipe(ic_to_soil_type)
 
 
 def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=None):
@@ -137,7 +137,6 @@ def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
           .pipe(nan_to_zero)
           .pipe(type_index)
           .pipe(ic_to_gamma, water_level)
-          .pipe(ic_to_soil_type)
           )
     return df
 
@@ -156,7 +155,5 @@ def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
           .pipe(nan_to_zero)
           .pipe(type_index)
           .pipe(ic_to_gamma, water_level)
-          .pipe(ic_to_soil_type)
           )
     return df
-
