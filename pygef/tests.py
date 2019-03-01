@@ -1,5 +1,6 @@
 import unittest
 import pygef.utils as utils
+import pygef.geo as geo
 from datetime import datetime
 from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 from pygef.gef import ParseGEF, ParseCPT, ParseBORE
@@ -335,5 +336,94 @@ class GefTest(unittest.TestCase):
                            'SI': [0, 0, 0],
                            })
         assert_frame_equal(df_calculated, df)
+
+    def test_delta_depth(self):
+        df1 = pd.DataFrame({'depth': [0, 0.5, 1]})
+        v = geo.delta_depth(df1)
+        df = pd.DataFrame({'depth': [0, 0.5, 1],
+                           'delta_depth': [0, 0.5, 0.5]})
+        assert_frame_equal(v, df)
+
+    def test_soil_pressure(self):
+        df1 = pd.DataFrame({'gamma': [0, 0.5, 1],
+                           'delta_depth': [0, 0.5, 0.5]})
+        v = geo.soil_pressure(df1)
+        df = pd.DataFrame({'gamma': [0, 0.5, 1],
+                            'delta_depth': [0, 0.5, 0.5],
+                           'soil_pressure': [0.0, 0.25, 0.75]})
+        assert_frame_equal(v, df)
+
+    def test_water_pressure(self):
+        water_level = 0.5
+        df1 = pd.DataFrame({'depth': [0, 0.5, 1]})
+        v = geo.water_pressure(df1, water_level)
+        df = pd.DataFrame({'depth': [0, 0.5, 1],
+                            'water_pressure': [0.0, 0.0, 4.905]})
+        assert_frame_equal(v, df)
+
+    def test_effective_soil_pressure(self):
+        df1 = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
+                            'water_pressure': [0.0, 0.0, 4.905]})
+        v = geo.effective_soil_pressure(df1)
+        df = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
+                           'water_pressure': [0.0, 0.0, 4.905],
+                           'effective_soil_pressure': [0.0, 0.25, -4.155]})
+        assert_frame_equal(v, df)
+
+    def test_assign_multiple_columns(self):
+        df1 = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
+                            'water_pressure': [0.0, 0.0, 4.905]})
+        v = geo.assign_multiple_columns(df1, ['soil_pressure', 'water_pressure'], df1)
+        df = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
+                            'water_pressure': [0.0, 0.0, 4.905]})
+        assert_frame_equal(v, df)
+
+    def test_kpa_to_mpa(self):
+        df1 = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
+                            'water_pressure': [0.0, 0.0, 4.905]})
+        v = geo.kpa_to_mpa(df1, ['soil_pressure', 'water_pressure'])
+        df = pd.DataFrame({'soil_pressure': [0.0, 0.00025, 0.00075],
+                            'water_pressure': [0.0, 0.0, 0.004905]})
+        assert_frame_equal(v, df)
+
+    def test_qt(self):
+        df1 = pd.DataFrame({'qc': [0.0, 1, 2],
+                            'u2': [0, 1, 1]})
+        v = geo.qt(df1, area_quotient_cone_tip=0.5)
+        df = pd.DataFrame({'qc': [0.0, 1, 2],
+                           'u2': [0, 1, 1],
+                           'qt': [0.0, 1.5, 2.5]})
+        assert_frame_equal(v, df)
+
+    def test_normalized_cone_resistance(self):
+        df1 = pd.DataFrame({'qt': [0.0, 1.5, 2.5],
+                            'soil_pressure': [0.0, 0.25, 0.75],
+                            'effective_soil_pressure': [0.0, 0.25, -4.155]})
+        v = geo.normalized_cone_resistance(df1)
+        df = pd.DataFrame({'qt': [0.0, 1.5, 2.5],
+                           'soil_pressure': [0.0, 0.25, 0.75],
+                           'effective_soil_pressure': [0.0, 0.25, -4.155],
+                           'normalized_cone_resistance': [np.nan, 5.0, 1.0]})
+        assert_frame_equal(v, df)
+
+    def test_normalized_friction_ratio(self):
+        df1 = pd.DataFrame({'qt': [0.0, 1.5, 2.5],
+                            'fs': [0.5, 0.5, 0.5],
+                            'soil_pressure': [0.0, 0.25, 0.75],
+                            'effective_soil_pressure': [0.0, 0.25, -4.155]})
+        v = geo.normalized_friction_ratio(df1)
+        df = pd.DataFrame({'qt': [0.0, 1.5, 2.5],
+                           'fs': [0.5, 0.5, 0.5],
+                           'soil_pressure': [0.0, 0.25, 0.75],
+                           'effective_soil_pressure': [0.0, 0.25, -4.155],
+                           'normalized_friction_ratio': [np.inf, 40.0, 28.57142857142857]})
+        assert_frame_equal(v, df)
+
+
+
+
+
+
+
 
 
