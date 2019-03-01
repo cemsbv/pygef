@@ -27,6 +27,15 @@ def ic_to_gamma(df, water_level):
                                         else type_index_to_gamma_sat(row['type_index'])), axis=1))
 
 
+def ic_to_soil_type(df):
+    return df.assign(soil_type=df.apply(
+        lambda row: type_index_to_soil_type(row['type_index']), axis=1))
+
+
+def nan_to_zero(df):
+    return df.fillna(0)
+
+
 def type_index_to_gamma(ic):
     gamma = None
     if ic > 3.6:
@@ -44,7 +53,7 @@ def type_index_to_gamma(ic):
     return gamma
 
 
-def type_index_to_gamma_sat(ic):
+def type_index_to_gamma_sat(ic):  # todo: maybe insert the case in which ic is nan
     gamma_sat = None
     if ic > 3.6:
         gamma_sat = 11
@@ -78,23 +87,23 @@ def type_index_to_soil_type(ic):
     return soil_type
 
 
-def iterate_robertson(orginal_df, water_level, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
-    gamma = np.ones(orginal_df.shape[0]) * 18
-    n = np.ones(orginal_df.shape[0])
-    type_index_n = np.ones(orginal_df.shape[0])
+def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
+    gamma = np.ones(original_df.shape[0]) * 18
+    n = np.ones(original_df.shape[0])
+    type_index_n = np.ones(original_df.shape[0])
 
     c = 0
     while True:
         c += 1
 
         if new:
-            df = orginal_df.assign(n=n, type_index_n=type_index_n, gamma=gamma)
+            df = original_df.assign(n=n, type_index_n=type_index_n, gamma=gamma)
             f = new_robertson
 
             def condition(x):
                 return np.all(x['gamma_predict'] == gamma) and np.all(x['n'] == n)
         else:
-            df = orginal_df.assign(gamma=gamma)
+            df = original_df.assign(gamma=gamma)
             f = old_robertson
 
             def condition(x):
@@ -115,23 +124,28 @@ def iterate_robertson(orginal_df, water_level, new=True, area_quotient_cone_tip=
     return df
 
 
-def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
-    return (df
-            .pipe(geo.soil_pressure, pre_excavated_depth)
-            .pipe(geo.qt, area_quotient_cone_tip)
-            .pipe(geo.water_pressure, water_level)
-            .pipe(geo.effective_soil_pressure)
-            .pipe(geo.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
-            .pipe(geo.normalized_cone_resistance)
-            .pipe(geo.normalized_friction_ratio)
-            .pipe(type_index)
-            .pipe(ic_to_gamma, water_level)
-            )
+def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=None):
+    df = (df
+          .pipe(geo.delta_depth, pre_excavated_depth)
+          .pipe(geo.soil_pressure)
+          .pipe(geo.qt, area_quotient_cone_tip)
+          .pipe(geo.water_pressure, water_level)
+          .pipe(geo.effective_soil_pressure)
+          .pipe(geo.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
+          .pipe(geo.normalized_cone_resistance)
+          .pipe(geo.normalized_friction_ratio)
+          .pipe(nan_to_zero)
+          .pipe(type_index)
+          .pipe(ic_to_gamma, water_level)
+          .pipe(ic_to_soil_type)
+          )
+    return df
 
 
 def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
     df = (df
-          .pipe(geo.soil_pressure, pre_excavated_depth)
+          .pipe(geo.delta_depth, pre_excavated_depth)
+          .pipe(geo.soil_pressure)
           .pipe(geo.qt, area_quotient_cone_tip)
           .pipe(geo.water_pressure, water_level)
           .pipe(geo.effective_soil_pressure)
@@ -139,7 +153,10 @@ def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
           .pipe(n_exponent, p_a)
           .pipe(normalized_cone_resistance_n, p_a)
           .pipe(geo.normalized_friction_ratio)
-          .pipe(type_index))
-    df.pipe(ic_to_gamma, water_level)
+          .pipe(nan_to_zero)
+          .pipe(type_index)
+          .pipe(ic_to_gamma, water_level)
+          .pipe(ic_to_soil_type)
+          )
     return df
 
