@@ -9,7 +9,7 @@ def soil_pressure(df, pre_excavated_depth=None):
 
 
 def water_pressure(df, water_level):
-    df = df.assign(water_pressure=(df['depth'] + water_level) * 9.81)
+    df = df.assign(water_pressure=(df['depth'] - water_level) * 9.81)
     df.loc[df['water_pressure'] < 0, 'water_pressure'] = 0
     return df
 

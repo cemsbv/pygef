@@ -130,15 +130,16 @@ def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
 
 
 def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
-    return (df
-            .pipe(geo.soil_pressure, pre_excavated_depth)
-            .pipe(geo.qt, area_quotient_cone_tip)
-            .pipe(geo.water_pressure, water_level)
-            .pipe(geo.effective_soil_pressure)
-            .pipe(geo.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
-            .pipe(n_exponent, p_a)
-            .pipe(normalized_cone_resistance_n, p_a)
-            .pipe(geo.normalized_friction_ratio)
-            .pipe(type_index)
-            .pipe(ic_to_gamma, water_level)
-            )
+    df = (df
+          .pipe(geo.soil_pressure, pre_excavated_depth)
+          .pipe(geo.qt, area_quotient_cone_tip)
+          .pipe(geo.water_pressure, water_level)
+          .pipe(geo.effective_soil_pressure)
+          .pipe(geo.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
+          .pipe(n_exponent, p_a)
+          .pipe(normalized_cone_resistance_n, p_a)
+          .pipe(geo.normalized_friction_ratio)
+          .pipe(type_index))
+    df.pipe(ic_to_gamma, water_level)
+    return df
+
