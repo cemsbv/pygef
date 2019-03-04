@@ -4,6 +4,7 @@ import io
 import numpy as np
 from pygef.plot_cpt import PlotCPT
 from pygef import robertson, been_jeffrey
+import logging
 
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
@@ -126,9 +127,11 @@ class ParseGEF:
                              "Check the REPORTCODE or the PROCEDURECODE.")
         self.__dict__.update(parsed.__dict__)
 
-    def plot_cpt(self, **kwargs):
-        plot = PlotCPT(self.df)
-        return plot.plot_cpt(**kwargs)
+    def plot_cpt(self, classification, water_level_NAP, p_a, new=True, show=True, figsize=(12, 30)):
+        df = self.classify_soil(classification, water_level_NAP, self.net_surface_area_quotient_of_the_cone_tip,
+                                self.pre_excavated_depth, p_a, new=new)
+        plot = PlotCPT(df, classification)
+        return plot.plot_cpt(show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None,
                            p_a=None):  # True to use the new robertson
@@ -141,6 +144,18 @@ class ParseGEF:
 
     def __str__(self):
         return self.df.__str__()
+
+    def classify_soil(self, classification, water_level_NAP, area_quotient_cone_tip, pre_excavated_depth, p_a,
+                      new=True):
+        if classification == 'robertson':
+            return self.classify_robertson(water_level_NAP, new, area_quotient_cone_tip=area_quotient_cone_tip,
+                                           pre_excavated_depth=pre_excavated_depth, p_a=p_a)
+        elif classification == 'been_jeffrey':
+            return self.classify_been_jeffrey(water_level_NAP, area_quotient_cone_tip=area_quotient_cone_tip,
+                                              pre_excavated_depth=pre_excavated_depth)
+        else:
+            return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
+                                 f'in the library')
 
 
 class ParseCPT:
