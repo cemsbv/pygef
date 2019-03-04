@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from collections import OrderedDict
+import numpy as np
 
 colours_robertson = {'Peat': '#578E57',
                      'Clays - silty clay to clay': '#a76b29',
@@ -23,9 +23,15 @@ colours_been_jeffrey = {'Peat': '#578E57',
 class PlotCPT:
     def __init__(self, df, classification):
         self.classification = classification
-        self.df = self.assign_color(df, classification)
+        self.df, self.title = self.assign_color(df, classification)
 
     def plot_cpt(self, show=True, figsize=(12, 30)):
+        """
+        Main fuction to plot qc, Fr and soil classification.
+        :param show: If show is True the figure is shown.
+        :param figsize: Figure size (x, y) , x i the width y is the height.
+        :return:
+        """
         depth_max = self.df['depth'].max()
         depth_min = self.df['depth'].min()
         fig = plt.figure(figsize=figsize)
@@ -39,17 +45,7 @@ class PlotCPT:
             plt.grid()
             plt.ylim(depth_max, depth_min)
 
-        plot_classify = fig.add_subplot(1, 3, 3)
-        for i in range(len(self.df['depth'])):
-            plt.barh(y=self.df['depth'][i], height=-self.df['delta_depth'][i], width=5,
-                     color=self.df['colour'][i], label=self.df['soil_type'][i], align='edge')
-        plot_classify.set_xlabel('-')
-        plot_classify.set_ylabel('Z (m)')
-        plot_classify.set_title(f'{self.classification} classification')
-        plt.ylim(depth_max, depth_min)
-        handles, labels = plt.gca().get_legend_handles_labels()
-        by_label = OrderedDict(zip(labels, handles))
-        plt.legend(by_label.values(), by_label.keys(), loc='best', fontsize='xx-small')
+        fig = self.add_plot_classification(fig, depth_max, depth_min)
 
         if show:
             return plt.show()
@@ -57,9 +53,40 @@ class PlotCPT:
 
     @staticmethod
     def assign_color(df, classification):
+        """
+        Add to the dataframe the column 'colour' based on the chosen classification.
+        :param df: original dataframe.
+        :param classification: Chosen classification.
+        :return:
+        """
         if classification == 'robertson':
-            return df.assign(colour=df.apply(lambda row: colours_robertson[row['soil_type']], axis=1))
+            return df.assign(colour=df.apply(lambda row: colours_robertson[row['soil_type']], axis=1)), 'Robertson'
         elif classification == 'been_jeffrey':
-            return df.assign(colour=df.apply(lambda row: colours_been_jeffrey[row['soil_type']], axis=1))
+            return df.assign(colour=df.apply(lambda row: colours_been_jeffrey[row['soil_type']], axis=1)), \
+                   'Been Jeffrey'
+
+    def add_plot_classification(self, fig, depth_max, depth_min):
+        """
+        Add to the plot the selected classification.
+        :param fig: Original figure.
+        :param depth_max: Maximum depth.
+        :param depth_min: Minimun depth.
+        :return:
+        """
+
+        plot_classify = fig.add_subplot(1, 3, 3)
+        df = self.df.copy()
+        df['soil_type'][df['soil_type'].isna()] = 'UNKNOWN'
+        for st in np.unique(df['soil_type']):
+            partial_df = df[df['soil_type'] == st]
+            plt.hlines(y=partial_df['depth'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
+
+        plot_classify.set_xlabel('-')
+        plot_classify.set_ylabel('Z (m)')
+        plot_classify.set_title(f'{self.title} classification')
+        plt.ylim(depth_max, depth_min)
+        plt.legend(loc='best', fontsize='xx-small')
+        return fig
+
 
 
