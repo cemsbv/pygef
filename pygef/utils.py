@@ -575,5 +575,17 @@ def parse_add_info(s):
     return add_info
 
 
+def assign_multiple_columns(df, columns, partial_df):
+    return df.assign(**dict(zip(columns, partial_df.values.T)))
+
+
+def nan_to_zero(df):
+    return df.fillna(0)
+
+
+def kpa_to_mpa(df, columns):
+    return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
+
+
 
 

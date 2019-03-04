@@ -3,7 +3,8 @@ import pandas as pd
 import io
 import numpy as np
 from pygef.plot_cpt import PlotCPT
-from pygef import robertson
+from pygef import robertson, been_jeffrey
+
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
@@ -133,6 +134,18 @@ class ParseGEF:
                            p_a=None):  # True to use the new robertson
         return robertson.classify(self.df, self.zid, water_level_NAP, new, area_quotient_cone_tip=area_quotient_cone_tip,
                                   pre_excavated_depth=pre_excavated_depth, p_a=p_a)
+
+    def __str__(self):
+        return self.df.__str__()
+
+    def classify_robertson(self, water_level_NAP, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None,
+                           p_a=None):  # True to use the new robertson
+        return robertson.classify(self.df, self.zid, water_level_NAP, new, area_quotient_cone_tip=area_quotient_cone_tip,
+                                  pre_excavated_depth=pre_excavated_depth, p_a=p_a)
+
+    def classify_been_jeffrey(self, water_level_NAP, area_quotient_cone_tip=None, pre_excavated_depth=None):
+        return been_jeffrey.classify(self.df, self.zid, water_level_NAP, area_quotient_cone_tip=area_quotient_cone_tip,
+                                     pre_excavated_depth=pre_excavated_depth)
 
     def __str__(self):
         return self.df.__str__()
