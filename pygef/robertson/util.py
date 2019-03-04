@@ -33,6 +33,10 @@ def ic_to_soil_type(df):
         lambda row: type_index_to_soil_type(row['type_index']), axis=1))
 
 
+def nan_to_zero(df):
+    return df.fillna(0)
+
+
 def type_index_to_gamma(ic):
     gamma = None
     if ic > 3.6:

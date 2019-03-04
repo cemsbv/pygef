@@ -5,6 +5,7 @@ import numpy as np
 from pygef.plot_cpt import PlotCPT
 from pygef import robertson, been_jeffrey
 
+
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
                     "fs",  # 3
@@ -125,9 +126,17 @@ class ParseGEF:
                              "Check the REPORTCODE or the PROCEDURECODE.")
         self.__dict__.update(parsed.__dict__)
 
-    def plot_cpt(self):
+    def plot_cpt(self, **kwargs):
         plot = PlotCPT(self.df)
-        return plot.plot_cpt()
+        return plot.plot_cpt(**kwargs)
+
+    def classify_robertson(self, water_level_NAP, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None,
+                           p_a=None):  # True to use the new robertson
+        return robertson.classify(self.df, self.zid, water_level_NAP, new, area_quotient_cone_tip=area_quotient_cone_tip,
+                                  pre_excavated_depth=pre_excavated_depth, p_a=p_a)
+
+    def __str__(self):
+        return self.df.__str__()
 
     def classify_robertson(self, water_level_NAP, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None,
                            p_a=None):  # True to use the new robertson
