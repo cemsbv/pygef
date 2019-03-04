@@ -1,7 +1,6 @@
 # PYGEF
 
 Simple parser for *.gef files. These are ASCII based files used for soil properties measurements. 
-It can reads both borehole *.gef file and cpt *.gef file. It is also possible to plot cpt files.
 
 ## Installation
 `$ pip install pygef`

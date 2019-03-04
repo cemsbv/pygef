@@ -374,6 +374,7 @@ class GefTest(unittest.TestCase):
         df1 = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
                             'water_pressure': [0.0, 0.0, 4.905]})
         v = utils.assign_multiple_columns(df1, ['soil_pressure', 'water_pressure'], df1)
+
         df = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
                             'water_pressure': [0.0, 0.0, 4.905]})
         assert_frame_equal(v, df)
@@ -418,12 +419,5 @@ class GefTest(unittest.TestCase):
                            'effective_soil_pressure': [0.0, 0.25, -4.155],
                            'normalized_friction_ratio': [np.inf, 40.0, 28.57142857142857]})
         assert_frame_equal(v, df)
-
-
-
-
-
-
-
 
 

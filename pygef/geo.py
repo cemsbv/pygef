@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as n
 import pygef.utils as utils
 
 
@@ -24,7 +24,7 @@ def effective_soil_pressure(df):
 
 
 def kpa_to_mpa(df, columns):
-    return utils.assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
+    return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
 
 
 def qt(df, area_quotient_cone_tip=None):
