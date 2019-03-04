@@ -55,12 +55,6 @@ class RobertsonTest(unittest.TestCase):
                                          'Silt mixtures - clayey silt to silty clay']})
         assert_frame_equal(v, df)
 
-    def test_nan_to_zero(self):
-        df1 = pd.DataFrame({'type_index': [np.nan]})
-        v = util.nan_to_zero(df1)
-        df = pd.DataFrame({'type_index': [0.]})
-        assert_frame_equal(v, df)
-
     def test_type_index_to_gamma(self):
         ic = 3.6
         gamma_calc = util.type_index_to_gamma(ic)

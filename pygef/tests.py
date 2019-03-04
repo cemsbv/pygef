@@ -373,7 +373,7 @@ class GefTest(unittest.TestCase):
     def test_assign_multiple_columns(self):
         df1 = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
                             'water_pressure': [0.0, 0.0, 4.905]})
-        v = geo.assign_multiple_columns(df1, ['soil_pressure', 'water_pressure'], df1)
+        v = utils.assign_multiple_columns(df1, ['soil_pressure', 'water_pressure'], df1)
         df = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
                             'water_pressure': [0.0, 0.0, 4.905]})
         assert_frame_equal(v, df)
@@ -381,7 +381,7 @@ class GefTest(unittest.TestCase):
     def test_kpa_to_mpa(self):
         df1 = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
                             'water_pressure': [0.0, 0.0, 4.905]})
-        v = geo.kpa_to_mpa(df1, ['soil_pressure', 'water_pressure'])
+        v = utils.kpa_to_mpa(df1, ['soil_pressure', 'water_pressure'])
         df = pd.DataFrame({'soil_pressure': [0.0, 0.00025, 0.00075],
                             'water_pressure': [0.0, 0.0, 0.004905]})
         assert_frame_equal(v, df)
@@ -418,6 +418,13 @@ class GefTest(unittest.TestCase):
                            'effective_soil_pressure': [0.0, 0.25, -4.155],
                            'normalized_friction_ratio': [np.inf, 40.0, 28.57142857142857]})
         assert_frame_equal(v, df)
+
+    def test_nan_to_zero(self):
+        df1 = pd.DataFrame({'type_index': [np.nan]})
+        v = utils.nan_to_zero(df1)
+        df = pd.DataFrame({'type_index': [0.]})
+        assert_frame_equal(v, df)
+
 
 
 
