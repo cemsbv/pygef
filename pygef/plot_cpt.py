@@ -70,13 +70,13 @@ class PlotCPT:
         Add to the plot the selected classification.
         :param fig: Original figure.
         :param depth_max: Maximum depth.
-        :param depth_min: Minimun depth.
+        :param depth_min: Minimum depth.
         :return:
         """
 
         plot_classify = fig.add_subplot(1, 3, 3)
         df = self.df.copy()
-        df['soil_type'][df['soil_type'].isna()] = 'UNKNOWN'
+        df['soil_type'].loc[df['soil_type'].isna()] = 'UNKNOWN'
         for st in np.unique(df['soil_type']):
             partial_df = df[df['soil_type'] == st]
             plt.hlines(y=partial_df['depth'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
