@@ -22,11 +22,12 @@ print(gef.df)
 gef.df.to_csv("my-file.csv")
 
 # Some important attributes are the follows:
+
 attributes= [
-gef.zid, # height respect to NAP
+gef.zid, # height with respect to NAP
 gef.type, # type of the gef file (borehole or cpt)
-gef.x, # x coordinate respect to the reference system
-gef.y # y coordinate respect to the reference system
+gef.x, # x coordinate with respect to the reference system
+gef.y # y coordinate with respect to the reference system
 ]
 
 # Plot cpt file and get soil classification
