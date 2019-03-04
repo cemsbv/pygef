@@ -2,12 +2,12 @@ from setuptools import setup
 
 setup(
     name="pygef",
-    version="0.2.1",
+    version="0.3",
     author="Ritchie Vink",
     author_email='ritchie46@gmail.com',
     url="https://www.ritchievink.com",
     license="mit",
-    packages=["pygef"],
+    packages=["pygef", "pygef.been_jeffrey", "pygef.robertson"],
     install_requires=[
         "pandas",
         "numpy",
