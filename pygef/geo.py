@@ -1,5 +1,4 @@
 import numpy as np
-import pygef.utils as utils
 
 
 def delta_depth(df, pre_excavated_depth=None):
@@ -21,10 +20,6 @@ def water_pressure(df, water_level):
 
 def effective_soil_pressure(df):
     return df.assign(effective_soil_pressure=(df['soil_pressure'] - df['water_pressure']))
-
-
-def kpa_to_mpa(df, columns):
-    return utils.assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
 
 
 def qt(df, area_quotient_cone_tip=None):

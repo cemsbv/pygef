@@ -1,5 +1,6 @@
 import numpy as np
 from pygef import geo
+import pygef.utils as utils
 
 
 def n_exponent(df, p_a):
@@ -30,10 +31,6 @@ def ic_to_gamma(df, water_level):
 def ic_to_soil_type(df):
     return df.assign(soil_type=df.apply(
         lambda row: type_index_to_soil_type(row['type_index']), axis=1))
-
-
-def nan_to_zero(df):
-    return df.fillna(0)
 
 
 def type_index_to_gamma(ic):
@@ -131,10 +128,10 @@ def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
           .pipe(geo.qt, area_quotient_cone_tip)
           .pipe(geo.water_pressure, water_level)
           .pipe(geo.effective_soil_pressure)
-          .pipe(geo.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
+          .pipe(utils.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
           .pipe(geo.normalized_cone_resistance)
           .pipe(geo.normalized_friction_ratio)
-          .pipe(nan_to_zero)
+          .pipe(utils.nan_to_zero)
           .pipe(type_index)
           .pipe(ic_to_gamma, water_level)
           )
@@ -148,11 +145,11 @@ def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
           .pipe(geo.qt, area_quotient_cone_tip)
           .pipe(geo.water_pressure, water_level)
           .pipe(geo.effective_soil_pressure)
-          .pipe(geo.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
+          .pipe(utils.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
           .pipe(n_exponent, p_a)
           .pipe(normalized_cone_resistance_n, p_a)
           .pipe(geo.normalized_friction_ratio)
-          .pipe(nan_to_zero)
+          .pipe(utils.nan_to_zero)
           .pipe(type_index)
           .pipe(ic_to_gamma, water_level)
           )
