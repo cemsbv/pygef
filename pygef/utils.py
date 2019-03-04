@@ -575,5 +575,9 @@ def parse_add_info(s):
     return add_info
 
 
+def assign_multiple_columns(df, columns, partial_df):
+    return df.assign(**dict(zip(columns, partial_df.values.T)))
+
+
 
 

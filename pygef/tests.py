@@ -373,7 +373,7 @@ class GefTest(unittest.TestCase):
     def test_assign_multiple_columns(self):
         df1 = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
                             'water_pressure': [0.0, 0.0, 4.905]})
-        v = geo.assign_multiple_columns(df1, ['soil_pressure', 'water_pressure'], df1)
+        v = utils.assign_multiple_columns(df1, ['soil_pressure', 'water_pressure'], df1)
         df = pd.DataFrame({'soil_pressure': [0.0, 0.25, 0.75],
                             'water_pressure': [0.0, 0.0, 4.905]})
         assert_frame_equal(v, df)
