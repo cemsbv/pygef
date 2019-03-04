@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from pygef.gef import ParseGEF
+import logging
 
 
 class PlotCPT:
@@ -18,6 +19,9 @@ class PlotCPT:
         elif classification == 'been_jeffrey':
             return ParseGEF.classify_been_jeffrey(water_level_NAP, area_quotient_cone_tip=area_quotient_cone_tip,
                                                pre_excavated_depth=pre_excavated_depth)
+        else:
+            return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
+                                 f'in the library')
 
     def plot_cpt(self, show=True, figsize=(8, 30)):
         depth_max = self.df['depth'].max()
