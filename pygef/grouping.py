@@ -30,6 +30,10 @@ class GroupClassification:
     def calculate_z_centr(df):
         return df.assign(z_centr=(df['zf'] + df['z_in'])/2)
 
+    def group_equal_layers_try(self, df_group):
+
+        return
+
     def group_equal_layers(self, df_group):
         layer = []
         z_in = []
@@ -114,45 +118,30 @@ class GroupClassification:
         final_layers = []
         final_z_in = []
         final_zf = []
-        final_layer_thickness = []
-        final_add_all_layer = []
-        final_store_thickness = 0
         for n in range(len(df_group['layer'])):
             if n == 0:
-                final_layer_i = df_group['layer'][n]
-                final_layers.append(final_layer_i)
-                final_add_all_layer.append(final_layer_i)
-                final_store_thickness += df_group['thickness'][n]
+                final_layers.append(df_group['layer'][n])
             elif n == (len(df_group['layer']) - 1):
-                final_layer_i = df_group['layer'][n]
-                final_z_in.append(df_group['z_in'][n] - final_store_thickness)
+                final_z_in.append(df_group['z_in'][n])
                 final_zf.append(df_group['z_in'][n])
-                final_add_all_layer.append(final_layer_i)
-                final_layer_thickness.append(final_store_thickness)
-                final_layers.append(final_layer_i)
+                final_layers.append(df_group['layer'][n])
                 final_z_in.append(df_group['z_in'][n])
                 final_zf.append(df_group['zf'][n])
-                final_layer_thickness.append(df_group['thickness'][n])
             else:
-                layer_check = df_group['layer'][n]
-                if layer_check == final_add_all_layer[n - 1] and n != (len(df_group['layer']) - 1):
-                    final_add_all_layer.append(layer_check)
-                    final_store_thickness += df_group['thickness'][n]
+                if df_group['layer'][n] == df_group['layer'][n - 1] and n != (len(df_group['layer']) - 1):
+                    pass
                 else:
-                    final_z_in_i = df_group['z_in'][n] - final_store_thickness
-                    final_z_f_i = df_group['z_in'][n]
-                    final_layers.append(layer_check)
-                    final_add_all_layer.append(layer_check)
-                    final_z_in.append(final_z_in_i)
-                    final_zf.append(final_z_f_i)
-                    final_layer_thickness.append(final_store_thickness)
-                    final_store_thickness = 0
-                    final_store_thickness += df_group['thickness'][n]
+                    final_layers.append(df_group['layer'][n])
+                    final_z_in.append(df_group['z_in'][n])
+                    final_zf.append(df_group['z_in'][n])
+        df_soil_grouped = pd.DataFrame({'layer': final_layers,
+                                        'z_in': final_z_in,
+                                        'zf': final_zf,
+                                        })
 
-        return pd.DataFrame({'layer': final_layers,
-                             'z_in': final_z_in,
-                             'zf': final_zf,
-                             'thickness': final_layer_thickness}).pipe(self.calculate_z_centr)
+        return(df_soil_grouped
+               .pipe(self.calculate_thickness)
+               .pipe(self.calculate_z_centr))
 
 
 
