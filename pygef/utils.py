@@ -314,7 +314,8 @@ INDICES = {
     "m": 1,
     "h": 4,
     "l": 2,
-    "v": 4
+    "v": 4,
+    'p': 4
 }
 
 INTENSITY = {"1": 0.05,
@@ -337,7 +338,7 @@ def soil_quantification(s):
     # ['G', 'S', 'C', 'L', 'P', 'SI']
     dist = np.zeros(6)
 
-    s = s.replace("'", '').replace(' ', '').lower()
+    s = s.replace("'", '').split(' ')[0].lower()
 
     if s in NO_CLASSIFY:
         return np.ones(6) * -1
