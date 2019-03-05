@@ -337,7 +337,7 @@ def soil_quantification(s):
     # ['G', 'S', 'C', 'L', 'P', 'SI']
     dist = np.zeros(6)
 
-    s = s.replace("'", '').lower()
+    s = s.replace("'", '').replace(' ', '').lower()
 
     if s in NO_CLASSIFY:
         return np.ones(6) * -1
@@ -589,6 +589,7 @@ def join_gef(bore, cpt):
     :param cpt: (ParseCPT)
     :return: (pd.DataFrame)
     """
+    assert bore.zid is not None, "Zid should be defined for merging to take place"
     df = cpt.df.assign(join_idx=0)
     df_bore = bore.df.assign(elevation_respect_to_NAP=bore.zid - bore.df['depth_top'])
     idx = np.searchsorted(cpt.df['elevation_respect_to_NAP'], df_bore['elevation_respect_to_NAP'])
