@@ -15,7 +15,6 @@ def cast_string(f, s):
     try:
         return f(s)
     except ValueError as e:
-        logging.warning(f'Could not parse {f}. Message: {e}')
         return None
 
 
