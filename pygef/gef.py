@@ -163,8 +163,7 @@ class ParseGEF:
     def __str__(self):
         return self.df.__str__()
 
-    def classify_soil(self, classification, water_level_NAP, p_a=0.1,
-                      new=True):
+    def classify_soil(self, classification, water_level_NAP, p_a=0.1, new=True):
         if classification == 'robertson':
             return self.classify_robertson(water_level_NAP, new, p_a=p_a)
         elif classification == 'been_jeffrey':
