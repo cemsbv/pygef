@@ -583,16 +583,17 @@ def kpa_to_mpa(df, columns):
 
 def join_gef(bore, cpt):
     """
-    Join a cpt and bore file in one Dataframe.
+    Join a cpt and bore file in one Dataframe based on NAP.
 
     :param bore: (ParseBORE)
     :param cpt: (ParseCPT)
     :return: (pd.DataFrame)
     """
     df = cpt.df.assign(join_idx=0)
-    idx = np.searchsorted(cpt.df['penetration_length'], bore.df['depth_top'])
+    df_bore = bore.df.assign(elevation_respect_to_NAP=bore.zid - bore.df['depth_top'])
+    idx = np.searchsorted(cpt.df['elevation_respect_to_NAP'], df_bore['elevation_respect_to_NAP'])
 
-    df = df[df['penetration_length'] < bore.df['depth_bottom'].max()]
+    df = df[df['elevation_respect_to_NAP'] < (bore.zid - bore.df['depth_bottom']).max()]
     a = np.zeros(df.shape[0])
     for i in range(len(idx) - 1):
         a[idx[i]: idx[i + 1]] = i
