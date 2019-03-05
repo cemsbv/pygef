@@ -94,6 +94,22 @@ COLUMN_NAMES_BORE_CHILD = ["depth_top",  # 1
                            "vertical_strain"]  # 16
 MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE_CHILD = dict(enumerate(COLUMN_NAMES_BORE_CHILD, 1))
 
+dict_soil_type_rob = {'Peat': 1,
+                      'Clays - silty clay to clay': 2,
+                      'Silt mixtures - clayey silt to silty clay': 3,
+                      'Sand mixtures - silty sand to sandy silt': 4,
+                      'Sands - clean sand to silty sand': 5,
+                      'Gravelly sand to dense sand': 6
+                      }
+
+dict_soil_type_been = {'Peat': 1,
+                       'Clays': 2,
+                       'Clayey silt to silty clay': 3,
+                       'Silty sand to sandy silt': 4,
+                       'Sands: clean sand to silty': 5,
+                       'Gravelly sands': 6
+                       }
+
 
 class ParseGEF:
     def __init__(self, path=None, string=None):
@@ -130,9 +146,10 @@ class ParseGEF:
                              "Check the REPORTCODE or the PROCEDURECODE.")
         self.__dict__.update(parsed.__dict__)
 
-    def plot_cpt(self, classification, water_level_NAP, p_a=0.1, new=True, show=False, figsize=(12, 30)):
+    def plot_cpt(self, classification, water_level_NAP, min_thickness, p_a=0.1, new=True, show=False, figsize=(12, 30)):
         df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
-        plot = PlotCPT(df, classification)
+        df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
+        plot = PlotCPT(df, df_group, classification)
         return plot.plot_cpt(show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
@@ -156,14 +173,16 @@ class ParseGEF:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
 
-    def group_classification(self, classification, water_level_NAP, new, p_a):
+    def group_classification(self, min_thickness, classification, water_level_NAP, new, p_a):
         if classification == 'robertson':
             df = self.classify_robertson(water_level_NAP, new, p_a=p_a)
+            return GroupClassification(df, dict_soil_type_rob, min_thickness).df_group
         elif classification == 'been_jeffrey':
             df = self.classify_been_jeffrey(water_level_NAP)
+            return GroupClassification(df, dict_soil_type_been, min_thickness).df_group
         else:
-            df = None
-        return GroupClassification(df)
+            return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
+                                 f'in the library')
 
 
 class ParseCPT:
