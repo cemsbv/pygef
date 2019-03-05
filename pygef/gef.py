@@ -5,6 +5,7 @@ import numpy as np
 from pygef.plot_cpt import PlotCPT
 from pygef import robertson, been_jeffrey
 import logging
+from pygef.grouping import GroupClassification
 
 
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
@@ -154,6 +155,16 @@ class ParseGEF:
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
+
+    def group_classification(self, classification, water_level_NAP, new, p_a):
+        if classification == 'robertson':
+            df = self.classify_robertson(water_level_NAP, new, p_a=p_a)
+        elif classification == 'been_jeffrey':
+            df = self.classify_been_jeffrey(water_level_NAP)
+        else:
+            df = None
+        grouped_df = GroupClassification(df).df_soil_grouped_final
+        return grouped_df
 
 
 class ParseCPT:
