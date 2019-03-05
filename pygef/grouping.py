@@ -1,7 +1,6 @@
 import pandas as pd
 ########
 # INPUT
-UseNewRobertson = True
 MinimumThickness = 0.20
 ########
 
@@ -16,161 +15,146 @@ dict_soil_type = {'Peat': 1,
 
 class GroupClassification:
     def __init__(self, df):
-        df_rob = df.copy()
-        df_rob = self.group_same_layers(df_rob)
+        df_group = df.copy()
+        self.df_group = (df_group
+                         .pipe(self.group_equal_layers)
+                         .pipe(self.group_significant_layers)
+                         .pipe(self.regroup_significant_layers)
+                         )
 
-        # Create significant layers
+    @staticmethod
+    def calculate_thickness(df):
+        return df.assign(thickness=(df['zf'] - df['z_in']))
 
+    @staticmethod
+    def calculate_z_centr(df):
+        return df.assign(z_centr=(df['zf'] + df['z_in'])/2)
+
+    def group_equal_layers(self, df_group):
+        layer = []
+        z_in = []
+        zf = []
+        for i, st in enumerate(df_group['soil_type']):
+            if i == 0:
+                layer.append(st)
+                z_in.append(df_group['depth'][i])
+            elif i == len(df_group['depth']) - 1:
+                zf.append(df_group['depth'][i])
+            else:
+                if st == df_group['soil_type'][i - 1]:
+                    pass
+                else:
+                    layer.append(st)
+                    z_in.append(df_group['depth'][i])
+                    zf.append(df_group['depth'][i])
+
+        df_soil_grouped = pd.DataFrame({'layer': layer,
+                                        'z_in': z_in,
+                                        'zf': zf})
+        return (df_soil_grouped
+                .pipe(self.calculate_thickness)
+                .pipe(self.calculate_z_centr))
+
+    @staticmethod
+    def group_significant_layers(df_group):
         significant_layers = []
         sig_z_in = []
         sig_zf = []
         sig_layer_thickness = []
         num_sign_layers = 0
         store_thickness = 0
-        for m in range(len(layer)):
+        for m in range(len(df_group['layer'])):
             if m == 0:
-                sig_layer_i = layer[m]
-                sig_layer_thickness_i = layer_thickness[m] + store_thickness
-                sig_zf_i = zf[m]
-                sig_z_in_i = z_in[m] - store_thickness
-                sig_layer_thickness.append(sig_layer_thickness_i)
-                significant_layers.append(sig_layer_i)
-                sig_z_in.append(sig_z_in_i)
-                sig_zf.append(sig_zf_i)
+                sig_layer_thickness.append(df_group['thickness'][m] + store_thickness)
+                significant_layers.append(df_group['layer'][m])
+                sig_z_in.append(df_group['z_in'][m] - store_thickness)
+                sig_zf.append(df_group['zf'][m])
                 num_sign_layers += 1
                 store_thickness = 0
-            elif m == len(layer)-1:
-                sig_layer_i = layer[m]
-                sig_layer_thickness_i = layer_thickness[m] + store_thickness
-                sig_zf_i = zf[m]
-                sig_z_in_i = z_in[m] - store_thickness
-                sig_layer_thickness.append(sig_layer_thickness_i)
-                significant_layers.append(sig_layer_i)
-                sig_z_in.append(sig_z_in_i)
-                sig_zf.append(sig_zf_i)
+            elif m == len(df_group['layer']) - 1:
+                sig_layer_thickness.append(df_group['thickness'][m] + store_thickness)
+                significant_layers.append(df_group['layer'][m])
+                sig_z_in.append(df_group['z_in'][m] - store_thickness)
+                sig_zf.append(df_group['zf'][m])
                 num_sign_layers += 1
                 store_thickness = 0
             else:
-                if layer_thickness[m] >= MinimumThickness:
-                    sig_layer_i = layer[m]
-                    sig_layer_thickness_i = layer_thickness[m] + store_thickness
-                    sig_zf_i = zf[m]
-                    sig_z_in_i = z_in[m] - store_thickness
-                    sig_layer_thickness.append(sig_layer_thickness_i)
-                    significant_layers.append(sig_layer_i)
-                    sig_z_in.append(sig_z_in_i)
-                    sig_zf.append(sig_zf_i)
+                if df_group['thickness'][m] >= MinimumThickness:
+                    sig_layer_thickness.append(df_group['thickness'][m] + store_thickness)
+                    significant_layers.append(df_group['layer'][m])
+                    sig_z_in.append(df_group['z_in'][m] - store_thickness)
+                    sig_zf.append(df_group['zf'][m])
                     num_sign_layers += 1
                     store_thickness = 0
                 else:
                     if store_thickness > 0:
-                        store_thickness += layer_thickness[m]
+                        store_thickness += df_group['thickness'][m]
                     else:
                         n = num_sign_layers
-                        soil_type_m = layer[m]
-                        soil_type_m_next = layer[m+1]
-                        soil_type_m_previous = layer[m-1]
+                        soil_type_m = df_group['layer'][m]
+                        soil_type_m_next = df_group['layer'][m + 1]
+                        soil_type_m_previous = df_group['layer'][m - 1]
                         num_soil_type_m = dict_soil_type[soil_type_m]
                         num_soil_type_m_next = dict_soil_type[soil_type_m_next]
                         num_soil_type_m_previous = dict_soil_type[soil_type_m_previous]
-                        diff1 = abs(num_soil_type_m-num_soil_type_m_previous)
-                        diff2 = abs(num_soil_type_m-num_soil_type_m_next)
+                        diff1 = abs(num_soil_type_m - num_soil_type_m_previous)
+                        diff2 = abs(num_soil_type_m - num_soil_type_m_next)
                         if diff1 <= diff2:
-                            sig_layer_thickness[n - 1] += layer_thickness[m]
-                            sig_zf[n-1] += layer_thickness[m]
+                            sig_layer_thickness[n - 1] += df_group['thickness'][m]
+                            sig_zf[n - 1] += df_group['thickness'][m]
                         else:
-                            store_thickness += layer_thickness[m]
+                            store_thickness += df_group['thickness'][m]
 
-        df_significant_layers = pd.DataFrame(significant_layers, columns=['significant_layers'])
-        df_sig_z_in = pd.DataFrame(sig_z_in, columns=['sig_z_in'])
-        df_sig_zf = pd.DataFrame(sig_zf, columns=['sig_zf'])
-        df_sig_layer_thickness = pd.DataFrame(sig_layer_thickness, columns=['sig_layer_thickness'])
-        self.df_soil_grouped_significant = pd.concat([df_significant_layers, df_sig_z_in, df_sig_zf,
-                                                      df_sig_layer_thickness], axis=1, sort=False)
-        # Regrouping significant layers
+        return pd.DataFrame({'layer': significant_layers,
+                             'z_in': sig_z_in,
+                             'zf': sig_zf,
+                             'thickness': sig_layer_thickness})
 
+    def regroup_significant_layers(self, df_group):
         final_layers = []
         final_z_in = []
         final_zf = []
         final_layer_thickness = []
         final_add_all_layer = []
         final_store_thickness = 0
-        for n in range(len(significant_layers)):
+        for n in range(len(df_group['layer'])):
             if n == 0:
-                final_layer_i = significant_layers[n]
+                final_layer_i = df_group['layer'][n]
                 final_layers.append(final_layer_i)
                 final_add_all_layer.append(final_layer_i)
-                final_store_thickness += sig_layer_thickness[n]
-            elif n == (len(significant_layers) - 1):
-                final_layer_i = significant_layers[n]
-                final_z_in.append(sig_z_in[n] - final_store_thickness)
-                final_zf.append(sig_z_in[n])
+                final_store_thickness += df_group['thickness'][n]
+            elif n == (len(df_group['layer']) - 1):
+                final_layer_i = df_group['layer'][n]
+                final_z_in.append(df_group['z_in'][n] - final_store_thickness)
+                final_zf.append(df_group['z_in'][n])
                 final_add_all_layer.append(final_layer_i)
                 final_layer_thickness.append(final_store_thickness)
                 final_layers.append(final_layer_i)
-                final_z_in.append(sig_z_in[n])
-                final_zf.append(sig_zf[n])
-                final_layer_thickness.append(sig_layer_thickness[n])
+                final_z_in.append(df_group['z_in'][n])
+                final_zf.append(df_group['zf'][n])
+                final_layer_thickness.append(df_group['thickness'][n])
             else:
-                layer_check = significant_layers[n]
-                if layer_check == final_add_all_layer[n-1] and n != (len(significant_layers) - 1):
+                layer_check = df_group['layer'][n]
+                if layer_check == final_add_all_layer[n - 1] and n != (len(df_group['layer']) - 1):
                     final_add_all_layer.append(layer_check)
-                    final_store_thickness += sig_layer_thickness[n]
+                    final_store_thickness += df_group['thickness'][n]
                 else:
-                    final_z_in_i = sig_z_in[n] - final_store_thickness
-                    final_z_f_i = sig_z_in[n]
+                    final_z_in_i = df_group['z_in'][n] - final_store_thickness
+                    final_z_f_i = df_group['z_in'][n]
                     final_layers.append(layer_check)
                     final_add_all_layer.append(layer_check)
                     final_z_in.append(final_z_in_i)
                     final_zf.append(final_z_f_i)
                     final_layer_thickness.append(final_store_thickness)
                     final_store_thickness = 0
-                    final_store_thickness += sig_layer_thickness[n]
+                    final_store_thickness += df_group['thickness'][n]
 
-        df_final_layers = pd.DataFrame(final_layers, columns=['final_layers'])
-        df_final_z_in = pd.DataFrame(final_z_in, columns=['final_z_in'])
-        df_final_zf = pd.DataFrame(final_zf, columns=['final_zf'])
-        df_final_layer_thickness = pd.DataFrame(final_layer_thickness, columns=['final_layer_thickness'])
-        self.df_soil_grouped_final = pd.concat([df_final_layers, df_final_z_in, df_final_zf,
-                                                df_final_layer_thickness], axis=1, sort=False)
-        self.df_soil_grouped_final['z_centr'] = self.df_soil_grouped_final.apply(lambda row: (row.final_z_in + row.final_zf) / 2, axis=1)
+        return pd.DataFrame({'layer': final_layers,
+                             'z_in': final_z_in,
+                             'zf': final_zf,
+                             'thickness': final_layer_thickness}).pipe(self.calculate_z_centr)
 
-    def group_same_layers(self, df):
-        depth = df['depth']
-        soil_type = df['soil_type']
-        layer = []
-        z_in = []
-        zf = []
-        add_all_layer = []
-        layer_thickness = []
-        for i in range(len(depth)):
-            if i == 0:
-                layer_i = soil_type[i]
-                zii = depth[i]
-                layer.append(layer_i)
-                add_all_layer.append(layer_i)
-                z_in.append(zii)
-            elif i == len(depth) - 1:
-                zfi = depth[i]
-                zf.append(zfi)
-            else:
-                layer_i_check = soil_type[i]
-                if layer_i_check == add_all_layer[i - 1]:
-                    add_all_layer.append(layer_i_check)
-                else:
-                    zii = depth[i]
-                    layer.append(layer_i_check)
-                    add_all_layer.append(layer_i_check)
-                    z_in.append(zii)
-                    zfi = depth[i]
-                    zf.append(zfi)
-        for j in range(len(layer)):
-            layer_thickness_i = zf[j] - z_in[j]
-            layer_thickness.append(layer_thickness_i)
-        df_layer = pd.DataFrame(layer, columns=['layer'])
-        df_z_in = pd.DataFrame(z_in, columns=['z_in'])
-        df_zf = pd.DataFrame(zf, columns=['zf'])
-        df_layer_thickness = pd.DataFrame(layer_thickness, columns=['layer_thickness'])
-        self.df_soil_grouped = pd.concat([df_layer, df_z_in, df_zf, df_layer_thickness], axis=1, sort=False)
-        self.df_soil_grouped['z_centr'] = self.df_soil_grouped.apply(lambda row: (row.z_in + row.zf) / 2, axis=1)
-        return df
+
+
+
+
