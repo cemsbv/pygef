@@ -305,6 +305,7 @@ def create_soil_type(s):
         soil_name = "soil_not_according_with_NEN_classification"
     return soil_name
 
+
 INDICES = {
     "g": 0,
     "z": 1,
@@ -580,5 +581,24 @@ def kpa_to_mpa(df, columns):
     return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
 
 
+def join_gef(bore, cpt):
+    """
+    Join a cpt and bore file in one Dataframe.
 
+    :param bore: (ParseBORE)
+    :param cpt: (ParseCPT)
+    :return: (pd.DataFrame)
+    """
+    df = cpt.df.assign(join_idx=0)
+    idx = np.searchsorted(cpt.df['penetration_length'], bore.df['depth_top'])
 
+    df = df[df['penetration_length'] < bore.df['depth_bottom'].max()]
+    a = np.zeros(df.shape[0])
+    for i in range(len(idx) - 1):
+        a[idx[i]: idx[i + 1]] = i
+
+    a[idx[i + 1]:] = i + 1
+    df['join_idx'] = a
+
+    return df.merge(bore.df[['soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']].reset_index(-1),
+                    left_on='join_idx', right_on='index').drop(['index', 'join_idx'], axis=1)
