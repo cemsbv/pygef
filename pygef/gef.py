@@ -163,8 +163,7 @@ class ParseGEF:
             df = self.classify_been_jeffrey(water_level_NAP)
         else:
             df = None
-        grouped_df = GroupClassification(df).df_soil_grouped_final
-        return grouped_df
+        return GroupClassification(df).df_soil_grouped_final
 
 
 class ParseCPT:
