@@ -15,7 +15,7 @@ def cast_string(f, s):
     try:
         return f(s)
     except ValueError as e:
-        logging.error(f'Could not parse {f}. Message: {e}')
+        logging.warning(f'Could not parse {f}. Message: {e}')
         return None
 
 
@@ -157,7 +157,7 @@ def parse_file_date(s):
         try:
             file_date = g.group(1).replace(',', '-').replace(' ', '').replace('\t', '')
         except ValueError as e:
-            logging.error(f'Could not parse file_date: {e}')
+            logging.warning(f'Could not parse file_date: {e}')
             return None
         try:
             date = datetime.strptime(file_date, "%Y-%m-%d")
