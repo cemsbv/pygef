@@ -130,8 +130,7 @@ class ParseGEF:
         self.__dict__.update(parsed.__dict__)
 
     def plot_cpt(self, classification, water_level_NAP, p_a=0.1, new=True, show=False, figsize=(12, 30)):
-        df = self.classify_soil(classification, water_level_NAP, self.net_surface_area_quotient_of_the_cone_tip,
-                                self.pre_excavated_depth, p_a=p_a, new=new)
+        df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
         plot = PlotCPT(df, classification)
         return plot.plot_cpt(show=show, figsize=figsize)
 
@@ -146,7 +145,7 @@ class ParseGEF:
     def __str__(self):
         return self.df.__str__()
 
-    def classify_soil(self, classification, water_level_NAP, area_quotient_cone_tip, pre_excavated_depth, p_a=0.1,
+    def classify_soil(self, classification, water_level_NAP, p_a=0.1,
                       new=True):
         if classification == 'robertson':
             return self.classify_robertson(water_level_NAP, new, p_a=p_a)
