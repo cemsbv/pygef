@@ -340,7 +340,7 @@ def soil_quantification(s):
 
     s = s.replace("'", '').split(' ')[0].lower()
 
-    if s in NO_CLASSIFY:
+    if s in NO_CLASSIFY or len(s) == 0:
         return np.ones(6) * -1
 
     tokens = list(enumerate(s))
