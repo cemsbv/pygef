@@ -427,18 +427,20 @@ class GefTest(unittest.TestCase):
         assert_frame_equal(v, df)
 
     def test_group_equal_layers(self):
-        df_group = pd.DataFrame({'depth': [0, 1, 2, 3, 4, 5],
+        df_group = pd.DataFrame({'depth': [0, 1, 2, 3, 4, 5, 6],
                                  'soil_type': ['Peat', 'Peat', 'Peat',
                                                'Silt mixtures - clayey silt to silty clay',
                                                'Silt mixtures - clayey silt to silty clay',
-                                               'Silt mixtures - clayey silt to silty clay']
+                                               'Silt mixtures - clayey silt to silty clay',
+                                               'Sand']
                                  })
+
         v = grouping.group_equal_layers(df_group)
-        df = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay'],
-                           'z_in': [0, 3],
-                           'zf': [3, 5],
-                           'thickness': [3, 2],
-                           'z_centr': [1.5, 4]
+        df = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay', 'Sand'],
+                           'z_in': [0, 3, 5],
+                           'zf': [3, 5, 6],
+                           'thickness': [3, 2, 1],
+                           'z_centr': [1.5, 4, 5.5]
                            })
         assert_frame_equal(v, df)
 

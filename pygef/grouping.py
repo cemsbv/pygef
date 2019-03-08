@@ -129,10 +129,3 @@ def regroup_significant_layers(df_group):
             .pipe(calculate_thickness)
             .pipe(calculate_z_centr)
             )
-
-
-
-
-
-
-
