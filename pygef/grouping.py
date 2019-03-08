@@ -4,12 +4,38 @@ import pandas as pd
 class GroupClassification:
     def __init__(self, df, dict_soil_type, min_thickness):
         df_group = df.copy()
+        self.zid = df_group['elevation_respect_to_NAP'].iloc[0]
         df_group = df_group.loc[:, ['depth', 'soil_type']]
         self.df_group = (df_group
-                         .pipe(group_equal_layers, 'soil_type', 'depth')
-                         .pipe(group_significant_layers, dict_soil_type, min_thickness)
-                         .pipe(group_equal_layers, 'layer', 'zf')
+                         .pipe(self.group_equal_layers, 'soil_type', 'depth')
+                         .pipe(self.group_significant_layers, dict_soil_type, min_thickness)
+                         .pipe(self.group_equal_layers, 'layer', 'zf')
                          )
+
+    def group_equal_layers(self, df_group, column1, column2):
+        df_group = df_group.groupby((df_group[column1] != df_group[column1].shift()).cumsum()).max().reset_index(drop=True)
+        df_group = pd.DataFrame({'layer': df_group[column1],
+                                 'z_in': df_group[column2].shift().fillna(0),
+                                 'zf': df_group[column2]})
+        return (df_group
+                .pipe(calculate_thickness)
+                .pipe(calculate_z_centr)
+                .pipe(calculate_zf_NAP, self.zid))
+
+    def group_significant_layers(self,df_group, dict_soil_type, min_thickness):
+        df_group = df_group.loc[:, ['zf', 'layer', 'thickness']]
+        depth = df_group['zf'].iloc[-1]
+        indexes = df_group[df_group.thickness < min_thickness].index.values.tolist()
+        #df_group = df_group.assign(dict_soil_type=[dict_soil_type[key] for key in df_group.layer])
+        #df_group = df_group.assign(is_dropped=[1 if i in indexes else 0 for i in df_group.index.values.tolist()])
+        df_group = df_group.drop(indexes).reset_index(drop=True)
+        df_group = pd.DataFrame({'layer': df_group.layer,
+                                 'z_in': df_group.zf.shift().fillna(0),
+                                 'zf': df_group.zf})
+        df_group['zf'].iloc[-1] = depth
+        return (df_group
+                .pipe(calculate_thickness)
+                .pipe(calculate_z_centr))
 
 
 def calculate_thickness(df):
@@ -20,30 +46,8 @@ def calculate_z_centr(df):
     return df.assign(z_centr=(df['zf'] + df['z_in'])/2)
 
 
-def group_equal_layers(df_group, column1, column2):
-    df_group = df_group.groupby((df_group[column1] != df_group[column1].shift()).cumsum()).max().reset_index(drop=True)
-    df_group = pd.DataFrame({'layer': df_group[column1],
-                             'z_in': df_group[column2].shift().fillna(0),
-                             'zf': df_group[column2]})
-    return (df_group
-            .pipe(calculate_thickness)
-            .pipe(calculate_z_centr))
-
-
-def group_significant_layers(df_group, dict_soil_type, min_thickness):
-    df_group = df_group.loc[:, ['zf', 'layer', 'thickness']]
-    depth = df_group['zf'].iloc[-1]
-    indexes = df_group[df_group.thickness < min_thickness].index.values.tolist()
-    #df_group = df_group.assign(dict_soil_type=[dict_soil_type[key] for key in df_group.layer])
-    #df_group = df_group.assign(is_dropped=[1 if i in indexes else 0 for i in df_group.index.values.tolist()])
-    df_group = df_group.drop(indexes).reset_index(drop=True)
-    df_group = pd.DataFrame({'layer': df_group.layer,
-                             'z_in': df_group.zf.shift().fillna(0),
-                             'zf': df_group.zf})
-    df_group['zf'].iloc[-1] = depth
-    return (df_group
-            .pipe(calculate_thickness)
-            .pipe(calculate_z_centr))
+def calculate_zf_NAP(df, z_id):
+    return df.assign(zf_NAP=(z_id - df['zf']))
 
 
 def group_significant_layers_not_funct(df_group, dict_soil_type, min_thickness):
