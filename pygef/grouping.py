@@ -4,10 +4,11 @@ import pandas as pd
 class GroupClassification:
     def __init__(self, df, dict_soil_type, min_thickness):
         df_group = df.copy()
+        df_group = df_group.loc[:, ['depth', 'soil_type']]
         self.df_group = (df_group
                          .pipe(group_equal_layers)
-                         .pipe(group_significant_layers, dict_soil_type, min_thickness)
-                         .pipe(regroup_significant_layers)
+                         #.pipe(group_significant_layers, dict_soil_type, min_thickness)
+                         #.pipe(regroup_significant_layers)
                          )
 
 
@@ -20,6 +21,16 @@ def calculate_z_centr(df):
 
 
 def group_equal_layers(df_group):
+    df_group = df_group.groupby((df_group.soil_type != df_group.soil_type.shift()).cumsum()).max().reset_index(drop=True)
+    df_group = pd.DataFrame({'layer': df_group.soil_type,
+                             'z_in': df_group.depth.shift().fillna(0),
+                             'zf': df_group.depth})
+    return (df_group
+            .pipe(calculate_thickness)
+            .pipe(calculate_z_centr))
+
+
+def group_equal_layers_not_functional(df_group):
     layer = []
     z_in = []
     zf = []
