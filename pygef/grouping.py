@@ -6,9 +6,9 @@ class GroupClassification:
         df_group = df.copy()
         df_group = df_group.loc[:, ['depth', 'soil_type']]
         self.df_group = (df_group
-                         .pipe(group_equal_layers)
-                         #.pipe(group_significant_layers, dict_soil_type, min_thickness)
-                         #.pipe(regroup_significant_layers)
+                         .pipe(group_equal_layers, 'soil_type', 'depth')
+                         .pipe(group_significant_layers_functional, dict_soil_type, min_thickness)
+                         .pipe(group_equal_layers, 'layer', 'zf')
                          )
 
 
@@ -20,37 +20,26 @@ def calculate_z_centr(df):
     return df.assign(z_centr=(df['zf'] + df['z_in'])/2)
 
 
-def group_equal_layers(df_group):
-    df_group = df_group.groupby((df_group.soil_type != df_group.soil_type.shift()).cumsum()).max().reset_index(drop=True)
-    df_group = pd.DataFrame({'layer': df_group.soil_type,
-                             'z_in': df_group.depth.shift().fillna(0),
-                             'zf': df_group.depth})
+def group_equal_layers(df_group, column1, column2):
+    df_group = df_group.groupby((df_group[column1] != df_group[column1].shift()).cumsum()).max().reset_index(drop=True)
+    df_group = pd.DataFrame({'layer': df_group[column1],
+                             'z_in': df_group[column2].shift().fillna(0),
+                             'zf': df_group[column2]})
     return (df_group
             .pipe(calculate_thickness)
             .pipe(calculate_z_centr))
 
 
-def group_equal_layers_not_functional(df_group):
-    layer = []
-    z_in = []
-    zf = []
-    for i, st in enumerate(df_group['soil_type']):
-        if i == 0:
-            layer.append(st)
-            z_in.append(df_group['depth'][i])
-        elif i == len(df_group['depth']) - 1:
-            zf.append(df_group['depth'][i])
-        else:
-            if st == df_group['soil_type'][i - 1]:
-                pass
-            else:
-                layer.append(st)
-                z_in.append(df_group['depth'][i])
-                zf.append(df_group['depth'][i])
-    df_soil_grouped = pd.DataFrame({'layer': layer,
-                                    'z_in': z_in,
-                                    'zf': zf})
-    return (df_soil_grouped
+def group_significant_layers_functional(df_group, dict_soil_type, min_thickness):
+    df_group = df_group.loc[:, ['zf', 'layer', 'thickness']]
+    depth = df_group['zf'].iloc[-1]
+    condition = df_group[df_group.thickness < min_thickness].index.values.tolist()
+    df_group = df_group.drop(condition).reset_index(drop=True)
+    df_group = pd.DataFrame({'layer': df_group.layer,
+                             'z_in': df_group.zf.shift().fillna(0),
+                             'zf': df_group.zf})
+    df_group['zf'].iloc[-1] = depth
+    return (df_group
             .pipe(calculate_thickness)
             .pipe(calculate_z_centr))
 
@@ -107,36 +96,3 @@ def group_significant_layers(df_group, dict_soil_type, min_thickness):
             .pipe(calculate_z_centr)
             )
 
-
-def regroup_significant_layers(df_group):
-    final_layers = []
-    final_z_in = []
-    final_zf = []
-    final_store_thickness = 0
-    for n, layer in enumerate(df_group['layer']):
-        if n == 0:
-            final_layers.append(layer)
-            final_store_thickness += df_group['thickness'][n]
-        elif n == (len(df_group['layer']) - 1):
-            final_z_in.append(df_group['z_in'][n] - final_store_thickness)
-            final_zf.append(df_group['z_in'][n])
-            final_layers.append(layer)
-            final_z_in.append(df_group['z_in'][n])
-            final_zf.append(df_group['zf'][n])
-        else:
-            if layer == df_group['layer'][n - 1]:
-                final_store_thickness += df_group['thickness'][n]
-            else:
-                final_layers.append(layer)
-                final_z_in.append(df_group['z_in'][n] - final_store_thickness)
-                final_zf.append(df_group['z_in'][n])
-                final_store_thickness = 0
-                final_store_thickness += df_group['thickness'][n]
-    df_soil_grouped = pd.DataFrame({'layer': final_layers,
-                                    'z_in': final_z_in,
-                                    'zf': final_zf
-                                    })
-    return (df_soil_grouped
-            .pipe(calculate_thickness)
-            .pipe(calculate_z_centr)
-            )
