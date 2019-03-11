@@ -131,6 +131,9 @@ def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
 
     subplot_val += 1
     plt.subplot(subplot_val)
+    if 'SI' in df.columns:
+        df = df.copy()
+        df['L'] += df['SI']
     v = df[['G', 'S', 'L', 'C', 'P']].values
 
     c = ['#578E57', '#a76b29', '#0078C1', '#DBAD4B', '#708090']

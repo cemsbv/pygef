@@ -590,11 +590,12 @@ def join_gef(bore, cpt):
     :return: (pd.DataFrame)
     """
     assert bore.zid is not None, "Zid should be defined for merging to take place"
-    df = cpt.df.assign(join_idx=0)
+    df_cpt = cpt.df.assign(join_idx=0)
     df_bore = bore.df.assign(elevation_respect_to_NAP=bore.zid - bore.df['depth_top'])
-    idx = np.searchsorted(cpt.df['elevation_respect_to_NAP'], df_bore['elevation_respect_to_NAP'])
+    df_bore = df_bore.loc[df_bore[['G', 'S', 'C', 'L', 'P', 'SI']].sum(1) == 1]
+    idx = np.searchsorted(cpt.df['elevation_respect_to_NAP'][::-1], df_bore['elevation_respect_to_NAP'][::-1])
+    df = df_cpt[df_cpt['elevation_respect_to_NAP'] > df_bore['elevation_respect_to_NAP'].min()]
 
-    df = df[df['elevation_respect_to_NAP'] < (bore.zid - bore.df['depth_bottom']).max()]
     a = np.zeros(df.shape[0])
     for i in range(len(idx) - 1):
         a[idx[i]: idx[i + 1]] = i
@@ -602,5 +603,5 @@ def join_gef(bore, cpt):
     a[idx[i + 1]:] = i + 1
     df['join_idx'] = a
 
-    return df.merge(bore.df[['soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']].reset_index(-1),
+    return df.merge(df_bore[['soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']].reset_index(-1),
                     left_on='join_idx', right_on='index').drop(['index', 'join_idx'], axis=1)
