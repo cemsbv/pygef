@@ -89,4 +89,26 @@ class PlotCPT:
         return fig
 
 
+def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
+    fig = plt.figure(figsize=figsize)
+    subplot_val = 131
+    plt.subplot(subplot_val)
+    plt.plot(df['qc'], -df['depth'])
+
+    subplot_val += 1
+    plt.subplot(subplot_val)
+    plt.plot(df['friction_number'], -df['depth'])
+
+    subplot_val += 1
+    plt.subplot(subplot_val)
+    v = df[['G', 'S', 'L', 'C', 'P']].values
+
+    c = ['#578E57', '#a76b29', '#0078C1', '#DBAD4B', '#708090']
+    for i in range(5):
+        plt.fill_betweenx(-df['depth'], np.zeros(v.shape[0]), np.cumsum(v, axis=1)[:, -(i + 1)], color=c[i])
+
+    if show:
+        plt.show()
+    return fig
+
 
