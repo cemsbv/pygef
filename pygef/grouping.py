@@ -4,7 +4,7 @@ import pandas as pd
 class GroupClassification:
     def __init__(self, df, min_thickness):
         df_group = df.copy()
-        self.zid = df_group['elevation_respect_to_NAP'].iloc[0]
+        self.zid = df_group['elevation_with_respect_to_NAP'].iloc[0]
         df_group = df_group.loc[:, ['depth', 'soil_type']]
         self.df_group = (df_group
                          .pipe(self.group_equal_layers, 'soil_type', 'depth')

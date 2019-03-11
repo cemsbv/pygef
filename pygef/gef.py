@@ -262,7 +262,7 @@ class ParseCPT:
         if zid is not None:
             depth_lst = np.array(df['depth'].tolist())
             lst_zid = np.array([zid] * len(df['depth']))
-            return df.assign(elevation_respect_to_NAP=(lst_zid - depth_lst))
+            return df.assign(elevation_with_respect_to_NAP=(lst_zid - depth_lst))
         return df
 
     @staticmethod

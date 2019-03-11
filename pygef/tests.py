@@ -209,7 +209,7 @@ class GefTest(unittest.TestCase):
         df1 = pd.DataFrame({'depth': [0, 1, 2, 3, 4]})
         zid = -3
         df_calculated = ParseCPT.calculate_elevation_respect_to_nap(df1, zid)
-        df = pd.DataFrame({'depth': [0, 1, 2, 3, 4], 'elevation_respect_to_NAP': [-3, -4, -5, -6, -7]})
+        df = pd.DataFrame({'depth': [0, 1, 2, 3, 4], 'elevation_with_respect_to_NAP': [-3, -4, -5, -6, -7]})
         assert_frame_equal(df_calculated, df)
 
     def test_correct_depth_with_inclination(self):
@@ -283,7 +283,7 @@ class GefTest(unittest.TestCase):
                            "qc": [0.0000e+000, 7.1000e-001, 7.3000e-001, 6.9000e-001],
                            "fs": [0.0000e+000, 4.6500e-002, 4.2750e-002, 3.9000e-002],
                            "depth": [0.0000e+000, 1.0200e+000, 1.0400e+000, 1.0600e+000],
-                           'elevation_respect_to_NAP': [1.3 , 0.28, 0.26, 0.24],
+                           'elevation_with_respect_to_NAP': [1.3 , 0.28, 0.26, 0.24],
                            'Fr': [np.nan, 6.54929577, 5.85616438, 5.65217391]} )
         assert_frame_equal(df_calculated, df)
 
@@ -434,7 +434,7 @@ class GefTest(unittest.TestCase):
                                                'Silt mixtures - clayey silt to silty clay',
                                                'Silt mixtures - clayey silt to silty clay',
                                                'Sand'],
-                                 'elevation_respect_to_NAP': [2, 1, 0, -1, -2, -3, -4]
+                                 'elevation_with_respect_to_NAP': [2, 1, 0, -1, -2, -3, -4]
                                  })
         group = GroupClassification(df_group, 0.2)
         v = group.group_equal_layers(df_group, 'soil_type', 'depth')
