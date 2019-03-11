@@ -1,6 +1,7 @@
 import re
 import logging
 from datetime import datetime
+import numpy as np
 
 
 def cast_string(f, s):
@@ -14,7 +15,6 @@ def cast_string(f, s):
     try:
         return f(s)
     except ValueError as e:
-        logging.error(f'Could not parse {f}. Message: {e}')
         return None
 
 
@@ -156,7 +156,7 @@ def parse_file_date(s):
         try:
             file_date = g.group(1).replace(',', '-').replace(' ', '').replace('\t', '')
         except ValueError as e:
-            logging.error(f'Could not parse file_date: {e}')
+            logging.warning(f'Could not parse file_date: {e}')
             return None
         try:
             date = datetime.strptime(file_date, "%Y-%m-%d")
@@ -305,6 +305,27 @@ def create_soil_type(s):
     return soil_name
 
 
+INDICES = {
+    "g": 0,
+    "z": 1,
+    "k": 2,
+    "s": 5,
+    "m": 1,
+    "h": 4,
+    "l": 2,
+    "v": 4,
+    'p': 4
+}
+
+INTENSITY = {"1": 0.05,
+             "2": 0.10,
+             "3": 0.15,
+             "4": 0.20}
+
+NO_CLASSIFY = {"gm": "layer information missing",
+                   "nbe": "soil cannot be classified properly"}
+
+
 def soil_quantification(s):
     """
     Function to create the quantification of the soil type.
@@ -312,56 +333,29 @@ def soil_quantification(s):
     :param s:(str) Soil code.
     :return: Quantification of the soil code.
     """
-    string_noquote = s.replace("'", '')
-    split_letters = list(string_noquote)
-    delete = ['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt']
+    #   0    1    2    3    4     5
+    # ['G', 'S', 'C', 'L', 'P', 'SI']
+    dist = np.zeros(6)
 
-    # split_soil_string = list(soil_string)
-    dict_name = {"G": 0,
-                 "Z": 1,
-                 "K": 2,
-                 "L": 3,
-                 "V": 4
-                 }
-    dict_addition = {"g": 0,
-                     "z": 1,
-                     "k": 2,
-                     "s": 5,
-                     "m": 1,
-                     "h": 4
-                     }
-    dict_intensity = {"1": 0.05,
-                      "2": 0.10,
-                      "3": 0.15,
-                      "4": 0.20}
-    dict_exceptions = {"GM": "layer information missing",
-                       "NBE": "soil cannot be classified properly"}
-    soil_components = [0, 0, 0, 0, 0, 0]
-    try:
-        if string_noquote is not "":
-            if string_noquote in dict_exceptions:
-                pass
-            else:
-                sum_addition = 0
-                percentage_main_component = 1
-                for i in range(1, (len(split_letters))):
-                    if split_letters[i] in dict_addition:
-                        pos_to_change = dict_addition[split_letters[i]]
-                        if i+1 <= (len(split_letters)-1):
-                            if split_letters[i+1] in dict_intensity:
-                                soil_components[pos_to_change] = dict_intensity[split_letters[i+1]]
-                                sum_addition = sum_addition + dict_intensity[split_letters[i+1]]
-                        else:
-                            soil_components[pos_to_change] = 0.05
-                            sum_addition = sum_addition + 0.05
-                if sum_addition > 0:
-                    percentage_main_component = percentage_main_component - sum_addition
-                soil_components[dict_name[split_letters[0]]] = percentage_main_component
+    s = s.replace("'", '').split(' ')[0].lower()
+
+    if s in NO_CLASSIFY or len(s) == 0:
+        return np.ones(6) * -1
+
+    tokens = list(enumerate(s))
+    numerics = dict(filter(lambda t: t[1].isnumeric(), tokens))
+    alphabetics = dict(filter(lambda t: not t[1].isnumeric(), tokens[1:]))  # skip the first one.
+
+    for i, token in alphabetics.items():
+        idx = INDICES[token]
+        if (i + 1) in numerics:
+            v = INTENSITY[numerics[i + 1]]
         else:
-            pass
-    except KeyError:
-        pass
-    return soil_components
+            v = 0.05
+        dist[idx] = v
+
+    dist[INDICES[s[0]]] = 1 - dist.sum()
+    return dist
 
 
 def parse_add_info(s):
@@ -587,5 +581,26 @@ def kpa_to_mpa(df, columns):
     return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
 
 
+def join_gef(bore, cpt):
+    """
+    Join a cpt and bore file in one Dataframe based on NAP.
 
+    :param bore: (ParseBORE)
+    :param cpt: (ParseCPT)
+    :return: (pd.DataFrame)
+    """
+    assert bore.zid is not None, "Zid should be defined for merging to take place"
+    df = cpt.df.assign(join_idx=0)
+    df_bore = bore.df.assign(elevation_respect_to_NAP=bore.zid - bore.df['depth_top'])
+    idx = np.searchsorted(cpt.df['elevation_respect_to_NAP'], df_bore['elevation_respect_to_NAP'])
 
+    df = df[df['elevation_respect_to_NAP'] < (bore.zid - bore.df['depth_bottom']).max()]
+    a = np.zeros(df.shape[0])
+    for i in range(len(idx) - 1):
+        a[idx[i]: idx[i + 1]] = i
+
+    a[idx[i + 1]:] = i + 1
+    df['join_idx'] = a
+
+    return df.merge(bore.df[['soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']].reset_index(-1),
+                    left_on='join_idx', right_on='index').drop(['index', 'join_idx'], axis=1)

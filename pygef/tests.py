@@ -182,15 +182,15 @@ class GefTest(unittest.TestCase):
     def test_soil_quantification(self):
         s = "'Kz'"
         v = utils.soil_quantification(s)
-        self.assertEqual(v, [0, 0.05, 0.95, 0, 0, 0])
+        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.95, 0, 0, 0])))
 
         s = "'Kz1'"
         v = utils.soil_quantification(s)
-        self.assertEqual(v, [0, 0.05, 0.95, 0, 0, 0])
+        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.95, 0, 0, 0])))
 
         s = "'Kz1s1'"
         v = utils.soil_quantification(s)
-        self.assertEqual(v, [0, 0.05, 0.9, 0, 0, 0.05])
+        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.9, 0, 0, 0.05])))
 
     def test_parse_data_soil_code(self):
         df = pd.DataFrame({'Soil_code': ['Kz', 'Kz1', 'Kz2']})
@@ -200,7 +200,7 @@ class GefTest(unittest.TestCase):
 
     def test_data_soil_quantified(self):
         lst = [[0, 0.05, 0.95, 0, 0, 0], [0, 0.05, 0.95, 0, 0, 0]]
-        df = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'])
+        df = pd.DataFrame(lst, columns=['Gravel', 'Sand', 'Clay', 'Loam', 'Peat', 'Silt'], dtype=float)
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"]]
         df_parsed = ParseBORE.data_soil_quantified(data_s)
         assert_frame_equal(df_parsed, df)
@@ -330,13 +330,13 @@ class GefTest(unittest.TestCase):
         df = pd.DataFrame({"depth_top": [0.0, 1.2, 3.1],
                            "depth_bottom": [1.2, 3.1, 5.0],
                            "soil_code": ["Zgh2", "Zg", "Vz"],
-                           "G": [0.00, 0.05, 0.00],
-                           'S': [0.90, 0.95, 0.05],
+                           "G": [0.05, 0.05, 0.00],
+                           'S': [0.85, 0.95, 0.05],
                            'C': [0, 0, 0],
                            'L': [0, 0, 0],
                            'P': [0.10, 0.00, 0.95],
                            'SI': [0, 0, 0],
-                           })
+                           }, dtype=float)
         assert_frame_equal(df_calculated, df)
 
     def test_delta_depth(self):
@@ -435,6 +435,7 @@ class GefTest(unittest.TestCase):
                                                'Silt mixtures - clayey silt to silty clay',
                                                'Sand'],
                                  'elevation_with_respect_to_NAP': [2, 1, 0, -1, -2, -3, -4]
+
                                  })
         group = GroupClassification(df_group, 0.2)
         v = group.group_equal_layers(df_group, 'soil_type', 'depth')
@@ -504,7 +505,95 @@ class GefTest(unittest.TestCase):
         assert_frame_equal(v, df)
 
 
+class BoreTest(unittest.TestCase):
 
+    def setUp(self):
+        self.bore = ParseGEF(string="""#GEFID = 1,1,0
+#COLUMNTEXT = 1, aan
+#COLUMNSEPARATOR = ;
+#RECORDSEPARATOR = !
+#FILEOWNER = DINO
+#COMPANYID = Wiertsema & Partners
+#FILEDATE = 2015,7,15
+#PROJECTID = DINO-BOR
+#COLUMN = 9
+#COLUMNINFO = 1, m, Diepte bovenkant laag, 1
+#COLUMNINFO = 2, m, Diepte onderkant laag, 2
+#COLUMNINFO = 3, mm, Zandmediaan, 8
+#COLUMNINFO = 4, mm, Grindmediaan, 9
+#COLUMNINFO = 5, %, Lutum percentage, 3
+#COLUMNINFO = 6, %, Silt percentage, 4
+#COLUMNINFO = 7, %, Zand percentage, 5
+#COLUMNINFO = 8, %, Grind percentage, 6
+#COLUMNINFO = 9, %, Organische stof percentage, 7
+#COLUMNVOID = 1, -9999.99
+#COLUMNVOID = 2, -9999.99
+#COLUMNVOID = 3, -9999.99
+#COLUMNVOID = 4, -9999.99
+#COLUMNVOID = 5, -9999.99
+#COLUMNVOID = 6, -9999.99
+#COLUMNVOID = 7, -9999.99
+#COLUMNVOID = 8, -9999.99
+#COLUMNVOID = 9, -9999.99
+#LASTSCAN = 29
+#REPORTCODE = GEF-BORE-Report,1,0,0
+#MEASUREMENTCODE = Volgens GEF-BORE-Report 1.0.0,-,-,-
+#TESTID = B43F1303
+#XYID = 31000,99046.00,424271.00
+#ZID = 31000,1.96,5.0000002E-5
+#MEASUREMENTTEXT = 3, Puttershoek, plaatsnaam
+#MEASUREMENTTEXT = 5, 2014-05-07, datum boorbeschrijving
+#MEASUREMENTTEXT = 6, Jan Palsma, beschrijver lagen
+#MEASUREMENTTEXT = 13, Wiertsema & Partners, boorbedrijf
+#MEASUREMENTTEXT = 16, 2014-05-07, datum boring
+#MEASUREMENTVAR = 31, 28.00, m, diepte onderkant boortraject
+#MEASUREMENTVAR = 32, 168, mm, boorbuisdiameter
+#MEASUREMENTTEXT = 31, PUM, boormethode
+#MEASUREMENTTEXT = 11, MONB, maaiveldhoogtebepaling
+#MEASUREMENTTEXT = 12, LONB, plaatsbepalingmethode
+#MEASUREMENTTEXT = 7, Rijksdriehoeksmeting, locaal coördinatensysteem
+#MEASUREMENTTEXT = 8, Normaal Amsterdams Peil, locaal referentiesysteem
+#MEASUREMENTVAR = 16, 28.00, m, einddiepte
+#MEASUREMENTTEXT = 1, Antea Group, opdrachtgever
+#MEASUREMENTTEXT = 14, Nee, openbaar
+#MEASUREMENTTEXT = 18, Nee, peilbuis afwezig
+#MEASUREMENTVAR = 18, 1.00, m, grondwaterstand direct na boring
+#EOH = 
+0.00;0.07;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'NBE';'NBE';'betontegel geen monster';!
+0.07;0.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI BR';'ZMG';'zeer veel baksteenresten';!
+0.50;2.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1g1';'LI BR';'ZZG';'GFN';'SCH1';'uiterst grof zandhoudend plaatselijk weinig schelprestjes opgebracht';!
+2.00;3.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1';'LI TGR GR';'ZMG';'SCH1';'grof zandhoudend opgebracht';!
+3.20;5.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI TGR GR';'ZMG';'SCH1';'plaatselijk weinig kleibrokjes grof zandhoudend opgebracht';!
+5.10;6.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz1';'GR';'KSTV';'SCH1';!
+6.00;8.40;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3h1';'GR';'KMST';'zandgelaagd plaatselijk weinig plantenresten rietresten';!
+8.40;8.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1';'LI GR';'ZMG';!
+8.50;8.55;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3';'KMST';'weinig plantenresten houtresten';!
+8.55;8.80;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI TGR GR';'ZMG';'plaatselijk weinig plantenresten houtresten weinig kleibrokjes';!
+8.80;9.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks1h3';'TGR BR';'KSTV';'plaatselijk plantenresten rietresten houtresten';!
+9.00;9.90;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vk1';'DO TBR BR';'VSTV';'houtresten';!
+9.90;12.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2h1';'TBR GR';'KSTV';'plaatselijk plantenresten rietresten veel houtresten';!
+12.50;13.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2h1';'TBR GR';'KSTV';'plaatselijk plantenresten rietresten houtresten plaatselijk grove houtresten';!
+13.00;13.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks1h2';'TGR BR';'KSTV';'plaatselijk plantenresten rietresten houtresten';!
+13.50;13.90;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vk3';'DO TBR GR';'VSTV';!
+13.90;15.90;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2h1';'GR';'KSTV';'plaatselijk weinig plantenresten rietresten houtresten';!
+15.90;16.30;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vk3';'TGR BR';'VSTV';!
+16.30;16.55;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2';'GR';'KSTV';'houtresten';!
+16.55;17.45;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI TGR GR';'ZMG';'plaatselijk plantenresten houtresten rietresten';!
+17.45;19.60;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1g1';'LI TGR GR';'ZUG';'GFN';'grof zandhoudend plaatselijk weinig plantenresten rietresten houtresten';!
+19.60;22.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1g2';'LI TGR GR';'ZUG';'GFN';'uiterst grof/grof zandhoudend';!
+22.10;23.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz2';'TGN GR';'KSTV';!
+23.20;23.70;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz1';'TGN GR';'KZST';!
+23.70;24.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3';'GR';'KSTV';!
+24.20;24.35;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs4';'GR';'ZZF';!
+24.35;26.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3';'TGN GR';'KSTV';!
+26.00;26.80;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs3';'LI TGR GR';'ZZF';'plaatselijk kleirestje fijn zandhoudend';!
+26.80;28.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz1';'TGN GR';'KZST';!
+""")
+
+    def test_sum_to_one(self):
+        df = self.bore.df[['G', 'S', 'C', 'L', 'P', 'SI']].sum(1)
+        df[df < 0] = 1.0
+        self.assertTrue(np.all(np.isclose(df.values, 1)))
 
 
 

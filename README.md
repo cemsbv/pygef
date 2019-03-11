@@ -57,6 +57,7 @@ args = [
 min_thickness, # min thickness accepted for the layers, it is suggested not use a value bigger than 0.2 m.
 classification, # Chosen soil classification
 water_level_NAP # Water level with respect to NAP (my field)
+
 ]
 
 filtered.df.to_csv("my_filtered_cpt.csv")   
