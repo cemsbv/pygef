@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from pandas.util.testing import assert_frame_equal
 import pygef.grouping as grouping
+from pygef.grouping import GroupClassification
 
 
 class GefTest(unittest.TestCase):
@@ -432,17 +433,78 @@ class GefTest(unittest.TestCase):
                                                'Silt mixtures - clayey silt to silty clay',
                                                'Silt mixtures - clayey silt to silty clay',
                                                'Silt mixtures - clayey silt to silty clay',
-                                               'Sand']
+                                               'Sand'],
+                                 'elevation_respect_to_NAP': [2, 1, 0, -1, -2, -3, -4]
                                  })
-
-        v = grouping.group_equal_layers(df_group)
+        group = GroupClassification(df_group, 0.2)
+        v = group.group_equal_layers(df_group, 'soil_type', 'depth')
         df = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay', 'Sand'],
-                           'z_in': [0, 3, 5],
-                           'zf': [3, 5, 6],
-                           'thickness': [3, 2, 1],
-                           'z_centr': [1.5, 4, 5.5]
+                           'z_in': [0., 2., 5.],
+                           'zf': [2, 5, 6],
+                           'thickness': [2., 3., 1.],
+                           'z_centr': [1., 3.5, 5.5],
+                           'zf_NAP': [0, -3, -4]
                            })
         assert_frame_equal(v, df)
+
+    def test_group_significant_layers(self):
+        df_group = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay', 'Sand'],
+                                 'z_in': [0., 0.4, 5.],
+                                 'zf': [0.4, 5, 6],
+                                 'thickness': [0.4, 4.6, 1.]
+                                 })
+
+        v = grouping.group_significant_layers(df_group, 0.5)
+
+        df = pd.DataFrame({'layer': ['Silt mixtures - clayey silt to silty clay', 'Sand'],
+                           'z_in': [0., 5.],
+                           'zf': [5., 6.],
+                           'thickness': [5., 1.],
+                           'z_centr': [2.5, 5.5]})
+        assert_frame_equal(v, df)
+
+    def test_calculate_thickness(self):
+        df_group = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay', 'Sand'],
+                                 'z_in': [0., 0.4, 5.],
+                                 'zf': [0.4, 5, 6]
+                                 })
+        v = grouping.calculate_thickness(df_group)
+        df = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay', 'Sand'],
+                            'z_in': [0., 0.4, 5.],
+                            'zf': [0.4, 5, 6],
+                           'thickness': [0.4, 4.6, 1.]})
+        assert_frame_equal(v, df)
+
+    def test_calculate_z_centr(self):
+        df_group = pd.DataFrame({'layer': ['Silt mixtures - clayey silt to silty clay', 'Sand'],
+                           'z_in': [0., 5.],
+                           'zf': [5., 6.]})
+        v = grouping.calculate_z_centr(df_group)
+        df = pd.DataFrame({'layer': ['Silt mixtures - clayey silt to silty clay', 'Sand'],
+                           'z_in': [0., 5.],
+                           'zf': [5., 6.],
+                           'z_centr': [2.5, 5.5]})
+        assert_frame_equal(v, df)
+
+    def test_calculate_zf_NAP(self):
+        df_group = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay', 'Sand'],
+                           'z_in': [0., 2., 5.],
+                           'zf': [2, 5, 6],
+                           'thickness': [2., 3., 1.],
+                           'z_centr': [1., 3.5, 5.5]})
+
+        v = grouping.calculate_zf_NAP(df_group, 2)
+
+        df = pd.DataFrame({'layer': ['Peat', 'Silt mixtures - clayey silt to silty clay', 'Sand'],
+                           'z_in': [0., 2., 5.],
+                           'zf': [2, 5, 6],
+                           'thickness': [2., 3., 1.],
+                           'z_centr': [1., 3.5, 5.5],
+                           'zf_NAP': [0, -3, -4]})
+        assert_frame_equal(v, df)
+
+
+
 
 
 

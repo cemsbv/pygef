@@ -2,13 +2,13 @@ import pandas as pd
 
 
 class GroupClassification:
-    def __init__(self, df, dict_soil_type, min_thickness):
+    def __init__(self, df, min_thickness):
         df_group = df.copy()
         self.zid = df_group['elevation_respect_to_NAP'].iloc[0]
         df_group = df_group.loc[:, ['depth', 'soil_type']]
         self.df_group = (df_group
                          .pipe(self.group_equal_layers, 'soil_type', 'depth')
-                         .pipe(self.group_significant_layers, dict_soil_type, min_thickness)
+                         .pipe(group_significant_layers, min_thickness)
                          .pipe(self.group_equal_layers, 'layer', 'zf')
                          )
 
@@ -36,24 +36,25 @@ class GroupClassification:
                 .pipe(calculate_z_centr)
                 .pipe(calculate_zf_NAP, self.zid))
 
-    def group_significant_layers(self, df_group, min_thickness):
-        """
-        Drop the layers with thickness < min_thickness and adjust the limits of the others.
-        :param df_group: Original dataframe.
-        :param min_thickness: Minimum thickness.
-        :return: Dataframe without the dropped layers.
-        """
-        df_group = df_group.loc[:, ['zf', 'layer', 'thickness']]
-        depth = df_group['zf'].iloc[-1]
-        indexes = df_group[df_group.thickness < min_thickness].index.values.tolist()
-        df_group = df_group.drop(indexes).reset_index(drop=True)
-        df_group = pd.DataFrame({'layer': df_group.layer,
-                                 'z_in': df_group.zf.shift().fillna(0),
-                                 'zf': df_group.zf})
-        df_group['zf'].iloc[-1] = depth
-        return (df_group
-                .pipe(calculate_thickness)
-                .pipe(calculate_z_centr))
+
+def group_significant_layers(df_group, min_thickness):
+    """
+    Drop the layers with thickness < min_thickness and adjust the limits of the others.
+    :param df_group: Original dataframe.
+    :param min_thickness: Minimum thickness.
+    :return: Dataframe without the dropped layers.
+    """
+    df_group = df_group.loc[:, ['zf', 'layer', 'thickness']]
+    depth = df_group['zf'].iloc[-1]
+    indexes = df_group[df_group.thickness < min_thickness].index.values.tolist()
+    df_group = df_group.drop(indexes).reset_index(drop=True)
+    df_group = pd.DataFrame({'layer': df_group.layer,
+                             'z_in': df_group.zf.shift().fillna(0),
+                             'zf': df_group.zf})
+    df_group['zf'].iloc[-1] = depth
+    return (df_group
+            .pipe(calculate_thickness)
+            .pipe(calculate_z_centr))
 
 
 def calculate_thickness(df):
