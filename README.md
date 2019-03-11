@@ -54,9 +54,9 @@ classified.df.to_csv("my_classified_cpt.csv")
 filtered = gef.group_classification(0.2, 'robertson', -1, True, 0.1)
 
 args = [
-min_thickness, # min thickness accept for the layers, it is suggested to not use a value bigger the 0.2 m
-classification, # Soil classification
-water_level_NAP # Water level respt to NAP of myfielf
+min_thickness, # min thickness accepted for the layers, it is suggested to not use a value bigger the 0.2 m.
+classification, # Chosen soil classification
+water_level_NAP # Water level respect to NAP (my field)
 ]
 
 filtered.df.to_csv("my_filtered_cpt.csv")   
