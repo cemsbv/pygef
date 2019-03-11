@@ -237,10 +237,10 @@ class ParseCPT:
         self.df = (self.parse_data(header_s, data_s)
                    .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
                    .pipe(self.correct_depth_with_inclination)
+                   .pipe(lambda df: df.assign(depth=np.abs(df['depth'].values)))
                    .pipe(self.calculate_elevation_respect_to_nap, zid)
                    .pipe(self.replace_column_void, self.column_void)
                    .pipe(self.calculate_friction_number)
-                   .pipe(lambda df: df.assign(depth=np.abs(df['depth'].values)))
                    )
 
     @staticmethod
