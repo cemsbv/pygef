@@ -31,12 +31,12 @@ gef.y # y coordinate with respect to the reference system
 ]
 
 # Plot cpt file and get soil classification
-gef.plot_cpt('been_jeffrey', -1, 0.1, show=True) # the plot in figure
+gef.plot_cpt('robertson', -1, 0.2, show=True) # the plot in figure
 
 classification = ['robertson','been_jeffrey']
 
 #type the name of the classification exactly as specified in the list classification, the inputs of plot_cpt are:
-args = ['classification name', water_level_NAP] 
+args = ['classification name', water_level_NAP, min_thickness] 
 kwargs = [p_a=0.1, # atmosferic pressure, used in the new Robertson, default: 0.1 Mpa
           new=True, # set new to use the new Robertson classification, default: New
           show=False, # set show=True to shown the plot, default: False
@@ -47,9 +47,21 @@ classified = gef.classify_robertson(water_level_NAP, new=True, p_a=0.1)
 # or Been&Jeffrey
 classified = gef.classify_been_jeffrey(water_level_NAP)    
                        
-classified.df.to_csv("my-file.csv")          
+classified.df.to_csv("my_classified_cpt.csv")   
 
+# Save the filtered Dataframe 
+
+filtered = gef.group_classification(0.2, 'robertson', -1, True, 0.1)
+
+args = [
+min_thickness, # min thickness accept for the layers, it is suggested to not use a value bigger the 0.2 m
+classification, # Soil classification
+water_level_NAP # Water level respt to NAP of myfielf
+]
+
+filtered.df.to_csv("my_filtered_cpt.csv")   
+       
 ```
 
-![](img/gef-only_.png)
+![](img/gef_classified_grouped.png)
 
