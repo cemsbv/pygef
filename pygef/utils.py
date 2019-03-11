@@ -591,7 +591,7 @@ def join_gef(bore, cpt):
     """
     assert bore.zid is not None, "Zid should be defined for merging to take place"
     df_cpt = cpt.df.assign(join_idx=0)
-    df_bore = bore.df.assign(elevation_respect_to_NAP=bore.zid - bore.df['depth_top'])
+    df_bore = bore.df.assign(elevation_with_respect_to_NAP=bore.zid - bore.df['depth_top'])
     df_bore = df_bore.loc[df_bore[['G', 'S', 'C', 'L', 'P', 'SI']].sum(1) == 1]
     idx = np.searchsorted(cpt.df['elevation_with_respect_to_NAP'][::-1], df_bore['elevation_with_respect_to_NAP'][::-1])
     df = df_cpt[df_cpt['elevation_with_respect_to_NAP'] > df_bore['elevation_with_respect_to_NAP'].min()]
