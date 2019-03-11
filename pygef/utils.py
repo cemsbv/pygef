@@ -593,8 +593,8 @@ def join_gef(bore, cpt):
     df_cpt = cpt.df.assign(join_idx=0)
     df_bore = bore.df.assign(elevation_respect_to_NAP=bore.zid - bore.df['depth_top'])
     df_bore = df_bore.loc[df_bore[['G', 'S', 'C', 'L', 'P', 'SI']].sum(1) == 1]
-    idx = np.searchsorted(cpt.df['elevation_respect_to_NAP'][::-1], df_bore['elevation_respect_to_NAP'][::-1])
-    df = df_cpt[df_cpt['elevation_respect_to_NAP'] > df_bore['elevation_respect_to_NAP'].min()]
+    idx = np.searchsorted(cpt.df['elevation_with_respect_to_NAP'][::-1], df_bore['elevation_with_respect_to_NAP'][::-1])
+    df = df_cpt[df_cpt['elevation_with_respect_to_NAP'] > df_bore['elevation_with_respect_to_NAP'].min()]
 
     a = np.zeros(df.shape[0])
     for i in range(len(idx) - 1):
