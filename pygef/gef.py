@@ -7,7 +7,6 @@ from pygef import robertson, been_jeffrey
 import logging
 from pygef.grouping import GroupClassification
 
-
 COLUMN_NAMES_CPT = ["penetration_length",  # 1
                     "qc",  # 2
                     "fs",  # 3
@@ -153,7 +152,8 @@ class ParseGEF:
         return plot.plot_cpt(show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
-        return robertson.classify(self.df, self.zid, water_level_NAP, new, self.net_surface_area_quotient_of_the_cone_tip,
+        return robertson.classify(self.df, self.zid, water_level_NAP, new,
+                                  self.net_surface_area_quotient_of_the_cone_tip,
                                   self.pre_excavated_depth, p_a=p_a)
 
     def classify_been_jeffrey(self, water_level_NAP):
@@ -235,12 +235,13 @@ class ParseCPT:
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
         self.df = (self.parse_data(header_s, data_s)
+                   .pipe(lambda df: df.assign(penetration_length=np.abs(df['penetration_length'])))
                    .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
                    .pipe(self.correct_depth_with_inclination)
                    .pipe(self.calculate_elevation_respect_to_nap, zid)
                    .pipe(self.replace_column_void, self.column_void)
                    .pipe(self.calculate_friction_number)
-        )
+                   )
 
     @staticmethod
     def replace_column_void(df, column_void):
