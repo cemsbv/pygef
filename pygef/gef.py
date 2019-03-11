@@ -172,13 +172,13 @@ class ParseGEF:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
 
-    def group_classification(self, min_thickness, classification, water_level_NAP, new, p_a):
+    def group_classification(self, min_thickness, classification, water_level_NAP, new=True, p_a=0.1):
         if classification == 'robertson':
             df = self.classify_robertson(water_level_NAP, new, p_a=p_a)
-            return GroupClassification(df, dict_soil_type_rob, min_thickness).df_group
+            return GroupClassification(df, min_thickness).df_group
         elif classification == 'been_jeffrey':
             df = self.classify_been_jeffrey(water_level_NAP)
-            return GroupClassification(df, dict_soil_type_been, min_thickness).df_group
+            return GroupClassification(df, min_thickness).df_group
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
