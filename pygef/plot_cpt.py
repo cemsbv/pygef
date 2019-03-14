@@ -56,8 +56,9 @@ class PlotCPT:
         fig = self.add_grouped_classification(fig, depth_max, depth_min)
 
         if show:
-            return plt.show()
-        return fig
+            plt.show()
+        else:
+            return fig
 
     @staticmethod
     def assign_color(df, classification):
