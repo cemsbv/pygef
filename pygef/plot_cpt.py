@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from collections import OrderedDict
 
-colours_robertson = {'Peat': '#578E57',
-                     'Clays - silty clay to clay': '#a76b29',
+colours_robertson = {'Peat': '#a76b29',
+                     'Clays - silty clay to clay': '#578E57',
                      'Silt mixtures - clayey silt to silty clay': '#0078C1',
                      'Sand mixtures - silty sand to sandy silt': '#DBAD4B',
                      'Sands - clean sand to silty sand': 'gold',
@@ -11,8 +11,8 @@ colours_robertson = {'Peat': '#578E57',
                      None: 'black'
                      }
 
-colours_been_jeffrey = {'Peat': '#578E57',
-                        'Clays': '#a76b29',
+colours_been_jeffrey = {'Peat': '#a76b29',
+                        'Clays': '#578E57',
                         'Clayey silt to silty clay': '#0078C1',
                         'Silty sand to sandy silt': '#DBAD4B',
                         'Sands: clean sand to silty': 'gold',
@@ -48,6 +48,8 @@ class PlotCPT:
             fig_i.set_xlabel(f'{c} {unit}')
             fig_i.set_ylabel('Z [m]')
             plt.grid()
+            fig_i.set_xticks(np.arange(0, self.df[c].max() + 2, 2))
+            fig_i.xaxis.set_tick_params(labeltop='on')
             plt.ylim(depth_max, depth_min)
 
         fig = self.add_plot_classification(fig, depth_max, depth_min)
