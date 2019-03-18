@@ -37,10 +37,11 @@ classification = ['robertson','been_jeffrey']
 
 #type the name of the classification exactly as specified in the list classification, the inputs of plot_cpt are:
 args = ['classification name', water_level_NAP, min_thickness] 
-kwargs = [p_a=0.1, # atmosferic pressure, used in the new Robertson, default: 0.1 Mpa
+kwargs = [p_a=0.1, # atmospheric pressure, used in the new Robertson, default: 0.1 Mpa
           new=True, # set new to use the new Robertson classification, default: New
           show=False, # set show=True to shown the plot, default: False
-          figsize=(12, 30)] # set the desired figure size, default: (12, 30)
+          figsize=(12, 30), # set the desired figure size, default: (12, 30)
+          df_group=None]  # if you want to plot a different filtered dataframe use this key argument
           
 # Save the complete dataframe with classification to csv file
 classified = gef.classify_robertson(water_level_NAP, new=True, p_a=0.1)

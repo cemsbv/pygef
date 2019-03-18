@@ -2,7 +2,7 @@ import pygef.utils as utils
 import pandas as pd
 import io
 import numpy as np
-from pygef.plot_cpt import PlotCPT
+import pygef.plot_cpt as plot
 from pygef import robertson, been_jeffrey
 import logging
 from pygef.grouping import GroupClassification
@@ -145,11 +145,12 @@ class ParseGEF:
                              "Check the REPORTCODE or the PROCEDURECODE.")
         self.__dict__.update(parsed.__dict__)
 
-    def plot_cpt(self, classification, water_level_NAP, min_thickness, p_a=0.1, new=True, show=False, figsize=(12, 30)):
+    def plot_cpt(self, classification, water_level_NAP, min_thickness, p_a=0.1, new=True, show=False,
+                 figsize=(12, 30), df_group=None):
         df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
-        df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
-        plot = PlotCPT(df, df_group, classification)
-        return plot.plot_cpt(show=show, figsize=figsize)
+        if df_group is None:
+            df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
+        return plot.plot_cpt(classification, df, df_group, show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
         return robertson.classify(self.df, self.zid, water_level_NAP, new,
@@ -159,9 +160,6 @@ class ParseGEF:
     def classify_been_jeffrey(self, water_level_NAP):
         return been_jeffrey.classify(self.df, self.zid, water_level_NAP, self.net_surface_area_quotient_of_the_cone_tip,
                                      self.pre_excavated_depth)
-
-    def __str__(self):
-        return self.df.__str__()
 
     def classify_soil(self, classification, water_level_NAP, p_a=0.1, new=True):
 
@@ -183,6 +181,9 @@ class ParseGEF:
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
+
+    def __str__(self):
+        return self.df.__str__()
 
 
 class ParseCPT:
