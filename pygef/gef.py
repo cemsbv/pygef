@@ -150,6 +150,8 @@ class ParseGEF:
         df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
         if df_group is None:
             df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
+        elif type(df_group) == str:
+            df_group = pd.read_json(df_group)
         return plot.plot_cpt(classification, df, df_group, show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
