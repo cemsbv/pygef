@@ -152,13 +152,10 @@ class ParseGEF:
             return self.plot_cpt(classification, water_level_NAP, min_thickness, p_a, new, show, figsize,
                                  df_group, do_grouping)
         elif self.type == "bore":
-            return self.plot_bore()
+            return plot.plot_bore(self.df, figsize=figsize, show=show)
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
-
-    def plot_bore(self):
-        return
 
     def plot_cpt(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=None, new=True, show=False,
                  figsize=None, df_group=None, do_grouping=True):

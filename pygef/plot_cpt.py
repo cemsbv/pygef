@@ -167,4 +167,18 @@ def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
     return fig
 
 
+def plot_bore(df, figsize=(11, 8), show=True):
+    fig = plt.figure(figsize=figsize)
+
+    v = df[['G', 'S', 'L', 'C', 'P']].values
+    v[:, 2] += df['SI'].values
+    c = ['#578E57', '#a76b29', '#0078C1', '#DBAD4B', '#708090']
+
+    for i in range(5):
+        plt.fill_betweenx(-np.repeat(df['depth_top'], 2), np.zeros(v.shape[0] * 2),
+                          np.roll(np.repeat(np.cumsum(v, axis=1)[:, -(i + 1)], 2), 1), color=c[i])
+    if show:
+        plt.show()
+    return fig
+
 
