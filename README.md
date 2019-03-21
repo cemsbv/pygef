@@ -31,17 +31,20 @@ gef.y # y coordinate with respect to the reference system
 ]
 
 # Plot cpt file and get soil classification
-gef.plot_cpt('robertson', -1, 0.2, show=True) # the plot in figure
+gef.plot(classification='robertson', water_level_NAP= -1, min_thickness= 0.2, show=True) # the plot in figure
 
 classification = ['robertson','been_jeffrey']
 
 #type the name of the classification exactly as specified in the list classification, the inputs of plot_cpt are:
-args = ['classification name', water_level_NAP, min_thickness] 
-kwargs = [p_a=0.1, # atmospheric pressure, used in the new Robertson, default: 0.1 Mpa
+kwargs = [classification='robertson', # possible choices 'robertson' and 'been_jeffrey'
+          water_level_NAP= -1, # insert water level respect to NAP
+          min_thickness = 0.2, # minimun accepted thickness for filtered layers
+          p_a=0.1, # atmospheric pressure, used in the new Robertson, default: 0.1 Mpa
           new=True, # set new to use the new Robertson classification, default: New
           show=False, # set show=True to shown the plot, default: False
           figsize=(12, 30), # set the desired figure size, default: (12, 30)
-          df_group=None]  # if you want to plot a different filtered dataframe use this key argument
+          df_group=None, # if you want to plot a different filtered dataframe use this key argument
+          do_gouping=True]  
           
 # Save the complete dataframe with classification to csv file
 classified = gef.classify_robertson(water_level_NAP, new=True, p_a=0.1)
@@ -62,6 +65,19 @@ water_level_NAP # Water level with respect to NAP (my field)
 ]
 
 filtered.df.to_csv("my_filtered_cpt.csv")   
+
+# Examples of different plotting:
+#Plot only qc and Fr:
+gef.plot(classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=True,
+                 figsize=(8, 30), df_group=None, do_grouping=True)
+                 
+# Plot qc, Fr and classification
+gef.plot(classification='robertson', water_level_NAP=-1, min_thickness=None, p_a=0.1, new=True, show=True,
+         figsize=(12, 30), df_group=None, do_grouping=False)
+         
+# Plot qc, Fr, classification and filtered classification 
+gef.plot(classification='robertson', water_level_NAP=-1, min_thickness=0.2, p_a=0.1, new=True, show=True,
+                 figsize=(16, 30), df_group=None, do_grouping=True)                          
        
 ```
 

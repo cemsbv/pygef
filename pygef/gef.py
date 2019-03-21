@@ -135,22 +135,39 @@ class ParseGEF:
         self.y = utils.parse_yid_as_float(header_s)
         self.file_date = utils.parse_file_date(header_s)
 
-        t = utils.parse_gef_type(string)
-        if t == "cpt":
+        self.type = utils.parse_gef_type(string)
+        if self.type == "cpt":
             parsed = ParseCPT(header_s, data_s, self.zid)
-        elif t == "bore":
+        elif self.type == "bore":
             parsed = ParseBORE(header_s, data_s)
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
+
         self.__dict__.update(parsed.__dict__)
 
-    def plot_cpt(self, classification, water_level_NAP, min_thickness, p_a=0.1, new=True, show=False,
-                 figsize=(12, 30), df_group=None):
-        df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
-        if df_group is None:
+    def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
+                 figsize=(12, 30), df_group=None, do_grouping=True):
+        if self.type == "cpt":
+            return self.plot_cpt(classification, water_level_NAP, min_thickness, p_a, new, show, figsize,
+                                 df_group, do_grouping)
+        elif self.type == "bore":
+            return self.plot_bore()
+        else:
+            raise ValueError("The selected gef file is not a cpt nor a borehole. "
+                             "Check the REPORTCODE or the PROCEDURECODE.")
+
+    def plot_bore(self):
+        return
+
+    def plot_cpt(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=None, new=True, show=False,
+                 figsize=None, df_group=None, do_grouping=True):
+
+        df = (self.df if classification is None
+              else self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new))
+        if df_group is None and do_grouping is True:
             df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
-        return plot.plot_cpt(classification, df, df_group, show=show, figsize=figsize)
+        return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
         return robertson.classify(self.df, self.zid, water_level_NAP, new,
