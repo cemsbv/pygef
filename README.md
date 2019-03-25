@@ -35,7 +35,7 @@ gef.plot(classification='robertson', water_level_NAP= -1, min_thickness= 0.2, sh
 
 classification = ['robertson','been_jeffrey']
 
-#type the name of the classification exactly as specified in the list classification, the inputs of plot_cpt are:
+# Type the name of the classification exactly as specified in the list classification, the inputs of plot_cpt are:
 kwargs = [classification='robertson', # possible choices 'robertson' and 'been_jeffrey'
           water_level_NAP= -1, # insert water level respect to NAP
           min_thickness = 0.2, # minimun accepted thickness for filtered layers
@@ -48,6 +48,7 @@ kwargs = [classification='robertson', # possible choices 'robertson' and 'been_j
           
 # Save the complete dataframe with classification to csv file
 classified = gef.classify_robertson(water_level_NAP, new=True, p_a=0.1)
+
 # or Been&Jeffrey
 classified = gef.classify_been_jeffrey(water_level_NAP)    
                        
@@ -66,8 +67,7 @@ water_level_NAP # Water level with respect to NAP (my field)
 
 filtered.df.to_csv("my_filtered_cpt.csv")   
 
-# Examples of different plotting:
-#Plot only qc and Fr:
+# Plot only qc and Fr:
 gef.plot(classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=True,
                  figsize=(8, 30), df_group=None, do_grouping=True)
                  
