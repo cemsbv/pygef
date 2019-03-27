@@ -1,0 +1,9 @@
+language: python
+python:
+- '3.7'
+install:
+- python setup.py install
+script:
+- python ./pygef/tests.py
+- python ./pygef/robertson/tests.py
+- python ./pygef/been_jeffrey/tests.py
