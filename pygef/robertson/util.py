@@ -137,7 +137,7 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
         df = df.assign(gamma_predict=np.nan_to_num(df['gamma_predict']))
         if condition(df):
             break
-        elif c > 10:
+        elif c == 4:
             break
         else:
             gamma = df['gamma_predict']
