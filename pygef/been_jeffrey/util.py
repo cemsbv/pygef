@@ -63,14 +63,53 @@ def excess_pore_pressure_ratio(df):
 
 
 def ic_to_gamma(df, water_level):
-    return df.assign(gamma_predict=df.apply(
-        lambda row: type_index_to_gamma(row['type_index']) if row['depth'] > water_level
-        else type_index_to_gamma_sat(row['type_index']), axis=1))
+    mask_below_water = -df['depth'].values < water_level
+    df = df.assign(gamma_predict=1)
+
+    ic_mask = df['type_index'].values > 3.22
+    # gamma_(sat) and ic > 3.6
+    df.loc[ic_mask, 'gamma_predict'] = 11
+
+    ic_mask = df['type_index'].values <= 3.22
+    # gamma_(sat) and ic < 3.6
+    df.loc[ic_mask, 'gamma_predict'] = 16
+
+    ic_mask = df['type_index'].values <= 2.76
+    # gamma_(sat) and ic < x
+    df.loc[ic_mask, 'gamma_predict'] = 18
+
+    ic_mask = df['type_index'].values <= 2.40
+    # gamma_sat and ic < x
+    df.loc[ic_mask & mask_below_water, 'gamma_predict'] = 19
+
+    ic_mask = df['type_index'].values <= 1.80
+    # gamma_sat and ic < x
+    df.loc[ic_mask & mask_below_water, 'gamma_predict'] = 20
+
+    return df
 
 
 def ic_to_soil_type(df):
-    return df.assign(soil_type=df.apply(
-        lambda row: type_index_to_soil_type(row['type_index']), axis=1))
+    df = df.assign(soil_type="")
+
+    ic_mask = df['type_index'].values > 3.22
+    df.loc[ic_mask, 'soil_type'] = 'Peat'
+
+    ic_mask = df['type_index'].values <= 3.22
+    df.loc[ic_mask, 'soil_type'] = 'Clays'
+
+    ic_mask = df['type_index'].values <= 2.76
+    df.loc[ic_mask, 'soil_type'] = 'Clayey silt to silty clay'
+
+    ic_mask = df['type_index'].values <= 2.40
+    df.loc[ic_mask, 'soil_type'] = 'Silty sand to sandy silt'
+
+    ic_mask = df['type_index'].values <= 1.80
+    df.loc[ic_mask, 'soil_type'] = 'Sands: clean sand to silty'
+
+    ic_mask = df['type_index'].values <= 1.25
+    df.loc[ic_mask, 'soil_type'] = 'Gravelly sands'
+    return df
 
 
 def type_index(df):
