@@ -4,28 +4,50 @@ import pygef.utils as utils
 
 
 def n_exponent(df, p_a):
-    return df.assign(n=df.apply(
-        lambda row: (0.381 * row['type_index_n'] + 0.05 * (row['effective_soil_pressure'] / p_a) - 0.15)
-        if (0.381 * row['type_index_n'] + 0.05 * (row['effective_soil_pressure'] / p_a) - 0.15) < 1
-        else 1, axis=1))
+    mask = (0.381 * df['type_index_n'].values + 0.05 * (df['effective_soil_pressure'].values / p_a) - 0.15) < 1
+    df = df.assign(n=1)
+    df.loc[mask, 'n'] = 0.381 * df['type_index_n'][mask].values + 0.05 * \
+                (df['effective_soil_pressure'][mask].values / p_a) - 0.15
+    return df
 
 
 def normalized_cone_resistance_n(df, p_a):
-    df = df.assign(normalized_cone_resistance=((df['qt'] - df['soil_pressure'])/p_a *
-                                               (p_a / df['effective_soil_pressure'])**df['n']))
-    df.loc[df['normalized_cone_resistance'] < 0, 'normalized_cone_resistance'] = 1
+    df = df.assign(normalized_cone_resistance=((df['qt'].values - df['soil_pressure'].values) / p_a *
+                                               (p_a / df['effective_soil_pressure'].values)**df['n'].values))
+    df.loc[df['normalized_cone_resistance'].values < 0, 'normalized_cone_resistance'] = 1
     return df
 
 
 def type_index(df):
-    return df.assign(type_index=(((3.47 - np.log10(df['normalized_cone_resistance'])) ** 2 +
-                                  (np.log10(df['normalized_friction_ratio']) + 1.22) ** 2) ** 0.5))
+    return df.assign(type_index=(((3.47 - np.log10(df['normalized_cone_resistance'].values)) ** 2 +
+                                  (np.log10(df['normalized_friction_ratio'].values) + 1.22) ** 2) ** 0.5))
 
 
 def ic_to_gamma(df, water_level):
-    return df.assign(gamma_predict=df.apply(
-        lambda row: type_index_to_gamma(row['type_index']) if row['depth'] > water_level
-                                        else type_index_to_gamma_sat(row['type_index']), axis=1))
+    mask_below_water = -df['depth'].values < water_level
+    df = df.assign(gamma_predict=1)
+
+    ic_mask = df['type_index'].values > 3.6
+    # gamma_(sat) and ic > 3.6
+    df.loc[ic_mask, 'gamma_predict'] = 11
+
+    ic_mask = df['type_index'].values <= 3.6
+    # gamma_(sat) and ic < 3.6
+    df.loc[ic_mask, 'gamma_predict'] = 16
+
+    ic_mask = df['type_index'].values <= 2.95
+    # gamma_(sat) and ic < x
+    df.loc[ic_mask, 'gamma_predict'] = 18
+
+    ic_mask = df['type_index'].values <= 2.6
+    # gamma_sat and ic < x
+    df.loc[ic_mask & mask_below_water, 'gamma_predict'] = 19
+
+    ic_mask = df['type_index'].values <= 2.05
+    # gamma_sat and ic < x
+    df.loc[ic_mask & mask_below_water, 'gamma_predict'] = 20
+
+    return df
 
 
 def ic_to_soil_type(df):
@@ -96,7 +118,6 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
     c = 0
     while True:
         c += 1
-
         if new:
             df = original_df.assign(n=n, type_index_n=type_index_n, gamma=gamma)
             f = new_robertson
@@ -112,10 +133,11 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
 
         df = f(df, water_level, area_quotient_cone_tip=area_quotient_cone_tip,
                pre_excavated_depth=pre_excavated_depth, p_a=p_a)
+
         df = df.assign(gamma_predict=np.nan_to_num(df['gamma_predict']))
         if condition(df):
             break
-        elif c > 10:
+        elif c == 4:
             break
         else:
             gamma = df['gamma_predict']
