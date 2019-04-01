@@ -157,7 +157,7 @@ class ParseGEF:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
-    def plot_cpt(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=None, new=True, show=False,
+    def plot_cpt(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
                  figsize=None, df_group=None, do_grouping=True):
 
         df = (self.df if classification is None

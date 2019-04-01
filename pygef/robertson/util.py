@@ -96,6 +96,7 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
     c = 0
     while True:
         c += 1
+        print(c)
 
         if new:
             df = original_df.assign(n=n, type_index_n=type_index_n, gamma=gamma)
@@ -112,6 +113,7 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
 
         df = f(df, water_level, area_quotient_cone_tip=area_quotient_cone_tip,
                pre_excavated_depth=pre_excavated_depth, p_a=p_a)
+        print('f applied')
         df = df.assign(gamma_predict=np.nan_to_num(df['gamma_predict']))
         if condition(df):
             break
@@ -145,16 +147,17 @@ def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
 def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
-          .pipe(geo.soil_pressure)
-          .pipe(geo.qt, area_quotient_cone_tip)
-          .pipe(geo.water_pressure, water_level)
-          .pipe(geo.effective_soil_pressure)
-          .pipe(utils.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
-          .pipe(n_exponent, p_a)
-          .pipe(normalized_cone_resistance_n, p_a)
-          .pipe(geo.normalized_friction_ratio)
-          .pipe(utils.nan_to_zero)
-          .pipe(type_index)
-          .pipe(ic_to_gamma, water_level)
+          # .pipe(geo.soil_pressure)
+          # .pipe(geo.qt, area_quotient_cone_tip)
+          # .pipe(geo.water_pressure, water_level)
+          # .pipe(geo.effective_soil_pressure)
+          # .pipe(utils.kpa_to_mpa, ['soil_pressure', 'effective_soil_pressure', 'water_pressure'])
+          # .pipe(n_exponent, p_a)
+          # .pipe(normalized_cone_resistance_n, p_a)
+          # .pipe(geo.normalized_friction_ratio)
+          # .pipe(utils.nan_to_zero)
+          # .pipe(type_index)
+          # .pipe(ic_to_gamma, water_level)
           )
+    print(df['effective_soil_pressure'])
     return df

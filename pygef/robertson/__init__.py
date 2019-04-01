@@ -2,7 +2,7 @@ from pygef.robertson.util import iterate_robertson
 
 
 def classify(df, zid, water_level_NAP, new=True, area_quotient_cone_tip=None,
-             pre_excavated_depth=None, p_a=None):
+             pre_excavated_depth=None, p_a=0.1):
     """
     :param df: (DataFrame)
     :param zid: (flt) Depth of cpt ground level.
