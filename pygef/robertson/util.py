@@ -24,6 +24,13 @@ def type_index(df):
 
 
 def ic_to_gamma(df, water_level):
+    """
+    Assign the right gamma (unit soil weight kN/m^3) to the corresponding Ic.
+
+    :param df: (DataFrame) Original DataFrame.
+    :param water_level: (int) Water level with respect to ground level.
+    :return: Updated DataFrame.
+    """
     mask_below_water = -df['depth'].values < water_level
     df = df.assign(gamma_predict=1)
 
@@ -51,6 +58,12 @@ def ic_to_gamma(df, water_level):
 
 
 def ic_to_soil_type(df):
+    """
+    Assign the soil type to the corresponding Ic.
+
+    :param df: (DataFrame) Original DataFrame.
+    :return: (DataFrame) Updated DataFrame.
+    """
     df = df.assign(soil_type="")
 
     ic_mask = df['type_index'].values > 3.6
@@ -130,6 +143,17 @@ def type_index_to_soil_type(ic):
 
 
 def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
+    """
+    Iteration function for Robertson classifier.
+
+    :param original_df: (DataFrame)
+    :param water_level: (int) Water level with respect to ground level.
+    :param new: (bool) True to use the new classification, False otherwise. Default: True
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :param p_a: (float) Atmospheric pressure. Default: 0.1 MPa.
+    :return: (DataFrame)
+    """
     gamma = np.ones(original_df.shape[0]) * 18
     n = np.ones(original_df.shape[0])
     type_index_n = np.ones(original_df.shape[0])

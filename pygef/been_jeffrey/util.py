@@ -55,6 +55,12 @@ def type_index_to_soil_type(ic):
 
 
 def excess_pore_pressure_ratio(df):
+    """
+    Assign the excess pore pressure ratio, if the water pressure u2 is defined. Else, raise ERROR.
+
+    :param df: (DataFrame)
+    :return: (DataFrame)
+    """
     try:
         u2 = df['u2']
     except KeyError:
@@ -63,6 +69,13 @@ def excess_pore_pressure_ratio(df):
 
 
 def ic_to_gamma(df, water_level):
+    """
+    Assign the right gamma (unit soil weight kN/m^3) to the corresponding Ic.
+
+    :param df: (DataFrame) Original DataFrame.
+    :param water_level: (int) Water level with respect to ground level.
+    :return: Updated DataFrame.
+    """
     mask_below_water = -df['depth'].values < water_level
     df = df.assign(gamma_predict=1)
 
@@ -90,6 +103,12 @@ def ic_to_gamma(df, water_level):
 
 
 def ic_to_soil_type(df):
+    """
+    Assign the soil type to the corresponding Ic.
+
+    :param df: (DataFrame) Original DataFrame.
+    :return: (DataFrame) Updated DataFrame.
+    """
     df = df.assign(soil_type="")
 
     ic_mask = df['type_index'].values > 3.22
@@ -119,6 +138,15 @@ def type_index(df):
 
 
 def iterate_been_jeffrey(original_df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
+    """
+    Iteration function for Been&Jefferies classifier.
+
+    :param original_df: (DataFrame)
+    :param water_level: (int) Water level with respect to ground level.
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :return: (DataFrame)
+    """
     gamma = np.ones(original_df.shape[0]) * 18
 
     c = 0
