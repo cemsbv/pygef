@@ -22,13 +22,13 @@ def soil_pressure(df):
 
 
 def water_pressure(df, water_level):
-    df = df.assign(water_pressure=(df['depth'] - water_level) * 9.81)
+    df = df.assign(water_pressure=(df['depth'].values - water_level) * 9.81)
     df.loc[df['water_pressure'] < 0, 'water_pressure'] = 0
     return df
 
 
 def effective_soil_pressure(df):
-    return df.assign(effective_soil_pressure=(df['soil_pressure'] - df['water_pressure']))
+    return df.assign(effective_soil_pressure=(df['soil_pressure'].values - df['water_pressure'].values))
 
 
 def qt(df, area_quotient_cone_tip=None):
