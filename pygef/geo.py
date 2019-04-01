@@ -2,10 +2,19 @@ import numpy as np
 
 
 def delta_depth(df, pre_excavated_depth=None):
-    if pre_excavated_depth is not None and df['depth'][0] == 0:
-        df['depth'] = df['depth'] + pre_excavated_depth
-    return df.assign(delta_depth=[df['depth'][i]-df['depth'][i-1]
-                                  if i != 0 else 0 for i, depth in enumerate(df['depth'])])
+    """
+    Take pre-excavated depth into account.
+
+    This function corrects the depth column and adds a column (np.diff(depth))
+
+    :param df: (DataFrame) with depth column
+    :param pre_excavated_depth: (flt)
+    :return: (DataFrame) [depth, delta_depth]
+    """
+    pre_excavated_depth = 0 if pre_excavated_depth is None else pre_excavated_depth
+
+    return df.assign(depth=df['depth'] + pre_excavated_depth,
+                     delta_depth=np.r_[np.array([0]), np.diff(df['depth'].values)])
 
 
 def soil_pressure(df):
