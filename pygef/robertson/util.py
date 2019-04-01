@@ -51,8 +51,27 @@ def ic_to_gamma(df, water_level):
 
 
 def ic_to_soil_type(df):
-    return df.assign(soil_type=df.apply(
-        lambda row: type_index_to_soil_type(row['type_index']), axis=1))
+    df = df.assign(soil_type="")
+
+    ic_mask = df['type_index'].values > 3.6
+    df.loc[ic_mask, 'soil_type'] = 'Peat'
+
+    ic_mask = df['type_index'].values <= 3.6
+    df.loc[ic_mask, 'soil_type'] = 'Clays - silty clay to clay'
+
+    ic_mask = df['type_index'].values <= 2.95
+    df.loc[ic_mask, 'soil_type'] = 'Silt mixtures - clayey silt to silty clay'
+
+    ic_mask = df['type_index'].values <= 2.6
+    df.loc[ic_mask, 'soil_type'] = 'Sand mixtures - silty sand to sandy silt'
+
+    ic_mask = df['type_index'].values <= 2.05
+    df.loc[ic_mask, 'soil_type'] = 'Sands - clean sand to silty sand'
+
+    ic_mask = df['type_index'].values <= 1.31
+    df.loc[ic_mask, 'soil_type'] = 'Gravelly sand to dense sand'
+
+    return df
 
 
 def nan_to_zero(df):
