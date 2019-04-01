@@ -2,7 +2,7 @@ import pygef.utils as utils
 import pandas as pd
 import io
 import numpy as np
-from pygef.plot_cpt import PlotCPT
+import pygef.plot_cpt as plot
 from pygef import robertson, been_jeffrey
 import logging
 from pygef.grouping import GroupClassification
@@ -135,21 +135,36 @@ class ParseGEF:
         self.y = utils.parse_yid_as_float(header_s)
         self.file_date = utils.parse_file_date(header_s)
 
-        t = utils.parse_gef_type(string)
-        if t == "cpt":
+        self.type = utils.parse_gef_type(string)
+        if self.type == "cpt":
             parsed = ParseCPT(header_s, data_s, self.zid)
-        elif t == "bore":
+        elif self.type == "bore":
             parsed = ParseBORE(header_s, data_s)
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
+
         self.__dict__.update(parsed.__dict__)
 
-    def plot_cpt(self, classification, water_level_NAP, min_thickness, p_a=0.1, new=True, show=False, figsize=(12, 30)):
-        df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
-        df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
-        plot = PlotCPT(df, df_group, classification)
-        return plot.plot_cpt(show=show, figsize=figsize)
+    def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
+                 figsize=(12, 30), df_group=None, do_grouping=True):
+        if self.type == "cpt":
+            return self.plot_cpt(classification, water_level_NAP, min_thickness, p_a, new, show, figsize,
+                                 df_group, do_grouping)
+        elif self.type == "bore":
+            return plot.plot_bore(self.df, figsize=figsize, show=show)
+        else:
+            raise ValueError("The selected gef file is not a cpt nor a borehole. "
+                             "Check the REPORTCODE or the PROCEDURECODE.")
+
+    def plot_cpt(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=None, new=True, show=False,
+                 figsize=None, df_group=None, do_grouping=True):
+
+        df = (self.df if classification is None
+              else self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new))
+        if df_group is None and do_grouping is True:
+            df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
+        return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
         return robertson.classify(self.df, self.zid, water_level_NAP, new,
@@ -160,10 +175,8 @@ class ParseGEF:
         return been_jeffrey.classify(self.df, self.zid, water_level_NAP, self.net_surface_area_quotient_of_the_cone_tip,
                                      self.pre_excavated_depth)
 
-    def __str__(self):
-        return self.df.__str__()
-
     def classify_soil(self, classification, water_level_NAP, p_a=0.1, new=True):
+
         if classification == 'robertson':
             return self.classify_robertson(water_level_NAP, new, p_a=p_a)
         elif classification == 'been_jeffrey':
@@ -182,6 +195,9 @@ class ParseGEF:
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
+
+    def __str__(self):
+        return self.df.__str__()
 
 
 class ParseCPT:

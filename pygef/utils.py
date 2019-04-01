@@ -312,7 +312,7 @@ INDICES = {
     "s": 5,
     "m": 1,
     "h": 4,
-    "l": 2,
+    "l": 3,
     "v": 4,
     'p': 4
 }
@@ -354,6 +354,8 @@ def soil_quantification(s):
             v = 0.05
         dist[idx] = v
 
+    # Sometimes the same soil type has multiple tokens ?? e.g. Kkgh2.
+    dist[INDICES[s[0]]] = 0
     dist[INDICES[s[0]]] = 1 - dist.sum()
     return dist
 
