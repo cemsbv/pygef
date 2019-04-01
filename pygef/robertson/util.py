@@ -22,8 +22,8 @@ def type_index(df):
     return df.assign(type_index=(((3.47 - np.log10(df['normalized_cone_resistance'].values)) ** 2 +
                                   (np.log10(df['normalized_friction_ratio'].values) + 1.22) ** 2) ** 0.5))
 
-def ic_to_gamma(df, water_level):
 
+def ic_to_gamma(df, water_level):
     mask_below_water = -df['depth'].values < water_level
     df = df.assign(gamma_predict=1)
 
