@@ -146,55 +146,59 @@ class ParseGEF:
 
         self.__dict__.update(parsed.__dict__)
 
-    def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
+    def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1, new=True, show=False,
                  figsize=(12, 30), df_group=None, do_grouping=True):
         if self.type == "cpt":
-            return self.plot_cpt(classification, water_level_NAP, min_thickness, p_a, new, show, figsize,
-                                 df_group, do_grouping)
+            return self.plot_cpt(classification=classification, water_level_NAP=water_level_NAP,
+                                 water_level_wrt_depth=water_level_wrt_depth, min_thickness=min_thickness, p_a=p_a,
+                                 new=new, show=show, figsize=figsize, df_group=df_group, do_grouping=do_grouping)
         elif self.type == "bore":
             return plot.plot_bore(self.df, figsize=figsize, show=show)
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
-    def plot_cpt(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
+    def plot_cpt(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None,
+                 min_thickness=None, p_a=0.1, new=True, show=False,
                  figsize=None, df_group=None, do_grouping=True):
 
         df = (self.df if classification is None
-              else self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new))
+              else self.classify_soil(classification, water_level_NAP=water_level_NAP,
+                                      water_level_wrt_depth=water_level_wrt_depth, p_a=p_a, new=new))
         if df_group is None and do_grouping is True:
-            df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
+            df_group = self.group_classification(min_thickness, classification, water_level_NAP=water_level_NAP,
+                                                 water_level_wrt_depth=water_level_wrt_depth, new=new, p_a=p_a)
         return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize)
 
-    def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
-        return robertson.classify(self.df, dict(water_level=water_level_NAP, zid=self.zid), new=new,
+    def classify_robertson(self, water_level_and_zid_NAP=None, water_level_wrt_depth=None, new=True, p_a=0.1):  # True to use the new robertson
+        return robertson.classify(self.df, new=new, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                  water_level_wrt_depth=water_level_wrt_depth,
                                   area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
                                   pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
 
-    def classify_been_jeffrey(self, water_level_NAP):
-        return been_jeffrey.classify(self.df, self.zid, water_level_NAP, self.net_surface_area_quotient_of_the_cone_tip,
-                                     self.pre_excavated_depth)
+    def classify_been_jeffrey(self, water_level_and_zid_NAP=None, water_level_wrt_depth=None):
+        return been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                     water_level_wrt_depth=water_level_wrt_depth,
+                                     area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                     pre_excavated_depth=self.pre_excavated_depth)
 
-    def classify_soil(self, classification, water_level_NAP, p_a=0.1, new=True):
-
+    def classify_soil(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True):
+        water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
         if classification == 'robertson':
-            return self.classify_robertson(water_level_NAP, new, p_a=p_a)
+            return self.classify_robertson(water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                           water_level_wrt_depth=water_level_wrt_depth, new=new, p_a=p_a)
         elif classification == 'been_jeffrey':
-            return self.classify_been_jeffrey(water_level_NAP)
+            return self.classify_been_jeffrey(water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                              water_level_wrt_depth=water_level_wrt_depth)
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
 
-    def group_classification(self, min_thickness, classification, water_level_NAP, new=True, p_a=0.1):
-        if classification == 'robertson':
-            df = self.classify_robertson(water_level_NAP, new, p_a=p_a)
-            return GroupClassification(df, min_thickness).df_group
-        elif classification == 'been_jeffrey':
-            df = self.classify_been_jeffrey(water_level_NAP)
-            return GroupClassification(df, min_thickness).df_group
-        else:
-            return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
-                                 f'in the library')
+    def group_classification(self, min_thickness, classification, water_level_NAP=None,
+                             water_level_wrt_depth=None, new=True, p_a=0.1):
+        df = self.classify_soil(classification, water_level_NAP=water_level_NAP, water_level_wrt_depth=water_level_wrt_depth,
+                                new=new, p_a=p_a)
+        return GroupClassification(df, min_thickness).df_group
 
     def __str__(self):
         return self.df.__str__()
