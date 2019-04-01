@@ -33,7 +33,7 @@ def effective_soil_pressure(df):
 
 def qt(df, area_quotient_cone_tip=None):
     if 'u2' in df.columns and area_quotient_cone_tip is not None:
-        return df.assign(qt=df['qc'] + df['u2'] * (1 - area_quotient_cone_tip))
+        return df.assign(qt=df['qc'].values + df['u2'].values * (1 - area_quotient_cone_tip))
 
     return df.assign(qt=df['qc'])
 
