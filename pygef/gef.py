@@ -167,9 +167,9 @@ class ParseGEF:
         return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize)
 
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
-        return robertson.classify(self.df, self.zid, water_level_NAP, new,
-                                  self.net_surface_area_quotient_of_the_cone_tip,
-                                  self.pre_excavated_depth, p_a=p_a)
+        return robertson.classify(self.df, dict(water_level=water_level_NAP, zid=self.zid), new=new,
+                                  area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                  pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
 
     def classify_been_jeffrey(self, water_level_NAP):
         return been_jeffrey.classify(self.df, self.zid, water_level_NAP, self.net_surface_area_quotient_of_the_cone_tip,

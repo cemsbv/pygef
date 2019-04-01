@@ -14,7 +14,7 @@ def delta_depth(df, pre_excavated_depth=None):
     pre_excavated_depth = 0 if pre_excavated_depth is None else pre_excavated_depth
 
     return df.assign(depth=df['depth'] + pre_excavated_depth,
-                     delta_depth=np.r_[np.array([0]), np.diff(df['depth'].values)])
+                     delta_depth=np.r_[np.array([df['depth'][0]]), np.diff(df['depth'].values)])
 
 
 def soil_pressure(df):
