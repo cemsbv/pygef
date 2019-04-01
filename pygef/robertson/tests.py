@@ -36,13 +36,13 @@ class RobertsonTest(unittest.TestCase):
         assert_frame_equal(v, df)
 
     def test_ic_to_gamma(self):
-        water_level = - 0.5
+        water_level = 0.5         # gammas:    19       19       18
         df1 = pd.DataFrame({'type_index': [2.208177, 2.408926, 2.793642],
                             'depth': [0.5, 1, 4]})
         v = util.ic_to_gamma(df1, water_level)
         df = pd.DataFrame({'type_index': [2.208177, 2.408926, 2.793642],
                             'depth': [0.5, 1, 4],
-                            'gamma_predict': [18, 18, 18]})
+                            'gamma_predict': [19, 19, 18]})
         assert_frame_equal(v, df)
 
     def test_ic_to_soil_type(self):

@@ -46,7 +46,7 @@ def normalized_cone_resistance(df):
 
 
 def normalized_friction_ratio(df):
-    df = df.assign(normalized_friction_ratio=((df['fs'] / (df['qt'] - df['soil_pressure'])) * 100))
-    df.loc[df['normalized_friction_ratio'] < 0, 'normalized_friction_ratio'] = 0.1
+    df = df.assign(normalized_friction_ratio=((df['fs'].values / (df['qt'].values - df['soil_pressure'].values)) * 100))
+    df.loc[df['normalized_friction_ratio'].values < 0, 'normalized_friction_ratio'] = 0.1
     return df
 
