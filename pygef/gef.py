@@ -147,7 +147,22 @@ class ParseGEF:
         self.__dict__.update(parsed.__dict__)
 
     def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=(8, 16), df_group=None, do_grouping=False):
+                 figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None):
+        """
+
+        :param classification: (str) specify this to classify the cpt, possible choice : "robertson", "been_jeffrey"
+        :param water_level_NAP: (float)
+        :param water_level_wrt_depth: (float)
+        :param min_thickness: (float) minimum accepted thickness for grouping
+        :param p_a: (float) Atmospheric pressure at ground level in MPA.
+        :param new: (bool) Old or New implementation of Robertson.
+        :param show: (bool) Set to True to show the plot.
+        :param figsize: (tpl) Figure size (x, y).
+        :param df_group: (DataFrame) specify your own DataFrame if you don't agree with the automatic one.
+        :param do_grouping: (bool) Do the grouping
+        :param grid_step_x: (int) Grid step of x-axes qc.
+        :return:
+        """
         if self.type == "cpt":
             if classification is None:
                 df = self.df
@@ -155,7 +170,7 @@ class ParseGEF:
                 df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
                 if df_group is None and do_grouping is True:
                     df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
-            return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize)
+            return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x)
 
         elif self.type == "bore":
             return plot.plot_bore(self.df, figsize=figsize, show=show)

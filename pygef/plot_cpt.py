@@ -36,7 +36,7 @@ def num_columns(classification, df_group):
         return 4
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16)):
+def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step_x=None):
     """
     Main function to plot qc, Fr and soil classification.
     :param df: Complete df.
@@ -68,7 +68,8 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16)):
         fig_i.set_xlabel(f'{c} {unit}')
         fig_i.set_ylabel('Z [m]')
         plt.grid()
-        fig_i.set_xticks(np.arange(0, df[c].max() + 2, 2))
+        if grid_step_x is not None:
+            fig_i.set_xticks(np.arange(0, df[c].max() + grid_step_x, grid_step_x))
         fig_i.xaxis.set_tick_params(labeltop='on')
         plt.ylim(depth_max, depth_min)
 
