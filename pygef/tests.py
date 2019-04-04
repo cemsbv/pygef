@@ -597,10 +597,11 @@ class BoreTest(unittest.TestCase):
 
 
 
+class PlotTest(unittest.TestCase):
 
-
-
-
+    def test_plot_cpt(self):
+        gef = ParseGEF('./files/example.gef')
+        gef.plot(show=True)
 
 
 
