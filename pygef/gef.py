@@ -149,17 +149,18 @@ class ParseGEF:
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1, new=True, show=False,
                  figsize=(12, 30), df_group=None, do_grouping=False):
         """
+        Plot function for the class gef parser, it can plot both cpt and bore.
 
-        :param classification:
-        :param water_level_NAP:
-        :param water_level_wrt_depth:
-        :param min_thickness:
-        :param p_a:
-        :param new:
-        :param show:
-        :param figsize:
-        :param df_group:
-        :param do_grouping:
+        :param classification: (str) specify this to classify the cpt, possible choice : "robertson", "been_jeffrey"
+        :param water_level_NAP: (float)
+        :param water_level_wrt_depth: (float)
+        :param min_thickness: (float) minimum accepted thickness for grouping
+        :param p_a: (float) Atmospheric pressure at ground level in MPA.
+        :param new: (bool) Old or New implementation of Robertson.
+        :param show: (bool) Set to True to show the plot.
+        :param figsize: Figure size (x, y) , x i the width y is the height.
+        :param df_group: (DataFrame) specify your own DataFrame if you don't agree with the automatic one.
+        :param do_grouping: (bool) Do the grouping, default:False
         :return:
         """
         if self.type == "cpt":
