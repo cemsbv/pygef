@@ -147,10 +147,16 @@ class ParseGEF:
         self.__dict__.update(parsed.__dict__)
 
     def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=(12, 30), df_group=None, do_grouping=True):
+                 figsize=(12, 30), df_group=None, do_grouping=False):
         if self.type == "cpt":
-            return self.plot_cpt(classification, water_level_NAP, min_thickness, p_a, new, show, figsize,
-                                 df_group, do_grouping)
+            if classification is None:
+                df = self.df
+            else:
+                df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
+                if df_group is None and do_grouping is True:
+                    df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
+            return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize)
+
         elif self.type == "bore":
             return plot.plot_bore(self.df, figsize=figsize, show=show)
         else:
