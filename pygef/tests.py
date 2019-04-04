@@ -603,6 +603,10 @@ class PlotTest(unittest.TestCase):
         gef = ParseGEF('./files/example.gef')
         gef.plot(show=True)
 
+    def test_plot_bore(self):
+        gef = ParseGEF('./files/example_bore.gef')
+        gef.plot(show=True, figsize=(4, 12))
+
 
 
 

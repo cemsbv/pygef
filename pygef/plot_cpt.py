@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import OrderedDict
+import matplotlib.patches as mpatches
 
 colours_robertson = {'Peat': '#a76b29',
                      'Clays - silty clay to clay': '#578E57',
@@ -159,7 +160,7 @@ def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
         df['L'] += df['SI']
     v = df[['G', 'S', 'L', 'C', 'P']].values
 
-    c = ['#578E57', '#a76b29', '#0078C1', '#DBAD4B', '#708090']
+    c = ['#a76b29', '#578E57', '#0078C1', '#DBAD4B', '#708090']
     for i in range(5):
         plt.fill_betweenx(-df['depth'], np.zeros(v.shape[0]), np.cumsum(v, axis=1)[:, -(i + 1)], color=c[i])
 
@@ -168,16 +169,29 @@ def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
     return fig
 
 
-def plot_bore(df, figsize=(11, 8), show=True):
+def plot_bore(df, figsize=(6, 16), show=True):
+    df = df.copy()
+
     fig = plt.figure(figsize=figsize)
 
     v = df[['G', 'S', 'L', 'C', 'P']].values
     v[:, 2] += df['SI'].values
-    c = ['#578E57', '#a76b29', '#0078C1', '#DBAD4B', '#708090']
+    v[np.argwhere(v.sum(1) < 0)] = np.nan
+
+    c = ['#a76b29', '#578E57', '#0078C1', '#DBAD4B', '#708090']
 
     for i in range(5):
         plt.fill_betweenx(-np.repeat(df['depth_top'], 2), np.zeros(v.shape[0] * 2),
                           np.roll(np.repeat(np.cumsum(v, axis=1)[:, -(i + 1)], 2), 1), color=c[i])
+
+    legend_dict = {'Gravel': '#708090', 'Sand': '#DBAD4B', 'Loam': '#0078C1', 'Clay': '#578E57', 'Peat': '#a76b29'}
+    patch_list = []
+    for key in legend_dict:
+        data_key = mpatches.Patch(color=legend_dict[key], label=key)
+        patch_list.append(data_key)
+
+    plt.legend(handles=patch_list)
+
     if show:
         plt.show()
     return fig

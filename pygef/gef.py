@@ -147,7 +147,7 @@ class ParseGEF:
         self.__dict__.update(parsed.__dict__)
 
     def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None):
+                 figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100):
         """
 
         :param classification: (str) specify this to classify the cpt, possible choice : "robertson", "been_jeffrey"
@@ -161,6 +161,7 @@ class ParseGEF:
         :param df_group: (DataFrame) specify your own DataFrame if you don't agree with the automatic one.
         :param do_grouping: (bool) Do the grouping
         :param grid_step_x: (int) Grid step of x-axes qc.
+        :param dpi: (int) matplotlib dpi settings
         :return:
         """
         if self.type == "cpt":
