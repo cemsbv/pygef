@@ -147,7 +147,21 @@ class ParseGEF:
         self.__dict__.update(parsed.__dict__)
 
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=(12, 30), df_group=None, do_grouping=True):
+                 figsize=(12, 30), df_group=None, do_grouping=False):
+        """
+
+        :param classification:
+        :param water_level_NAP:
+        :param water_level_wrt_depth:
+        :param min_thickness:
+        :param p_a:
+        :param new:
+        :param show:
+        :param figsize:
+        :param df_group:
+        :param do_grouping:
+        :return:
+        """
         if self.type == "cpt":
             return self.plot_cpt(classification=classification, water_level_NAP=water_level_NAP,
                                  water_level_wrt_depth=water_level_wrt_depth, min_thickness=min_thickness, p_a=p_a,
@@ -160,7 +174,7 @@ class ParseGEF:
 
     def plot_cpt(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None,
                  min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=None, df_group=None, do_grouping=True):
+                 figsize=None, df_group=None, do_grouping=False):
 
         df = (self.df if classification is None
               else self.classify_soil(classification, water_level_NAP=water_level_NAP,
