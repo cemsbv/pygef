@@ -147,7 +147,7 @@ class ParseGEF:
         self.__dict__.update(parsed.__dict__)
 
     def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=(12, 30), df_group=None, do_grouping=False):
+                 figsize=(8, 16), df_group=None, do_grouping=False):
         if self.type == "cpt":
             if classification is None:
                 df = self.df

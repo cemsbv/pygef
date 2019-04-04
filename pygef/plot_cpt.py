@@ -36,7 +36,7 @@ def num_columns(classification, df_group):
         return 4
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=(12, 30)):
+def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16)):
     """
     Main function to plot qc, Fr and soil classification.
     :param df: Complete df.
