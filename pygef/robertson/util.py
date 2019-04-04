@@ -24,6 +24,13 @@ def type_index(df):
 
 
 def ic_to_gamma(df, water_level):
+    """
+    Assign the right gamma (unit soil weight kN/m^3) to the corresponding Ic.
+
+    :param df: (DataFrame) Original DataFrame.
+    :param water_level: (int) Water level with respect to ground level.
+    :return: Updated DataFrame.
+    """
     mask_below_water = -df['depth'].values < water_level
     df = df.assign(gamma_predict=1)
 
@@ -51,8 +58,33 @@ def ic_to_gamma(df, water_level):
 
 
 def ic_to_soil_type(df):
-    return df.assign(soil_type=df.apply(
-        lambda row: type_index_to_soil_type(row['type_index']), axis=1))
+    """
+    Assign the soil type to the corresponding Ic.
+
+    :param df: (DataFrame) Original DataFrame.
+    :return: (DataFrame) Updated DataFrame.
+    """
+    df = df.assign(soil_type="")
+
+    ic_mask = df['type_index'].values > 3.6
+    df.loc[ic_mask, 'soil_type'] = 'Peat'
+
+    ic_mask = df['type_index'].values <= 3.6
+    df.loc[ic_mask, 'soil_type'] = 'Clays - silty clay to clay'
+
+    ic_mask = df['type_index'].values <= 2.95
+    df.loc[ic_mask, 'soil_type'] = 'Silt mixtures - clayey silt to silty clay'
+
+    ic_mask = df['type_index'].values <= 2.6
+    df.loc[ic_mask, 'soil_type'] = 'Sand mixtures - silty sand to sandy silt'
+
+    ic_mask = df['type_index'].values <= 2.05
+    df.loc[ic_mask, 'soil_type'] = 'Sands - clean sand to silty sand'
+
+    ic_mask = df['type_index'].values <= 1.31
+    df.loc[ic_mask, 'soil_type'] = 'Gravelly sand to dense sand'
+
+    return df
 
 
 def nan_to_zero(df):
@@ -111,6 +143,17 @@ def type_index_to_soil_type(ic):
 
 
 def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
+    """
+    Iteration function for Robertson classifier.
+
+    :param original_df: (DataFrame)
+    :param water_level: (int) Water level with respect to ground level.
+    :param new: (bool) True to use the new classification, False otherwise. Default: True
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :param p_a: (float) Atmospheric pressure. Default: 0.1 MPa.
+    :return: (DataFrame)
+    """
     gamma = np.ones(original_df.shape[0]) * 18
     n = np.ones(original_df.shape[0])
     type_index_n = np.ones(original_df.shape[0])
