@@ -157,15 +157,6 @@ class ParseGEF:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
-    def plot_cpt(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=None, df_group=None, do_grouping=True):
-
-        df = (self.df if classification is None
-              else self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new))
-        if df_group is None and do_grouping is True:
-            df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
-        return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize)
-
     def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
         return robertson.classify(self.df, dict(water_level=water_level_NAP, zid=self.zid), new=new,
                                   area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
