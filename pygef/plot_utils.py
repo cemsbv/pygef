@@ -190,7 +190,7 @@ def plot_bore(df, figsize=(6, 16), show=True):
         data_key = mpatches.Patch(color=legend_dict[key], label=key)
         patch_list.append(data_key)
 
-    plt.legend(handles=patch_list)
+    plt.legend(handles=patch_list, bbox_to_anchor=(1, 1), loc='upper left')
 
     if show:
         plt.show()

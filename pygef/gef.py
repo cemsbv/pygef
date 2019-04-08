@@ -2,7 +2,7 @@ import pygef.utils as utils
 import pandas as pd
 import io
 import numpy as np
-import pygef.plot_cpt as plot
+import pygef.plot_utils as plot
 from pygef import robertson, been_jeffrey
 import logging
 from pygef.grouping import GroupClassification
