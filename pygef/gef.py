@@ -145,9 +145,10 @@ class ParseGEF:
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
         self.__dict__.update(parsed.__dict__)
+        self.df = self.df.dropna().reset_index(drop=True)
 
-    def plot(self, classification=None, water_level_NAP=None, min_thickness=None, p_a=0.1, new=True, show=False,
-                 figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100):
+    def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1,
+             new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100):
         """
 
         :param classification: (str) specify this to classify the cpt, possible choice : "robertson", "been_jeffrey"
@@ -168,7 +169,7 @@ class ParseGEF:
             if classification is None:
                 df = self.df
             else:
-                df = self.classify_soil(classification, water_level_NAP, p_a=p_a, new=new)
+                df = self.classify_soil(classification, water_level_NAP, water_level_wrt_depth, p_a=p_a, new=new)
                 if df_group is None and do_grouping is True:
                     df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
             return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x)
@@ -179,8 +180,19 @@ class ParseGEF:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
-    def classify_robertson(self, water_level_NAP, new=True, p_a=0.1):  # True to use the new robertson
-        return robertson.classify(self.df, dict(water_level=water_level_NAP, zid=self.zid), new=new,
+    def classify_robertson(self, water_level_NAP=None, water_level_wrt_depth=None, new=True, p_a=0.1):
+        """
+        :param water_level_NAP: (flt) Water level w.r.t. NAP.
+        :param water_level_wrt_depth: (flt) Water level w.r.t. to depth. For example, -1 is one meter below level.
+        :param new: (bool): Old or New implementation of Robertson.  TODO year?
+        :param p_a: (flt) Atmospheric pressure at ground level in MPA.
+        :return: (DataFrame) containing classification and IC values
+        """
+        if water_level_NAP:
+            return robertson.classify(self.df, dict(water_level=water_level_NAP, zid=self.zid), new=new,
+                                      area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                      pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
+        return robertson.classify(self.df, None, water_level_wrt_depth, new,
                                   area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
                                   pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
 
@@ -193,7 +205,7 @@ class ParseGEF:
     def classify_soil(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True):
         water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
         if classification == 'robertson':
-            return self.classify_robertson(water_level_and_zid_NAP=water_level_and_zid_NAP,
+            return self.classify_robertson(water_level_NAP=water_level_NAP,
                                            water_level_wrt_depth=water_level_wrt_depth, new=new, p_a=p_a)
         elif classification == 'been_jeffrey':
             return self.classify_been_jeffrey(water_level_and_zid_NAP=water_level_and_zid_NAP,
@@ -204,7 +216,8 @@ class ParseGEF:
 
     def group_classification(self, min_thickness, classification, water_level_NAP=None,
                              water_level_wrt_depth=None, new=True, p_a=0.1):
-        df = self.classify_soil(classification, water_level_NAP=water_level_NAP, water_level_wrt_depth=water_level_wrt_depth,
+        df = self.classify_soil(classification, water_level_NAP=water_level_NAP,
+                                water_level_wrt_depth=water_level_wrt_depth,
                                 new=new, p_a=p_a)
         return GroupClassification(df, min_thickness).df_group
 
