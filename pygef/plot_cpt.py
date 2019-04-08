@@ -116,7 +116,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
     plot_classify.set_ylabel('Z (m)')
     plot_classify.set_title(f'{title} classification')
     plt.ylim(depth_max, depth_min)
-    plt.legend(loc='best', fontsize='xx-small')
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
     return fig
 
 
