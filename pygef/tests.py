@@ -623,7 +623,7 @@ class TestRobertson(unittest.TestCase):
         """
         depth starts at 6 meters, So -7 should lead to water pressure of 0
         """
-        df = self.gef.classify_robertson(None, water_level_wrt_depth=-7)
+        df = self.gef.classify_soil('robertson', water_level_NAP=None, water_level_wrt_depth=-7)
         self.assertEqual(df['water_pressure'][0], 0)
 
 

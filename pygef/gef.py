@@ -189,7 +189,8 @@ class ParseGEF:
         :return: (DataFrame) containing classification and IC values
         """
         if water_level_and_zid_NAP:
-            return robertson.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP, new=new,
+            return robertson.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                      water_level_wrt_depth=water_level_wrt_depth, new=new,
                                       area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
                                       pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
         return robertson.classify(self.df, None, water_level_wrt_depth, new,
