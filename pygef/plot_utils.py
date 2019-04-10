@@ -37,7 +37,7 @@ def num_columns(classification, df_group):
         return 4
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step_x=None):
+def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step_x=None, colors=None):
     """
     Main function to plot qc, Fr and soil classification.
     :param df: Complete df.
@@ -54,8 +54,11 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step
     if df_group is not None:
         df_group = df_group.copy()
         df_group = df_group.rename(columns={'layer': 'soil_type'})
-        df_group, title_group = assign_color(df_group, classification)
-        title_group = 'Filtered'
+        df_group, title_group = assign_color(df_group, classification, colors=colors)
+        if colors is None:
+            title_group = 'Filtered'
+        else:
+            title_group = 'User defined filter'
 
     depth_max = df['depth'].max()
     depth_min = df['depth'].min()
@@ -84,18 +87,22 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step
         return fig
 
 
-def assign_color(df, classification):
+def assign_color(df, classification, colors=None):
     """
     Add to the dataframe the column 'colour' based on the chosen classification.
     :param df: original dataframe.
     :param classification: Chosen classification.
+    :param colors: (Dictionary) Dictionary with the user color associated to each layer.
     :return:
     """
-    if classification == 'robertson':
-        return df.assign(colour=df.apply(lambda row: colours_robertson[row['soil_type']], axis=1)), 'Robertson'
-    elif classification == 'been_jeffrey':
-        return df.assign(colour=df.apply(lambda row: colours_been_jeffrey[row['soil_type']], axis=1)), \
-               'Been Jeffrey'
+    if colors is None:
+        if classification == 'robertson':
+            return df.assign(colour=df.apply(lambda row: colours_robertson[row['soil_type']], axis=1)), 'Robertson'
+        elif classification == 'been_jeffrey':
+            return df.assign(colour=df.apply(lambda row: colours_been_jeffrey[row['soil_type']], axis=1)), \
+                   'Been Jeffrey'
+    else:
+        return df.assign(colour=df.apply(lambda row: colors[row['soil_type']], axis=1)), 'User defined'
 
 
 def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
@@ -116,7 +123,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
     plot_classify.set_ylabel('Z (m)')
     plot_classify.set_title(f'{title} classification')
     plt.ylim(depth_max, depth_min)
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.legend(loc='best', fontsize='xx-small')
     return fig
 
 
