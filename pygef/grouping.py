@@ -34,7 +34,9 @@ class GroupClassification:
         return (df_group
                 .pipe(calculate_thickness)
                 .pipe(calculate_z_centr)
-                .pipe(calculate_zf_NAP, self.zid))
+                .pipe(calculate_z_in_NAP, self.zid)
+                .pipe(calculate_zf_NAP, self.zid)
+                )
 
 
 def group_significant_layers(df_group, min_thickness):
@@ -86,3 +88,13 @@ def calculate_zf_NAP(df, z_id):
     :return: Dataframe with zf_NAP column.
     """
     return df.assign(zf_NAP=(z_id - df['zf']))
+
+
+def calculate_z_in_NAP(df, z_id):
+    """
+    Assign z_in respect to NAP to each layer of a dataframe.
+    :param df: Original dataframe.
+    :param z_id: Elevation respt to the NAp of my field.
+    :return:  Dataframe with z_in_NAP column.
+    """
+    return df.assign(z_in_NAP=(z_id - df['z_in']))
