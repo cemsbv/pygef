@@ -3,6 +3,7 @@ import pandas as pd
 
 class GroupClassification:
     def __init__(self, df, min_thickness):
+        # TODO: docstring
         df_group = df.copy()
         self.zid = df_group['elevation_with_respect_to_NAP'].iloc[0]
         df_group = df_group.loc[:, ['depth', 'soil_type']]
@@ -42,6 +43,7 @@ class GroupClassification:
 def group_significant_layers(df_group, min_thickness):
     """
     Drop the layers with thickness < min_thickness and adjust the limits of the others.
+
     :param df_group: Original dataframe.
     :param min_thickness: Minimum thickness.
     :return: Dataframe without the dropped layers.
@@ -80,6 +82,7 @@ def calculate_z_centr(df):
 
 
 def calculate_zf_NAP(df, z_id):
+    # TODO: Docstring types example: :param z_id: (flt) Description
     """
     Assign the zf respect to NAP to each layer of a dataframe.
 

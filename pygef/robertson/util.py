@@ -2,6 +2,10 @@ import numpy as np
 from pygef import geo
 import pygef.utils as utils
 
+# TODO: remove unused functions.
+# TODO: unit test functions
+# TODO: at test coverage to travis.yaml Nice to have. :)
+
 
 def n_exponent(df, p_a):
     mask = (0.381 * df['type_index_n'].values + 0.05 * (df['effective_soil_pressure'].values / p_a) - 0.15) < 1
@@ -191,6 +195,8 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
 
 
 def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=None):
+    # TODO: remove p_a
+    # TODO: old?
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)
@@ -208,6 +214,7 @@ def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
 
 
 def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
+    # TODO: new?
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)

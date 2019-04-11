@@ -149,7 +149,10 @@ class ParseGEF:
 
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1,
              new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100, colors=None):
+        # TODO: pep-8 line breakings
+        # TODO: pass dpi setting to lower functions.
         """
+        Plot cpt and return matplotlib figure.
 
         :param classification: (str) specify this to classify the cpt, possible choice : "robertson", "been_jeffrey"
         :param water_level_NAP: (float)
@@ -198,12 +201,17 @@ class ParseGEF:
                                   pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
 
     def classify_been_jeffrey(self, water_level_and_zid_NAP=None, water_level_wrt_depth=None):
+        # TODO: delete
         return been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
                                      water_level_wrt_depth=water_level_wrt_depth,
                                      area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
                                      pre_excavated_depth=self.pre_excavated_depth)
 
     def classify_soil(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True):
+        # TODO: this is the control logic function. Calls robertson.classify or been_jeffrey.classify
+        # TODO: docstring
+        # TODO: Make sure it runs w/ default args. Default water level -> log warning if run
+        # TODO:
         water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
         if classification == 'robertson':
             return self.classify_robertson(water_level_and_zid_NAP=water_level_and_zid_NAP,
@@ -217,6 +225,7 @@ class ParseGEF:
 
     def group_classification(self, min_thickness, classification, water_level_NAP=None,
                              water_level_wrt_depth=None, new=True, p_a=0.1):
+        # TODO: merge as argument in classify_soil -> delete
         df = self.classify_soil(classification, water_level_NAP=water_level_NAP,
                                 water_level_wrt_depth=water_level_wrt_depth,
                                 new=new, p_a=p_a)

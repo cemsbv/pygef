@@ -2,6 +2,9 @@ import numpy as np
 from pygef import geo
 import pygef.utils as utils
 
+# TODO: remove unused functions.
+# TODO: unit test functions
+# TODO: at test coverage to travis.yaml Nice to have. :)
 
 def type_index_to_gamma(ic):
     gamma = None
