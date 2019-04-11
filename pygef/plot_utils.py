@@ -37,7 +37,7 @@ def num_columns(classification, df_group):
         return 4
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step_x=None, colors=None):
+def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step_x=None, colors=None, dpi=100):
     """
     Main function to plot qc, Fr and soil classification.
     :param df: Complete df.
@@ -62,7 +62,7 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step
 
     depth_max = df['depth'].max()
     depth_min = df['depth'].min()
-    fig = plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize, dpi=dpi)
     n = 0
     num_col = num_columns(classification, df_group)
     for c, unit in zip(['qc', 'Fr'], ['[MPa]', '[%]']):
@@ -176,10 +176,10 @@ def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
     return fig
 
 
-def plot_bore(df, figsize=(6, 16), show=True):
+def plot_bore(df, figsize=(6, 16), show=True, dpi=100):
     df = df.copy()
 
-    fig = plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize, dpi=dpi)
 
     v = df[['G', 'S', 'L', 'C', 'P']].values
     v[:, 2] += df['SI'].values

@@ -148,7 +148,8 @@ class ParseGEF:
         self.df = self.df.dropna().reset_index(drop=True)
 
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1,
-             new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100, colors=None):
+             new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100,
+             colors=None):
         # TODO: pep-8 line breakings
         # TODO: pass dpi setting to lower functions.
         """
@@ -180,10 +181,11 @@ class ParseGEF:
                                              water_level_wrt_depth=water_level_wrt_depth, p_a=p_a, new=new,
                                              do_grouping=True, min_thickness=min_thickness)
 
-            return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x, colors=colors)
+            return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x,
+                                 colors=colors, dpi=dpi)
 
         elif self.type == "bore":
-            return plot.plot_bore(self.df, figsize=figsize, show=show)
+            return plot.plot_bore(self.df, figsize=figsize, show=show, dpi=dpi)
 
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
