@@ -150,24 +150,23 @@ class ParseGEF:
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1,
              new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100,
              colors=None):
-        # TODO: pep-8 line breakings
-        # TODO: pass dpi setting to lower functions.
         """
         Plot cpt and return matplotlib figure.
 
-        :param classification: (str) specify this to classify the cpt, possible choice : "robertson", "been_jeffrey"
+        :param classification: (str) Specify this to classify the cpt, possible choice : "robertson", "been_jeffrey".
         :param water_level_NAP: (float)
         :param water_level_wrt_depth: (float)
-        :param min_thickness: (float) minimum accepted thickness for grouping
-        :param p_a: (float) Atmospheric pressure at ground level in MPA.
-        :param new: (bool) Old or New implementation of Robertson.
+        :param min_thickness: (float) Minimum accepted thickness for grouping.
+        :param p_a: (float) Atmospheric pressure at ground level in MPa.
+        :param new: (bool) Old(1990) or New(2016) implementation of Robertson.
         :param show: (bool) Set to True to show the plot.
         :param figsize: (tpl) Figure size (x, y).
-        :param df_group: (DataFrame) specify your own DataFrame if you don't agree with the automatic one.
-        :param do_grouping: (bool) Do the grouping
+        :param df_group: (DataFrame) Specify your own DataFrame if you don't agree with the automatic one.
+        :param do_grouping: (bool) Plot the grouping if True.
         :param grid_step_x: (int) Grid step of x-axes qc.
-        :param dpi: (int) matplotlib dpi settings
-        :return:
+        :param dpi: (int) Matplotlib dpi settings.
+        :param colors: (dict) Dictionary with soil type and related color, use this to plot your own classification.
+        :return: matplotlib Figure.
         """
         if self.type == "cpt":
             if classification is None:
