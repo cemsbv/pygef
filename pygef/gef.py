@@ -172,7 +172,7 @@ class ParseGEF:
             if classification is None:
                 df = self.df
             else:
-                df = self.classify_soil(classification, water_level_NAP, water_level_wrt_depth, p_a=p_a, new=new)
+                df = self.classify(classification, water_level_NAP, water_level_wrt_depth, p_a=p_a, new=new)
                 if df_group is None and do_grouping is True:
                     df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
             return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x, colors=colors)
@@ -183,42 +183,34 @@ class ParseGEF:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
-    def classify_robertson(self, water_level_and_zid_NAP=None, water_level_wrt_depth=None, new=True, p_a=0.1):
+    def classify(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True):
         """
-        :param water_level_NAP: (flt) Water level w.r.t. NAP.
-        :param water_level_wrt_depth: (flt) Water level w.r.t. to depth. For example, -1 is one meter below level.
-        :param new: (bool): Old or New implementation of Robertson.  TODO year?
-        :param p_a: (flt) Atmospheric pressure at ground level in MPA.
-        :return: (DataFrame) containing classification and IC values
+        Classify function, classify gef files and return a dataframe with the classified gef.
+
+        :param classification: (str) Specify the classification, possible choice : "robertson", "been_jeffrey"
+        :param water_level_NAP: (float)
+        :param water_level_wrt_depth: (float)
+        :param p_a: (float) Atmospheric pressure at ground level in MPa.
+        :param new: (bool) Old or New implementation of Robertson.
+        :return: (DataFrame) Dataframe with classification.
         """
-        if water_level_and_zid_NAP:
+        water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
+        if water_level_NAP is None and water_level_wrt_depth is None:
+            water_level_wrt_depth = -1
+            logging.warn(f'You did not input the water level, a default value of -1 m respect to the ground is used.'
+                         f' Change it using the kwagr water_level_NAP or water_level_wrt_depth.')
+
+        if classification == 'robertson':
             return robertson.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
                                       water_level_wrt_depth=water_level_wrt_depth, new=new,
                                       area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
                                       pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
-        return robertson.classify(self.df, None, water_level_wrt_depth, new,
-                                  area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                  pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
 
-    def classify_been_jeffrey(self, water_level_and_zid_NAP=None, water_level_wrt_depth=None):
-        # TODO: delete
-        return been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                     water_level_wrt_depth=water_level_wrt_depth,
-                                     area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                     pre_excavated_depth=self.pre_excavated_depth)
-
-    def classify_soil(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True):
-        # TODO: this is the control logic function. Calls robertson.classify or been_jeffrey.classify
-        # TODO: docstring
-        # TODO: Make sure it runs w/ default args. Default water level -> log warning if run
-        # TODO:
-        water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
-        if classification == 'robertson':
-            return self.classify_robertson(water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                           water_level_wrt_depth=water_level_wrt_depth, new=new, p_a=p_a)
         elif classification == 'been_jeffrey':
-            return self.classify_been_jeffrey(water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                              water_level_wrt_depth=water_level_wrt_depth)
+            return been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                         water_level_wrt_depth=water_level_wrt_depth,
+                                         area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                         pre_excavated_depth=self.pre_excavated_depth)
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
@@ -226,9 +218,9 @@ class ParseGEF:
     def group_classification(self, min_thickness, classification, water_level_NAP=None,
                              water_level_wrt_depth=None, new=True, p_a=0.1):
         # TODO: merge as argument in classify_soil -> delete
-        df = self.classify_soil(classification, water_level_NAP=water_level_NAP,
-                                water_level_wrt_depth=water_level_wrt_depth,
-                                new=new, p_a=p_a)
+        df = self.classify(classification, water_level_NAP=water_level_NAP,
+                           water_level_wrt_depth=water_level_wrt_depth,
+                           new=new, p_a=p_a)
         return GroupClassification(df, min_thickness).df_group
 
     def __str__(self):
