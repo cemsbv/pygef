@@ -172,56 +172,68 @@ class ParseGEF:
             if classification is None:
                 df = self.df
             else:
-                df = self.classify(classification, water_level_NAP, water_level_wrt_depth, p_a=p_a, new=new)
+                df = self.classify(classification=classification, water_level_NAP=water_level_NAP,
+                                   water_level_wrt_depth=water_level_wrt_depth, p_a=p_a, new=new)
+
                 if df_group is None and do_grouping is True:
-                    df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
+                    df_group = self.classify(classification=classification, water_level_NAP=water_level_NAP,
+                                             water_level_wrt_depth=water_level_wrt_depth, p_a=p_a, new=new,
+                                             do_grouping=True, min_thickness=min_thickness)
+
             return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x, colors=colors)
 
         elif self.type == "bore":
             return plot.plot_bore(self.df, figsize=figsize, show=show)
+
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
-    def classify(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True):
+    def classify(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True,
+                 do_grouping=False, min_thickness=None):
         """
         Classify function, classify gef files and return a dataframe with the classified gef.
 
-        :param classification: (str) Specify the classification, possible choice : "robertson", "been_jeffrey"
-        :param water_level_NAP: (float)
+        :param classification: (str) Specify the classification, possible choice : "robertson", "been_jeffrey".
+        :param water_level_NAP:(float)
         :param water_level_wrt_depth: (float)
         :param p_a: (float) Atmospheric pressure at ground level in MPa.
-        :param new: (bool) Old or New implementation of Robertson.
-        :return: (DataFrame) Dataframe with classification.
+        :param new: (bool) Old(1990) or New(2016) implementation of Robertson.
+        :param do_grouping: (bool) Do grouping if True.
+        :param min_thickness: (float) Minimum accepted thickness for layers.
+        :return: (DataFrame) DataFrame with classification.
         """
+
         water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
         if water_level_NAP is None and water_level_wrt_depth is None:
             water_level_wrt_depth = -1
             logging.warn(f'You did not input the water level, a default value of -1 m respect to the ground is used.'
                          f' Change it using the kwagr water_level_NAP or water_level_wrt_depth.')
+        if min_thickness is None:
+            min_thickness = 0.2
+            logging.warn(f'You did not input the accepted minimum thickness, a default value of 0.2 m is used.'
+                         f' Change it using th kwarg min_thickness')
 
         if classification == 'robertson':
-            return robertson.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                      water_level_wrt_depth=water_level_wrt_depth, new=new,
-                                      area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                      pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
+            df = robertson.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                    water_level_wrt_depth=water_level_wrt_depth, new=new,
+                                    area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                    pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
+            if do_grouping:
+                return GroupClassification(df, min_thickness).df_group
+            return df
 
         elif classification == 'been_jeffrey':
-            return been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                         water_level_wrt_depth=water_level_wrt_depth,
-                                         area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                         pre_excavated_depth=self.pre_excavated_depth)
+            df = been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                       water_level_wrt_depth=water_level_wrt_depth,
+                                       area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                       pre_excavated_depth=self.pre_excavated_depth)
+            if do_grouping:
+                return GroupClassification(df, min_thickness).df_group
+            return df
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
-
-    def group_classification(self, min_thickness, classification, water_level_NAP=None,
-                             water_level_wrt_depth=None, new=True, p_a=0.1):
-        # TODO: merge as argument in classify_soil -> delete
-        df = self.classify(classification, water_level_NAP=water_level_NAP,
-                           water_level_wrt_depth=water_level_wrt_depth,
-                           new=new, p_a=p_a)
-        return GroupClassification(df, min_thickness).df_group
 
     def __str__(self):
         return self.df.__str__()
