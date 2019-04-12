@@ -6,6 +6,7 @@ import pygef.utils as utils
 # TODO: unit test functions
 # TODO: at test coverage to travis.yaml Nice to have. :)
 
+
 def type_index_to_gamma(ic):
     gamma = None
     if ic > 3.22:
@@ -142,7 +143,7 @@ def type_index(df):
 
 def iterate_been_jeffrey(original_df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
     """
-    Iteration function for Been&Jefferies classifier.
+    Iteration function for Been & Jefferies classifier.
 
     :param original_df: (DataFrame)
     :param water_level: (int) Water level with respect to ground level.
@@ -173,6 +174,15 @@ def iterate_been_jeffrey(original_df, water_level, area_quotient_cone_tip=None, 
 
 
 def been_jeffrey(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
+    """
+    Implementation of Been & Jefferies.
+
+    :param df: (DataFrame)
+    :param water_level: (float)
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :return: (DataFrame)
+    """
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)

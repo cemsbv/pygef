@@ -12,14 +12,14 @@ colours_robertson = {'Peat': '#a76b29',
                      None: 'black'
                      }
 
-colours_been_jeffrey = {'Peat': '#a76b29',
-                        'Clays': '#578E57',
-                        'Clayey silt to silty clay': '#0078C1',
-                        'Silty sand to sandy silt': '#DBAD4B',
-                        'Sands: clean sand to silty': 'gold',
-                        'Gravelly sands': '#708090',
-                        None: 'black'
-                        }
+colours_been_jefferies = {'Peat': '#a76b29',
+                          'Clays': '#578E57',
+                          'Clayey silt to silty clay': '#0078C1',
+                          'Silty sand to sandy silt': '#DBAD4B',
+                          'Sands: clean sand to silty': 'gold',
+                          'Gravelly sands': '#708090',
+                          None: 'black'
+                          }
 
 
 def num_columns(classification, df_group):
@@ -99,8 +99,8 @@ def assign_color(df, classification, colors=None):
         if classification == 'robertson':
             return df.assign(colour=df.apply(lambda row: colours_robertson[row['soil_type']], axis=1)), 'Robertson'
         elif classification == 'been_jefferies':
-            return df.assign(colour=df.apply(lambda row: colours_been_jeffrey[row['soil_type']], axis=1)), \
-                   'Been Jeffrey'
+            return df.assign(colour=df.apply(lambda row: colours_been_jefferies[row['soil_type']], axis=1)), \
+                   'Been Jefferies'
     else:
         return df.assign(colour=df.apply(lambda row: colors[row['soil_type']], axis=1)), 'User defined'
 
@@ -121,7 +121,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
         plt.hlines(y=partial_df['depth'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
     plot_classify.set_xlabel('-')
     plot_classify.set_ylabel('Z (m)')
-    plot_classify.set_title(f'{title} classification')
+    plot_classify.set_title(f'{title} classification', fontsize='small')
     plt.ylim(depth_max, depth_min)
     plt.legend(loc='best', fontsize='xx-small')
     return fig
@@ -142,7 +142,7 @@ def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group,
                  color=df['colour'][i], label=layer)
     plot_classify.set_xlabel('-')
     plot_classify.set_ylabel('Z (m)')
-    plot_classify.set_title(f'{title_group} classification')
+    plot_classify.set_title(f'{title_group} classification', fontsize='small')
     plt.ylim(depth_max, depth_min)
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = OrderedDict(zip(labels, handles))

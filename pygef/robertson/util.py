@@ -11,7 +11,7 @@ def n_exponent(df, p_a):
     mask = (0.381 * df['type_index_n'].values + 0.05 * (df['effective_soil_pressure'].values / p_a) - 0.15) < 1
     df = df.assign(n=1)
     df.loc[mask, 'n'] = 0.381 * df['type_index_n'][mask].values + 0.05 * \
-                (df['effective_soil_pressure'][mask].values / p_a) - 0.15
+                        (df['effective_soil_pressure'][mask].values / p_a) - 0.15
     return df
 
 
@@ -194,9 +194,16 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
     return df.pipe(ic_to_soil_type)
 
 
-def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=None):
-    # TODO: remove p_a
-    # TODO: old?
+def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
+    """
+    Old (1990) implementation of Robertson.
+
+    :param df: (DataFrame)
+    :param water_level: (float)
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :return: (DataFrame) Classified dataframe.
+    """
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)
@@ -214,7 +221,16 @@ def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
 
 
 def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
-    # TODO: new?
+    """
+    New (2016) implementation of Robertson.
+
+    :param df: (DataFrame)
+    :param water_level: (float)
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :param p_a: (float)
+    :return: (DataFrame) Classified dataframe.
+    """
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)
