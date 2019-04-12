@@ -1,9 +1,11 @@
 language: python
+
 python:
 - '3.6'
 install:
 - python setup.py install
 script:
+- $TRAVIS_BUILD_DIR realpath files
 - python -m unittest pygef/tests.py
 - python -m unittest pygef/robertson/tests.py
 - python -m unittest pygef/been_jefferies/tests.py
