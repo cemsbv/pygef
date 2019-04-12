@@ -3,7 +3,6 @@ from pygef import geo
 import pygef.utils as utils
 
 
-# TODO: unit test functions
 # TODO: at test coverage to travis.yaml Nice to have. :)
 
 

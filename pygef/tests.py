@@ -351,7 +351,7 @@ class GefTest(unittest.TestCase):
                            'delta_depth': [0, 0.5, 0.5]})
         v = geo.soil_pressure(df1)
         df = pd.DataFrame({'gamma': [0, 0.5, 1],
-                            'delta_depth': [0, 0.5, 0.5],
+                           'delta_depth': [0, 0.5, 0.5],
                            'soil_pressure': [0.0, 0.25, 0.75]})
         assert_frame_equal(v, df)
 
@@ -360,7 +360,7 @@ class GefTest(unittest.TestCase):
         df1 = pd.DataFrame({'depth': [0, 0.5, 1]})
         v = geo.water_pressure(df1, water_level)
         df = pd.DataFrame({'depth': [0, 0.5, 1],
-                            'water_pressure': [0.0, 0.0, 4.905]})
+                           'water_pressure': [0.0, 0.0, 4.905]})
         assert_frame_equal(v, df)
 
     def test_effective_soil_pressure(self):
