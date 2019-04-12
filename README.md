@@ -33,10 +33,10 @@ gef.y # y coordinate with respect to the reference system
 # Plot cpt file and get soil classification
 gef.plot(classification='robertson', water_level_NAP= -1, min_thickness= 0.2, show=True) # the plot in figure
 
-classification = ['robertson','been_jeffrey']
+classification = ['robertson',been_jefferies]
 
 # Type the name of the classification exactly as specified in the list classification, the inputs of plot_cpt are:
-kwargs = [classification='robertson', # possible choices 'robertson' and 'been_jeffrey'
+kwargs = [classification='robertson', been_jefferies
           water_level_NAP= -1, # insert water level respect to NAP
           min_thickness = 0.2, # minimun accepted thickness for filtered layers
           p_a=0.1, # atmospheric pressure, used in the new Robertson, default: 0.1 Mpa

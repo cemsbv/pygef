@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
-import pygef.been_jeffrey.util as util
+import pygef.been_jefferies.util as util
 
 
 class BeenJeffreyTest(unittest.TestCase):

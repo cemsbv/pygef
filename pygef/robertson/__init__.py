@@ -4,7 +4,9 @@ from pygef.robertson.util import iterate_robertson
 def classify(df, water_level_and_zid_NAP=None, water_level_wrt_depth=None, new=True, area_quotient_cone_tip=None,
              pre_excavated_depth=None, p_a=0.1):
     """
-    :param df: (DataFrame)
+    Classify function for Rpbertson.
+
+    :param df: (DataFrame) Original dataframe.
     :param water_level_NAP: (dict) {
                                         water_level: <water level wrt NAP,
                                         zid: <zid>
@@ -13,7 +15,7 @@ def classify(df, water_level_and_zid_NAP=None, water_level_wrt_depth=None, new=T
     :param area_quotient_cone_tip: (flt)
     :param pre_excavated_depth: (flt)
     :param p_a: (flt) Atmospheric pressure at ground level in MPA.
-    :return: (DataFrame) containing classification and IC values
+    :return: (DataFrame) containing classification and IC values.
     """
 
     if water_level_and_zid_NAP['water_level_NAP'] is not None:

@@ -98,7 +98,7 @@ def assign_color(df, classification, colors=None):
     if colors is None:
         if classification == 'robertson':
             return df.assign(colour=df.apply(lambda row: colours_robertson[row['soil_type']], axis=1)), 'Robertson'
-        elif classification == 'been_jeffrey':
+        elif classification == 'been_jefferies':
             return df.assign(colour=df.apply(lambda row: colours_been_jeffrey[row['soil_type']], axis=1)), \
                    'Been Jeffrey'
     else:

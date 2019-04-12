@@ -3,7 +3,7 @@ import pandas as pd
 import io
 import numpy as np
 import pygef.plot_utils as plot
-from pygef import robertson, been_jeffrey
+from pygef import robertson, been_jefferies
 import logging
 from pygef.grouping import GroupClassification
 
@@ -153,7 +153,7 @@ class ParseGEF:
         """
         Plot cpt and return matplotlib figure.
 
-        :param classification: (str) Specify this to classify the cpt, possible choice : "robertson", "been_jeffrey".
+        :param classification: (str) Specify this to classify the cpt, possible choice : "robertson", "been_jefferies".
         :param water_level_NAP: (float)
         :param water_level_wrt_depth: (float)
         :param min_thickness: (float) Minimum accepted thickness for grouping.
@@ -195,7 +195,7 @@ class ParseGEF:
         """
         Classify function, classify gef files and return a dataframe with the classified gef.
 
-        :param classification: (str) Specify the classification, possible choice : "robertson", "been_jeffrey".
+        :param classification: (str) Specify the classification, possible choice : "robertson", "been_jefferies".
         :param water_level_NAP:(float)
         :param water_level_wrt_depth: (float)
         :param p_a: (float) Atmospheric pressure at ground level in MPa.
@@ -204,8 +204,8 @@ class ParseGEF:
         :param min_thickness: (float) Minimum accepted thickness for layers.
         :return: (DataFrame) DataFrame with classification.
         """
-
         water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
+
         if water_level_NAP is None and water_level_wrt_depth is None:
             water_level_wrt_depth = -1
             logging.warn(f'You did not input the water level, a default value of -1 m respect to the ground is used.'
@@ -224,11 +224,11 @@ class ParseGEF:
                 return GroupClassification(df, min_thickness).df_group
             return df
 
-        elif classification == 'been_jeffrey':
-            df = been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                       water_level_wrt_depth=water_level_wrt_depth,
-                                       area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                       pre_excavated_depth=self.pre_excavated_depth)
+        elif classification == 'been_jefferies':
+            df = been_jefferies.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                         water_level_wrt_depth=water_level_wrt_depth,
+                                         area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                         pre_excavated_depth=self.pre_excavated_depth)
             if do_grouping:
                 return GroupClassification(df, min_thickness).df_group
             return df
