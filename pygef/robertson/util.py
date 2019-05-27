@@ -3,11 +3,14 @@ from pygef import geo
 import pygef.utils as utils
 
 
+# TODO: at test coverage to travis.yaml Nice to have. :)
+
+
 def n_exponent(df, p_a):
     mask = (0.381 * df['type_index_n'].values + 0.05 * (df['effective_soil_pressure'].values / p_a) - 0.15) < 1
     df = df.assign(n=1)
     df.loc[mask, 'n'] = 0.381 * df['type_index_n'][mask].values + 0.05 * \
-                (df['effective_soil_pressure'][mask].values / p_a) - 0.15
+                        (df['effective_soil_pressure'][mask].values / p_a) - 0.15
     return df
 
 
@@ -91,57 +94,6 @@ def nan_to_zero(df):
     return df.fillna(0)
 
 
-def type_index_to_gamma(ic):
-    gamma = None
-    if ic > 3.6:
-        gamma = 11
-    elif 2.95 < ic <= 3.6:
-        gamma = 16
-    elif 2.60 < ic <= 2.95:
-        gamma = 18
-    elif 2.05 < ic <= 2.60:
-        gamma = 18
-    elif 1.31 < ic <= 2.05:
-        gamma = 18
-    elif ic <= 1.31:
-        gamma = 18
-    return gamma
-
-
-def type_index_to_gamma_sat(ic):  # todo: maybe insert the case in which ic is nan
-    gamma_sat = None
-    if ic > 3.6:
-        gamma_sat = 11
-    elif 2.95 < ic <= 3.6:
-        gamma_sat = 16
-    elif 2.60 < ic <= 2.95:
-        gamma_sat = 18
-    elif 2.05 < ic <= 2.60:
-        gamma_sat = 19
-    elif 1.31 < ic <= 2.05:
-        gamma_sat = 20
-    elif ic <= 1.31:
-        gamma_sat = 20
-    return gamma_sat
-
-
-def type_index_to_soil_type(ic):
-    soil_type = None
-    if ic > 3.6:
-        soil_type = 'Peat'
-    elif 2.95 < ic <= 3.6:
-        soil_type = 'Clays - silty clay to clay'
-    elif 2.60 < ic <= 2.95:
-        soil_type = 'Silt mixtures - clayey silt to silty clay'
-    elif 2.05 < ic <= 2.60:
-        soil_type = 'Sand mixtures - silty sand to sandy silt'
-    elif 1.31 < ic <= 2.05:
-        soil_type = 'Sands - clean sand to silty sand'
-    elif ic <= 1.31:
-        soil_type = 'Gravelly sand to dense sand'
-    return soil_type
-
-
 def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
     """
     Iteration function for Robertson classifier.
@@ -190,7 +142,16 @@ def iterate_robertson(original_df, water_level, new=True, area_quotient_cone_tip
     return df.pipe(ic_to_soil_type)
 
 
-def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=None):
+def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
+    """
+    Old (1990) implementation of Robertson.
+
+    :param df: (DataFrame)
+    :param water_level: (float)
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :return: (DataFrame) Classified dataframe.
+    """
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)
@@ -208,6 +169,16 @@ def old_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_de
 
 
 def new_robertson(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None, p_a=0.1):
+    """
+    New (2016) implementation of Robertson.
+
+    :param df: (DataFrame)
+    :param water_level: (float)
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :param p_a: (float)
+    :return: (DataFrame) Classified dataframe.
+    """
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)

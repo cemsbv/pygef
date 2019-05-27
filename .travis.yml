@@ -1,4 +1,5 @@
 language: python
+
 python:
 - '3.6'
 install:
@@ -6,5 +7,5 @@ install:
 script:
 - python -m unittest pygef/tests.py
 - python -m unittest pygef/robertson/tests.py
-- python -m unittest pygef/been_jeffrey/tests.py
+- python -m unittest pygef/been_jefferies/tests.py
 

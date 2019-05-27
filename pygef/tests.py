@@ -351,7 +351,7 @@ class GefTest(unittest.TestCase):
                            'delta_depth': [0, 0.5, 0.5]})
         v = geo.soil_pressure(df1)
         df = pd.DataFrame({'gamma': [0, 0.5, 1],
-                            'delta_depth': [0, 0.5, 0.5],
+                           'delta_depth': [0, 0.5, 0.5],
                            'soil_pressure': [0.0, 0.25, 0.75]})
         assert_frame_equal(v, df)
 
@@ -360,7 +360,7 @@ class GefTest(unittest.TestCase):
         df1 = pd.DataFrame({'depth': [0, 0.5, 1]})
         v = geo.water_pressure(df1, water_level)
         df = pd.DataFrame({'depth': [0, 0.5, 1],
-                            'water_pressure': [0.0, 0.0, 4.905]})
+                           'water_pressure': [0.0, 0.0, 4.905]})
         assert_frame_equal(v, df)
 
     def test_effective_soil_pressure(self):
@@ -444,6 +444,7 @@ class GefTest(unittest.TestCase):
                            'zf': [2, 5, 6],
                            'thickness': [2., 3., 1.],
                            'z_centr': [1., 3.5, 5.5],
+                           'z_in_NAP': [2., 0., -3.],
                            'zf_NAP': [0, -3, -4]
                            })
         assert_frame_equal(v, df)
@@ -599,22 +600,22 @@ class BoreTest(unittest.TestCase):
 class PlotTest(unittest.TestCase):
 
     def test_plot_cpt(self):
-        gef = ParseGEF('./files/example.gef')
+        gef = ParseGEF('./pygef/files/example.gef')
         gef.plot(show=False)
 
     def test_plot_bore(self):
-        gef = ParseGEF('./files/example_bore.gef')
+        gef = ParseGEF('./pygef/files/example_bore.gef')
         gef.plot(show=False, figsize=(4, 12))
 
     def test_plot_classification(self):
-        gef = ParseGEF('./files/example.gef')
+        gef = ParseGEF('./pygef/files/example.gef')
         gef.plot(show=False, classification='robertson', water_level_wrt_depth=-1)
 
 
 class TestRobertson(unittest.TestCase):
 
     def setUp(self):
-        self.gef = ParseGEF('./files/example.gef')
+        self.gef = ParseGEF('./pygef/files/example.gef')
 
     def test_nan_dropped(self):
         self.assertAlmostEqual(self.gef.df['qc'].iloc[0], 16.72)
@@ -623,7 +624,7 @@ class TestRobertson(unittest.TestCase):
         """
         depth starts at 6 meters, So -7 should lead to water pressure of 0
         """
-        df = self.gef.classify_robertson(None, water_level_wrt_depth=-7)
+        df = self.gef.classify('robertson', water_level_NAP=None, water_level_wrt_depth=-7)
         self.assertEqual(df['water_pressure'][0], 0)
 
 
