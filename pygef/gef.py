@@ -308,9 +308,9 @@ class ParseCPT:
     @staticmethod
     def calculate_friction_number(df):
         if 'friction_number' in df.columns:
-            return df.assign(Fr=df['friction_number'])
+            return df
         elif 'fs' in df.columns and 'qc' in df.columns:
-            return df.assign(Fr=(df['fs'] / df['qc'] * 100))
+            return df.assign(friction_number=(df['fs'] / df['qc'] * 100))
         else:
             return df
 

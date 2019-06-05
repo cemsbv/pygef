@@ -65,7 +65,7 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step
     fig = plt.figure(figsize=figsize, dpi=dpi)
     n = 0
     num_col = num_columns(classification, df_group)
-    for c, unit in zip(['qc', 'Fr'], ['[MPa]', '[%]']):
+    for c, unit in zip(['qc', 'friction_number'], ['[MPa]', '[%]']):
         n += 1
         fig_i = fig.add_subplot(1, num_col, n)
         plt.plot(df[c], df['depth'], 'b')

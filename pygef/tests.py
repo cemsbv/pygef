@@ -248,7 +248,7 @@ class GefTest(unittest.TestCase):
     def test_calculate_friction_number(self):
         df1 = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08]})
         df_calculated = ParseCPT.calculate_friction_number(df1)
-        df = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08], 'Fr': [0., 10., 10., 10., 10.]})
+        df = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08], 'friction_number': [0., 10., 10., 10., 10.]})
         assert_frame_equal(df_calculated, df)
 
     def test_parse_cpt(self):
@@ -284,7 +284,7 @@ class GefTest(unittest.TestCase):
                            "fs": [4.6500e-002, 4.2750e-002, 3.9000e-002],
                            "depth": [1.0200e+000, 1.0400e+000, 1.0600e+000],
                            'elevation_with_respect_to_NAP': [0.28, 0.26, 0.24],
-                           'Fr': [6.54929577, 5.85616438, 5.65217391]} )
+                           'friction_number': [6.54929577, 5.85616438, 5.65217391]} )
         assert_frame_equal(df_calculated, df)
 
     def test_parse_bore(self):
