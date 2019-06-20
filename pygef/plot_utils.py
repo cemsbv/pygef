@@ -7,7 +7,8 @@ colours_robertson = {'Peat': '#a76b29',
                      'Silt mixtures - clayey silt to silty clay': '#0078C1',
                      'Sand mixtures - silty sand to sandy silt': '#DBAD4B',
                      'Sands - clean sand to silty sand': '#e5c581',
-                     'Gravelly sand to dense sand': '#708090'
+                     'Gravelly sand to dense sand': '#708090',
+                     None: "black"
                      }
 
 colours_been_jefferies = {'Peat': '#a76b29',
@@ -15,7 +16,8 @@ colours_been_jefferies = {'Peat': '#a76b29',
                           'Clayey silt to silty clay': '#0078C1',
                           'Silty sand to sandy silt': '#DBAD4B',
                           'Sands: clean sand to silty': '#e5c581',
-                          'Gravelly sands': '#708090'}
+                          'Gravelly sands': '#708090',
+                          None: "black"}
 
 
 def num_columns(classification, df_group):
@@ -80,13 +82,14 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step
     if df_group is not None:
         fig = add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col)
 
-    legend_dict = get_legend(classification, colors=colors)
-    patch_list = []
-    for key in legend_dict:
-        data_key = mpatches.Patch(color=legend_dict[key], label=key)
-        patch_list.append(data_key)
+    if classification is not None:
+        legend_dict = get_legend(classification, colors=colors)
+        patch_list = []
+        for key in legend_dict:
+            data_key = mpatches.Patch(color=legend_dict[key], label=key)
+            patch_list.append(data_key)
 
-    plt.legend(handles=patch_list, bbox_to_anchor=(1, 1), loc='upper left')
+        plt.legend(handles=patch_list, bbox_to_anchor=(1, 1), loc='upper left')
 
     if show:
         plt.show()
