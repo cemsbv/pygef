@@ -36,7 +36,7 @@ def num_columns(classification, df_group):
         return 5
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step_x=None, colors=None, dpi=100,
+def plot_cpt(df, df_group, classification, show=True, figsize=None, grid_step_x=None, colors=None, dpi=100,
              z_NAP=False):
     """
     Main function to plot qc, Fr and soil classification.
@@ -183,7 +183,7 @@ def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group,
     return fig
 
 
-def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
+def plot_merged_cpt_bore(df, figsize=None, show=True):
     fig = plt.figure(figsize=figsize)
     subplot_val = 131
     plt.subplot(subplot_val)
