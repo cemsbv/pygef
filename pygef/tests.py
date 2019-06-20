@@ -445,7 +445,8 @@ class GefTest(unittest.TestCase):
                            'thickness': [2., 3., 1.],
                            'z_centr': [1., 3.5, 5.5],
                            'z_in_NAP': [2., 0., -3.],
-                           'zf_NAP': [0, -3, -4]
+                           'zf_NAP': [0, -3, -4],
+                           'z_centr_NAP': [1., -1.5, -3.5]
                            })
         assert_frame_equal(v, df)
 

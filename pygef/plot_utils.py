@@ -36,7 +36,8 @@ def num_columns(classification, df_group):
         return 5
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step_x=None, colors=None, dpi=100):
+def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step_x=None, colors=None, dpi=100,
+             z_NAP=False):
     """
     Main function to plot qc, Fr and soil classification.
 
@@ -59,18 +60,27 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step
             title_group = 'Filtered'
         else:
             title_group = 'User defined filter'
+    if z_NAP:
+        depth_max = df['elevation_with_respect_to_NAP'].min()
+        depth_min = df['elevation_with_respect_to_NAP'].max()
+    else:
+        depth_max = df['depth'].max()
+        depth_min = df['depth'].min()
 
-    depth_max = df['depth'].max()
-    depth_min = df['depth'].min()
     fig = plt.figure(figsize=figsize, dpi=dpi)
     n = 0
     num_col = num_columns(classification, df_group)
     for c, unit in zip(['qc', 'friction_number'], ['[MPa]', '[%]']):
         n += 1
         fig_i = fig.add_subplot(1, num_col, n)
-        plt.plot(df[c], df['depth'], 'C0')
+        if z_NAP:
+            plt.plot(df[c], df['elevation_with_respect_to_NAP'], 'C0')
+            fig_i.set_ylabel('Z NAP [m]')
+        else:
+            plt.plot(df[c], df['depth'], 'C0')
+            fig_i.set_ylabel('Z [m]')
         fig_i.set_xlabel(f'{c} {unit}')
-        fig_i.set_ylabel('Z [m]')
+
         plt.grid()
         if grid_step_x is not None:
             fig_i.set_xticks(np.arange(0, df[c].max() + grid_step_x, grid_step_x))
@@ -78,9 +88,9 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step
         plt.ylim(depth_max, depth_min)
 
     if classification is not None:
-        fig = add_plot_classification(fig, df, depth_max, depth_min, title, num_col)
+        fig = add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP=z_NAP)
     if df_group is not None:
-        fig = add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col)
+        fig = add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col, z_NAP=z_NAP)
 
     if classification is not None:
         legend_dict = get_legend(classification, colors=colors)
@@ -116,7 +126,7 @@ def assign_color(df, classification, colors=None):
         return df.assign(colour=df.apply(lambda row: colors[row['soil_type']], axis=1)), 'User defined'
 
 
-def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
+def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP=False):
     """
     Add to the plot the selected classification.
 
@@ -130,15 +140,22 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
     df['soil_type'].loc[df['soil_type'].isna()] = 'UNKNOWN'
     for st in np.unique(df['soil_type']):
         partial_df = df[df['soil_type'] == st]
-        plt.hlines(y=partial_df['depth'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
+        if z_NAP:
+            plt.hlines(y=partial_df['elevation_with_respect_to_NAP'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
+        else:
+            plt.hlines(y=partial_df['depth'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
+
     plot_classify.set_xlabel('-')
-    plot_classify.set_ylabel('Z (m)')
+    if z_NAP:
+        plot_classify.set_ylabel('Z NAP(m)')
+    else:
+        plot_classify.set_ylabel('Z (m)')
     plot_classify.set_title(f'{title} classification', fontsize='small')
     plt.ylim(depth_max, depth_min)
     return fig
 
 
-def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col):
+def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col, z_NAP=False):
     """
     Add to the plot the selected classification.
 
@@ -150,10 +167,17 @@ def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group,
     plot_classify = fig.add_subplot(1, num_col, 4)
     df = df_group
     for i, layer in enumerate(df['soil_type']):
-        plt.barh(y=df['z_centr'][i], height=df['thickness'][i], width=5,
-                 color=df['colour'][i], label=layer)
+        if z_NAP:
+            plt.barh(y=df['z_centr_NAP'][i], height=df['thickness'][i], width=5,
+                     color=df['colour'][i], label=layer)
+        else:
+            plt.barh(y=df['z_centr'][i], height=df['thickness'][i], width=5,
+                     color=df['colour'][i], label=layer)
     plot_classify.set_xlabel('-')
-    plot_classify.set_ylabel('Z (m)')
+    if z_NAP:
+        plot_classify.set_ylabel('Z NAP (m)')
+    else:
+        plot_classify.set_ylabel('Z (m)')
     plot_classify.set_title(f'{title_group} classification', fontsize='small')
     plt.ylim(depth_max, depth_min)
     return fig
