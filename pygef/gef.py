@@ -149,7 +149,7 @@ class ParseGEF:
 
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1,
              new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100,
-             colors=None):
+             colors=None, z_NAP=False):
         """
         Plot cpt and return matplotlib figure.
 
@@ -166,6 +166,7 @@ class ParseGEF:
         :param grid_step_x: (int) Grid step of x-axes qc.
         :param dpi: (int) Matplotlib dpi settings.
         :param colors: (dict) Dictionary with soil type and related color, use this to plot your own classification.
+        :param z_NAP: (bool) True to plot the z-axis with respect to NAP. Default: False.
         :return: matplotlib Figure.
         """
         if self.type == "cpt":
@@ -181,7 +182,7 @@ class ParseGEF:
                                              do_grouping=True, min_thickness=min_thickness)
 
             return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x,
-                                 colors=colors, dpi=dpi)
+                                 colors=colors, dpi=dpi, z_NAP=z_NAP)
 
         elif self.type == "bore":
             return plot.plot_bore(self.df, figsize=figsize, show=show, dpi=dpi)

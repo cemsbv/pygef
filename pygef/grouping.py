@@ -37,6 +37,7 @@ class GroupClassification:
                 .pipe(calculate_z_centr)
                 .pipe(calculate_z_in_NAP, self.zid)
                 .pipe(calculate_zf_NAP, self.zid)
+                .pipe(calculate_z_centr_NAP, self.zid)
                 )
 
 
@@ -101,3 +102,13 @@ def calculate_z_in_NAP(df, z_id):
     :return:  Dataframe with z_in_NAP column.
     """
     return df.assign(z_in_NAP=(z_id - df['z_in']))
+
+
+def calculate_z_centr_NAP(df, z_id):
+    """
+    Assign z_in respect to NAP to each layer of a dataframe.
+    :param df: Original dataframe.
+    :param z_id: Elevation respt to the NAp of my field.
+    :return:  Dataframe with z_in_NAP column.
+    """
+    return df.assign(z_centr_NAP=(z_id - df['z_centr']))
