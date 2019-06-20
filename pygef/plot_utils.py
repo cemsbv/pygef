@@ -7,7 +7,7 @@ colours_robertson = {'Peat': '#a76b29',
                      'Clays - silty clay to clay': '#578E57',
                      'Silt mixtures - clayey silt to silty clay': '#0078C1',
                      'Sand mixtures - silty sand to sandy silt': '#DBAD4B',
-                     'Sands - clean sand to silty sand': 'gold',
+                     'Sands - clean sand to silty sand': '#e5c581',
                      'Gravelly sand to dense sand': '#708090',
                      None: 'black'
                      }
@@ -16,7 +16,7 @@ colours_been_jefferies = {'Peat': '#a76b29',
                           'Clays': '#578E57',
                           'Clayey silt to silty clay': '#0078C1',
                           'Silty sand to sandy silt': '#DBAD4B',
-                          'Sands: clean sand to silty': 'gold',
+                          'Sands: clean sand to silty': '#e5c581',
                           'Gravelly sands': '#708090',
                           None: 'black'
                           }
@@ -37,7 +37,7 @@ def num_columns(classification, df_group):
         return 4
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=(8, 16), grid_step_x=None, colors=None, dpi=100):
+def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step_x=None, colors=None, dpi=100):
     """
     Main function to plot qc, Fr and soil classification.
     :param df: Complete df.
@@ -176,7 +176,7 @@ def plot_merged_cpt_bore(df, figsize=(11, 8), show=True):
     return fig
 
 
-def plot_bore(df, figsize=(6, 16), show=True, dpi=100):
+def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
     df = df.copy()
 
     fig = plt.figure(figsize=figsize, dpi=dpi)
