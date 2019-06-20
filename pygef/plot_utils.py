@@ -36,8 +36,7 @@ def num_columns(classification, df_group):
         return 5
 
 
-def plot_cpt(df, df_group, classification, show=True, figsize=None, grid_step_x=None, colors=None, dpi=100,
-             z_NAP=False):
+def plot_cpt(df, df_group, classification, show, figsize, grid_step_x, colors, dpi, z_NAP):
     """
     Main function to plot qc, Fr and soil classification.
 
@@ -51,7 +50,7 @@ def plot_cpt(df, df_group, classification, show=True, figsize=None, grid_step_x=
     title_group = None
 
     if classification is not None:
-        df, title = assign_color(df, classification)
+        df, title = assign_color(df, classification, colors)
     if df_group is not None:
         df_group = df_group.copy()
         df_group = df_group.rename(columns={'layer': 'soil_type'})
@@ -107,7 +106,7 @@ def plot_cpt(df, df_group, classification, show=True, figsize=None, grid_step_x=
         return fig
 
 
-def assign_color(df, classification, colors=None):
+def assign_color(df, classification, colors):
     """
     Add to the dataframe the column 'colour' based on the chosen classification.
 
@@ -126,7 +125,7 @@ def assign_color(df, classification, colors=None):
         return df.assign(colour=df.apply(lambda row: colors[row['soil_type']], axis=1)), 'User defined'
 
 
-def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP=False):
+def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP):
     """
     Add to the plot the selected classification.
 
@@ -155,7 +154,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
     return fig
 
 
-def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col, z_NAP=False):
+def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col, z_NAP):
     """
     Add to the plot the selected classification.
 
@@ -237,7 +236,7 @@ def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
     return fig
 
 
-def get_legend(classification, colors=None):
+def get_legend(classification, colors):
     if colors is not None:
         return colors
     elif classification == "robertson":
