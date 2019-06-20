@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import OrderedDict
 import matplotlib.patches as mpatches
 
 colours_robertson = {'Peat': '#a76b29',
@@ -8,8 +7,7 @@ colours_robertson = {'Peat': '#a76b29',
                      'Silt mixtures - clayey silt to silty clay': '#0078C1',
                      'Sand mixtures - silty sand to sandy silt': '#DBAD4B',
                      'Sands - clean sand to silty sand': '#e5c581',
-                     'Gravelly sand to dense sand': '#708090',
-                     None: 'black'
+                     'Gravelly sand to dense sand': '#708090'
                      }
 
 colours_been_jefferies = {'Peat': '#a76b29',
@@ -17,14 +15,13 @@ colours_been_jefferies = {'Peat': '#a76b29',
                           'Clayey silt to silty clay': '#0078C1',
                           'Silty sand to sandy silt': '#DBAD4B',
                           'Sands: clean sand to silty': '#e5c581',
-                          'Gravelly sands': '#708090',
-                          None: 'black'
-                          }
+                          'Gravelly sands': '#708090'}
 
 
 def num_columns(classification, df_group):
     """
     Get the columns number to plot.
+
     :param classification: (str) classification
     :param df_group: grouped dataframe.
     :return: number of columns to plot
@@ -32,14 +29,15 @@ def num_columns(classification, df_group):
     if classification is None:
         return 2
     if df_group is None and classification is not None:
-        return 3
-    else:
         return 4
+    else:
+        return 5
 
 
 def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step_x=None, colors=None, dpi=100):
     """
     Main function to plot qc, Fr and soil classification.
+
     :param df: Complete df.
     :param df_group: Grouped df.
     :param show: If show is True the figure is shown.
@@ -68,7 +66,7 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step
     for c, unit in zip(['qc', 'friction_number'], ['[MPa]', '[%]']):
         n += 1
         fig_i = fig.add_subplot(1, num_col, n)
-        plt.plot(df[c], df['depth'], 'b')
+        plt.plot(df[c], df['depth'], 'C0')
         fig_i.set_xlabel(f'{c} {unit}')
         fig_i.set_ylabel('Z [m]')
         plt.grid()
@@ -81,6 +79,15 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step
         fig = add_plot_classification(fig, df, depth_max, depth_min, title, num_col)
     if df_group is not None:
         fig = add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col)
+
+    legend_dict = get_legend(classification, colors=colors)
+    patch_list = []
+    for key in legend_dict:
+        data_key = mpatches.Patch(color=legend_dict[key], label=key)
+        patch_list.append(data_key)
+
+    plt.legend(handles=patch_list, bbox_to_anchor=(1, 1), loc='upper left')
+
     if show:
         plt.show()
     else:
@@ -90,6 +97,7 @@ def plot_cpt(df, df_group, classification, show=True, figsize=(11, 8), grid_step
 def assign_color(df, classification, colors=None):
     """
     Add to the dataframe the column 'colour' based on the chosen classification.
+
     :param df: original dataframe.
     :param classification: Chosen classification.
     :param colors: (Dictionary) Dictionary with the user color associated to each layer.
@@ -108,6 +116,7 @@ def assign_color(df, classification, colors=None):
 def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
     """
     Add to the plot the selected classification.
+
     :param fig: Original figure.
     :param depth_max: Maximum depth.
     :param depth_min: Minimum depth.
@@ -123,13 +132,13 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col):
     plot_classify.set_ylabel('Z (m)')
     plot_classify.set_title(f'{title} classification', fontsize='small')
     plt.ylim(depth_max, depth_min)
-    plt.legend(loc='best', fontsize='xx-small')
     return fig
 
 
 def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col):
     """
     Add to the plot the selected classification.
+
     :param fig: Original figure.
     :param depth_max: Maximum depth.
     :param depth_min: Minimum depth.
@@ -144,9 +153,6 @@ def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group,
     plot_classify.set_ylabel('Z (m)')
     plot_classify.set_title(f'{title_group} classification', fontsize='small')
     plt.ylim(depth_max, depth_min)
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = OrderedDict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc='best', fontsize='xx-small')
     return fig
 
 
@@ -204,3 +210,10 @@ def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
     return fig
 
 
+def get_legend(classification, colors=None):
+    if colors is not None:
+        return colors
+    elif classification == "robertson":
+        return colours_robertson
+    elif classification == "been_jefferies":
+        return colours_been_jefferies
