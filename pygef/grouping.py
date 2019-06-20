@@ -88,7 +88,7 @@ def calculate_zf_NAP(df, z_id):
     Assign the zf respect to NAP to each layer of a dataframe.
 
     :param df: Original dataframe.
-    :param z_id: Elevation respt to the NAp of my field.
+    :param z_id: Elevation respect to the NAp of my field.
     :return: Dataframe with zf_NAP column.
     """
     return df.assign(zf_NAP=(z_id - df['zf']))
@@ -98,7 +98,7 @@ def calculate_z_in_NAP(df, z_id):
     """
     Assign z_in respect to NAP to each layer of a dataframe.
     :param df: Original dataframe.
-    :param z_id: Elevation respt to the NAp of my field.
+    :param z_id: Elevation respet to the NAp of my field.
     :return:  Dataframe with z_in_NAP column.
     """
     return df.assign(z_in_NAP=(z_id - df['z_in']))
@@ -106,9 +106,9 @@ def calculate_z_in_NAP(df, z_id):
 
 def calculate_z_centr_NAP(df, z_id):
     """
-    Assign z_in respect to NAP to each layer of a dataframe.
-    :param df: Original dataframe.
-    :param z_id: Elevation respt to the NAp of my field.
-    :return:  Dataframe with z_in_NAP column.
+    Assign z_centr respect to NAP to each layer of a dataframe.
+    :param df: Original DataFrame.
+    :param z_id: Elevation respect to the NAP of my field.
+    :return:  Dataframe with z_centr_NAP column.
     """
     return df.assign(z_centr_NAP=(z_id - df['z_centr']))
