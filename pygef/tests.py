@@ -208,7 +208,7 @@ class GefTest(unittest.TestCase):
     def test_calculate_elevation_respect_to_NAP(self):
         df1 = pd.DataFrame({'depth': [0, 1, 2, 3, 4]})
         zid = -3
-        df_calculated = ParseCPT.calculate_elevation_respect_to_nap(df1, zid)
+        df_calculated = ParseCPT.calculate_elevation_with_respect_to_nap(df1, zid)
         df = pd.DataFrame({'depth': [0, 1, 2, 3, 4], 'elevation_with_respect_to_NAP': [-3, -4, -5, -6, -7]})
         assert_frame_equal(df_calculated, df)
 

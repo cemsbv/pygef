@@ -327,17 +327,15 @@ class ParseCPT:
             # corrected depth
             return df.assign(depth=np.concatenate([np.array([df['penetration_length'].iloc[0]]),
                                                    np.cumsum(diff_t_depth)]))
-        else:
-            return df.assign(depth=df['penetration_length'])
+        return df.assign(depth=df['penetration_length'])
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
         if pre_excavated_depth is not None and \
                 np.any(np.isclose(df['penetration_length'].values - pre_excavated_depth, 0)):
             mask = df['penetration_length'] == pre_excavated_depth
-            mask2 = df[mask].reset_index(drop=False)
-            i = mask2['index'][0]
-            return df[i:].reset_index(drop=True)
+            start_idx = df[mask].reset_index(drop=False)['index'][0]
+            return df[start_idx:].reset_index(drop=True)
         return df
 
     @staticmethod
