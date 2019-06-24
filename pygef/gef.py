@@ -295,7 +295,7 @@ class ParseCPT:
                    .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
                    .pipe(self.correct_depth_with_inclination)
                    .pipe(lambda df: df.assign(depth=np.abs(df['depth'].values)))
-                   .pipe(self.calculate_elevation_respect_to_nap, zid)
+                   .pipe(self.calculate_elevation_with_respect_to_nap, zid)
                    .pipe(self.replace_column_void, self.column_void)
                    .pipe(self.calculate_friction_number)
                    )
@@ -313,11 +313,9 @@ class ParseCPT:
         return df
 
     @staticmethod
-    def calculate_elevation_respect_to_nap(df, zid):
+    def calculate_elevation_with_respect_to_nap(df, zid):
         if zid is not None:
-            depth_lst = np.array(df['depth'].tolist())
-            lst_zid = np.array([zid] * len(df['depth']))
-            return df.assign(elevation_with_respect_to_NAP=(lst_zid - depth_lst))
+            df = df.assign(elevation_with_respect_to_NAP=np.subtract(zid, df['depth'].values))
         return df
 
     @staticmethod
