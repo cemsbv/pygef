@@ -350,8 +350,7 @@ class ParseCPT:
                     columns_info.append(column_info)
         new_data = data_s.replace('!', '')
         separator = utils.find_separator(header_s)
-        df = pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
-        return df
+        return pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
 
 
 class ParseBORE:
