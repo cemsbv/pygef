@@ -148,7 +148,7 @@ class ParseGEF:
         self.df = self.df.dropna().reset_index(drop=True)
 
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1,
-             new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100,
+             new=True, show=False, figsize=(11, 8), df_group=None, do_grouping=False, grid_step_x=None, dpi=100,
              colors=None, z_NAP=False):
         """
         Plot cpt and return matplotlib figure.
