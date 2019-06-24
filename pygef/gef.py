@@ -308,12 +308,9 @@ class ParseCPT:
 
     @staticmethod
     def calculate_friction_number(df):
-        if 'friction_number' in df.columns:
-            return df
-        elif 'fs' in df.columns and 'qc' in df.columns:
-            return df.assign(friction_number=(df['fs'] / df['qc'] * 100))
-        else:
-            return df
+        if 'fs' in df.columns and 'qc' in df.columns:
+            df = df.assign(friction_number=(df['fs'] / df['qc'] * 100))
+        return df
 
     @staticmethod
     def calculate_elevation_respect_to_nap(df, zid):
