@@ -86,6 +86,7 @@ def plot_cpt(df, df_group, classification, show, figsize, grid_step_x, colors, d
             labels = [item.get_text() for item in ax.get_yticklabels()]
             empty_string_labels = [''] * len(labels)
             ax.set_yticklabels(empty_string_labels)
+            plt.xlim([0, df[c].max() + 1])
         fig_i.set_xlabel(f'{c} {unit}')
 
         plt.grid()
