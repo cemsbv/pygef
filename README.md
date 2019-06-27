@@ -41,5 +41,5 @@ gef.plot(classification='robertson', water_level_NAP= -1, min_thickness= 0.2, sh
 ```
 
 
-![]img/gef_classified_grouped.png)
+![](img/gef_classified_grouped.png)
 
