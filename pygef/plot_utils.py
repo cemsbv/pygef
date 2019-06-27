@@ -43,7 +43,7 @@ def plot_cpt(df, df_group, classification, show, figsize, grid_step_x, colors, d
     :param df: Complete df.
     :param df_group: Grouped df.
     :param show: If show is True the figure is shown.
-    :param figsize: Figure size (x, y) , x i the width y is the height.
+    :param figsize: Figure size (x, y)
     :return:
     """
     title = None
@@ -74,16 +74,25 @@ def plot_cpt(df, df_group, classification, show, figsize, grid_step_x, colors, d
         fig_i = fig.add_subplot(1, num_col, n)
         if z_NAP:
             plt.plot(df[c], df['elevation_with_respect_to_NAP'], 'C0')
-            fig_i.set_ylabel('Z NAP [m]')
+            if n == 1:
+                fig_i.set_ylabel('Z NAP [m]')
         else:
             plt.plot(df[c], df['depth'], 'C0')
-            fig_i.set_ylabel('Z [m]')
+            if n == 1:
+                fig_i.set_ylabel('Z [m]')
+        if n > 1:
+            # keep grid, but no labels
+            ax = plt.gca()
+            labels = [item.get_text() for item in ax.get_yticklabels()]
+            empty_string_labels = [''] * len(labels)
+            ax.set_yticklabels(empty_string_labels)
         fig_i.set_xlabel(f'{c} {unit}')
 
         plt.grid()
+
+        # custom x grid
         if grid_step_x is not None:
             fig_i.set_xticks(np.arange(0, df[c].max() + grid_step_x, grid_step_x))
-        fig_i.xaxis.set_tick_params(labeltop='on')
         plt.ylim(depth_max, depth_min)
 
     if classification is not None:
@@ -92,6 +101,7 @@ def plot_cpt(df, df_group, classification, show, figsize, grid_step_x, colors, d
         fig = add_grouped_classification(fig, df_group, depth_max, depth_min, title_group, num_col, z_NAP=z_NAP)
 
     if classification is not None:
+        # custom legend
         legend_dict = get_legend(classification, colors=colors)
         patch_list = []
         for key in legend_dict:
@@ -99,7 +109,6 @@ def plot_cpt(df, df_group, classification, show, figsize, grid_step_x, colors, d
             patch_list.append(data_key)
 
         plt.legend(handles=patch_list, bbox_to_anchor=(1, 1), loc='upper left')
-
     if show:
         plt.show()
     else:
@@ -134,7 +143,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
     :param depth_min: Minimum depth.
     :return:
     """
-    plot_classify = fig.add_subplot(1, num_col, 3)
+    ax = fig.add_subplot(1, num_col, 3)
     df = df.copy()
     df['soil_type'].loc[df['soil_type'].isna()] = 'UNKNOWN'
     for st in np.unique(df['soil_type']):
@@ -143,13 +152,8 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
             plt.hlines(y=partial_df['elevation_with_respect_to_NAP'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
         else:
             plt.hlines(y=partial_df['depth'], xmin=0, xmax=1, colors=partial_df['colour'], label=st)
-
-    plot_classify.set_xlabel('-')
-    if z_NAP:
-        plot_classify.set_ylabel('Z NAP(m)')
-    else:
-        plot_classify.set_ylabel('Z (m)')
-    plot_classify.set_title(f'{title} classification', fontsize='small')
+    ax.set_xticks([])
+    ax.set_title(f'{title}')
     plt.ylim(depth_max, depth_min)
     return fig
 
@@ -163,7 +167,7 @@ def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group,
     :param depth_min: Minimum depth.
     :return: Complete figure.
     """
-    plot_classify = fig.add_subplot(1, num_col, 4)
+    ax = fig.add_subplot(1, num_col, 4)
     df = df_group
     for i, layer in enumerate(df['soil_type']):
         if z_NAP:
@@ -172,12 +176,8 @@ def add_grouped_classification(fig, df_group, depth_max, depth_min, title_group,
         else:
             plt.barh(y=df['z_centr'][i], height=df['thickness'][i], width=5,
                      color=df['colour'][i], label=layer)
-    plot_classify.set_xlabel('-')
-    if z_NAP:
-        plot_classify.set_ylabel('Z NAP (m)')
-    else:
-        plot_classify.set_ylabel('Z (m)')
-    plot_classify.set_title(f'{title_group} classification', fontsize='small')
+    ax.set_xticks([])
+    ax.set_title(f'{title_group} classification')
     plt.ylim(depth_max, depth_min)
     return fig
 
