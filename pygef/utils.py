@@ -212,7 +212,7 @@ def parse_column_separator(s):
     """
     Function to parse the column separator. It is used only in the borehole class.
 
-    :param s: (str) String to search for regex pattern.olumn separato
+    :param s: (str) String to search for regex pattern.
     :return: Column separator.
     """
     return parse_regex_cast(r"#COLUMNSEPARATOR+[=\s+]+(.)", s, str, 1)
