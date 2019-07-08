@@ -134,6 +134,7 @@ class ParseGEF:
         self.x = utils.parse_xid_as_float(header_s)
         self.y = utils.parse_yid_as_float(header_s)
         self.file_date = utils.parse_file_date(header_s)
+        self.test_id = utils.parse_test_id(header_s)
 
         self.type = utils.parse_gef_type(string)
         if self.type == "cpt":

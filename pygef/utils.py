@@ -218,6 +218,16 @@ def parse_column_separator(s):
     return parse_regex_cast(r"#COLUMNSEPARATOR+[=\s+]+(.)", s, str, 1)
 
 
+def parse_test_id(s):
+    """
+    Function to parse the test id.
+
+    :param s: (str) String to search for regex pattern.
+    :return: test id.
+    """
+    return parse_regex_cast(r"#TESTID+[=\s+]+(.*)", s, str, 1)
+
+
 def parse_record_separator(s):
     """
     Function to parse the record separator(end of the line). It is used only in the borehole class.
