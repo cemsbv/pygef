@@ -7,26 +7,6 @@ from pygef import robertson, been_jefferies
 import logging
 from pygef.grouping import GroupClassification
 
-COLUMN_NAMES_CPT = ["penetration_length",  # 1
-                    "qc",  # 2
-                    "fs",  # 3
-                    "friction_number",  # 4
-                    "u1",  # 5
-                    "u2",  # 6
-                    "u3",  # 7
-                    "inclination",  # 8
-                    "inclination_NS",  # 9
-                    "inclination_EW",  # 10
-                    "corrected_depth",  # 11
-                    "time",  # 12
-                    "corrected_qc",  # 13
-                    "net_cone_resistance",  # 14
-                    "pore_ratio",  # 15
-                    "cone_resistance_number",  # 16
-                    "weight_per_unit_volume",  # 17
-                    "initial_pore_pressure",  # 18
-                    "total_vertical_soil_pressure",  # 19
-                    "effective_vertical_soil_pressure"]  # 20
 
 MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
                                        2: "qc",  # 2
@@ -62,7 +42,7 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
                                        131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
                                        135: "Temperature_C",  # found in:#COMPANYID= Inpijn-Blokpoel,
                                        250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
-                                       251: "magneto_slope_x"}  # found in:OMPANYID= Danny, Tjaden, 31
+                                       251: "magneto_slope_x"}  # found in:COMPANYID= Danny, Tjaden, 31
 
 COLUMN_NAMES_BORE = ["depth_top",  # 1
                      "depth_bottom",  # 2
