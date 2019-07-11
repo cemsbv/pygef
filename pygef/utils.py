@@ -135,8 +135,10 @@ def parse_gef_type(s):
 
     if "cpt" in proc_code or "dis" in proc_code:
         gef_type = "cpt"
-    elif "bore" in proc_code:
+    elif "bore" in proc_code and not "borehole" in proc_code:
         gef_type = "bore"
+    elif "borehole" in proc_code:
+        gef_type = "borehole-report"
     else:
         gef_type = None
 
