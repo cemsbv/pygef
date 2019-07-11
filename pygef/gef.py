@@ -307,7 +307,7 @@ class ParseCPT:
     @staticmethod
     def correct_depth_with_inclination(df):
         if 'corrected_depth' in df.columns:
-            return df.assign(depth=df['corrected_depth'])
+            return df.rename(columns={"corrected_depth": "depth"})
         if 'inclination' in df.columns:
             diff_t_depth = np.diff(df['penetration_length'].values) * np.cos(np.radians(df['inclination'].values[:-1]))
             # corrected depth
