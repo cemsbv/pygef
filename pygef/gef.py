@@ -121,6 +121,9 @@ class ParseGEF:
             parsed = ParseCPT(header_s, data_s, self.zid)
         elif self.type == "bore":
             parsed = ParseBORE(header_s, data_s)
+        elif self.type == "borehole-report":
+            raise ValueError("Selected gef file is a GEF-BOREHOLE-Report. Can only parse "
+                             "GEF-CPT-Report and GEF-BORE-Report. Check the PROCEDURECODE.")
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
