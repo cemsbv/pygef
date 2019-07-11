@@ -224,11 +224,12 @@ class GefTest(unittest.TestCase):
                            'depth': [0.0, 0.14142135623730953, 0.28284271247461906, 0.42426406871192857, 0.5656854249492381]})
         assert_frame_equal(df_calculated, df)
 
-        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'corrected_depth':
-            [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
+        df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8],
+                            'corrected_depth': [0, 0.10, 0.25, 0.40, 0.60],
+                            'inclination': [45, 45, 45, 45, 45]})
         df_calculated = ParseCPT.correct_depth_with_inclination(df2)
-        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'corrected_depth': [0, 0.10, 0.25, 0.40, 0.60],
-                           'inclination': [45, 45, 45, 45, 45], 'depth': [0, 0.10, 0.25, 0.40, 0.60]})
+        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8],
+                           'depth': [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
         assert_frame_equal(df_calculated, df)
 
     def test_pre_excavated_depth(self):
