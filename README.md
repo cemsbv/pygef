@@ -1,4 +1,5 @@
 # PYGEF
+[![Build Status](https://travis-ci.org/jmmaljaars/pygef.svg?branch=master)](https://travis-ci.org/jmmaljaars/pygef)
 
 Simple parser for *.gef files. These are ASCII based files used for soil properties measurements. 
 
