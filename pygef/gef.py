@@ -350,6 +350,7 @@ class ParseBORE:
         self.type = 'bore'
         self.project_id = utils.parse_project_type(header_s, 'bore')
 
+        # This is usually not correct for the boringen
         columns_number = utils.parse_columns_number(header_s)
         column_separator = utils.parse_column_separator(header_s)
         record_separator = utils.parse_record_separator(header_s)
@@ -362,14 +363,13 @@ class ParseBORE:
                    .pipe(self.parse_add_info_as_string, data_rows_soil)
                    ).join(self.data_soil_quantified(data_rows_soil))[
             ['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
-             'Loam', 'Peat', 'Silt']
+             'Loam', 'Peat', 'Silt', 'remarks']
         ]
-
-        self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']
+        self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'SI', 'Remarks']
 
     @staticmethod
     def parse_add_info_as_string(df, data_rows_soil):
-        return df.assign(additional_info=[''.join(map(utils.parse_add_info, row[1:-1])) for row in data_rows_soil])
+        return df.assign(remarks=[utils.parse_add_info(''.join(row[1::])) for row in data_rows_soil])
 
     @staticmethod
     def extract_soil_info(data_s_rows, columns_number, column_separator):
