@@ -576,11 +576,12 @@ def parse_add_info(s):
     string2list = string_noquote.split("''")
     add_info = ""
     for i, string in enumerate(string2list):
-        add_info += ("{}) ".format(i+1)
-                     + "".join([dict_add_info[string_split]
-                                if string_split in dict_add_info
-                                else string_split + " "
-                                for string_split in string.split(" ")]))
+        if string:
+            add_info += ("{}) ".format(i+1)
+                         + "".join([dict_add_info[string_split]
+                                    if string_split in dict_add_info
+                                    else string_split + " "
+                                    for string_split in string.split(" ")]))
     return add_info
 
 
