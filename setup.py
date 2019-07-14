@@ -7,7 +7,7 @@ setup(
     author_email='ritchie46@gmail.com',
     url="https://www.ritchievink.com",
     license="mit",
-    packages=["pygef", "pygef.been_jeffrey", "pygef.robertson"],
+    packages=["pygef", "pygef.been_jefferies", "pygef.robertson"],
     install_requires=[
         "pandas",
         "numpy",

@@ -1,4 +1,5 @@
 language: python
+
 python:
 - '3.6'
 install:
@@ -6,5 +7,13 @@ install:
 script:
 - python -m unittest pygef/tests.py
 - python -m unittest pygef/robertson/tests.py
-- python -m unittest pygef/been_jeffrey/tests.py
-
+- python -m unittest pygef/been_jefferies/tests.py
+deploy:
+  provider: pypi
+  user: ritchie46
+  password:
+    secure: "rx1RJgu38vrUn3S6WeECG6G1qmCLvN1tBmsV3nS551YWLF86GO42IiIFN5GheptBkrUN1+LUHd6llHX+eGNKVzRNGuBoTnTGl5On9EtC2D4ap2Ino3bVa8etYGtISA7v6BPqbjkAork+5BDGRjmfu1g2SdDsVkxtBZLbGgET/fZUbQV6v1Q0xxU6278Y4MjCodIzTx7uspEG9rvPzqvcR3uCypbaiZ5kafxdma2GhrSatYJNA8yt5Gt+1pn2vZ1nZae86iI03d1TQMzahgsoMZQ4TEqKX9zIbJKc6j5meHYdjVvPo0j4OQRtOSbQlPMNbqYzB0BKtEdS0gxsNCW3TPyxNuCDriKnUjFi0qDGsVdYxa6wrk5GombamcPPDPcooSNUBGu6+Ex/LH5JFk2gED6QjhZgXteRbG45mn8xkcupCmOmMblE5nzLU7M4lVwkTphl+DEj2AnOLi0qVmciTL3aX887g03pBGB4tQQVygc4ZP4zWruvlbWMgrDHbcOuJKphRnU7+Von79YygrSMs3gadGb4SYgsW0YSnBlC27TuTOmCyqjGMa/sN2hTK0PB1v2cjXCLABatPaaB8MS+H2WgqiuDqpP+V9toDda6cDeu/+Do/gqMQFyqMo9B1XkxOutZMrag6Nr/Xqs3ve/jt8OG5GiYoPCKD4pFepDPcOk="
+  on:
+    branch: release
+  skip_existing: true
+  distributions: "sdist bdist_wheel"

@@ -55,24 +55,6 @@ class RobertsonTest(unittest.TestCase):
                                          'Silt mixtures - clayey silt to silty clay']})
         assert_frame_equal(v, df)
 
-    def test_type_index_to_gamma(self):
-        ic = 3.6
-        gamma_calc = util.type_index_to_gamma(ic)
-        gamma = 16
-        self.assertEqual(gamma_calc, gamma)
-
-    def test_type_index_to_gamma_sat(self):
-        ic = 3.6
-        gamma_calc = util.type_index_to_gamma_sat(ic)
-        gamma = 16
-        self.assertEqual(gamma_calc, gamma)
-
-    def test_type_index_to_soil_type(self):
-        ic = 2.70
-        soil_type_calc = util.type_index_to_soil_type(ic)
-        soil_type = 'Silt mixtures - clayey silt to silty clay'
-        self.assertEqual(soil_type_calc, soil_type)
-
     def test_old_robertson(self):
         water_level = -0.5
         df1 = pd.DataFrame({'qc': [1, 1, 1],

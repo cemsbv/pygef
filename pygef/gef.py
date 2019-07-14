@@ -3,30 +3,10 @@ import pandas as pd
 import io
 import numpy as np
 import pygef.plot_utils as plot
-from pygef import robertson, been_jeffrey
+from pygef import robertson, been_jefferies
 import logging
 from pygef.grouping import GroupClassification
 
-COLUMN_NAMES_CPT = ["penetration_length",  # 1
-                    "qc",  # 2
-                    "fs",  # 3
-                    "friction_number",  # 4
-                    "u1",  # 5
-                    "u2",  # 6
-                    "u3",  # 7
-                    "inclination",  # 8
-                    "inclination_NS",  # 9
-                    "inclination_EW",  # 10
-                    "corrected_depth",  # 11
-                    "time",  # 12
-                    "corrected_qc",  # 13
-                    "net_cone_resistance",  # 14
-                    "pore_ratio",  # 15
-                    "cone_resistance_number",  # 16
-                    "weight_per_unit_volume",  # 17
-                    "initial_pore_pressure",  # 18
-                    "total_vertical_soil_pressure",  # 19
-                    "effective_vertical_soil_pressure"]  # 20
 
 MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
                                        2: "qc",  # 2
@@ -62,7 +42,7 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {1: "penetration_length",
                                        131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
                                        135: "Temperature_C",  # found in:#COMPANYID= Inpijn-Blokpoel,
                                        250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
-                                       251: "magneto_slope_x"}  # found in:OMPANYID= Danny, Tjaden, 31
+                                       251: "magneto_slope_x"}  # found in:COMPANYID= Danny, Tjaden, 31
 
 COLUMN_NAMES_BORE = ["depth_top",  # 1
                      "depth_bottom",  # 2
@@ -134,12 +114,16 @@ class ParseGEF:
         self.x = utils.parse_xid_as_float(header_s)
         self.y = utils.parse_yid_as_float(header_s)
         self.file_date = utils.parse_file_date(header_s)
+        self.test_id = utils.parse_test_id(header_s)
 
         self.type = utils.parse_gef_type(string)
         if self.type == "cpt":
             parsed = ParseCPT(header_s, data_s, self.zid)
         elif self.type == "bore":
             parsed = ParseBORE(header_s, data_s)
+        elif self.type == "borehole-report":
+            raise ValueError("Selected gef file is a GEF-BOREHOLE-Report. Can only parse "
+                             "GEF-CPT-Report and GEF-BORE-Report. Check the PROCEDURECODE.")
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
@@ -148,78 +132,94 @@ class ParseGEF:
         self.df = self.df.dropna().reset_index(drop=True)
 
     def plot(self, classification=None, water_level_NAP=None, water_level_wrt_depth=None, min_thickness=None, p_a=0.1,
-             new=True, show=False, figsize=(8, 16), df_group=None, do_grouping=False, grid_step_x=None, dpi=100):
+             new=True, show=False, figsize=(11, 8), df_group=None, do_grouping=False, grid_step_x=None, dpi=100,
+             colors=None, z_NAP=False):
         """
+        Plot cpt and return matplotlib figure.
 
-        :param classification: (str) specify this to classify the cpt, possible choice : "robertson", "been_jeffrey"
+        :param classification: (str) Specify this to classify the cpt, possible choice : "robertson", "been_jefferies".
         :param water_level_NAP: (float)
         :param water_level_wrt_depth: (float)
-        :param min_thickness: (float) minimum accepted thickness for grouping
-        :param p_a: (float) Atmospheric pressure at ground level in MPA.
-        :param new: (bool) Old or New implementation of Robertson.
+        :param min_thickness: (float) Minimum accepted thickness for grouping.
+        :param p_a: (float) Atmospheric pressure at ground level in MPa.
+        :param new: (bool) Old(1990) or New(2016) implementation of Robertson.
         :param show: (bool) Set to True to show the plot.
         :param figsize: (tpl) Figure size (x, y).
-        :param df_group: (DataFrame) specify your own DataFrame if you don't agree with the automatic one.
-        :param do_grouping: (bool) Do the grouping
+        :param df_group: (DataFrame) Specify your own DataFrame if you don't agree with the automatic one.
+        :param do_grouping: (bool) Plot the grouping if True.
         :param grid_step_x: (int) Grid step of x-axes qc.
-        :param dpi: (int) matplotlib dpi settings
-        :return:
+        :param dpi: (int) Matplotlib dpi settings.
+        :param colors: (dict) Dictionary with soil type and related color, use this to plot your own classification.
+        :param z_NAP: (bool) True to plot the z-axis with respect to NAP. Default: False.
+        :return: matplotlib Figure.
         """
         if self.type == "cpt":
             if classification is None:
                 df = self.df
             else:
-                df = self.classify_soil(classification, water_level_NAP, water_level_wrt_depth, p_a=p_a, new=new)
+                df = self.classify(classification=classification, water_level_NAP=water_level_NAP,
+                                   water_level_wrt_depth=water_level_wrt_depth, p_a=p_a, new=new)
+
                 if df_group is None and do_grouping is True:
-                    df_group = self.group_classification(min_thickness, classification, water_level_NAP, new, p_a)
-            return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x)
+                    df_group = self.classify(classification=classification, water_level_NAP=water_level_NAP,
+                                             water_level_wrt_depth=water_level_wrt_depth, p_a=p_a, new=new,
+                                             do_grouping=True, min_thickness=min_thickness)
+
+            return plot.plot_cpt(df, df_group, classification, show=show, figsize=figsize, grid_step_x=grid_step_x,
+                                 colors=colors, dpi=dpi, z_NAP=z_NAP)
 
         elif self.type == "bore":
-            return plot.plot_bore(self.df, figsize=figsize, show=show)
+            return plot.plot_bore(self.df, figsize=figsize, show=show, dpi=dpi)
+
         else:
             raise ValueError("The selected gef file is not a cpt nor a borehole. "
                              "Check the REPORTCODE or the PROCEDURECODE.")
 
-    def classify_robertson(self, water_level_NAP=None, water_level_wrt_depth=None, new=True, p_a=0.1):
+    def classify(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True,
+                 do_grouping=False, min_thickness=None):
         """
-        :param water_level_NAP: (flt) Water level w.r.t. NAP.
-        :param water_level_wrt_depth: (flt) Water level w.r.t. to depth. For example, -1 is one meter below level.
-        :param new: (bool): Old or New implementation of Robertson.  TODO year?
-        :param p_a: (flt) Atmospheric pressure at ground level in MPA.
-        :return: (DataFrame) containing classification and IC values
+        Classify function, classify gef files and return a dataframe with the classified gef.
+
+        :param classification: (str) Specify the classification, possible choice : "robertson", "been_jefferies".
+        :param water_level_NAP:(float)
+        :param water_level_wrt_depth: (float)
+        :param p_a: (float) Atmospheric pressure at ground level in MPa.
+        :param new: (bool) Old(1990) or New(2016) implementation of Robertson.
+        :param do_grouping: (bool) Do grouping if True.
+        :param min_thickness: (float) Minimum accepted thickness for layers.
+        :return: (DataFrame) DataFrame with classification.
         """
-        if water_level_NAP:
-            return robertson.classify(self.df, dict(water_level=water_level_NAP, zid=self.zid), new=new,
-                                      area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                      pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
-        return robertson.classify(self.df, None, water_level_wrt_depth, new,
-                                  area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                  pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
-
-    def classify_been_jeffrey(self, water_level_and_zid_NAP=None, water_level_wrt_depth=None):
-        return been_jeffrey.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                     water_level_wrt_depth=water_level_wrt_depth,
-                                     area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                                     pre_excavated_depth=self.pre_excavated_depth)
-
-    def classify_soil(self, classification, water_level_NAP=None, water_level_wrt_depth=None, p_a=0.1, new=True):
         water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
+
+        if water_level_NAP is None and water_level_wrt_depth is None:
+            water_level_wrt_depth = -1
+            logging.warn(f'You did not input the water level, a default value of -1 m respect to the ground is used.'
+                         f' Change it using the kwagr water_level_NAP or water_level_wrt_depth.')
+        if min_thickness is None:
+            min_thickness = 0.2
+            logging.warn(f'You did not input the accepted minimum thickness, a default value of 0.2 m is used.'
+                         f' Change it using th kwarg min_thickness')
+
         if classification == 'robertson':
-            return self.classify_robertson(water_level_NAP=water_level_NAP,
-                                           water_level_wrt_depth=water_level_wrt_depth, new=new, p_a=p_a)
-        elif classification == 'been_jeffrey':
-            return self.classify_been_jeffrey(water_level_and_zid_NAP=water_level_and_zid_NAP,
-                                              water_level_wrt_depth=water_level_wrt_depth)
+            df = robertson.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                    water_level_wrt_depth=water_level_wrt_depth, new=new,
+                                    area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                    pre_excavated_depth=self.pre_excavated_depth, p_a=p_a)
+            if do_grouping:
+                return GroupClassification(df, min_thickness).df_group
+            return df
+
+        elif classification == 'been_jefferies':
+            df = been_jefferies.classify(self.df, water_level_and_zid_NAP=water_level_and_zid_NAP,
+                                         water_level_wrt_depth=water_level_wrt_depth,
+                                         area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
+                                         pre_excavated_depth=self.pre_excavated_depth)
+            if do_grouping:
+                return GroupClassification(df, min_thickness).df_group
+            return df
         else:
             return logging.error(f'Could not find {classification}. Check the spelling or classification not defined '
                                  f'in the library')
-
-    def group_classification(self, min_thickness, classification, water_level_NAP=None,
-                             water_level_wrt_depth=None, new=True, p_a=0.1):
-        df = self.classify_soil(classification, water_level_NAP=water_level_NAP,
-                                water_level_wrt_depth=water_level_wrt_depth,
-                                new=new, p_a=p_a)
-        return GroupClassification(df, min_thickness).df_group
 
     def __str__(self):
         return self.df.__str__()
@@ -279,7 +279,7 @@ class ParseCPT:
                    .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
                    .pipe(self.correct_depth_with_inclination)
                    .pipe(lambda df: df.assign(depth=np.abs(df['depth'].values)))
-                   .pipe(self.calculate_elevation_respect_to_nap, zid)
+                   .pipe(self.calculate_elevation_with_respect_to_nap, zid)
                    .pipe(self.replace_column_void, self.column_void)
                    .pipe(self.calculate_friction_number)
                    )
@@ -292,41 +292,36 @@ class ParseCPT:
 
     @staticmethod
     def calculate_friction_number(df):
-        if 'friction_number' in df.columns:
-            return df.assign(Fr=df['friction_number'])
-        elif 'fs' in df.columns and 'qc' in df.columns:
-            return df.assign(Fr=(df['fs'] / df['qc'] * 100))
-        else:
-            return df
+        if 'fs' in df.columns and 'qc' in df.columns:
+            df = df.assign(friction_number=(df['fs'].values / df['qc'].values * 100))
+        if 'friction_number' not in df.columns:
+            df = df.assign(friction_number=(np.zeros(df.shape[0])))
+        return df
 
     @staticmethod
-    def calculate_elevation_respect_to_nap(df, zid):
+    def calculate_elevation_with_respect_to_nap(df, zid):
         if zid is not None:
-            depth_lst = np.array(df['depth'].tolist())
-            lst_zid = np.array([zid] * len(df['depth']))
-            return df.assign(elevation_with_respect_to_NAP=(lst_zid - depth_lst))
+            df = df.assign(elevation_with_respect_to_NAP=np.subtract(zid, df['depth'].values))
         return df
 
     @staticmethod
     def correct_depth_with_inclination(df):
         if 'corrected_depth' in df.columns:
-            return df.assign(depth=df['corrected_depth'])
+            return df.rename(columns={"corrected_depth": "depth"})
         if 'inclination' in df.columns:
             diff_t_depth = np.diff(df['penetration_length'].values) * np.cos(np.radians(df['inclination'].values[:-1]))
             # corrected depth
             return df.assign(depth=np.concatenate([np.array([df['penetration_length'].iloc[0]]),
                                                    np.cumsum(diff_t_depth)]))
-        else:
-            return df.assign(depth=df['penetration_length'])
+        return df.assign(depth=df['penetration_length'])
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
         if pre_excavated_depth is not None and \
                 np.any(np.isclose(df['penetration_length'].values - pre_excavated_depth, 0)):
             mask = df['penetration_length'] == pre_excavated_depth
-            mask2 = df[mask].reset_index(drop=False)
-            i = mask2['index'][0]
-            return df[i:].reset_index(drop=True)
+            start_idx = df[mask].reset_index(drop=False)['index'][0]
+            return df[start_idx:].reset_index(drop=True)
         return df
 
     @staticmethod
@@ -341,8 +336,7 @@ class ParseCPT:
                     columns_info.append(column_info)
         new_data = data_s.replace('!', '')
         separator = utils.find_separator(header_s)
-        df = pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
-        return df
+        return pd.read_csv(io.StringIO(new_data), sep=separator, names=columns_info, index_col=False, engine='python')
 
 
 class ParseBORE:
@@ -356,6 +350,7 @@ class ParseBORE:
         self.type = 'bore'
         self.project_id = utils.parse_project_type(header_s, 'bore')
 
+        # This is usually not correct for the boringen
         columns_number = utils.parse_columns_number(header_s)
         column_separator = utils.parse_column_separator(header_s)
         record_separator = utils.parse_record_separator(header_s)
@@ -368,14 +363,13 @@ class ParseBORE:
                    .pipe(self.parse_add_info_as_string, data_rows_soil)
                    ).join(self.data_soil_quantified(data_rows_soil))[
             ['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
-             'Loam', 'Peat', 'Silt']
+             'Loam', 'Peat', 'Silt', 'remarks']
         ]
-
-        self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'SI']
+        self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'SI', 'Remarks']
 
     @staticmethod
     def parse_add_info_as_string(df, data_rows_soil):
-        return df.assign(additional_info=[''.join(map(utils.parse_add_info, row[1:-1])) for row in data_rows_soil])
+        return df.assign(remarks=[utils.parse_add_info(''.join(row[1::])) for row in data_rows_soil])
 
     @staticmethod
     def extract_soil_info(data_s_rows, columns_number, column_separator):

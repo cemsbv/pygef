@@ -3,55 +3,7 @@ from pygef import geo
 import pygef.utils as utils
 
 
-def type_index_to_gamma(ic):
-    gamma = None
-    if ic > 3.22:
-        gamma = 11
-    elif 2.76 < ic <= 3.22:
-        gamma = 16
-    elif 2.40 < ic <= 2.76:
-        gamma = 18
-    elif 1.80 < ic <= 2.40:
-        gamma = 18
-    elif 1.25 < ic <= 1.80:
-        gamma = 18
-    elif ic <= 1.25:
-        gamma = 18
-    return gamma
-
-
-def type_index_to_gamma_sat(ic):
-    gamma_sat = None
-    if ic > 3.22:
-        gamma_sat = 11
-    elif 2.76 < ic <= 3.22:
-        gamma_sat = 16
-    elif 2.40 < ic <= 2.76:
-        gamma_sat = 18
-    elif 1.80 < ic <= 2.40:
-        gamma_sat = 19
-    elif 1.25 < ic <= 1.80:
-        gamma_sat = 20
-    elif ic <= 1.25:
-        gamma_sat = 20
-    return gamma_sat
-
-
-def type_index_to_soil_type(ic):
-    soil_type = None
-    if ic > 3.22:
-        soil_type = 'Peat'
-    elif 2.76 < ic <= 3.22:
-        soil_type = 'Clays'
-    elif 2.40 < ic <= 2.76:
-        soil_type = 'Clayey silt to silty clay'
-    elif 1.80 < ic <= 2.40:
-        soil_type = 'Silty sand to sandy silt'
-    elif 1.25 < ic <= 1.80:
-        soil_type = 'Sands: clean sand to silty'
-    elif ic <= 1.25:
-        soil_type = 'Gravelly sands'
-    return soil_type
+# TODO: at test coverage to travis.yaml Nice to have. :)
 
 
 def excess_pore_pressure_ratio(df):
@@ -139,7 +91,7 @@ def type_index(df):
 
 def iterate_been_jeffrey(original_df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
     """
-    Iteration function for Been&Jefferies classifier.
+    Iteration function for Been & Jefferies classifier.
 
     :param original_df: (DataFrame)
     :param water_level: (int) Water level with respect to ground level.
@@ -170,6 +122,15 @@ def iterate_been_jeffrey(original_df, water_level, area_quotient_cone_tip=None, 
 
 
 def been_jeffrey(df, water_level, area_quotient_cone_tip=None, pre_excavated_depth=None):
+    """
+    Implementation of Been & Jefferies.
+
+    :param df: (DataFrame)
+    :param water_level: (float)
+    :param area_quotient_cone_tip: (float)
+    :param pre_excavated_depth: (float)
+    :return: (DataFrame)
+    """
     df = (df
           .pipe(geo.delta_depth, pre_excavated_depth)
           .pipe(geo.soil_pressure)

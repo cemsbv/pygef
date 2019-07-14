@@ -157,23 +157,23 @@ class GefTest(unittest.TestCase):
     def test_parse_add_info(self):
         s = "'SCH1'"
         v = utils.parse_add_info(s)
-        self.assertEqual(v, "spoor schelpmateriaal <1%|")
+        self.assertEqual(v, "1) spoor schelpmateriaal <1% ")
 
         s = "'DO TOL RO'"
         v = utils.parse_add_info(s)
-        self.assertEqual(v, "dark olive-red|")
+        self.assertEqual(v, "1) dark olive-red ")
 
         s = "'BIO'"
         v = utils.parse_add_info(s)
-        self.assertEqual(v, "bioturbatie|")
+        self.assertEqual(v, "1) bioturbatie ")
 
         s = "'KEL DR'"
         v = utils.parse_add_info(s)
-        self.assertEqual(v, "keileem|Formatie van Drente|")
+        self.assertEqual(v, "1) keileem Formatie van Drente ")
 
     def test_parse_add_info_as_string(self):
-        df = pd.DataFrame({'additional_info': ['spoor schelpmateriaal <1%|', 'dark olive-red|',
-                                               'keileem|Formatie van Drente|']})
+        df = pd.DataFrame({'remarks': ['1) spoor schelpmateriaal <1% ', '1) dark olive-red ',
+                                               '1) keileem Formatie van Drente ']})
         data_s = [["'Kz'", "'SCH1'", "''"], ["'Kz1'", "'DO TOL RO'", "''"], ["'Kz2'", "'KEL DR'", "''"]]
 
         df_parsed = ParseBORE.parse_add_info_as_string(pd.DataFrame({}), data_s)
@@ -208,7 +208,7 @@ class GefTest(unittest.TestCase):
     def test_calculate_elevation_respect_to_NAP(self):
         df1 = pd.DataFrame({'depth': [0, 1, 2, 3, 4]})
         zid = -3
-        df_calculated = ParseCPT.calculate_elevation_respect_to_nap(df1, zid)
+        df_calculated = ParseCPT.calculate_elevation_with_respect_to_nap(df1, zid)
         df = pd.DataFrame({'depth': [0, 1, 2, 3, 4], 'elevation_with_respect_to_NAP': [-3, -4, -5, -6, -7]})
         assert_frame_equal(df_calculated, df)
 
@@ -227,8 +227,8 @@ class GefTest(unittest.TestCase):
         df2 = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'corrected_depth':
             [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
         df_calculated = ParseCPT.correct_depth_with_inclination(df2)
-        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8], 'corrected_depth': [0, 0.10, 0.25, 0.40, 0.60],
-                           'inclination': [45, 45, 45, 45, 45], 'depth': [0, 0.10, 0.25, 0.40, 0.60]})
+        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8],
+                           'depth': [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
         assert_frame_equal(df_calculated, df)
 
     def test_pre_excavated_depth(self):
@@ -248,7 +248,7 @@ class GefTest(unittest.TestCase):
     def test_calculate_friction_number(self):
         df1 = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08]})
         df_calculated = ParseCPT.calculate_friction_number(df1)
-        df = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08], 'Fr': [0., 10., 10., 10., 10.]})
+        df = pd.DataFrame({'qc': [0.5, 0.5, 0.6, 0.7, 0.8], 'fs': [0, 0.05, 0.06, 0.07, 0.08], 'friction_number': [0., 10., 10., 10., 10.]})
         assert_frame_equal(df_calculated, df)
 
     def test_parse_cpt(self):
@@ -284,7 +284,7 @@ class GefTest(unittest.TestCase):
                            "fs": [4.6500e-002, 4.2750e-002, 3.9000e-002],
                            "depth": [1.0200e+000, 1.0400e+000, 1.0600e+000],
                            'elevation_with_respect_to_NAP': [0.28, 0.26, 0.24],
-                           'Fr': [6.54929577, 5.85616438, 5.65217391]} )
+                           'friction_number': [6.54929577, 5.85616438, 5.65217391]} )
         assert_frame_equal(df_calculated, df)
 
     def test_parse_bore(self):
@@ -336,6 +336,9 @@ class GefTest(unittest.TestCase):
                            'L': [0, 0, 0],
                            'P': [0.10, 0.00, 0.95],
                            'SI': [0, 0, 0],
+                           'Remarks': ["1) gray-yellow 2) ZMFO 3) kalkrijk ",
+                                       "1) ON 2) ZMGO 3) weinig fijn grind (1-25%) 4) kalkarm ",
+                                       "1) brown-black 2) ZMO 3) kalkloos "]
                            }, dtype=float)
         assert_frame_equal(df_calculated, df)
 
@@ -351,7 +354,7 @@ class GefTest(unittest.TestCase):
                            'delta_depth': [0, 0.5, 0.5]})
         v = geo.soil_pressure(df1)
         df = pd.DataFrame({'gamma': [0, 0.5, 1],
-                            'delta_depth': [0, 0.5, 0.5],
+                           'delta_depth': [0, 0.5, 0.5],
                            'soil_pressure': [0.0, 0.25, 0.75]})
         assert_frame_equal(v, df)
 
@@ -360,7 +363,7 @@ class GefTest(unittest.TestCase):
         df1 = pd.DataFrame({'depth': [0, 0.5, 1]})
         v = geo.water_pressure(df1, water_level)
         df = pd.DataFrame({'depth': [0, 0.5, 1],
-                            'water_pressure': [0.0, 0.0, 4.905]})
+                           'water_pressure': [0.0, 0.0, 4.905]})
         assert_frame_equal(v, df)
 
     def test_effective_soil_pressure(self):
@@ -444,7 +447,9 @@ class GefTest(unittest.TestCase):
                            'zf': [2, 5, 6],
                            'thickness': [2., 3., 1.],
                            'z_centr': [1., 3.5, 5.5],
-                           'zf_NAP': [0, -3, -4]
+                           'z_in_NAP': [2., 0., -3.],
+                           'zf_NAP': [0, -3, -4],
+                           'z_centr_NAP': [1., -1.5, -3.5]
                            })
         assert_frame_equal(v, df)
 
@@ -599,22 +604,22 @@ class BoreTest(unittest.TestCase):
 class PlotTest(unittest.TestCase):
 
     def test_plot_cpt(self):
-        gef = ParseGEF('./files/example.gef')
+        gef = ParseGEF('./pygef/files/example.gef')
         gef.plot(show=False)
 
     def test_plot_bore(self):
-        gef = ParseGEF('./files/example_bore.gef')
+        gef = ParseGEF('./pygef/files/example_bore.gef')
         gef.plot(show=False, figsize=(4, 12))
 
     def test_plot_classification(self):
-        gef = ParseGEF('./files/example.gef')
+        gef = ParseGEF('./pygef/files/example.gef')
         gef.plot(show=False, classification='robertson', water_level_wrt_depth=-1)
 
 
 class TestRobertson(unittest.TestCase):
 
     def setUp(self):
-        self.gef = ParseGEF('./files/example.gef')
+        self.gef = ParseGEF('./pygef/files/example.gef')
 
     def test_nan_dropped(self):
         self.assertAlmostEqual(self.gef.df['qc'].iloc[0], 16.72)
@@ -623,7 +628,5 @@ class TestRobertson(unittest.TestCase):
         """
         depth starts at 6 meters, So -7 should lead to water pressure of 0
         """
-        df = self.gef.classify_robertson(None, water_level_wrt_depth=-7)
+        df = self.gef.classify('robertson', water_level_NAP=None, water_level_wrt_depth=-7)
         self.assertEqual(df['water_pressure'][0], 0)
-
-
