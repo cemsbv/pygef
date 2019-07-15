@@ -93,7 +93,7 @@ def plot_cpt(
             ax.set_yticklabels(empty_string_labels)
             plt.xlim([0, min(15, df[c].max() + 1)])
         plt.xlim(0, df[c].max() * 1.05)
-        fig_i.set_xlabel(f'{c} {unit}')
+        fig_i.set_xlabel(f"{c} {unit}")
 
         plt.grid()
 

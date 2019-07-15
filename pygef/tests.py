@@ -183,9 +183,20 @@ class GefTest(unittest.TestCase):
         self.assertEqual(v, "1) keileem Formatie van Drente ")
 
     def test_parse_add_info_as_string(self):
-        df = pd.DataFrame({'remarks': ['1) spoor schelpmateriaal <1% ', '1) dark olive-red ',
-                                               '1) keileem Formatie van Drente ']})
-        data_s = [["'Kz'", "'SCH1'", "''"], ["'Kz1'", "'DO TOL RO'", "''"], ["'Kz2'", "'KEL DR'", "''"]]
+        df = pd.DataFrame(
+            {
+                "remarks": [
+                    "1) spoor schelpmateriaal <1% ",
+                    "1) dark olive-red ",
+                    "1) keileem Formatie van Drente ",
+                ]
+            }
+        )
+        data_s = [
+            ["'Kz'", "'SCH1'", "''"],
+            ["'Kz1'", "'DO TOL RO'", "''"],
+            ["'Kz2'", "'KEL DR'", "''"],
+        ]
 
         df_parsed = ParseBORE.parse_add_info_as_string(pd.DataFrame({}), data_s)
         assert_frame_equal(df_parsed, df)
@@ -271,8 +282,13 @@ class GefTest(unittest.TestCase):
             }
         )
         df_calculated = ParseCPT.correct_depth_with_inclination(df2)
-        df = pd.DataFrame({'penetration_length': [0, 0.2, 0.4, 0.6, 0.8],
-                           'depth': [0, 0.10, 0.25, 0.40, 0.60], 'inclination': [45, 45, 45, 45, 45]})
+        df = pd.DataFrame(
+            {
+                "penetration_length": [0, 0.2, 0.4, 0.6, 0.8],
+                "depth": [0, 0.10, 0.25, 0.40, 0.60],
+                "inclination": [45, 45, 45, 45, 45],
+            }
+        )
         assert_frame_equal(df_calculated, df)
 
     def test_pre_excavated_depth(self):
@@ -396,19 +412,25 @@ class GefTest(unittest.TestCase):
                                  """
         )
         df_calculated = cpt.df
-        df = pd.DataFrame({"depth_top": [0.0, 1.2, 3.1],
-                           "depth_bottom": [1.2, 3.1, 5.0],
-                           "soil_code": ["Zgh2", "Zg", "Vz"],
-                           "G": [0.05, 0.05, 0.00],
-                           'S': [0.85, 0.95, 0.05],
-                           'C': [0, 0, 0],
-                           'L': [0, 0, 0],
-                           'P': [0.10, 0.00, 0.95],
-                           'SI': [0, 0, 0],
-                           'Remarks': ["1) gray-yellow 2) ZMFO 3) kalkrijk ",
-                                       "1) ON 2) ZMGO 3) weinig fijn grind (1-25%) 4) kalkarm ",
-                                       "1) brown-black 2) ZMO 3) kalkloos "]
-                           }, dtype=float)
+        df = pd.DataFrame(
+            {
+                "depth_top": [0.0, 1.2, 3.1],
+                "depth_bottom": [1.2, 3.1, 5.0],
+                "soil_code": ["Zgh2", "Zg", "Vz"],
+                "G": [0.05, 0.05, 0.00],
+                "S": [0.85, 0.95, 0.05],
+                "C": [0, 0, 0],
+                "L": [0, 0, 0],
+                "P": [0.10, 0.00, 0.95],
+                "SI": [0, 0, 0],
+                "Remarks": [
+                    "1) gray-yellow 2) ZMFO 3) kalkrijk ",
+                    "1) ON 2) ZMGO 3) weinig fijn grind (1-25%) 4) kalkarm ",
+                    "1) brown-black 2) ZMO 3) kalkloos ",
+                ],
+            },
+            dtype=float,
+        )
         assert_frame_equal(df_calculated, df)
 
     def test_delta_depth(self):
@@ -761,5 +783,7 @@ class TestRobertson(unittest.TestCase):
         """
         depth starts at 6 meters, So -7 should lead to water pressure of 0
         """
-        df = self.gef.classify('robertson', water_level_NAP=None, water_level_wrt_depth=-7)
-        self.assertEqual(df['water_pressure'][0], 0)
+        df = self.gef.classify(
+            "robertson", water_level_NAP=None, water_level_wrt_depth=-7
+        )
+        self.assertEqual(df["water_pressure"][0], 0)

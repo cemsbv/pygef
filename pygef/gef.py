@@ -130,8 +130,10 @@ class ParseGEF:
         elif self.type == "bore":
             parsed = ParseBORE(header_s, data_s)
         elif self.type == "borehole-report":
-            raise ValueError("Selected gef file is a GEF-BOREHOLE-Report. Can only parse "
-                             "GEF-CPT-Report and GEF-BORE-Report. Check the PROCEDURECODE.")
+            raise ValueError(
+                "Selected gef file is a GEF-BOREHOLE-Report. Can only parse "
+                "GEF-CPT-Report and GEF-BORE-Report. Check the PROCEDURECODE."
+            )
         else:
             raise ValueError(
                 "The selected gef file is not a cpt nor a borehole. "
@@ -427,10 +429,12 @@ class ParseCPT:
 
     @staticmethod
     def correct_depth_with_inclination(df):
-        if 'corrected_depth' in df.columns:
+        if "corrected_depth" in df.columns:
             return df.rename(columns={"corrected_depth": "depth"})
-        if 'inclination' in df.columns:
-            diff_t_depth = np.diff(df['penetration_length'].values) * np.cos(np.radians(df['inclination'].values[:-1]))
+        if "inclination" in df.columns:
+            diff_t_depth = np.diff(df["penetration_length"].values) * np.cos(
+                np.radians(df["inclination"].values[:-1])
+            )
             # corrected depth
             return df.assign(
                 depth=np.concatenate(
@@ -490,21 +494,49 @@ class ParseBORE:
         column_separator = utils.parse_column_separator(header_s)
         record_separator = utils.parse_record_separator(header_s)
         data_s_rows = data_s.split(record_separator)
-        data_rows_soil = self.extract_soil_info(data_s_rows, columns_number, column_separator)
+        data_rows_soil = self.extract_soil_info(
+            data_s_rows, columns_number, column_separator
+        )
 
-        self.df = (self.parse_data_column_info(header_s, data_s, column_separator, columns_number)
-                   .pipe(self.parse_data_soil_code, data_rows_soil)
-                   .pipe(self.parse_data_soil_type, data_rows_soil)
-                   .pipe(self.parse_add_info_as_string, data_rows_soil)
-                   ).join(self.data_soil_quantified(data_rows_soil))[
-            ['depth_top', 'depth_bottom', 'Soil_code', 'Gravel', 'Sand', 'Clay',
-             'Loam', 'Peat', 'Silt', 'remarks']
+        self.df = (
+            self.parse_data_column_info(
+                header_s, data_s, column_separator, columns_number
+            )
+            .pipe(self.parse_data_soil_code, data_rows_soil)
+            .pipe(self.parse_data_soil_type, data_rows_soil)
+            .pipe(self.parse_add_info_as_string, data_rows_soil)
+        ).join(self.data_soil_quantified(data_rows_soil))[
+            [
+                "depth_top",
+                "depth_bottom",
+                "Soil_code",
+                "Gravel",
+                "Sand",
+                "Clay",
+                "Loam",
+                "Peat",
+                "Silt",
+                "remarks",
+            ]
         ]
-        self.df.columns = ['depth_top', 'depth_bottom', 'soil_code', 'G', 'S', 'C', 'L', 'P', 'SI', 'Remarks']
+        self.df.columns = [
+            "depth_top",
+            "depth_bottom",
+            "soil_code",
+            "G",
+            "S",
+            "C",
+            "L",
+            "P",
+            "SI",
+            "Remarks",
+        ]
 
     @staticmethod
     def parse_add_info_as_string(df, data_rows_soil):
-        return df.assign(remarks=[utils.parse_add_info(''.join(row[1::])) for row in data_rows_soil])
+        return df.assign(
+            remarks=[utils.parse_add_info("".join(row[1::])) for row in data_rows_soil]
+        )
 
     @staticmethod
     def extract_soil_info(data_s_rows, columns_number, column_separator):
