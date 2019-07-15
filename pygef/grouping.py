@@ -5,13 +5,13 @@ class GroupClassification:
     def __init__(self, df, min_thickness):
         # TODO: docstring
         df_group = df.copy()
-        self.zid = df_group['elevation_with_respect_to_NAP'].iloc[0]
-        df_group = df_group.loc[:, ['depth', 'soil_type']]
-        self.df_group = (df_group
-                         .pipe(self.group_equal_layers, 'soil_type', 'depth')
-                         .pipe(group_significant_layers, min_thickness)
-                         .pipe(self.group_equal_layers, 'layer', 'zf')
-                         )
+        self.zid = df_group["elevation_with_respect_to_NAP"].iloc[0]
+        df_group = df_group.loc[:, ["depth", "soil_type"]]
+        self.df_group = (
+            df_group.pipe(self.group_equal_layers, "soil_type", "depth")
+            .pipe(group_significant_layers, min_thickness)
+            .pipe(self.group_equal_layers, "layer", "zf")
+        )
 
     def group_equal_layers(self, df_group, column1, column2):
         """
@@ -24,21 +24,26 @@ class GroupClassification:
         :param column2: Depth or zf (final z).
         :return: Grouped dataframe.
         """
-        df_group = (df_group.groupby((df_group[column1] != df_group[column1].shift())
-                                     .cumsum())
-                    .max()
-                    .reset_index(drop=True))
+        df_group = (
+            df_group.groupby((df_group[column1] != df_group[column1].shift()).cumsum())
+            .max()
+            .reset_index(drop=True)
+        )
 
-        df_group = pd.DataFrame({'layer': df_group[column1],
-                                 'z_in': df_group[column2].shift().fillna(0),
-                                 'zf': df_group[column2]})
-        return (df_group
-                .pipe(calculate_thickness)
-                .pipe(calculate_z_centr)
-                .pipe(calculate_z_in_NAP, self.zid)
-                .pipe(calculate_zf_NAP, self.zid)
-                .pipe(calculate_z_centr_NAP, self.zid)
-                )
+        df_group = pd.DataFrame(
+            {
+                "layer": df_group[column1],
+                "z_in": df_group[column2].shift().fillna(0),
+                "zf": df_group[column2],
+            }
+        )
+        return (
+            df_group.pipe(calculate_thickness)
+            .pipe(calculate_z_centr)
+            .pipe(calculate_z_in_NAP, self.zid)
+            .pipe(calculate_zf_NAP, self.zid)
+            .pipe(calculate_z_centr_NAP, self.zid)
+        )
 
 
 def group_significant_layers(df_group, min_thickness):
@@ -49,17 +54,19 @@ def group_significant_layers(df_group, min_thickness):
     :param min_thickness: Minimum thickness.
     :return: DataFrame without the dropped layers.
     """
-    df_group = df_group.loc[:, ['zf', 'layer', 'thickness']]
-    depth = df_group['zf'].iloc[-1]
+    df_group = df_group.loc[:, ["zf", "layer", "thickness"]]
+    depth = df_group["zf"].iloc[-1]
     indexes = df_group[df_group.thickness < min_thickness].index.values.tolist()
     df_group = df_group.drop(indexes).reset_index(drop=True)
-    df_group = pd.DataFrame({'layer': df_group.layer,
-                             'z_in': df_group.zf.shift().fillna(0),
-                             'zf': df_group.zf})
-    df_group['zf'].iloc[-1] = depth
-    return (df_group
-            .pipe(calculate_thickness)
-            .pipe(calculate_z_centr))
+    df_group = pd.DataFrame(
+        {
+            "layer": df_group.layer,
+            "z_in": df_group.zf.shift().fillna(0),
+            "zf": df_group.zf,
+        }
+    )
+    df_group["zf"].iloc[-1] = depth
+    return df_group.pipe(calculate_thickness).pipe(calculate_z_centr)
 
 
 def calculate_thickness(df):
@@ -69,7 +76,7 @@ def calculate_thickness(df):
     :param df: Original DataFrame.
     :return: Dataframe with thickness column.
     """
-    return df.assign(thickness=(df['zf'] - df['z_in']))
+    return df.assign(thickness=(df["zf"] - df["z_in"]))
 
 
 def calculate_z_centr(df):
@@ -79,7 +86,7 @@ def calculate_z_centr(df):
     :param df: Original DataFrame.
     :return: Dataframe with the z_centr column.
     """
-    return df.assign(z_centr=(df['zf'] + df['z_in']) / 2)
+    return df.assign(z_centr=(df["zf"] + df["z_in"]) / 2)
 
 
 def calculate_zf_NAP(df, z_id):
@@ -90,7 +97,7 @@ def calculate_zf_NAP(df, z_id):
     :param z_id: (float) Elevation with respect to the NAP of my field.
     :return: DataFrame with zf_NAP column.
     """
-    return df.assign(zf_NAP=(z_id - df['zf']))
+    return df.assign(zf_NAP=(z_id - df["zf"]))
 
 
 def calculate_z_in_NAP(df, z_id):
@@ -101,7 +108,7 @@ def calculate_z_in_NAP(df, z_id):
     :param z_id: Elevation with respect to the NAP of my field.
     :return:  DataFrame with z_in_NAP column.
     """
-    return df.assign(z_in_NAP=(z_id - df['z_in']))
+    return df.assign(z_in_NAP=(z_id - df["z_in"]))
 
 
 def calculate_z_centr_NAP(df, z_id):
@@ -111,4 +118,4 @@ def calculate_z_centr_NAP(df, z_id):
     :param z_id: Elevation with respect to the NAP of my field.
     :return:  DataFrame with z_centr_NAP column.
     """
-    return df.assign(z_centr_NAP=(z_id - df['z_centr']))
+    return df.assign(z_centr_NAP=(z_id - df["z_centr"]))
