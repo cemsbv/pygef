@@ -597,6 +597,14 @@ def kpa_to_mpa(df, columns):
     return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
 
 
+def nap_to_depth(zid, nap):
+    return abs(nap - zid)
+
+
+def depth_to_nap(depth, zid):
+    return zid - depth
+
+
 def join_gef(bore, cpt):
     """
     Join a cpt and bore file in one Dataframe based on depth.
