@@ -627,7 +627,7 @@ def kpa_to_mpa(df, columns):
 
 
 def nap_to_depth(zid, nap):
-    return abs(nap - zid)
+    return -(nap - zid)
 
 
 def depth_to_nap(depth, zid):
