@@ -76,15 +76,15 @@ def plot_cpt(
     num_col = num_columns(classification, df_group)
     for c, unit in zip(["qc", "friction_number"], ["[MPa]", "[%]"]):
         n += 1
-        fig_i = fig.add_subplot(1, num_col, n)
+        ax = fig.add_subplot(1, num_col, n)
         if z_NAP:
             plt.plot(df[c], df["elevation_with_respect_to_NAP"], "C0")
             if n == 1:
-                fig_i.set_ylabel("Z NAP [m]")
+                ax.set_ylabel("Z NAP [m]")
         else:
             plt.plot(df[c], df["depth"], "C0")
             if n == 1:
-                fig_i.set_ylabel("Z [m]")
+                ax.set_ylabel("Z [m]")
         if n > 1:
             # keep grid, but no labels
             ax = plt.gca()
@@ -93,13 +93,13 @@ def plot_cpt(
             ax.set_yticklabels(empty_string_labels)
             plt.xlim([0, min(15, df[c].max() + 1)])
         plt.xlim(0, df[c].max() * 1.05)
-        fig_i.set_xlabel(f"{c} {unit}")
+        ax.set_xlabel(f"{c} {unit}")
 
         plt.grid()
 
         # custom x grid
         if grid_step_x is not None:
-            fig_i.set_xticks(np.arange(0, df[c].max() + grid_step_x, grid_step_x))
+            ax.set_xticks(np.arange(0, df[c].max() + grid_step_x, grid_step_x))
         plt.ylim(depth_max, depth_min)
 
     if classification is not None:
