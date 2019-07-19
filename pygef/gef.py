@@ -292,7 +292,14 @@ class ParseGEF:
             )
 
     def __str__(self):
-        return self.df.__str__()
+        return (
+            "test id: {} \n"
+            "type: {} \n"
+            "(x,y): ({:.2f},{:.2f}) \n"
+            "First rows of dataframe: \n {}".format(
+                self.test_id, self.type, self.x, self.y, self.df.head(n=2)
+            )
+        )
 
 
 class ParseCPT:
