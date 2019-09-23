@@ -310,6 +310,7 @@ def create_soil_type(s):
     dict_exceptions = {
         "GM": "layer information missing",
         "NBE": "soil cannot be classified properly",
+        "W": "water",
     }
     soil_name = ""
     try:
@@ -357,6 +358,7 @@ INTENSITY = {"1": 0.05, "2": 0.10, "3": 0.15, "4": 0.20}
 NO_CLASSIFY = {
     "gm": "layer information missing",
     "nbe": "soil cannot be classified properly",
+    "w": "water",
 }
 
 
