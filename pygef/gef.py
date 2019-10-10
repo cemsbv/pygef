@@ -447,7 +447,8 @@ class ParseCPT:
                 depth=np.concatenate(
                     [
                         np.array([df["penetration_length"].iloc[0]]),
-                        np.cumsum(diff_t_depth),
+                        np.array([df["penetration_length"].iloc[0]])
+                        + np.cumsum(diff_t_depth),
                     ]
                 )
             )
