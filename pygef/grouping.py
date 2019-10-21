@@ -2,18 +2,20 @@ import pandas as pd
 
 
 class GroupClassification:
-    def __init__(self, df, min_thickness):
+    def __init__(self, zid, df, min_thickness):
         # TODO: docstring
         df_group = df.copy()
-        self.zid = df_group["elevation_with_respect_to_NAP"].iloc[0]
+        self.zid = zid
+        start_depth = df_group["depth"][0]
         df_group = df_group.loc[:, ["depth", "soil_type"]]
+
         self.df_group = (
-            df_group.pipe(self.group_equal_layers, "soil_type", "depth")
-            .pipe(group_significant_layers, min_thickness)
-            .pipe(self.group_equal_layers, "layer", "zf")
+            df_group.pipe(self.group_equal_layers, "soil_type", "depth", start_depth)
+            .pipe(group_significant_layers, min_thickness, start_depth)
+            .pipe(self.group_equal_layers, "layer", "zf", start_depth)
         )
 
-    def group_equal_layers(self, df_group, column1, column2):
+    def group_equal_layers(self, df_group, column1, column2, start_depth):
         """
         Group equal layers by checking the difference between the original column of soil type and the shifted one and
         storing that in a boolean array, then it does a cumulative sum of the boolean array and it groups the
@@ -22,6 +24,7 @@ class GroupClassification:
         :param df_group: Original DataFrame to group.
         :param column1: Column to group, it can be soil_type or layer.
         :param column2: Depth or zf (final z).
+        :param start_depth: First value of depth.
         :return: Grouped dataframe.
         """
         df_group = (
@@ -33,7 +36,7 @@ class GroupClassification:
         df_group = pd.DataFrame(
             {
                 "layer": df_group[column1],
-                "z_in": df_group[column2].shift().fillna(0),
+                "z_in": df_group[column2].shift().fillna(start_depth),
                 "zf": df_group[column2],
             }
         )
@@ -46,12 +49,13 @@ class GroupClassification:
         )
 
 
-def group_significant_layers(df_group, min_thickness):
+def group_significant_layers(df_group, min_thickness, start_depth):
     """
     Drop the layers with thickness < min_thickness and adjust the limits of the others.
 
     :param df_group: Original DataFrame.
     :param min_thickness: Minimum thickness.
+    :param start_depth: First value of depth.
     :return: DataFrame without the dropped layers.
     """
     df_group = df_group.loc[:, ["zf", "layer", "thickness"]]
@@ -61,7 +65,7 @@ def group_significant_layers(df_group, min_thickness):
     df_group = pd.DataFrame(
         {
             "layer": df_group.layer,
-            "z_in": df_group.zf.shift().fillna(0),
+            "z_in": df_group.zf.shift().fillna(start_depth),
             "zf": df_group.zf,
         }
     )

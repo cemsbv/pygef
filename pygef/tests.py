@@ -563,8 +563,8 @@ class GefTest(unittest.TestCase):
                 "elevation_with_respect_to_NAP": [2, 1, 0, -1, -2, -3, -4],
             }
         )
-        group = GroupClassification(df_group, 0.2)
-        v = group.group_equal_layers(df_group, "soil_type", "depth")
+        group = GroupClassification(2, df_group, 0.2)
+        v = group.group_equal_layers(df_group, "soil_type", "depth", 0)
         df = pd.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
@@ -589,7 +589,7 @@ class GefTest(unittest.TestCase):
             }
         )
 
-        v = grouping.group_significant_layers(df_group, 0.5)
+        v = grouping.group_significant_layers(df_group, 0.5, 0.0)
 
         df = pd.DataFrame(
             {
