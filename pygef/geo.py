@@ -11,10 +11,8 @@ def delta_depth(df, pre_excavated_depth=None):
     :param pre_excavated_depth: (flt)
     :return: (DataFrame) [depth, delta_depth]
     """
-    pre_excavated_depth = 0 if pre_excavated_depth is None else pre_excavated_depth
-
     return df.assign(
-        depth=df["depth"] + pre_excavated_depth,
+        depth=df["depth"],
         delta_depth=np.r_[np.array([df["depth"][0]]), np.diff(df["depth"].values)],
     )
 

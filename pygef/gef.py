@@ -271,7 +271,7 @@ class ParseGEF:
                 p_a=p_a,
             )
             if do_grouping:
-                return GroupClassification(df, min_thickness).df_group
+                return GroupClassification(self.zid, df, min_thickness).df_group
             return df
 
         elif classification == "been_jefferies":
@@ -283,7 +283,7 @@ class ParseGEF:
                 pre_excavated_depth=self.pre_excavated_depth,
             )
             if do_grouping:
-                return GroupClassification(df, min_thickness).df_group
+                return GroupClassification(self.zid, df, min_thickness).df_group
             return df
         else:
             return logging.error(
