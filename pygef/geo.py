@@ -12,7 +12,7 @@ def delta_depth(df, pre_excavated_depth=None):
     :return: (DataFrame) [depth, delta_depth]
     """
     pre_excavated_depth = 0 if pre_excavated_depth is None else pre_excavated_depth
-    if np.isclose(df["depth"][0] - pre_excavated_depth, 0):
+    if df["depth"][0] != 0:
         pre_excavated_depth = 0
     return df.assign(
         depth=df["depth"] + pre_excavated_depth,
