@@ -7,6 +7,8 @@ from pygef import robertson, been_jefferies
 import logging
 from pygef.grouping import GroupClassification
 
+logger = logging.getLogger(__name__)
+
 
 MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {
     1: "penetration_length",
@@ -249,13 +251,13 @@ class ParseGEF:
 
         if water_level_NAP is None and water_level_wrt_depth is None:
             water_level_wrt_depth = -1
-            logging.warn(
+            logger.warn(
                 f"You did not input the water level, a default value of -1 m respect to the ground is used."
                 f" Change it using the kwagr water_level_NAP or water_level_wrt_depth."
             )
         if min_thickness is None:
             min_thickness = 0.2
-            logging.warn(
+            logger.warn(
                 f"You did not input the accepted minimum thickness, a default value of 0.2 m is used."
                 f" Change it using th kwarg min_thickness"
             )
@@ -286,10 +288,8 @@ class ParseGEF:
                 return GroupClassification(self.zid, df, min_thickness).df_group
             return df
         else:
-            # TODO: Logger should be set up properly. And here a ValueException should be raised.
-            return logging.error(
-                f"Could not find {classification}. Check the spelling or classification not defined "
-                f"in the library"
+            raise ValueError(
+                f"Could not find {classification}. Check the spelling or classification not defined in the library"
             )
 
     def __str__(self):

@@ -4,6 +4,9 @@ from datetime import datetime
 import numpy as np
 
 
+logger = logging.getLogger(__name__)
+
+
 def cast_string(f, s):
     """
     Generic function that casts a string.
@@ -174,7 +177,7 @@ def parse_file_date(s):
         try:
             file_date = g.group(1).replace(",", "-").replace(" ", "").replace("\t", "")
         except ValueError as e:
-            logging.warning(f"Could not parse file_date: {e}")
+            logger.warning(f"Could not parse file_date: {e}")
             return None
         try:
             date = datetime.strptime(file_date, "%Y-%m-%d")
