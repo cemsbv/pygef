@@ -286,6 +286,7 @@ class ParseGEF:
                 return GroupClassification(self.zid, df, min_thickness).df_group
             return df
         else:
+            # TODO: Logger should be set up properly. And here a ValueException should be raised.
             return logging.error(
                 f"Could not find {classification}. Check the spelling or classification not defined "
                 f"in the library"
