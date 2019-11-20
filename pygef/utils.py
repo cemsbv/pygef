@@ -84,6 +84,21 @@ def parse_measurement_var_as_float(s, var_number):
     return measurement_var
 
 
+def parse_cpt_class(s):
+    """
+    Function that returns the class of the cpt as an int.
+    The word class or klasse has to be defined in the parsed string.
+
+    :param s: (str) String from which the project type is parsed.
+    :return: Cpt class.
+    """
+    cpt_class = None
+    all_definition = parse_regex_cast(r"#MEASUREMENTTEXT[=\s+]+6[, ](.*)", s, str, 1)
+    if all_definition is not None:
+        cpt_class = parse_regex_cast(r"^.*?(klasse|class).*?(\d{1})", all_definition.lower(), int, 2)
+    return cpt_class
+
+
 def parse_project_type(s, gef_type):
     """
     Function that returns the project type as an int.
