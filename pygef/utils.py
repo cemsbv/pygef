@@ -95,7 +95,9 @@ def parse_cpt_class(s):
     cpt_class = None
     all_definition = parse_regex_cast(r"#MEASUREMENTTEXT[=\s+]+6[, ](.*)", s, str, 1)
     if all_definition is not None:
-        cpt_class = parse_regex_cast(r"^.*?(klasse|class).*?(\d{1})", all_definition.lower(), int, 2)
+        cpt_class = parse_regex_cast(
+            r"^.*?(klasse|class).*?(\d{1})", all_definition.lower(), int, 2
+        )
     return cpt_class
 
 
