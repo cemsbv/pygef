@@ -42,6 +42,23 @@ class GefTest(unittest.TestCase):
         v = utils.parse_measurement_var_as_float(s, 41)
         self.assertAlmostEqual(v, 0)
 
+    def test_parse_cpt_class(self):
+        s = r"#MEASUREMENTTEXT= 6, NEN 5140 / klasse onbekend, sondeernorm en kwaliteitsklasse"
+        v = utils.parse_cpt_class(s)
+        self.assertEqual(v, None)
+
+        s = r"#MEASUREMENTTEXT= 6, NEN-EN-ISO22476-1 / klasse 2 / TE2, gehanteerde norm en klasse en type sondering"
+        v = utils.parse_cpt_class(s)
+        self.assertEqual(v, 2)
+
+        s = r"#MEASUREMENTTEXT= 6, Norm : NEN 5140; Klasse : 2, De norm waaraan deze sondering moet voldoen."
+        v = utils.parse_cpt_class(s)
+        self.assertEqual(v, 2)
+
+        s = r"#MEASUREMENTTEXT= 6, Norm : NEN 5140; class : 2, De norm waaraan deze sondering moet voldoen."
+        v = utils.parse_cpt_class(s)
+        self.assertEqual(v, 2)
+
     def test_file_date(self):
         s = r"#FILEDATE= 2004, 1, 14"
         v = utils.parse_file_date(s)
