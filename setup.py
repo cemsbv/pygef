@@ -1,8 +1,10 @@
 from setuptools import setup
 
+exec(open("pygef/_version.py").read())
+
 setup(
     name="pygef",
-    version="0.3.3",
+    version=__version__,
     author="Ritchie Vink",
     author_email="ritchie46@gmail.com",
     url="https://www.ritchievink.com",
