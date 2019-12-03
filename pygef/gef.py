@@ -315,6 +315,7 @@ class ParseCPT:
 
         self.type = "cpt"
         self.project_id = utils.parse_project_type(header_s, "cpt")
+        self.cpt_class = utils.parse_cpt_class(header_s)
         self.column_void = utils.parse_column_void(header_s)
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(
             header_s, 1
