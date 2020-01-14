@@ -250,7 +250,7 @@ class ParseGEF:
 
         self.type = utils.parse_gef_type(string)
         if self.type == "cpt":
-            parsed = ParseCPT(header_s, data_s, self.zid)
+            parsed = ParseCPT(header_s, data_s, self.zid, self.height_system)
         elif self.type == "bore":
             parsed = ParseBORE(header_s, data_s)
         elif self.type == "borehole-report":
@@ -294,14 +294,16 @@ class ParseGEF:
         Parameters
         ----------
         classification: str, only for cpt type
-            If classification ("robertson", "been_jefferies") is specified a subplot is added with the classification for each cpt row.
+            If classification ("robertson", "been_jefferies") is specified a subplot is added with the classification
+            for each cpt row.
         water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth
             Water level with respect to NAP
         water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
             Water level with respect to the ground_level [0], it should be a negative value.
         min_thickness: float, only for cpt type, optional for the classification [m]
             If specified together with the do_grouping set to True, a group classification is added to the plot.
-            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one > min_thickness.
+            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one >
+            min_thickness.
             In order to not make a big error do not use a value bigger then 0.2 m
         p_a: float, only for cpt type, optional for the classification
             Atmospheric pressure. Default: 0.1 MPa.
@@ -478,7 +480,7 @@ class ParseGEF:
 
 
 class ParseCPT:
-    def __init__(self, header_s, data_s, zid):
+    def __init__(self, header_s, data_s, zid, height_system):
         """
         Parser of the cpt file.
 
@@ -583,7 +585,7 @@ class ParseCPT:
             .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(self.correct_depth_with_inclination)
             .pipe(lambda df: df.assign(depth=np.abs(df["depth"].values)))
-            .pipe(self.calculate_elevation_with_respect_to_nap, zid)
+            .pipe(self.calculate_elevation_with_respect_to_nap, zid, height_system)
             .pipe(self.replace_column_void, self.column_void)
             .pipe(self.calculate_friction_number)
         )
@@ -603,8 +605,8 @@ class ParseCPT:
         return df
 
     @staticmethod
-    def calculate_elevation_with_respect_to_nap(df, zid):
-        if zid is not None:
+    def calculate_elevation_with_respect_to_nap(df, zid, height_system):
+        if zid is not None and height_system == 31000:
             df = df.assign(
                 elevation_with_respect_to_NAP=np.subtract(zid, df["depth"].values)
             )
