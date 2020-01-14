@@ -293,44 +293,50 @@ class ParseGEF:
         Parameters
         ----------
         classification: str, only for cpt type
-        water_level_NAP
-        water_level_wrt_depth
-        min_thickness
-        p_a
-        new
-        show
-        figsize
-        df_group
-        do_grouping
-        grid_step_x
-        dpi
-        colors
-        z_NAP
-
+            If classification ("robertson", "been_jefferies") is specified a subplot is added with the classification for each cpt row.
+        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth
+            Water level with respect to NAP
+        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
+            Water level with respect to the ground_level [0], it should be a negative value.
+        min_thickness: float, only for cpt type, optional for the classification [m]
+            If specified together with the do_grouping set to True, a group classification is added to the plot.
+            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one > min_thickness.
+            In order to not make a big error do not use a value bigger then 0.2 m
+        p_a: float, only for cpt type, optional for the classification
+            Atmospheric pressure. Default: 0.1 MPa.
+        new: bool, only for cpt type, optional for the classification default:True
+            If True and the classification is robertson, the new(2016) implementation of robertson is used.
+        show: bool
+            If True the plot is showed, else the matplotlib.pytplot.figure is returned
+        figsize: tuple
+            Figsize of the plot, default (11, 8).
+        df_group: pd.DataFrame, only for cpt type, optional for the classification
+            Use this argument to plot a defined soil layering next to the other subplots.
+            It should contain the columns:
+                - layer
+                    Name of layer, should be either BeenJefferies of Robertson soil type,
+                    if it is different then also the argument colors should be passed.
+                - z_centr_NAP
+                    Z value of the middle of the layer
+                - thickness
+                    Thickness of the layer
+        do_grouping: bool, only for cpt type, optional for the classification
+            If True a group classification is added to the plot.
+        grid_step_x: float, only for cpt type, default: None
+            Grid step for qc and Fr subplots.
+        dpi: int
+            Dpi figure
+        colors: dict
+            Dictionary containing the colors associated to each soil type, if specified
+        z_NAP: bool
+            If True the Z-axis is with respect to NAP.
         Returns
         -------
-
+        matplotlib.pyplot.figure
         """
-        """
-        Plot cpt and return matplotlib figure.
-
-        :param classification: (str) Specify this to classify the cpt, possible choice : "robertson", "been_jefferies".
-        :param water_level_NAP: (float)
-        :param water_level_wrt_depth: (float)
-        :param min_thickness: (float) Minimum accepted thickness for grouping.
-        :param p_a: (float) Atmospheric pressure at ground level in MPa.
-        :param new: (bool) Old(1990) or New(2016) implementation of Robertson.
-        :param show: (bool) Set to True to show the plot.
-        :param figsize: (tpl) Figure size (x, y).
-        :param df_group: (DataFrame) Specify your own DataFrame if you don't agree with the automatic one.
-        :param do_grouping: (bool) Plot the grouping if True.
-        :param grid_step_x: (int) Grid step of x-axes qc.
-        :param dpi: (int) Matplotlib dpi settings.
-        :param colors: (dict) Dictionary with soil type and related color, use this to plot your own classification.
-        :param z_NAP: (bool) True to plot the z-axis with respect to NAP. Default: False.
-        :return: matplotlib Figure.
-        """
-        if self.type == "cpt":
+        if (
+            self.type == "cpt"
+        ):  # todo: refactor arguments, the arguments connected to each other should be given as a dict or tuple, check order
             if classification is None:
                 df = self.df
             else:
@@ -385,17 +391,35 @@ class ParseGEF:
         min_thickness=None,
     ):
         """
-        Classify function, classify gef files and return a dataframe with the classified gef.
+        Classify each row of the cpt type.
 
-        :param classification: (str) Specify the classification, possible choice : "robertson", "been_jefferies".
-        :param water_level_NAP:(float)
-        :param water_level_wrt_depth: (float)
-        :param p_a: (float) Atmospheric pressure at ground level in MPa.
-        :param new: (bool) Old(1990) or New(2016) implementation of Robertson.
-        :param do_grouping: (bool) Do grouping if True.
-        :param min_thickness: (float) Minimum accepted thickness for layers.
-        :return: (DataFrame) DataFrame with classification.
+        Parameters
+        ----------
+        classification: str
+            Specify the classification, possible choices : "robertson", "been_jefferies".
+        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth
+            Water level with respect to NAP
+        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
+            Water level with respect to the ground_level [0], it should be a negative value.
+        p_a: float
+            Atmospheric pressure. Default: 0.1 MPa.
+        new: bool, default:True
+            If True and the classification is robertson, the new(2016) implementation of robertson is used.
+        do_grouping: bool,  optional for the classification
+            If True a group classification is added to the plot.
+        min_thickness: float, optional for the classification [m]
+            If specified together with the do_grouping set to True, a group classification is added to the plot.
+            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one > min_thickness.
+            In order to not make a big error do not use a value bigger then 0.2 m
+
+        Returns
+        -------
+        df: pd.DataFrame
+        If do_grouping is True a pandas.DataFrame with the grouped layer is returned otherwise a pandas.DataFrame with
+        a classification for each row is returned.
+
         """
+
         water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
 
         if water_level_NAP is None and water_level_wrt_depth is None:
