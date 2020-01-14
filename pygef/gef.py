@@ -131,6 +131,8 @@ class ParseGEF:
             Y coordinate respect to the coordinate system
         zid: float
             Z coordinate respect to the height system
+        height_system: float
+            Type of coordinate system, 31000 is NAP
         file_date: datatime.datetime
             Start date time
         test_id: str
