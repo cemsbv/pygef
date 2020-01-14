@@ -101,12 +101,133 @@ dict_soil_type_been = {
 
 
 class ParseGEF:
+    """
+    The ParseGEF file can be used to parse a *.gef file and use it as an ParseGEF object.
+
+    The gef parser is built following the conventional format described in:
+    https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&modificationDate=1409732008000&api=v2
+
+    For more information on initialization of this class type:
+    print(ParseGEF.__init__.__doc__)
+
+    To check the available methods, type:
+        print(dir(ParseGEF))
+
+    **Attributes**:
+    The ParseGEF class accept as input the *.gef file of a bore or cpt type.
+
+    Some attributes are common for the both types, other are specific to the type(cpt or bore).
+
+    Check the list below for the available attributes.
+
+        ** Common attributes:**
+        type: str
+            Type of the gef file
+        project_id: str
+            Project id
+        x: float
+            X coordinate respect to the coordinate system
+        y: float
+            Y coordinate respect to the coordinate system
+        zid: float
+            Z coordinate respect to the height system
+        file_date: datatime.datetime
+            Start date time
+        test_id: str
+            Identifying name of gef file.
+        s: str
+            String version of gef file.
+
+        ** Cpt attributes:**
+        *Always present:*
+            df: pandas.DataFrame
+                DataFrame containing the same column contained in the original .gef file and
+                some additional columns [depth, elevation_with_respect_to_NAP]
+
+                Tip: Use depth column instead of the penetration_length, the depth is corrected
+                with the inclination(if present).
+
+                Note that the Friction ratio is always calculated from the fs and qc values and not parsed from the file.
+
+                If this attribute is called after the classify method the columns relative to the classification
+                are also contained.
+
+        *Not always present* default: None
+        The description is added only for the most important attributes, for the others check:
+        https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&modificationDate=1409732008000&api=v2
+
+            cpt_class: str
+                Cpt class. The format is not standard so it might be not always properly parsed.
+            column_void: str
+                It is the definition of no value for the gef file
+            nom_surface_area_cone_tip: float
+                Nom. surface area of cone tip [mm2]
+            nom_surface_area_friction_element: float
+                Nom. surface area of friction casing [mm2]
+            net_surface_area_quotient_of_the_cone_tip: float
+                Net surface area quotient of cone tip [-]
+            net_surface_area_quotient_of_the_friction_casing: float
+                Net surface area quotient of friction casing [-]
+            distance_between_cone_and_centre_of_friction_casing: float
+            friction_present: float
+            ppt_u1_present: float
+            ppt_u2_present: float
+            ppt_u3_present: float
+            inclination_measurement_present: float
+            use_of_back_flow_compensator: float
+            type_of_cone_penetration_test: float
+            pre_excavated_depth: float
+                 Pre excavate depth [m]
+            groundwater_level: float
+                Ground water level [m]
+            water_depth_offshore_activities: float
+            end_depth_of_penetration_test: float
+            stop_criteria: float
+            zero_measurement_cone_before_penetration_test: float
+            zero_measurement_cone_after_penetration_test: float
+            zero_measurement_friction_before_penetration_test: float
+            zero_measurement_friction_after_penetration_test: float
+            zero_measurement_ppt_u1_before_penetration_test: float
+            zero_measurement_ppt_u1_after_penetration_test: float
+            zero_measurement_ppt_u2_before_penetration_test: float
+            zero_measurement_ppt_u2_after_penetration_test: float
+            zero_measurement_ppt_u3_before_penetration_test: float
+            zero_measurement_ppt_u3_after_penetration_test: float
+            zero_measurement_inclination_before_penetration_test: float
+            zero_measurement_inclination_after_penetration_test: float
+            zero_measurement_inclination_ns_before_penetration_test: float
+            zero_measurement_inclination_ns_after_penetration_test: float
+            zero_measurement_inclination_ew_before_penetration_test: float
+            zero_measurement_inclination_ew_after_penetration_test : float
+            mileage: float
+        ** Bore attributes:**
+            df: pandas.DataFrame
+                DataFrame containing the columns: [
+                                                    "depth_top",
+                                                    "depth_bottom",
+                                                    "soil_code",
+                                                    "G", gravel component
+                                                    "S", sand component
+                                                    "C", clay component
+                                                    "L", loam component
+                                                    "P", peat component
+                                                    "SI", silt component
+                                                    "Remarks",
+                                                ]
+    """
+
     def __init__(self, path=None, string=None):
         """
         Base class of gef parser. It switches between the cpt or borehole parser.
 
-        :param path:(str) Path of the .gef file to parse.
-        :param string:(str) String to parse.
+        It takes as input either the path to the gef file or the gef file as string.
+
+        Parameters
+        ----------
+        path: str
+            Path to the *.gef file.
+        string: str
+            String version of the *.gef file.
         """
         self.path = path
         self.df = None
@@ -133,7 +254,7 @@ class ParseGEF:
             parsed = ParseBORE(header_s, data_s)
         elif self.type == "borehole-report":
             raise ValueError(
-                "Selected gef file is a GEF-BOREHOLE-Report. Can only parse "
+                "The selected gef file is a GEF-BOREHOLE-Report. Can only parse "
                 "GEF-CPT-Report and GEF-BORE-Report. Check the PROCEDURECODE."
             )
         else:
@@ -162,6 +283,34 @@ class ParseGEF:
         colors=None,
         z_NAP=False,
     ):
+        """
+        Plot the *.gef file and return matplotlib.pyplot.figure .
+
+        It works both with a cpt or borehole type file. If no argument it is passed it returns:
+        - CPT: plot of qc [MPa] and Friction ratio [%]
+        - BOREHOLE: plot of soil components over the depth.
+
+        Parameters
+        ----------
+        classification: str, only for cpt type
+        water_level_NAP
+        water_level_wrt_depth
+        min_thickness
+        p_a
+        new
+        show
+        figsize
+        df_group
+        do_grouping
+        grid_step_x
+        dpi
+        colors
+        z_NAP
+
+        Returns
+        -------
+
+        """
         """
         Plot cpt and return matplotlib figure.
 
