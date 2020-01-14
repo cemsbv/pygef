@@ -242,6 +242,7 @@ class ParseGEF:
         end_of_header = utils.parse_end_of_header(self.s)
         header_s, data_s = self.s.split(end_of_header)
         self.zid = utils.parse_zid_as_float(header_s)
+        self.height_system = utils.parse_height_system(header_s)
         self.x = utils.parse_xid_as_float(header_s)
         self.y = utils.parse_yid_as_float(header_s)
         self.file_date = utils.parse_file_date(header_s)
