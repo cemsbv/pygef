@@ -419,7 +419,7 @@ class ParseGEF:
         a classification for each row is returned.
 
         """
-
+        # todo: refactor arguments, the arguments connected to each other should be given as a dict or tuple, check order
         water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
 
         if water_level_NAP is None and water_level_wrt_depth is None:
