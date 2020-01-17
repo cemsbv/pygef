@@ -108,11 +108,13 @@ class ParseGEF:
     https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&modificationDate=1409732008000&api=v2
 
     For more information on initialization of this class type:
+
     .. code-block:: python
 
         print(ParseGEF.__init__.__doc__)
 
     To check the available methods, type:
+
     .. code-block:: python
 
         print(dir(ParseGEF))
