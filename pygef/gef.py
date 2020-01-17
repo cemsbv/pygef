@@ -108,9 +108,13 @@ class ParseGEF:
     https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&modificationDate=1409732008000&api=v2
 
     For more information on initialization of this class type:
+    .. code-block:: python
+
         print(ParseGEF.__init__.__doc__)
 
     To check the available methods, type:
+    .. code-block:: python
+
         print(dir(ParseGEF))
 
     **Attributes**:
@@ -215,15 +219,13 @@ class ParseGEF:
                                                     "SI", silt component
                                                     "Remarks",
                                                 ]
-            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
-            | depth_top | depth_bottom | soil_code | G | S | C | L | P | SI | Remarks |
-            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
-            |           |              |           |   |   |   |   |   |    |         |
-            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
-            |           |              |           |   |   |   |   |   |    |         |
-            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
-            |           |              |           |   |   |   |   |   |    |         |
-            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
+                .. code-block:: python
+
+                    +-----------+--------------+-----------+---+---+---+---+---+----+---------+
+                    | depth_top | depth_bottom | soil_code | G | S | C | L | P | SI | Remarks |
+                    +-----------+--------------+-----------+---+---+---+---+---+----+---------+
+                    |           |              |           |   |   |   |   |   |    |         |
+                    +-----------+--------------+-----------+---+---+---+---+---+----+---------+
     """
 
     def __init__(self, path=None, string=None):
@@ -331,15 +333,14 @@ class ParseGEF:
                     Z value of the middle of the layer
                 - thickness
                     Thickness of the layer
-            +-------+-------------+-----------+
-            | layer | z_centr_NAP | thickness |
-            +-------+-------------+-----------+
-            |       |             |           |
-            +-------+-------------+-----------+
-            |       |             |           |
-            +-------+-------------+-----------+
-            |       |             |           |
-            +-------+-------------+-----------+
+            .. code-block:: python
+
+                +-------+-------------+-----------+
+                | layer | z_centr_NAP | thickness |
+                +-------+-------------+-----------+
+                |       |             |           |
+                +-------+-------------+-----------+
+
         do_grouping: bool, only for cpt type, optional for the classification, default:False
             If True a group classification is added to the plot.
         grid_step_x: float, only for cpt type, default: None
