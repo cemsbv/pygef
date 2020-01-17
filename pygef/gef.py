@@ -102,13 +102,13 @@ dict_soil_type_been = {
 
 class ParseGEF:
     """
-    The ParseGEF file can be used to parse a *.gef file and use it as an ParseGEF object.
+    The ParseGEF class can be used to parse a *.gef file and use it as a ParseGEF object.
 
     The gef parser is built following the conventional format described in:
     https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&modificationDate=1409732008000&api=v2
 
     For more information on initialization of this class type:
-    print(ParseGEF.__init__.__doc__)
+        print(ParseGEF.__init__.__doc__)
 
     To check the available methods, type:
         print(dir(ParseGEF))
@@ -120,7 +120,7 @@ class ParseGEF:
 
     Check the list below for the available attributes.
 
-        ** Common attributes:**
+        **Common attributes:**
         type: str
             Type of the gef file
         project_id: str
@@ -138,7 +138,7 @@ class ParseGEF:
         s: str
             String version of gef file.
 
-        ** Cpt attributes:**
+        **Cpt attributes:**
         *Always present:*
             df: pandas.DataFrame
                 DataFrame containing the same column contained in the original .gef file and
@@ -177,11 +177,12 @@ class ParseGEF:
             use_of_back_flow_compensator: float
             type_of_cone_penetration_test: float
             pre_excavated_depth: float
-                 Pre excavate depth [m]
+                 Pre excavated depth [m]
             groundwater_level: float
                 Ground water level [m]
             water_depth_offshore_activities: float
             end_depth_of_penetration_test: float
+                End depth of penetration test
             stop_criteria: float
             zero_measurement_cone_before_penetration_test: float
             zero_measurement_cone_after_penetration_test: float
@@ -200,7 +201,7 @@ class ParseGEF:
             zero_measurement_inclination_ew_before_penetration_test: float
             zero_measurement_inclination_ew_after_penetration_test : float
             mileage: float
-        ** Bore attributes:**
+        **Bore attributes:**
             df: pandas.DataFrame
                 DataFrame containing the columns: [
                                                     "depth_top",
@@ -214,6 +215,15 @@ class ParseGEF:
                                                     "SI", silt component
                                                     "Remarks",
                                                 ]
+            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
+            | depth_top | depth_bottom | soil_code | G | S | C | L | P | SI | Remarks |
+            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
+            |           |              |           |   |   |   |   |   |    |         |
+            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
+            |           |              |           |   |   |   |   |   |    |         |
+            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
+            |           |              |           |   |   |   |   |   |    |         |
+            +-----------+--------------+-----------+---+---+---+---+---+----+---------+
     """
 
     def __init__(self, path=None, string=None):
@@ -292,27 +302,28 @@ class ParseGEF:
 
         Parameters
         ----------
-        classification: str, only for cpt type
+        classification: str, only for cpt type, default:None
             If classification ("robertson", "been_jefferies") is specified a subplot is added with the classification for each cpt row.
-        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth
+        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth, default:None
             Water level with respect to NAP
-        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
+        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP, default:None
             Water level with respect to the ground_level [0], it should be a negative value.
-        min_thickness: float, only for cpt type, optional for the classification [m]
+        min_thickness: float, only for cpt type, optional for the classification [m], default:None
             If specified together with the do_grouping set to True, a group classification is added to the plot.
-            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one > min_thickness.
+            The grouping is a simple algorithm that merge all the layers with thickness < min_thickness with the last
+            above  with thickness > min_thickness.
             In order to not make a big error do not use a value bigger then 0.2 m
-        p_a: float, only for cpt type, optional for the classification
-            Atmospheric pressure. Default: 0.1 MPa.
+        p_a: float, only for cpt type, optional for the classification, default: 0.1 MPa
+            Atmospheric pressure.
         new: bool, only for cpt type, optional for the classification default:True
             If True and the classification is robertson, the new(2016) implementation of robertson is used.
-        show: bool
+        show: bool, default:False
             If True the plot is showed, else the matplotlib.pytplot.figure is returned
-        figsize: tuple
-            Figsize of the plot, default (11, 8).
-        df_group: pd.DataFrame, only for cpt type, optional for the classification
+        figsize: tuple, default: (11, 8)
+            Figsize of the plot.
+        df_group: pd.DataFrame, only for cpt type, optional for the classification, default:None
             Use this argument to plot a defined soil layering next to the other subplots.
-            It should contain the columns:
+            It should contain at least the columns:
                 - layer
                     Name of layer, should be either BeenJefferies of Robertson soil type,
                     if it is different then also the argument colors should be passed.
@@ -320,15 +331,24 @@ class ParseGEF:
                     Z value of the middle of the layer
                 - thickness
                     Thickness of the layer
-        do_grouping: bool, only for cpt type, optional for the classification
+            +-------+-------------+-----------+
+            | layer | z_centr_NAP | thickness |
+            +-------+-------------+-----------+
+            |       |             |           |
+            +-------+-------------+-----------+
+            |       |             |           |
+            +-------+-------------+-----------+
+            |       |             |           |
+            +-------+-------------+-----------+
+        do_grouping: bool, only for cpt type, optional for the classification, default:False
             If True a group classification is added to the plot.
         grid_step_x: float, only for cpt type, default: None
             Grid step for qc and Fr subplots.
-        dpi: int
+        dpi: int, default: 100
             Dpi figure
-        colors: dict
+        colors: dict, default:None
             Dictionary containing the colors associated to each soil type, if specified
-        z_NAP: bool
+        z_NAP: bool, default:False
             If True the Z-axis is with respect to NAP.
         Returns
         -------
@@ -397,17 +417,17 @@ class ParseGEF:
         ----------
         classification: str
             Specify the classification, possible choices : "robertson", "been_jefferies".
-        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth
+        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth, default:None
             Water level with respect to NAP
-        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
+        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP, default:None
             Water level with respect to the ground_level [0], it should be a negative value.
-        p_a: float
-            Atmospheric pressure. Default: 0.1 MPa.
+        p_a: float, default: 0.1 MPa
+            Atmospheric pressure.
         new: bool, default:True
             If True and the classification is robertson, the new(2016) implementation of robertson is used.
-        do_grouping: bool,  optional for the classification
+        do_grouping: bool,  optional for the classification, default: False
             If True a group classification is added to the plot.
-        min_thickness: float, optional for the classification [m]
+        min_thickness: float, optional for the classification [m], default:None
             If specified together with the do_grouping set to True, a group classification is added to the plot.
             The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one > min_thickness.
             In order to not make a big error do not use a value bigger then 0.2 m
