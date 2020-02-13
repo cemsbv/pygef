@@ -127,6 +127,16 @@ def parse_zid_as_float(s):
     return parse_regex_cast(r"#ZID[=\s+]+[^,]*[,\s+]+([^,]+)", s, float, 1)
 
 
+def parse_height_system(s):
+    """
+    Function that returns the zid as a float.
+
+    :param s: (str) String from which the zid is parsed.
+    :return: ZID number.
+    """
+    return parse_regex_cast(r"#ZID[=\s+]+([^,]*)", s, float, 1)
+
+
 def parse_xid_as_float(s):
     """
     Function that returns the x coordinate as a float.
