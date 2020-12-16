@@ -69,7 +69,7 @@ def group_significant_layers(df_group, min_thickness, start_depth):
             "zf": df_group.zf,
         }
     )
-    df_group["zf"].iloc[-1] = depth
+    df_group.iloc[-1, 2] = depth
     return df_group.pipe(calculate_thickness).pipe(calculate_z_centr)
 
 
