@@ -78,6 +78,13 @@ class GefTest(unittest.TestCase):
         v = utils.parse_zid_as_float(s)
         self.assertEqual(v, 1.3)
 
+        s = r"""#TESTID = B38C2094
+            #XYID = 31000,108025,432470
+            #ZID = 31000,-1.5
+            #MEASUREMENTTEXT = 9, maaiveld, vast horizontaal niveau"""
+        v = utils.parse_zid_as_float(s)
+        self.assertEqual(v, -1.5)
+
     def test_parse_gef_type(self):
         s = r"#PROCEDURECODE= GEF-CPT-Report"
         v = utils.parse_gef_type(s)
