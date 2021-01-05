@@ -584,11 +584,11 @@ class ParseCPT:
 
         self.df = (
             self.parse_data(header_s, data_s)
+            .pipe(self.replace_column_void, self.column_void)
             .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(self.correct_depth_with_inclination)
             .pipe(lambda df: df.assign(depth=np.abs(df["depth"].values)))
             .pipe(self.calculate_elevation_with_respect_to_nap, zid, height_system)
-            .pipe(self.replace_column_void, self.column_void)
             .pipe(self.calculate_friction_number)
         )
 
@@ -620,7 +620,7 @@ class ParseCPT:
             return df.rename(columns={"corrected_depth": "depth"})
         if "inclination" in df.columns:
             diff_t_depth = np.diff(df["penetration_length"].values) * np.cos(
-                np.radians(df["inclination"].values[:-1])
+                np.radians(df["inclination"].fillna(0).values[:-1])
             )
             # corrected depth
             return df.assign(
