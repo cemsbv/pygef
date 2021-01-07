@@ -344,7 +344,7 @@ def create_soil_type(s):
     }
     soil_name = ""
     try:
-        if string_noquote is not "":
+        if string_noquote != "":
             if string_noquote in dict_exceptions:
                 soil_name = soil_name + dict_exceptions[string_noquote]
             else:
