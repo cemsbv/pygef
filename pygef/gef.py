@@ -429,13 +429,13 @@ class ParseGEF:
 
         if water_level_NAP is None and water_level_wrt_depth is None:
             water_level_wrt_depth = -1
-            logger.warn(
+            logger.warning(
                 f"You did not input the water level, a default value of -1 m respect to the ground is used."
                 f" Change it using the kwagr water_level_NAP or water_level_wrt_depth."
             )
         if min_thickness is None:
             min_thickness = 0.2
-            logger.warn(
+            logger.warning(
                 f"You did not input the accepted minimum thickness, a default value of 0.2 m is used."
                 f" Change it using th kwarg min_thickness"
             )
@@ -493,6 +493,7 @@ class ParseCPT:
 
         self.type = "cpt"
         self.project_id = utils.parse_project_type(header_s, "cpt")
+        self.cone_id = utils.parse_cone_id(header_s)
         self.cpt_class = utils.parse_cpt_class(header_s)
         self.column_void = utils.parse_column_void(header_s)
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(
