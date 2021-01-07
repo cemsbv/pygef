@@ -84,6 +84,20 @@ def parse_measurement_var_as_float(s, var_number):
     return measurement_var
 
 
+def parse_cone_id(s):
+    """
+    Function that returns the cone id specified in GEF-CPT file.
+
+    :param s: (str) String from which the cone_id is parsed.
+    :return: cone_id.
+    """
+    try:
+        measurement_text = parse_regex_cast(r"#MEASUREMENTTEXT[=\s+]+4[, ]+([\w.-]+)", s, str, 1)
+    except ValueError:
+        measurement_text = None
+    return measurement_text
+
+
 def parse_cpt_class(s):
     """
     Function that returns the class of the cpt as an int.

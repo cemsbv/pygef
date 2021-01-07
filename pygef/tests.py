@@ -85,6 +85,19 @@ class GefTest(unittest.TestCase):
         v = utils.parse_zid_as_float(s)
         self.assertEqual(v, -1.5)
 
+    def test_cone_id(self):
+        s = "#MEASUREMENTTEXT= 4, CFI, conus type"
+        v = utils.parse_cone_id(s)
+        self.assertEqual("CFI", v)
+
+        s = "#MEASUREMENTTEXT = 4, C10CFIIP.C18469, cone type and serial number"
+        v = utils.parse_cone_id(s)
+        self.assertEqual("C10CFIIP.C18469", v)
+
+        s= "#MEASUREMENTTEXT=4, S15CFII.d82, Cone Type"
+        v = utils.parse_cone_id(s)
+        self.assertEqual("S15CFII.d82", v)
+
     def test_parse_gef_type(self):
         s = r"#PROCEDURECODE= GEF-CPT-Report"
         v = utils.parse_gef_type(s)
