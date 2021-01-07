@@ -6,7 +6,7 @@ from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 from pygef.gef import ParseGEF, ParseCPT, ParseBORE
 import pandas as pd
 import numpy as np
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 import pygef.grouping as grouping
 from pygef.grouping import GroupClassification
 
