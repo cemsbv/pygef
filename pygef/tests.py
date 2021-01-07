@@ -94,7 +94,7 @@ class GefTest(unittest.TestCase):
         v = utils.parse_cone_id(s)
         self.assertEqual("C10CFIIP.C18469", v)
 
-        s= "#MEASUREMENTTEXT=4, S15CFII.d82, Cone Type"
+        s = "#MEASUREMENTTEXT=4, S15CFII.d82, Cone Type"
         v = utils.parse_cone_id(s)
         self.assertEqual("S15CFII.d82", v)
 

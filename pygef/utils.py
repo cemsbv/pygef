@@ -92,7 +92,9 @@ def parse_cone_id(s):
     :return: cone_id.
     """
     try:
-        measurement_text = parse_regex_cast(r"#MEASUREMENTTEXT[=\s+]+4[, ]+([\w.-]+)", s, str, 1)
+        measurement_text = parse_regex_cast(
+            r"#MEASUREMENTTEXT[=\s+]+4[, ]+([\w.-]+)", s, str, 1
+        )
     except ValueError:
         measurement_text = None
     return measurement_text
