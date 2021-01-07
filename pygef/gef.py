@@ -429,13 +429,13 @@ class ParseGEF:
 
         if water_level_NAP is None and water_level_wrt_depth is None:
             water_level_wrt_depth = -1
-            logger.warn(
+            logger.warning(
                 f"You did not input the water level, a default value of -1 m respect to the ground is used."
                 f" Change it using the kwagr water_level_NAP or water_level_wrt_depth."
             )
         if min_thickness is None:
             min_thickness = 0.2
-            logger.warn(
+            logger.warning(
                 f"You did not input the accepted minimum thickness, a default value of 0.2 m is used."
                 f" Change it using th kwarg min_thickness"
             )
