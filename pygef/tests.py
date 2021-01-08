@@ -459,6 +459,46 @@ class GefTest(unittest.TestCase):
         )
         assert_frame_equal(df_calculated, df)
 
+    def test_parse_pre_excavated_dept_with_void_inclination(self):
+        cpt = ParseGEF(string="""
+            #COLUMN= 6
+            #COLUMNINFO= 1, m, Sondeerlengte, 1
+            #COLUMNINFO= 2, MPa, Conuswaarde, 2
+            #COLUMNINFO= 3, MPa, Wrijvingsweerstand, 3
+            #COLUMNINFO= 4, Deg, Helling, 8
+            #COLUMNINFO= 5, %, Wrijvingsgetal, 4
+            #COLUMNINFO= 6, MPa, Waterspanning, 5
+            #COLUMNVOID= 2, -9999.000000
+            #COLUMNVOID= 3, -9999.000000
+            #COLUMNVOID= 4, -9999.000000
+            #COLUMNVOID= 5, -9999.000000
+            #COLUMNVOID= 6, -9999.000000
+            #LASTSCAN= 3
+            #ZID= 31000, -0.39, 0.05
+            #MEASUREMENTVAR= 13, 1.500000, m, voorgeboorde/voorgegraven diepte
+            #REPORTCODE= GEF-CPT-Report, 1, 1, 0, -
+            #EOH=
+            0.0000e+000 -9.9990e+003 -9.9990e+003 -9.9990e+003 -9.9990e+003 -9.9990e+003 
+            1.5100e+000 9.1800e+000 5.3238e-002 5.8398e-001 5.7314e-001 3.0107e-003 
+            1.5300e+000 9.3044e+000 5.3803e-002 8.2007e-001 5.7986e-001 3.3362e-003 
+        """)   
+        actual = cpt.df.round(6)
+
+        expected = pd.DataFrame(
+            {
+                "penetration_length": [1.51, 1.53],
+                "qc": [9.1800, 9.3044],
+                "fs": [0.053238, 0.053803],
+                "inclination": [0.58398, 0.82007],
+                "friction_number": [0.579935, 0.578253],
+                "u1": [0.003011, 0.003336],
+                "depth": [1.510000, 1.529999],
+                "elevation_with_respect_to_NAP": [-1.90, -1.919999],
+            }
+        )
+        assert_frame_equal(actual, expected)
+
+
     def test_delta_depth(self):
         df1 = pd.DataFrame({"depth": [0, 0.5, 1]})
         v = geo.delta_depth(df1)
