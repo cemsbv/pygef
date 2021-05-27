@@ -296,7 +296,10 @@ def parse_test_id(s):
     :param s: (str) String to search for regex pattern.
     :return: test id.
     """
-    return parse_regex_cast(r"#TESTID+[=\s+]+(.+?)\s+(\S+)", s, str, 1)
+    result = parse_regex_cast(r"#TESTID+[=\s+]+(.*)", s, str, 1)
+    if result != None:
+        result = result.strip()
+    return result
 
 
 def parse_record_separator(s):

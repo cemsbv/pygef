@@ -98,6 +98,27 @@ class GefTest(unittest.TestCase):
         v = utils.parse_cone_id(s)
         self.assertEqual("S15CFII.d82", v)
 
+    def test_parse_test_id(self):
+        # Test ID without spaces on a single line
+        s = "#TESTID= CPT-01"
+        v = utils.parse_test_id(s)
+        self.assertEqual("CPT-01", v)
+
+        # Test ID without spaces on a single line and trailing white space
+        s = "#TESTID= CPT-02   "
+        v = utils.parse_test_id(s)
+        self.assertEqual("CPT-02", v)
+
+        # Test ID with a space on a single line
+        s = "#TESTID= CPT 03"
+        v = utils.parse_test_id(s)
+        self.assertEqual("CPT 03", v)
+
+        # Test ID with a space and trailing whitespace
+        s = "#TESTID= CPT 03   "
+        v = utils.parse_test_id(s)
+        self.assertEqual("CPT 03", v)
+
     def test_parse_gef_type(self):
         s = r"#PROCEDURECODE= GEF-CPT-Report"
         v = utils.parse_gef_type(s)
