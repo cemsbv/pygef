@@ -297,7 +297,7 @@ def parse_test_id(s):
     :return: test id.
     """
     result = parse_regex_cast(r"#TESTID+[=\s+]+(.*)", s, str, 1)
-    if result != None:
+    if result is not None:
         result = result.strip()
     return result
 

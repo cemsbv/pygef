@@ -119,6 +119,11 @@ class GefTest(unittest.TestCase):
         v = utils.parse_test_id(s)
         self.assertEqual("CPT 03", v)
 
+        # Test ID with 2 spaces in the name
+        s = "#TESTID= CPTU17.7 + 83BITE"
+        v = utils.parse_test_id(s)
+        self.assertEqual("CPTU17.7 + 83BITE", v)
+
     def test_parse_gef_type(self):
         s = r"#PROCEDURECODE= GEF-CPT-Report"
         v = utils.parse_gef_type(s)
