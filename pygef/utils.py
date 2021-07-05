@@ -61,7 +61,11 @@ def parse_column_void(s):
         column_void = list(
             map(float, re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", s))
         )
-    return column_void
+        return column_void
+    else:
+        return (
+            -9999
+        )  # standard value, if some gef files the column void is not specified but used anyway
 
 
 def parse_measurement_var_as_float(s, var_number):

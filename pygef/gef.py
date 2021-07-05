@@ -596,7 +596,13 @@ class ParseCPT:
     @staticmethod
     def replace_column_void(df, column_void):
         if column_void is not None:
-            return df.replace(column_void, np.nan).interpolate(method="linear")
+            # added drop nan because values can't be extrapolated
+            return (
+                df.replace(column_void, np.nan)
+                .interpolate(method="linear")
+                .dropna()
+                .reset_index(drop=True)
+            )
         return df
 
     @staticmethod
@@ -637,10 +643,26 @@ class ParseCPT:
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
-        if pre_excavated_depth is not None and np.any(
-            np.isclose(df["penetration_length"].values - pre_excavated_depth, 0)
+        atol = float(
+            np.mean(
+                np.diff(
+                    df.loc[(df["qc"] > 0) & (df["qc"] < 1000)][
+                        "penetration_length"
+                    ].values
+                )
+            )
+            / 2
+        )
+        if (
+            pre_excavated_depth is not None
+            and pre_excavated_depth > 0
+            and np.any(
+                np.isclose(
+                    df["penetration_length"].values - pre_excavated_depth, 0, atol=atol
+                )
+            )
         ):
-            mask = df["penetration_length"] == pre_excavated_depth
+            mask = np.isclose(df["penetration_length"], pre_excavated_depth, atol=atol)
             start_idx = df[mask].reset_index(drop=False)["index"][0]
             return df[start_idx:].reset_index(drop=True)
         return df
