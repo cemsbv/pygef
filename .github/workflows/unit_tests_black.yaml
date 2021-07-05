@@ -1,0 +1,30 @@
+name: Unit test and formatting
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python setup.py install
+      - name: Formatting with black
+        run: |
+          black --check .
+      - name: Test with unittest
+        run: |
+          python -m unittest pygef/tests.py
+          python -m unittest pygef/robertson/tests.py
+          python -m unittest pygef/been_jefferies/tests.py

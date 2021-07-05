@@ -5,6 +5,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/ritchie46/pygef.svg?logo=github&label=Stars&logoColor=white)](https://github.com/ritchie46/pygef)
 
 Simple parser for *.gef files. These are ASCII based files used for soil properties measurements. 
+Compatible with Python 3.7.
 
 ## Installation
 `$ pip install pygef`
