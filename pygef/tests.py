@@ -372,10 +372,7 @@ class GefTest(unittest.TestCase):
         column_void = 999
         df_calculated = ParseCPT.replace_column_void(df1, column_void)
         df = pd.DataFrame(
-            {
-                "penetration_length": [np.nan, 1, 2, 3, 4],
-                "qc": [np.nan, 0.5, 0.6, 0.7, 0.8],
-            }
+            {"penetration_length": [1.0, 2, 3, 4], "qc": [0.5, 0.6, 0.7, 0.8],}
         )
         assert_frame_equal(df_calculated, df)
 
@@ -770,6 +767,60 @@ class GefTest(unittest.TestCase):
             }
         )
         assert_frame_equal(v, df)
+
+    def test_bug_depth(self):
+        cpt = """
+        #FILEDATE= 2011, 5, 13
+        #PROJECTID= CPT, 4015110
+        #COLUMN= 5
+        #COLUMNINFO= 1, m, Sondeerlengte, 1
+        #COLUMNINFO= 2, MPa, Conuswaarde, 2
+        #COLUMNINFO= 3, MPa, Wrijvingsweerstand, 3
+        #COLUMNINFO= 4, Deg, Helling, 8
+        #COLUMNINFO= 5, %, Wrijvingsgetal, 4
+        #XYID= 31000, 116371.70, 514039.34, 0.02, 0.02
+        #ZID= 31000, -2.21, 0.05
+        #MEASUREMENTTEXT= 4, S10CFI518, conusnummer
+        #MEASUREMENTTEXT= 6, NEN 5140 klasse2, gehanteerde norm en klasse sondering
+        #MEASUREMENTTEXT= 9, maaiveld, vast horizontaal vlak
+        #MEASUREMENTVAR= 1, 1000.000000, mm2, nom. oppervlak conuspunt
+        #MEASUREMENTVAR= 12, 0.000000, -, elektrische sondering
+        #MEASUREMENTVAR= 13, 1.500000, m, voorgeboorde/voorgegraven diepte
+        #TESTID= 29
+        #PROJECTNAME= Herinrichting van de N243
+        #REPORTCODE= GEF-CPT-Report, 1, 1, 0, -
+        #REPORTTEXT= 201, Mos Grondmechanica B.V.
+        #REPORTTEXT= 202, Herinrichting van de N243 te Schermer en Beemster
+        #REPORTTEXT= 203, Sondering 29
+        #STARTDATE= 2010, 12, 7
+        #STARTTIME= 9, 0, 21.000000
+        #OS= DOS
+        #EOH=
+        0.0000e+000 -9.9990e+003 -9.9990e+003 -9.9990e+003 -9.9990e+003 
+        1.5100e+000 3.6954e-001 3.7981e-003 9.9502e-002 9.2308e-001 
+        1.5300e+000 4.0370e-001 5.5589e-003 1.1194e-001 1.3260e+000 
+        1.5500e+000 4.2854e-001 7.5360e-003 1.1194e-001 1.8315e+000 
+        1.5700e+000 4.4407e-001 1.0028e-002 1.1194e-001 2.5117e+000 
+        1.5900e+000 4.5028e-001 9.4163e-003 9.9502e-002 2.4202e+000 
+        1.6100e+000 3.7265e-001 8.6356e-003 9.9502e-002 2.3201e+000 
+        1.6300e+000 3.2607e-001 7.9297e-003 1.1194e-001 2.2770e+000 
+        1.6500e+000 2.9812e-001 7.9607e-003 9.9502e-002 2.4315e+000 
+        1.6700e+000 2.8570e-001 7.0938e-003 1.2438e-001 2.2649e+000 
+        1.6900e+000 2.6085e-001 6.4691e-003 1.1194e-001 1.9653e+000 
+        1.7100e+000 2.9812e-001 5.9068e-003 9.9502e-002 1.6748e+000 
+        1.7300e+000 3.5091e-001 5.2480e-003 9.9502e-002 1.4391e+000 
+        1.7500e+000 4.8444e-001 3.8332e-003 9.9502e-002 1.0214e+000 
+        1.7700e+000 4.9065e-001 3.5531e-003 9.9502e-002 9.0498e-001 
+        1.7900e+000 3.8196e-001 3.4469e-003 1.1194e-001 8.5759e-001 
+        1.8100e+000 3.6023e-001 4.1928e-003 9.9502e-002 1.0363e+000 
+        1.8300e+000 3.8196e-001 4.5735e-003 1.1194e-001 1.1782e+000 
+        1.8500e+000 3.6333e-001 5.2490e-003 1.1194e-001 1.4342e+000 
+        1.8700e+000 3.6954e-001 5.2590e-003 9.9502e-002 1.4635e+000 
+        1.8900e+000 3.6954e-001 5.8176e-003 1.1194e-001 1.5781e+000 
+        """
+        cpt = ParseGEF(string=cpt)
+        a = np.diff(cpt.df["penetration_length"].values)
+        assert np.isclose(cpt.df.loc[0, "depth"], 1.51)
 
 
 class BoreTest(unittest.TestCase):
