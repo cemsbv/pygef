@@ -77,15 +77,18 @@ def parse_measurement_var_as_float(s, var_number):
     :return: Variable value.
     """
     try:
-        measurement_var = parse_regex_cast(
-            r"#MEASUREMENTVAR[=\s+]+{}[, ]+([\d-]+\.?\d*)".format(var_number),
-            s,
-            float,
-            1,
-        )
+        # Convert the variable number to a string so it's cheaper to compare
+        var_number_str = str(var_number)
+
+        # Find all '#MEASUREMENTVAR= **,' strings first
+        for match in re.finditer(r"#MEASUREMENTVAR[=\s+]+(\d+)[, ]+([\d-]+\.?\d*)", s):
+            # The first group is the variable number
+            if match.group(1) == var_number_str:
+                # The second group is the actual value
+                return cast_string(float, match.group(2))
     except ValueError:
-        measurement_var = None
-    return measurement_var
+        pass
+    return None
 
 
 def parse_cone_id(s):
@@ -255,14 +258,21 @@ def parse_quantity_number(s, column_number):
     :param column_number: (int) Number of the column.
     :return: Quantity number.
     """
-    return parse_regex_cast(
-        r"#COLUMNINFO[=\s+]+{}+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)".format(
-            column_number
-        ),
-        s,
-        int,
-        1,
-    )
+    try:
+        # Convert the variable number to a string so it's cheaper to compare
+        column_number_str = str(column_number)
+
+        # Find all '#COLUMNINFO= **,' strings first
+        for match in re.finditer(
+            r"#COLUMNINFO[=\s+]+(\d+)+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)", s
+        ):
+            # The first group is the column number
+            if match.group(1) == column_number_str:
+                # The second group is the actual value
+                return cast_string(float, match.group(2))
+    except ValueError:
+        pass
+    return None
 
 
 def parse_column_info(s, column_number, dictionary):
@@ -309,7 +319,7 @@ def parse_test_id(s):
 def parse_record_separator(s):
     """
     Function to parse the record separator(end of the line). It is used only in the borehole class.
-    
+
     :param s: (str) String to search for regex pattern.
     :return: Record separator.
     """ ""
