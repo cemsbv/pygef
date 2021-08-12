@@ -1,5 +1,4 @@
 # PYGEF
-[![Build Status](https://travis-ci.org/ritchie46/pygef.svg?branch=master)](https://travis-ci.org/ritchie46/pygef)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPi Version](https://img.shields.io/pypi/v/pygef.svg)](https://pypi.org/project/pygef)
 [![GitHub stars](https://img.shields.io/github/stars/ritchie46/pygef.svg?logo=github&label=Stars&logoColor=white)](https://github.com/ritchie46/pygef)
