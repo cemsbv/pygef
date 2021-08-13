@@ -5,6 +5,7 @@ from datetime import datetime
 from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 from pygef.gef import ParseGEF, ParseCPT, ParseBORE
 import pandas as pd
+import polars as pl
 import numpy as np
 from pandas.util.testing import assert_frame_equal
 import pygef.grouping as grouping
@@ -653,7 +654,7 @@ class GefTest(unittest.TestCase):
         assert_frame_equal(v, df)
 
     def test_group_equal_layers(self):
-        df_group = pd.DataFrame(
+        df_group = pl.DataFrame(
             {
                 "depth": [0, 1, 2, 3, 4, 5, 6],
                 "soil_type": [
@@ -670,7 +671,7 @@ class GefTest(unittest.TestCase):
         )
         group = GroupClassification(2, df_group, 0.2)
         v = group.group_equal_layers(df_group, "soil_type", "depth", 0)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 2.0, 5.0],
@@ -682,10 +683,17 @@ class GefTest(unittest.TestCase):
                 "z_centr_NAP": [1.0, -1.5, -3.5],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.layer == df.layer
+        assert v.z_in == df.z_in
+        assert v.zf == df.zf
+        assert v.thickness == df.thickness
+        assert v.z_centr == df.z_centr
+        assert v.z_in_NAP == df.z_in_NAP
+        assert v.zf_NAP == df.zf_NAP
+        assert v.z_centr_NAP == df.z_centr_NAP
 
     def test_group_significant_layers(self):
-        df_group = pd.DataFrame(
+        df_group = pl.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 0.4, 5.0],
@@ -696,7 +704,7 @@ class GefTest(unittest.TestCase):
 
         v = grouping.group_significant_layers(df_group, 0.5, 0.0)
 
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "layer": ["Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 5.0],
@@ -705,7 +713,13 @@ class GefTest(unittest.TestCase):
                 "z_centr": [2.5, 5.5],
             }
         )
-        assert_frame_equal(v, df)
+
+        # TODO: use a better comparison method
+        assert v.zf == df.zf
+        assert v.layer == df.layer
+        assert v.z_in == df.z_in
+        assert v.thickness == df.thickness
+        assert v.z_centr == df.z_centr
 
     def test_calculate_thickness(self):
         df_group = pd.DataFrame(
