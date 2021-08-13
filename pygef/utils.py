@@ -336,7 +336,8 @@ def find_separator(header_s):
     if try_sep is not None:
         return parse_column_separator(header_s)
     else:
-        return r";|\s+|,|\|\s*"
+        # TODO: verify that this space is good enough for all use cases
+        return " "
 
 
 def parse_soil_code(s):

@@ -1,5 +1,6 @@
 import pygef.utils as utils
 import pandas as pd
+import polars as pl
 import io
 import numpy as np
 import pygef.plot_utils as plot
@@ -142,7 +143,7 @@ class ParseGEF:
 
         ** Cpt attributes:**
         *Always present:*
-            df: pandas.DataFrame
+            df: polars.DataFrame
                 DataFrame containing the same column contained in the original .gef file and
                 some additional columns [depth, elevation_with_respect_to_NAP]
 
@@ -203,7 +204,7 @@ class ParseGEF:
             zero_measurement_inclination_ew_after_penetration_test : float
             mileage: float
         ** Bore attributes:**
-            df: pandas.DataFrame
+            df: polars.DataFrame
                 DataFrame containing the columns: [
                                                     "depth_top",
                                                     "depth_bottom",
@@ -315,7 +316,7 @@ class ParseGEF:
             If True the plot is showed, else the matplotlib.pytplot.figure is returned
         figsize: tuple
             Figsize of the plot, default (11, 8).
-        df_group: pd.DataFrame, only for cpt type, optional for the classification
+        df_group: polars.DataFrame, only for cpt type, optional for the classification
             Use this argument to plot a defined soil layering next to the other subplots.
             It should contain the columns:
                 - layer
@@ -419,8 +420,8 @@ class ParseGEF:
 
         Returns
         -------
-        df: pd.DataFrame
-        If do_grouping is True a pandas.DataFrame with the grouped layer is returned otherwise a pandas.DataFrame with
+        df: polars.DataFrame
+        If do_grouping is True a polars.DataFrame with the grouped layer is returned otherwise a polars.DataFrame with
         a classification for each row is returned.
 
         """
@@ -674,19 +675,20 @@ class ParseCPT:
             if columns_number is not None:
                 columns_info = []
                 for column_number in range(1, columns_number + 1):
-                    column_info = utils.parse_column_info(
-                        header_s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+                    columns_info.append(
+                        utils.parse_column_info(
+                            header_s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+                        )
                     )
-                    columns_info.append(column_info)
         new_data = data_s.replace("!", "")
         separator = utils.find_separator(header_s)
-        return pd.read_csv(
+
+        return pl.read_csv(
             io.StringIO(new_data),
             sep=separator,
-            names=columns_info,
-            index_col=False,
-            engine="python",
-        )
+            new_columns=columns_info,
+            has_headers=False,
+        ).to_pandas()
 
 
 class ParseBORE:
@@ -770,17 +772,20 @@ class ParseBORE:
                     range(1, columns_number + 1),
                 )
             )
-            return pd.read_csv(
-                io.StringIO(data_s), sep=sep, names=col, index_col=False, usecols=col
-            )
-        else:
-            return pd.read_csv(
+            return pl.read_csv(
                 io.StringIO(data_s),
                 sep=sep,
-                names=columns_info,
-                index_col=False,
-                usecols=columns_info,
-            )
+                new_columns=col,
+                has_headers=False,
+                projection=list(range(0, len(col))),
+            ).to_pandas()
+        else:
+            return pl.read_csv(
+                io.StringIO(data_s),
+                sep=sep,
+                new_columns=columns_info,
+                has_headers=False,
+            ).to_pandas()
 
     @staticmethod
     def parse_data_soil_type(df, data_rows_soil):
