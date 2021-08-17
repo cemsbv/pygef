@@ -26,7 +26,7 @@ class GefTest(unittest.TestCase):
     def test_measurement_var_integer(self):
         s = r"#MEASUREMENTVAR= 41, 0, deg, "
         v = utils.parse_measurement_var_as_float(s, 41)
-        self.assertAlmostEqual(v, 0)
+        self.assertAlmostEqual(v, 0.0)
 
     def test_measurement_var_big_integer(self):
         s = r"#MEASUREMENTVAR= 41, 10000, deg, "
@@ -36,12 +36,12 @@ class GefTest(unittest.TestCase):
     def test_measurement_var_different_space(self):
         s = r"#MEASUREMENTVAR = 41, 0, deg, "
         v = utils.parse_measurement_var_as_float(s, 41)
-        self.assertAlmostEqual(v, 0)
+        self.assertAlmostEqual(v, 0.0)
 
     def test_measurement_var_different_comma(self):
         s = r"#MEASUREMENTVAR= 41 , 0, deg, "
         v = utils.parse_measurement_var_as_float(s, 41)
-        self.assertAlmostEqual(v, 0)
+        self.assertAlmostEqual(v, 0.0)
 
     def test_parse_cpt_class(self):
         s = r"#MEASUREMENTTEXT= 6, NEN 5140 / klasse onbekend, sondeernorm en kwaliteitsklasse"
@@ -50,15 +50,15 @@ class GefTest(unittest.TestCase):
 
         s = r"#MEASUREMENTTEXT= 6, NEN-EN-ISO22476-1 / klasse 2 / TE2, gehanteerde norm en klasse en type sondering"
         v = utils.parse_cpt_class(s)
-        self.assertEqual(v, 2)
+        self.assertEqual(v, 2.0)
 
         s = r"#MEASUREMENTTEXT= 6, Norm : NEN 5140; Klasse : 2, De norm waaraan deze sondering moet voldoen."
         v = utils.parse_cpt_class(s)
-        self.assertEqual(v, 2)
+        self.assertEqual(v, 2.0)
 
         s = r"#MEASUREMENTTEXT= 6, Norm : NEN 5140; class : 2, De norm waaraan deze sondering moet voldoen."
         v = utils.parse_cpt_class(s)
-        self.assertEqual(v, 2)
+        self.assertEqual(v, 2.0)
 
     def test_file_date(self):
         s = r"#FILEDATE= 2004, 1, 14"
@@ -176,11 +176,11 @@ class GefTest(unittest.TestCase):
     def test_parse_data(self):
         header_s = "This is an header"
         df = pd.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
-        data_s = "\n1,1,1\n2,2,2\n3,3,3".replace(",", " ")
+        data_s = "\n1,1,1\n2,2,2\n3,3,3\n".replace(",", " ")
         df_parsed = ParseCPT.parse_data(
             header_s, data_s, columns_number=3, columns_info=["col1", "col2", "col3"]
         )
-        assert_frame_equal(df_parsed, df)
+        assert df_parsed.to_pandas().frame_equal(df, null_equal=True)
 
     def test_parse_column_separator(self):
         s = r"#COLUMNSEPARATOR = ;"
@@ -208,12 +208,12 @@ class GefTest(unittest.TestCase):
     def test_parse_data_column_info(self):
         header_s = "This is an header"
         df = pd.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
-        data_s = "\n1;1;1\n2;2;2\n3;3;3"
+        data_s = "\n1;1;1\n2;2;2\n3;3;3\n"
         sep = ";"
         df_parsed = ParseBORE.parse_data_column_info(
             header_s, data_s, sep, 3, columns_info=["col1", "col2", "col3"]
         )
-        assert_frame_equal(df_parsed, df)
+        assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_parse_data_soil_type(self):
         df = pd.DataFrame(
@@ -227,7 +227,7 @@ class GefTest(unittest.TestCase):
         )
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
         df_parsed = ParseBORE.parse_data_soil_type(pd.DataFrame({}), data_s)
-        assert_frame_equal(df_parsed, df)
+        assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_parse_add_info(self):
         s = "'SCH1'"
@@ -263,71 +263,71 @@ class GefTest(unittest.TestCase):
         ]
 
         df_parsed = ParseBORE.parse_add_info_as_string(pd.DataFrame({}), data_s)
-        assert_frame_equal(df_parsed, df)
+        assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_soil_quantification(self):
         s = "'Kz'"
         v = utils.soil_quantification(s)
-        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.95, 0, 0, 0])))
+        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.95, 0.0, 0.0, 0.0])))
 
         s = "'Kz1'"
         v = utils.soil_quantification(s)
-        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.95, 0, 0, 0])))
+        self.assertTrue(np.all(np.isclose(v, [0.0, 0.05, 0.95, 0.0, 0.0, 0.0])))
 
         s = "'Kz1s1'"
         v = utils.soil_quantification(s)
-        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.9, 0, 0, 0.05])))
+        self.assertTrue(np.all(np.isclose(v, [0.0, 0.05, 0.9, 0.0, 0.0, 0.05])))
 
     def test_parse_data_soil_code(self):
         df = pd.DataFrame({"Soil_code": ["Kz", "Kz1", "Kz2"]})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
         df_parsed = ParseBORE.parse_data_soil_code(pd.DataFrame({}), data_s)
-        assert_frame_equal(df_parsed, df)
+        assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_data_soil_quantified(self):
-        lst = [[0, 0.05, 0.95, 0, 0, 0], [0, 0.05, 0.95, 0, 0, 0]]
+        lst = [[0.0, 0.05, 0.95, 0.0, 0.0, 0.0], [0.0, 0.05, 0.95, 0.0, 0.0, 0.0]]
         df = pd.DataFrame(
             lst, columns=["Gravel", "Sand", "Clay", "Loam", "Peat", "Silt"], dtype=float
         )
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"]]
         df_parsed = ParseBORE.data_soil_quantified(data_s)
-        assert_frame_equal(df_parsed, df)
+        assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_calculate_elevation_respect_to_NAP(self):
-        df1 = pd.DataFrame({"depth": [0, 1, 2, 3, 4]})
+        df1 = pl.DataFrame({"depth": [0.0, 1.0, 2.0, 3.0, 4.0]})
         zid = -3
         df_calculated = ParseCPT.calculate_elevation_with_respect_to_nap(
             df1, zid, 31000
         )
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
-                "depth": [0, 1, 2, 3, 4],
-                "elevation_with_respect_to_NAP": [-3, -4, -5, -6, -7],
+                "depth": [0.0, 1.0, 2.0, 3.0, 4.0],
+                "elevation_with_respect_to_NAP": [-3.0, -4.0, -5.0, -6.0, -7.0],
             }
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_correct_depth_with_inclination(self):
-        df1 = pd.DataFrame({"penetration_length": [0, 0.2, 0.4, 0.6, 0.8]})
+        df1 = pl.DataFrame({"penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8]})
         df_calculated = ParseCPT.correct_depth_with_inclination(df1)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
-                "penetration_length": [0, 0.2, 0.4, 0.6, 0.8],
-                "depth": [0, 0.2, 0.4, 0.6, 0.8],
+                "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
+                "depth": [0.0, 0.2, 0.4, 0.6, 0.8],
             }
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
-        df2 = pd.DataFrame(
+        df2 = pl.DataFrame(
             {
-                "penetration_length": [0, 0.2, 0.4, 0.6, 0.8],
+                "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
         df_calculated = ParseCPT.correct_depth_with_inclination(df2)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
-                "penetration_length": [0, 0.2, 0.4, 0.6, 0.8],
+                "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
                 "inclination": [45, 45, 45, 45, 45],
                 "depth": [
                     0.0,
@@ -338,58 +338,72 @@ class GefTest(unittest.TestCase):
                 ],
             }
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
-        df2 = pd.DataFrame(
+        df2 = pl.DataFrame(
             {
-                "penetration_length": [0, 0.2, 0.4, 0.6, 0.8],
-                "corrected_depth": [0, 0.10, 0.25, 0.40, 0.60],
+                "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
+                "corrected_depth": [0.0, 0.10, 0.25, 0.40, 0.60],
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
         df_calculated = ParseCPT.correct_depth_with_inclination(df2)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
-                "penetration_length": [0, 0.2, 0.4, 0.6, 0.8],
-                "depth": [0, 0.10, 0.25, 0.40, 0.60],
+                "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
+                "depth": [0.0, 0.10, 0.25, 0.40, 0.60],
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_pre_excavated_depth(self):
         df1 = pd.DataFrame(
-            {"penetration_length": [0, 1, 2, 3, 4], "qc": [0.5, 0.5, 0.6, 0.7, 0.8]}
+            {
+                "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
+                "qc": [0.5, 0.5, 0.6, 0.7, 0.8],
+            }
         )
         pre_excavated_depth = 2
         df_calculated = ParseCPT.correct_pre_excavated_depth(df1, pre_excavated_depth)
-        df = pd.DataFrame({"penetration_length": [2, 3, 4], "qc": [0.6, 0.7, 0.8]})
-        assert_frame_equal(df_calculated, df)
+        df = pd.DataFrame(
+            {"penetration_length": [2.0, 3.0, 4.0], "qc": [0.6, 0.7, 0.8]}
+        )
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_replace_column_void(self):
-        df1 = pd.DataFrame(
-            {"penetration_length": [999, 1, 2, 3, 4], "qc": [999, 0.5, 0.6, 0.7, 0.8]}
+        df1 = pl.DataFrame(
+            {
+                "penetration_length": [999.0, 1.0, 2.0, 3.0, 4.0],
+                "qc": [999.0, 0.5, 0.6, 0.7, 0.8],
+            }
         )
-        column_void = 999
+        column_void = 999.0
         df_calculated = ParseCPT.replace_column_void(df1, column_void)
-        df = pd.DataFrame(
-            {"penetration_length": [1.0, 2, 3, 4], "qc": [0.5, 0.6, 0.7, 0.8],}
+        df = pl.DataFrame(
+            {"penetration_length": [1.0, 2.0, 3.0, 4.0], "qc": [0.5, 0.6, 0.7, 0.8],}
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
+
+        df1 = pl.DataFrame(
+            {"penetration_length": [1.0, 2.0, 999.0, 4.0], "qc": [0.5, 0.6, 999.0, 0.8]}
+        )
+        df_calculated = ParseCPT.replace_column_void(df1, column_void)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_calculate_friction_number(self):
         df1 = pd.DataFrame(
-            {"qc": [0.5, 0.5, 0.6, 0.7, 0.8], "fs": [0, 0.05, 0.06, 0.07, 0.08]}
+            {"qc": [0.5, 0.5, 0.6, 0.7, 0.8], "fs": [0.0, 0.05, 0.06, 0.07, 0.08]}
         )
         df_calculated = ParseCPT.calculate_friction_number(df1)
         df = pd.DataFrame(
             {
                 "qc": [0.5, 0.5, 0.6, 0.7, 0.8],
-                "fs": [0, 0.05, 0.06, 0.07, 0.08],
+                "fs": [0.0, 0.05, 0.06, 0.07, 0.08],
                 "friction_number": [0.0, 10.0, 10.0, 10.0, 10.0],
             }
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_parse_cpt(self):
         cpt = ParseGEF(
@@ -432,7 +446,7 @@ class GefTest(unittest.TestCase):
                 "friction_number": [6.54929577, 5.85616438, 5.65217391],
             }
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_parse_bore(self):
         cpt = ParseGEF(
@@ -496,7 +510,7 @@ class GefTest(unittest.TestCase):
             },
             dtype=float,
         )
-        assert_frame_equal(df_calculated, df)
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_parse_pre_excavated_dept_with_void_inclination(self):
         cpt = ParseGEF(
@@ -523,7 +537,7 @@ class GefTest(unittest.TestCase):
 1.5300e+000 9.3044e+000 5.3803e-002 8.2007e-001 5.7986e-001 3.3362e-003
 """
         )
-        actual = cpt.df.round(6)
+        actual = cpt.df.to_pandas().round(6)
 
         expected = pd.DataFrame(
             {
@@ -537,32 +551,35 @@ class GefTest(unittest.TestCase):
                 "elevation_with_respect_to_NAP": [-1.90, -1.919999],
             }
         )
-        assert_frame_equal(actual, expected)
+        assert actual.frame_equal(expected, null_equal=True)
 
     def test_delta_depth(self):
-        df1 = pd.DataFrame({"depth": [0, 0.5, 1]})
+        df1 = pd.DataFrame({"depth": [0.0, 0.5, 1.0]})
         v = geo.delta_depth(df1)
-        df = pd.DataFrame({"depth": [0, 0.5, 1], "delta_depth": [0, 0.5, 0.5]})
-        assert_frame_equal(v, df)
+        df = pd.DataFrame({"depth": [0.0, 0.5, 1.0], "delta_depth": [0.0, 0.5, 0.5]})
+        assert v.frame_equal(df, null_equal=True)
 
     def test_soil_pressure(self):
-        df1 = pd.DataFrame({"gamma": [0, 0.5, 1], "delta_depth": [0, 0.5, 0.5]})
-        v = geo.soil_pressure(df1)
-        df = pd.DataFrame(
+        v = pl.DataFrame({"gamma": [0.0, 0.5, 1.0], "delta_depth": [0.0, 0.5, 0.5]})
+        geo.soil_pressure(v)
+        df = pl.DataFrame(
             {
-                "gamma": [0, 0.5, 1],
-                "delta_depth": [0, 0.5, 0.5],
+                "gamma": [0.0, 0.5, 1.0],
+                "delta_depth": [0.0, 0.5, 0.5],
                 "soil_pressure": [0.0, 0.25, 0.75],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_water_pressure(self):
         water_level = 0.5
-        df1 = pd.DataFrame({"depth": [0, 0.5, 1]})
-        v = geo.water_pressure(df1, water_level)
-        df = pd.DataFrame({"depth": [0, 0.5, 1], "water_pressure": [0.0, 0.0, 4.905]})
-        assert_frame_equal(v, df)
+        v = pl.DataFrame({"depth": [0.0, 0.5, 1.0]})
+        geo.water_pressure(v, water_level)
+        df = pl.DataFrame(
+            {"depth": [0.0, 0.5, 1.0], "water_pressure": [0.0, 0.0, 4.905]}
+        )
+
+        assert v.frame_equal(df, null_equal=True)
 
     def test_effective_soil_pressure(self):
         df1 = pd.DataFrame(
@@ -576,7 +593,7 @@ class GefTest(unittest.TestCase):
                 "effective_soil_pressure": [0.0, 0.25, -4.155],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_assign_multiple_columns(self):
         df1 = pd.DataFrame(
@@ -586,7 +603,7 @@ class GefTest(unittest.TestCase):
         df = pd.DataFrame(
             {"soil_pressure": [0.0, 0.25, 0.75], "water_pressure": [0.0, 0.0, 4.905]}
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_kpa_to_mpa(self):
         df1 = pd.DataFrame(
@@ -599,13 +616,13 @@ class GefTest(unittest.TestCase):
                 "water_pressure": [0.0, 0.0, 0.004905],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_qt(self):
         df1 = pd.DataFrame({"qc": [0.0, 1, 2], "u2": [0, 1, 1]})
         v = geo.qt(df1, area_quotient_cone_tip=0.5)
         df = pd.DataFrame({"qc": [0.0, 1, 2], "u2": [0, 1, 1], "qt": [0.0, 1.5, 2.5]})
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_normalized_cone_resistance(self):
         df1 = pd.DataFrame(
@@ -624,7 +641,7 @@ class GefTest(unittest.TestCase):
                 "normalized_cone_resistance": [np.nan, 5.0, 1.0],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_normalized_friction_ratio(self):
         df1 = pd.DataFrame(
@@ -645,13 +662,13 @@ class GefTest(unittest.TestCase):
                 "normalized_friction_ratio": [np.inf, 40.0, 28.57142857142857],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_nan_to_zero(self):
         df1 = pd.DataFrame({"type_index": [np.nan]})
         v = utils.nan_to_zero(df1)
         df = pd.DataFrame({"type_index": [0.0]})
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_group_equal_layers(self):
         df_group = pl.DataFrame(
@@ -738,7 +755,7 @@ class GefTest(unittest.TestCase):
                 "thickness": [0.4, 4.6, 1.0],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_calculate_z_centr(self):
         df_group = pd.DataFrame(
@@ -757,7 +774,7 @@ class GefTest(unittest.TestCase):
                 "z_centr": [2.5, 5.5],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_calculate_zf_NAP(self):
         df_group = pd.DataFrame(
@@ -782,7 +799,7 @@ class GefTest(unittest.TestCase):
                 "zf_NAP": [0, -3, -4],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_bug_depth(self):
         cpt = """

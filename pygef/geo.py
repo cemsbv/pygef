@@ -20,20 +20,16 @@ def delta_depth(df, pre_excavated_depth=None):
 
 
 def soil_pressure(df):
-    polars_df = pl.from_pandas(df)
-    polars_df["soil_pressure"] = np.cumsum(
-        polars_df["gamma"] * polars_df["delta_depth"], axis=0
-    )
-    return polars_df.to_pandas()
+    df["soil_pressure"] = (df["gamma"] * df["delta_depth"]).cum_sum()
+
+    return df
 
 
 def water_pressure(df, water_level):
-    polars_df = pl.from_pandas(df)
-    polars_df["water_pressure"] = polars_df["depth"].apply(
-        lambda depth: (depth - water_level) * 9.81
-    )
-    polars_df[polars_df["water_pressure"] < 0, "water_pressure"] = 0
-    return polars_df.to_pandas()
+    df["water_pressure"] = df["depth"].apply(lambda depth: (depth - water_level) * 9.81)
+    df[df["water_pressure"] < 0, "water_pressure"] = 0
+
+    return df
 
 
 def effective_soil_pressure(df):

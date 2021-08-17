@@ -1,4 +1,4 @@
 pre-commit>=2.13.0
 black==19.10b0
 matplotlib >= 3.4.2
-polars >= 0.8.20
+polars >= 0.8.21

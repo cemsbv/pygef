@@ -589,67 +589,61 @@ class ParseCPT:
             .pipe(self.replace_column_void, self.column_void)
             .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(self.correct_depth_with_inclination)
-            .pipe(lambda df: df.assign(depth=np.abs(df["depth"].values)))
+            .pipe(self.make_depth_absolute)
             .pipe(self.calculate_elevation_with_respect_to_nap, zid, height_system)
             .pipe(self.calculate_friction_number)
         )
 
     @staticmethod
     def replace_column_void(df, column_void):
+        # TODO: add interpolation for none values
         if column_void is not None:
-            # added drop nan because values can't be extrapolated
-            return (
-                df.replace(column_void, np.nan)
-                .interpolate(method="linear")
-                .dropna()
-                .reset_index(drop=True)
-            )
+            df = df.filter(pl.col("*") != column_void)
+
         return df
 
     @staticmethod
     def calculate_friction_number(df):
         if "fs" in df.columns and "qc" in df.columns:
-            df = df.assign(friction_number=(df["fs"].values / df["qc"].values * 100))
+            df["friction_number"] = df["fs"] / df["qc"] * 100
         if "friction_number" not in df.columns:
-            df = df.assign(friction_number=(np.zeros(df.shape[0])))
+            df["friction_number"] = np.zeros(df.shape[0])
+
         return df
 
     @staticmethod
     def calculate_elevation_with_respect_to_nap(df, zid, height_system):
         if zid is not None and height_system == 31000:
-            df = df.assign(
-                elevation_with_respect_to_NAP=np.subtract(zid, df["depth"].values)
-            )
+            df["elevation_with_respect_to_NAP"] = np.subtract(zid, df["depth"])
+
         return df
 
     @staticmethod
     def correct_depth_with_inclination(df):
         if "corrected_depth" in df.columns:
-            return df.rename(columns={"corrected_depth": "depth"})
-        if "inclination" in df.columns:
-            diff_t_depth = np.diff(df["penetration_length"].values) * np.cos(
-                np.radians(df["inclination"].fillna(0).values[:-1])
+            df.rename(columns={"corrected_depth": "depth"})
+        elif "inclination" in df.columns:
+            diff_t_depth = np.diff(df["penetration_length"]) * np.cos(
+                np.radians(df.select(pl.col("inclination").fill_none(0))[:-1])
             )
             # corrected depth
-            return df.assign(
-                depth=np.concatenate(
-                    [
-                        np.array([df["penetration_length"].iloc[0]]),
-                        np.array([df["penetration_length"].iloc[0]])
-                        + np.cumsum(diff_t_depth),
-                    ]
-                )
+            df["depth"] = np.concatenate(
+                [
+                    np.array([df["penetration_length"][0]]),
+                    np.array([df["penetration_length"][0]]) + np.cumsum(diff_t_depth),
+                ]
             )
-        return df.assign(depth=df["penetration_length"])
+        else:
+            df["depth"] = df["penetration_length"]
+
+        return df
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
         atol = float(
             np.mean(
                 np.diff(
-                    df.loc[(df["qc"] > 0) & (df["qc"] < 1000)][
-                        "penetration_length"
-                    ].values
+                    df.loc[(df["qc"] > 0) & (df["qc"] < 1000)]["penetration_length"]
                 )
             )
             / 2
@@ -658,9 +652,7 @@ class ParseCPT:
             pre_excavated_depth is not None
             and pre_excavated_depth > 0
             and np.any(
-                np.isclose(
-                    df["penetration_length"].values - pre_excavated_depth, 0, atol=atol
-                )
+                np.isclose(df["penetration_length"] - pre_excavated_depth, 0, atol=atol)
             )
         ):
             mask = np.isclose(df["penetration_length"], pre_excavated_depth, atol=atol)
@@ -688,7 +680,13 @@ class ParseCPT:
             sep=separator,
             new_columns=columns_info,
             has_headers=False,
-        ).to_pandas()
+        )
+
+    @staticmethod
+    def make_depth_absolute(df):
+        df["depth"] = np.abs(df["depth"])
+
+        return df
 
 
 class ParseBORE:

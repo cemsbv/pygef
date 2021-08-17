@@ -706,7 +706,7 @@ def join_gef(bore, cpt):
 
     :param bore: (ParseBORE)
     :param cpt: (ParseCPT)
-    :return: (pd.DataFrame)
+    :return: (pl.DataFrame)
     """
     df_cpt = cpt.df.assign(join_idx=0)
     df_bore = bore.df.loc[
