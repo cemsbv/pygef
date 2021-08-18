@@ -1,13 +1,12 @@
 import unittest
 import pygef.robertson.util as util
-import pandas as pd
-from pandas.util.testing import assert_frame_equal
+import polars as pl
 import numpy as np
 
 
 class RobertsonTest(unittest.TestCase):
     def test_n_exponent(self):
-        df1 = pd.DataFrame(
+        df1 = pl.DataFrame(
             {
                 "type_index_n": [1, 1, 1],
                 "effective_soil_pressure": [0.001, 0.002, 0.003],
@@ -15,17 +14,17 @@ class RobertsonTest(unittest.TestCase):
         )
         p_a = 0.1
         v = util.n_exponent(df1, p_a)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "type_index_n": [1, 1, 1],
                 "effective_soil_pressure": [0.001, 0.002, 0.003],
                 "n": [0.2315, 0.2320, 0.2325],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_normalized_cone_resistance_n(self):
-        df1 = pd.DataFrame(
+        df1 = pl.DataFrame(
             {
                 "qt": [1, 1, 1],
                 "soil_pressure": [0.002, 0.003, 0.004],
@@ -35,7 +34,7 @@ class RobertsonTest(unittest.TestCase):
         )
         p_a = 0.1
         v = util.normalized_cone_resistance_n(df1, p_a)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "qt": [1, 1, 1],
                 "soil_pressure": [0.002, 0.003, 0.004],
@@ -44,44 +43,44 @@ class RobertsonTest(unittest.TestCase):
                 "normalized_cone_resistance": [28.982146, 24.709059, 22.507572],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_type_index(self):
-        df1 = pd.DataFrame(
+        df1 = pl.DataFrame(
             {
                 "normalized_cone_resistance": [28.982146, 24.709059, 22.507572],
                 "normalized_friction_ratio": [0.5, 1, 4],
             }
         )
         v = util.type_index(df1)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "normalized_cone_resistance": [28.982146, 24.709059, 22.507572],
                 "normalized_friction_ratio": [0.5, 1, 4],
                 "type_index": [2.208177, 2.408926, 2.793642],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_ic_to_gamma(self):
         water_level = 0.5  # gammas:    19       19       18
-        df1 = pd.DataFrame(
+        df1 = pl.DataFrame(
             {"type_index": [2.208177, 2.408926, 2.793642], "depth": [0.5, 1, 4]}
         )
         v = util.ic_to_gamma(df1, water_level)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "type_index": [2.208177, 2.408926, 2.793642],
                 "depth": [0.5, 1, 4],
                 "gamma_predict": [19, 19, 18],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_ic_to_soil_type(self):
-        df1 = pd.DataFrame({"type_index": [2.208177, 2.408926, 2.793642]})
+        df1 = pl.DataFrame({"type_index": [2.208177, 2.408926, 2.793642]})
         v = util.ic_to_soil_type(df1)
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "type_index": [2.208177, 2.408926, 2.793642],
                 "soil_type": [
@@ -91,11 +90,11 @@ class RobertsonTest(unittest.TestCase):
                 ],
             }
         )
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_old_robertson(self):
         water_level = -0.5
-        df1 = pd.DataFrame(
+        df1 = pl.DataFrame(
             {
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
@@ -105,7 +104,7 @@ class RobertsonTest(unittest.TestCase):
         )
         v = util.old_robertson(df1, water_level)
 
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
@@ -139,11 +138,11 @@ class RobertsonTest(unittest.TestCase):
             }
         )
 
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_new_robertson(self):
         water_level = -0.5
-        df1 = pd.DataFrame(
+        df1 = pl.DataFrame(
             {
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
@@ -155,7 +154,7 @@ class RobertsonTest(unittest.TestCase):
         )
         v = util.new_robertson(df1, water_level)
 
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
@@ -187,11 +186,11 @@ class RobertsonTest(unittest.TestCase):
             }
         )
 
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)
 
     def test_iterate_robertson(self):
         water_level = -0.5
-        df1 = pd.DataFrame(
+        df1 = pl.DataFrame(
             {
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
@@ -203,7 +202,7 @@ class RobertsonTest(unittest.TestCase):
         )
         v = util.iterate_robertson(df1, water_level)
 
-        df = pd.DataFrame(
+        df = pl.DataFrame(
             {
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
@@ -236,4 +235,4 @@ class RobertsonTest(unittest.TestCase):
             }
         )
 
-        assert_frame_equal(v, df)
+        assert v.frame_equal(df, null_equal=True)

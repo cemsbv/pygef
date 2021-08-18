@@ -271,7 +271,7 @@ def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
 
     v = df[["G", "S", "L", "C", "P"]].values
     v[:, 2] += df["SI"].values
-    v[np.argwhere(v.sum(1) < 0)] = np.nan
+    v[np.argwhere(v.sum(1) < 0)] = None
 
     c = ["#a76b29", "#578E57", "#0078C1", "#DBAD4B", "#708090"]
 

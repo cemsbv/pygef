@@ -2,6 +2,7 @@ import re
 import logging
 from datetime import datetime
 import numpy as np
+import polars as pl
 
 
 logger = logging.getLogger(__name__)
@@ -681,11 +682,12 @@ def parse_add_info(s):
 
 
 def assign_multiple_columns(df, columns, partial_df):
-    return df.assign(**dict(zip(columns, partial_df.values.T)))
+    # TODO: what did this do?
+    return partial_df
 
 
-def nan_to_zero(df):
-    return df.fillna(0)
+def none_to_zero(df):
+    return df.fill_none(0.0)
 
 
 def kpa_to_mpa(df, columns):

@@ -12,11 +12,9 @@ def delta_depth(df, pre_excavated_depth=None):
     :param pre_excavated_depth: (flt)
     :return: (DataFrame) [depth, delta_depth]
     """
-    polars_df = pl.from_pandas(df)
-    polars_df["delta_depth"] = np.r_[
-        np.array([df["depth"][0]]), np.diff(df["depth"].values)
-    ]
-    return polars_df.to_pandas()
+    df["delta_depth"] = np.r_[np.array([df["depth"][0]]), np.diff(df["depth"])]
+
+    return df
 
 
 def soil_pressure(df):
@@ -33,50 +31,39 @@ def water_pressure(df, water_level):
 
 
 def effective_soil_pressure(df):
-    polars_df = pl.from_pandas(df)
-    polars_df["effective_soil_pressure"] = (
-        polars_df["soil_pressure"] - polars_df["water_pressure"]
-    )
-    return polars_df.to_pandas()
+    df["effective_soil_pressure"] = df["soil_pressure"] - df["water_pressure"]
+
+    return df
 
 
 def qt(df, area_quotient_cone_tip=None):
-    polars_df = pl.from_pandas(df)
     if "u2" in df.columns and area_quotient_cone_tip is not None:
-        polars_df["qt"] = polars_df["qc"] + polars_df["u2"].apply(
+        df["qt"] = df["qc"] + df["u2"].apply(
             lambda u2: u2 * (1.0 - area_quotient_cone_tip)
         )
     else:
-        polars_df["qt"] = polars_df["qc"]
+        df["qt"] = df["qc"]
 
-    return polars_df.to_pandas()
+    return df
 
 
 def normalized_cone_resistance(df):
-    polars_df = pl.from_pandas(df)
-    polars_df["normalized_cone_resistance"] = (
-        polars_df["qt"] - polars_df["soil_pressure"]
-    ) / polars_df["effective_soil_pressure"]
-    polars_df[
-        polars_df["normalized_cone_resistance"] < 0, "normalized_cone_resistance"
-    ] = 1
-    return polars_df.to_pandas()
+    df["normalized_cone_resistance"] = (df["qt"] - df["soil_pressure"]) / df[
+        "effective_soil_pressure"
+    ]
+    df[df["normalized_cone_resistance"] < 0, "normalized_cone_resistance"] = 1
+
+    return df
 
 
 def normalized_friction_ratio(df):
-    polars_df = pl.from_pandas(df)
-
     if "fs" in df.columns:
-        fs = polars_df["fs"]
+        fs = df["fs"]
     else:
-        fs = polars_df["friction_number"] * polars_df["qc"] / 100
+        fs = df["friction_number"] * df["qc"] / 100
 
-    polars_df["normalized_friction_ratio"] = (
-        fs / (polars_df["qt"] - polars_df["soil_pressure"])
-    ) * 100
+    df["normalized_friction_ratio"] = (fs / (df["qt"] - df["soil_pressure"])) * 100
 
-    polars_df[
-        polars_df["normalized_friction_ratio"] < 0, "normalized_friction_ratio"
-    ] = 0.1
+    df[df["normalized_friction_ratio"] < 0, "normalized_friction_ratio"] = 0.1
 
-    return polars_df.to_pandas()
+    return df
