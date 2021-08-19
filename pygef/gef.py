@@ -268,7 +268,9 @@ class ParseGEF:
             )
 
         self.__dict__.update(parsed.__dict__)
-        self.df = self.df.drop_nulls()
+
+        # Convert all NaN to None and drop them
+        self.df = self.df.fill_nan(None).drop_nulls()
 
     def plot(
         self,
@@ -805,15 +807,15 @@ class ParseBORE:
 
         # Gravel
         df["g"] = data[:, 0]
-        # SaND
+        # Sand
         df["s"] = data[:, 1]
-        # ClAY
+        # Clay
         df["c"] = data[:, 2]
-        # LoAM
+        # Loam
         df["l"] = data[:, 3]
-        # PeAT
+        # Peat
         df["p"] = data[:, 4]
-        # SiLT
+        # Silt
         df["si"] = data[:, 5]
 
         return df

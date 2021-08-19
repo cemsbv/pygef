@@ -683,7 +683,10 @@ def parse_add_info(s):
 
 def assign_multiple_columns(df, columns, partial_df):
     # TODO: what did this do?
-    return partial_df
+    for column in columns:
+        df[column] = partial_df[column]
+
+    return df
 
 
 def none_to_zero(df):
