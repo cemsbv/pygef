@@ -682,18 +682,18 @@ def parse_add_info(s):
 
 
 def assign_multiple_columns(df, columns, partial_df):
-    # TODO: wait until transpose is added to polars
+    # TODO: figure out a way to not use a transpose here
     return pl.from_pandas(
         df.to_pandas().assign(**dict(zip(columns, partial_df.to_pandas().values.T)))
     )
 
 
-def none_to_zero(df):
-    return df.fill_none(0.0)
-
-
 def kpa_to_mpa(df, columns):
     return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
+
+
+def none_to_zero(df):
+    return df.fill_none(0.0)
 
 
 def nap_to_depth(zid, nap):

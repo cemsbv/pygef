@@ -155,7 +155,7 @@ def iterate_robertson(
             f = old_robertson
 
             def condition(x):
-                return np.all(x["gamma_predict"] == gamma)
+                return np.all(x["gamma_predict"].series_equal(pl.Series(gamma)))
 
         df = f(
             df,

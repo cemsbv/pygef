@@ -7,8 +7,7 @@ import polars as pl
 import pygef.geo as geo
 import pygef.grouping as grouping
 import pygef.utils as utils
-from pygef.gef import (MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT, ParseBORE,
-                       ParseCPT, ParseGEF)
+from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT, ParseBORE, ParseCPT, ParseGEF
 from pygef.grouping import GroupClassification
 
 
