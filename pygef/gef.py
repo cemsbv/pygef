@@ -628,9 +628,8 @@ class ParseCPT:
     @staticmethod
     def correct_depth_with_inclination(df):
         if "corrected_depth" in df.columns:
-            df.rename(mapping={"corrected_depth": "depth"})
+            df = df.rename(mapping={"corrected_depth": "depth"})
         elif "inclination" in df.columns:
-            # TODO: wait for support for [:-1]
             inclination = df.select(pl.col("inclination").fill_none(0))[:-1]
             diff_t_depth = np.diff(df["penetration_length"]) * np.cos(
                 np.radians(inclination)
@@ -667,7 +666,8 @@ class ParseCPT:
             )
             minimum_length = df[mask][0]["penetration_length"]
 
-            return df.filter(pl.col("penetration_length") >= minimum_length)
+            if minimum_length.len() > 0:
+                return df.filter(pl.col("penetration_length") >= minimum_length)
 
         return df
 

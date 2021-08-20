@@ -957,9 +957,9 @@ class BoreTest(unittest.TestCase):
         )
 
     def test_sum_to_one(self):
-        df = self.bore.df[["G", "S", "C", "L", "P", "SI"]].sum(1)
-        df[df < 0] = 1.0
-        self.assertTrue(np.all(np.isclose(df.values, 1)))
+        df = self.bore.df[["g", "s", "c", "l", "p", "si"]].sum(1)
+        df[df["g"] < 0.0, "g"] = 1.0
+        self.assertTrue(np.all(np.isclose(df["g"], 1)))
 
 
 class PlotTest(unittest.TestCase):
@@ -981,7 +981,7 @@ class TestRobertson(unittest.TestCase):
         self.gef = ParseGEF("./pygef/files/example.gef")
 
     def test_nan_dropped(self):
-        self.assertAlmostEqual(self.gef.df["qc"].iloc[0], 16.72)
+        self.assertAlmostEqual(self.gef.df["qc"][0], 16.72)
 
     def test_water_pressure(self):
         """
