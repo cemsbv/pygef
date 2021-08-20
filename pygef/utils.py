@@ -682,11 +682,10 @@ def parse_add_info(s):
 
 
 def assign_multiple_columns(df, columns, partial_df):
-    # TODO: what did this do?
-    for column in columns:
-        df[column] = partial_df[column]
-
-    return df
+    # TODO: wait until transpose is added to polars
+    return pl.from_pandas(
+        df.to_pandas().assign(**dict(zip(columns, partial_df.to_pandas().values.T)))
+    )
 
 
 def none_to_zero(df):

@@ -24,7 +24,7 @@ def normalized_cone_resistance_n(df, p_a):
         / p_a
         * (p_a / df["effective_soil_pressure"]).to_numpy() ** df["n"].to_numpy()
     )
-    df[df["normalized_cone_resistance"] < 0, "normalized_cone_resistance"] = 1.0
+    df[df["normalized_cone_resistance"] < 0.0, "normalized_cone_resistance"] = 1.0
 
     return df
 
@@ -32,8 +32,8 @@ def normalized_cone_resistance_n(df, p_a):
 def type_index(df):
     # We have to convert the series to numpy because they don't support pow
     df["type_index"] = (
-        (3.47 - np.log10(df["normalized_cone_resistance"].to_numpy())) ** 2
-        + (np.log10(df["normalized_friction_ratio"].to_numpy()) + 1.22) ** 2
+        (3.47 - np.log10(df["normalized_cone_resistance"].to_numpy())) ** 2.0
+        + (np.log10(df["normalized_friction_ratio"].to_numpy()) + 1.22) ** 2.0
     ) ** 0.5
 
     return df
@@ -143,7 +143,6 @@ def iterate_robertson(
             f = new_robertson
 
             def condition(x):
-                # TODO: use polars series equal
                 return np.all(
                     x["gamma_predict"].series_equal(pl.Series(gamma))
                     and np.all(x["n"].series_equal(pl.Series(n)))
