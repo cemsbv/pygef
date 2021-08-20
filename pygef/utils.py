@@ -1,9 +1,9 @@
-import re
 import logging
+import re
 from datetime import datetime
+
 import numpy as np
 import polars as pl
-
 
 logger = logging.getLogger(__name__)
 

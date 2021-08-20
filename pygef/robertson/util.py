@@ -1,7 +1,8 @@
 import numpy as np
 import polars as pl
-from pygef import geo
+
 import pygef.utils as utils
+from pygef import geo
 
 # TODO: at test coverage to travis.yaml Nice to have. :)
 

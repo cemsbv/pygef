@@ -1,7 +1,9 @@
 import unittest
-import pygef.robertson.util as util
-import polars as pl
+
 import numpy as np
+import polars as pl
+
+import pygef.robertson.util as util
 
 
 class RobertsonTest(unittest.TestCase):

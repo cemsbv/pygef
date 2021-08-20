@@ -1,12 +1,14 @@
 import unittest
-import pygef.utils as utils
-import pygef.geo as geo
 from datetime import datetime
-from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
-from pygef.gef import ParseGEF, ParseCPT, ParseBORE
-import polars as pl
+
 import numpy as np
+import polars as pl
+
+import pygef.geo as geo
 import pygef.grouping as grouping
+import pygef.utils as utils
+from pygef.gef import (MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT, ParseBORE,
+                       ParseCPT, ParseGEF)
 from pygef.grouping import GroupClassification
 
 

@@ -1,11 +1,12 @@
-import pygef.utils as utils
-import pandas as pd
-import polars as pl
 import io
-import numpy as np
-import pygef.plot_utils as plot
-from pygef import robertson, been_jefferies
 import logging
+
+import numpy as np
+import polars as pl
+
+import pygef.plot_utils as plot
+import pygef.utils as utils
+from pygef import been_jefferies, robertson
 from pygef.grouping import GroupClassification
 
 logger = logging.getLogger(__name__)

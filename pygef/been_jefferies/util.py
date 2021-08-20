@@ -1,7 +1,7 @@
 import numpy as np
-from pygef import geo
-import pygef.utils as utils
 
+import pygef.utils as utils
+from pygef import geo
 
 # TODO: at test coverage to travis.yaml Nice to have. :)
 
