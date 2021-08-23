@@ -1,8 +1,9 @@
-import re
 import logging
+import re
 from datetime import datetime
-import numpy as np
 
+import numpy as np
+import polars as pl
 
 logger = logging.getLogger(__name__)
 
@@ -336,7 +337,8 @@ def find_separator(header_s):
     if try_sep is not None:
         return parse_column_separator(header_s)
     else:
-        return r";|\s+|,|\|\s*"
+        # TODO: verify that this space is good enough for all use cases
+        return " "
 
 
 def parse_soil_code(s):
@@ -680,15 +682,18 @@ def parse_add_info(s):
 
 
 def assign_multiple_columns(df, columns, partial_df):
-    return df.assign(**dict(zip(columns, partial_df.values.T)))
-
-
-def nan_to_zero(df):
-    return df.fillna(0)
+    # TODO: figure out a way to not use a transpose here
+    return pl.from_pandas(
+        df.to_pandas().assign(**dict(zip(columns, partial_df.to_pandas().values.T)))
+    )
 
 
 def kpa_to_mpa(df, columns):
     return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
+
+
+def none_to_zero(df):
+    return df.fill_none(0.0)
 
 
 def nap_to_depth(zid, nap):
@@ -705,7 +710,7 @@ def join_gef(bore, cpt):
 
     :param bore: (ParseBORE)
     :param cpt: (ParseCPT)
-    :return: (pd.DataFrame)
+    :return: (pl.DataFrame)
     """
     df_cpt = cpt.df.assign(join_idx=0)
     df_bore = bore.df.loc[

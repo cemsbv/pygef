@@ -1,50 +1,43 @@
 import numpy as np
-from pygef import geo
-import pygef.utils as utils
+import polars as pl
 
+import pygef.utils as utils
+from pygef import geo
 
 # TODO: at test coverage to travis.yaml Nice to have. :)
 
 
 def n_exponent(df, p_a):
-    mask = (
-        0.381 * df["type_index_n"].values
-        + 0.05 * (df["effective_soil_pressure"].values / p_a)
-        - 0.15
-    ) < 1
-    df = df.assign(n=1)
-    df.loc[mask, "n"] = (
-        0.381 * df["type_index_n"][mask].values
-        + 0.05 * (df["effective_soil_pressure"][mask].values / p_a)
-        - 0.15
+    df["n"] = (
+        0.381 * df["type_index_n"] + 0.05 * (df["effective_soil_pressure"] / p_a) - 0.15
     )
+
+    # Set the maximum for N to 1.0
+    df[df["n"] > 1.0, "n"] = 1.0
+
     return df
 
 
 def normalized_cone_resistance_n(df, p_a):
-    df = df.assign(
-        normalized_cone_resistance=(
-            (df["qt"].values - df["soil_pressure"].values)
-            / p_a
-            * (p_a / df["effective_soil_pressure"].values) ** df["n"].values
-        )
+    # We have to convert the series to numpy because they don't support pow
+    df["normalized_cone_resistance"] = (
+        (df["qt"] - df["soil_pressure"]).to_numpy()
+        / p_a
+        * (p_a / df["effective_soil_pressure"]).to_numpy() ** df["n"].to_numpy()
     )
-    df.loc[
-        df["normalized_cone_resistance"].values < 0, "normalized_cone_resistance"
-    ] = 1
+    df[df["normalized_cone_resistance"] < 0.0, "normalized_cone_resistance"] = 1.0
+
     return df
 
 
 def type_index(df):
-    return df.assign(
-        type_index=(
-            (
-                (3.47 - np.log10(df["normalized_cone_resistance"].values)) ** 2
-                + (np.log10(df["normalized_friction_ratio"].values) + 1.22) ** 2
-            )
-            ** 0.5
-        )
-    )
+    # We have to convert the series to numpy because they don't support pow
+    df["type_index"] = (
+        (3.47 - np.log10(df["normalized_cone_resistance"].to_numpy())) ** 2.0
+        + (np.log10(df["normalized_friction_ratio"].to_numpy()) + 1.22) ** 2.0
+    ) ** 0.5
+
+    return df
 
 
 def ic_to_gamma(df, water_level):
@@ -55,28 +48,29 @@ def ic_to_gamma(df, water_level):
     :param water_level: (int) Water level with respect to ground level.
     :return: Updated DataFrame.
     """
-    mask_below_water = -df["depth"].values < water_level
-    df = df.assign(gamma_predict=1)
+    mask_below_water = (1.0 - df["depth"]) < water_level
+    # TODO: how to fill it properly with the same initial values?
+    df["gamma_predict"] = np.tile(1.0, len(df.rows()))
 
-    ic_mask = df["type_index"].values > 3.6
+    ic_mask = df["type_index"] > 3.6
     # gamma_(sat) and ic > 3.6
-    df.loc[ic_mask, "gamma_predict"] = 11
+    df[ic_mask, "gamma_predict"] = 11.0
 
-    ic_mask = df["type_index"].values <= 3.6
+    ic_mask = df["type_index"] <= 3.6
     # gamma_(sat) and ic < 3.6
-    df.loc[ic_mask, "gamma_predict"] = 16
+    df[ic_mask, "gamma_predict"] = 16.0
 
-    ic_mask = df["type_index"].values <= 2.95
+    ic_mask = df["type_index"] <= 2.95
     # gamma_(sat) and ic < x
-    df.loc[ic_mask, "gamma_predict"] = 18
+    df[ic_mask, "gamma_predict"] = 18.0
 
-    ic_mask = df["type_index"].values <= 2.6
+    ic_mask = df["type_index"] <= 2.6
     # gamma_sat and ic < x
-    df.loc[ic_mask & mask_below_water, "gamma_predict"] = 19
+    df[ic_mask & mask_below_water, "gamma_predict"] = 19.0
 
-    ic_mask = df["type_index"].values <= 2.05
+    ic_mask = df["type_index"] <= 2.05
     # gamma_sat and ic < x
-    df.loc[ic_mask & mask_below_water, "gamma_predict"] = 20
+    df[ic_mask & mask_below_water, "gamma_predict"] = 20.0
 
     return df
 
@@ -88,31 +82,32 @@ def ic_to_soil_type(df):
     :param df: (DataFrame) Original DataFrame.
     :return: (DataFrame) Updated DataFrame.
     """
-    df = df.assign(soil_type="")
+    # TODO: how to fill it properly with the same initial values?
+    df["soil_type"] = np.tile("", len(df.rows()))
 
-    ic_mask = df["type_index"].values > 3.6
-    df.loc[ic_mask, "soil_type"] = "Peat"
+    ic_mask = df["type_index"] > 3.6
+    df[ic_mask, "soil_type"] = "Peat"
 
-    ic_mask = df["type_index"].values <= 3.6
-    df.loc[ic_mask, "soil_type"] = "Clays - silty clay to clay"
+    ic_mask = df["type_index"] <= 3.6
+    df[ic_mask, "soil_type"] = "Clays - silty clay to clay"
 
-    ic_mask = df["type_index"].values <= 2.95
-    df.loc[ic_mask, "soil_type"] = "Silt mixtures - clayey silt to silty clay"
+    ic_mask = df["type_index"] <= 2.95
+    df[ic_mask, "soil_type"] = "Silt mixtures - clayey silt to silty clay"
 
-    ic_mask = df["type_index"].values <= 2.6
-    df.loc[ic_mask, "soil_type"] = "Sand mixtures - silty sand to sandy silt"
+    ic_mask = df["type_index"] <= 2.6
+    df[ic_mask, "soil_type"] = "Sand mixtures - silty sand to sandy silt"
 
-    ic_mask = df["type_index"].values <= 2.05
-    df.loc[ic_mask, "soil_type"] = "Sands - clean sand to silty sand"
+    ic_mask = df["type_index"] <= 2.05
+    df[ic_mask, "soil_type"] = "Sands - clean sand to silty sand"
 
-    ic_mask = df["type_index"].values <= 1.31
-    df.loc[ic_mask, "soil_type"] = "Gravelly sand to dense sand"
+    ic_mask = df["type_index"] <= 1.31
+    df[ic_mask, "soil_type"] = "Gravelly sand to dense sand"
 
     return df
 
 
-def nan_to_zero(df):
-    return df.fillna(0)
+def none_to_zero(df):
+    return df.fill_none(0)
 
 
 def iterate_robertson(
@@ -134,7 +129,7 @@ def iterate_robertson(
     :param p_a: (float) Atmospheric pressure. Default: 0.1 MPa.
     :return: (DataFrame)
     """
-    gamma = np.ones(original_df.shape[0]) * 18
+    gamma = np.ones(original_df.shape[0]) * 18.0
     n = np.ones(original_df.shape[0])
     type_index_n = np.ones(original_df.shape[0])
 
@@ -142,18 +137,25 @@ def iterate_robertson(
     while True:
         c += 1
         if new:
-            df = original_df.assign(n=n, type_index_n=type_index_n, gamma=gamma)
+            df = original_df
+            df["n"] = n
+            df["type_index_n"] = type_index_n
+            df["gamma"] = gamma
             f = new_robertson
 
             def condition(x):
-                return np.all(x["gamma_predict"] == gamma) and np.all(x["n"] == n)
+                return np.all(
+                    x["gamma_predict"].series_equal(pl.Series(gamma))
+                    and np.all(x["n"].series_equal(pl.Series(n)))
+                )
 
         else:
-            df = original_df.assign(gamma=gamma)
+            df = original_df
+            df["gamma"] = gamma
             f = old_robertson
 
             def condition(x):
-                return np.all(x["gamma_predict"] == gamma)
+                return np.all(x["gamma_predict"].series_equal(pl.Series(gamma)))
 
         df = f(
             df,
@@ -163,7 +165,7 @@ def iterate_robertson(
             p_a=p_a,
         )
 
-        df = df.assign(gamma_predict=np.nan_to_num(df["gamma_predict"]))
+        df["gamma_predict"] = np.nan_to_num(df["gamma_predict"])
         if condition(df):
             break
         elif c == 4:
@@ -200,10 +202,11 @@ def old_robertson(
         )
         .pipe(geo.normalized_cone_resistance)
         .pipe(geo.normalized_friction_ratio)
-        .pipe(utils.nan_to_zero)
+        .pipe(utils.none_to_zero)
         .pipe(type_index)
         .pipe(ic_to_gamma, water_level)
     )
+
     return df
 
 
@@ -233,7 +236,7 @@ def new_robertson(
         .pipe(n_exponent, p_a)
         .pipe(normalized_cone_resistance_n, p_a)
         .pipe(geo.normalized_friction_ratio)
-        .pipe(utils.nan_to_zero)
+        .pipe(utils.none_to_zero)
         .pipe(type_index)
         .pipe(ic_to_gamma, water_level)
     )

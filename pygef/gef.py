@@ -1,10 +1,12 @@
-import pygef.utils as utils
-import pandas as pd
 import io
-import numpy as np
-import pygef.plot_utils as plot
-from pygef import robertson, been_jefferies
 import logging
+
+import numpy as np
+import polars as pl
+
+import pygef.plot_utils as plot
+import pygef.utils as utils
+from pygef import been_jefferies, robertson
 from pygef.grouping import GroupClassification
 
 logger = logging.getLogger(__name__)
@@ -142,7 +144,7 @@ class ParseGEF:
 
         ** Cpt attributes:**
         *Always present:*
-            df: pandas.DataFrame
+            df: polars.DataFrame
                 DataFrame containing the same column contained in the original .gef file and
                 some additional columns [depth, elevation_with_respect_to_NAP]
 
@@ -203,7 +205,7 @@ class ParseGEF:
             zero_measurement_inclination_ew_after_penetration_test : float
             mileage: float
         ** Bore attributes:**
-            df: pandas.DataFrame
+            df: polars.DataFrame
                 DataFrame containing the columns: [
                                                     "depth_top",
                                                     "depth_bottom",
@@ -267,7 +269,9 @@ class ParseGEF:
             )
 
         self.__dict__.update(parsed.__dict__)
-        self.df = self.df.dropna().reset_index(drop=True)
+
+        # Convert all NaN to None and drop them
+        self.df = self.df.fill_nan(None).drop_nulls()
 
     def plot(
         self,
@@ -315,7 +319,7 @@ class ParseGEF:
             If True the plot is showed, else the matplotlib.pytplot.figure is returned
         figsize: tuple
             Figsize of the plot, default (11, 8).
-        df_group: pd.DataFrame, only for cpt type, optional for the classification
+        df_group: polars.DataFrame, only for cpt type, optional for the classification
             Use this argument to plot a defined soil layering next to the other subplots.
             It should contain the columns:
                 - layer
@@ -419,8 +423,8 @@ class ParseGEF:
 
         Returns
         -------
-        df: pd.DataFrame
-        If do_grouping is True a pandas.DataFrame with the grouped layer is returned otherwise a pandas.DataFrame with
+        df: polars.DataFrame
+        If do_grouping is True a polars.DataFrame with the grouped layer is returned otherwise a polars.DataFrame with
         a classification for each row is returned.
 
         """
@@ -588,83 +592,83 @@ class ParseCPT:
             .pipe(self.replace_column_void, self.column_void)
             .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(self.correct_depth_with_inclination)
-            .pipe(lambda df: df.assign(depth=np.abs(df["depth"].values)))
+            .pipe(self.make_depth_absolute)
             .pipe(self.calculate_elevation_with_respect_to_nap, zid, height_system)
             .pipe(self.calculate_friction_number)
         )
 
     @staticmethod
     def replace_column_void(df, column_void):
+        # TODO: add interpolation for none values
         if column_void is not None:
-            # added drop nan because values can't be extrapolated
-            return (
-                df.replace(column_void, np.nan)
-                .interpolate(method="linear")
-                .dropna()
-                .reset_index(drop=True)
-            )
+            # TODO: what to do with multiple columnvoids?
+            if isinstance(column_void, list):
+                df = df.filter(pl.col("*") != column_void[0])
+            else:
+                df = df.filter(pl.col("*") != column_void)
+
         return df
 
     @staticmethod
     def calculate_friction_number(df):
         if "fs" in df.columns and "qc" in df.columns:
-            df = df.assign(friction_number=(df["fs"].values / df["qc"].values * 100))
+            df["friction_number"] = df["fs"] / df["qc"] * 100
         if "friction_number" not in df.columns:
-            df = df.assign(friction_number=(np.zeros(df.shape[0])))
+            df["friction_number"] = np.zeros(df.shape[0])
+
         return df
 
     @staticmethod
     def calculate_elevation_with_respect_to_nap(df, zid, height_system):
         if zid is not None and height_system == 31000:
-            df = df.assign(
-                elevation_with_respect_to_NAP=np.subtract(zid, df["depth"].values)
-            )
+            df["elevation_with_respect_to_NAP"] = np.subtract(zid, df["depth"])
+
         return df
 
     @staticmethod
     def correct_depth_with_inclination(df):
         if "corrected_depth" in df.columns:
-            return df.rename(columns={"corrected_depth": "depth"})
-        if "inclination" in df.columns:
-            diff_t_depth = np.diff(df["penetration_length"].values) * np.cos(
-                np.radians(df["inclination"].fillna(0).values[:-1])
+            df = df.rename(mapping={"corrected_depth": "depth"})
+        elif "inclination" in df.columns:
+            inclination = df.select(pl.col("inclination").fill_none(0))[:-1]
+            diff_t_depth = np.diff(df["penetration_length"]) * np.cos(
+                np.radians(inclination)
             )
             # corrected depth
-            return df.assign(
-                depth=np.concatenate(
-                    [
-                        np.array([df["penetration_length"].iloc[0]]),
-                        np.array([df["penetration_length"].iloc[0]])
-                        + np.cumsum(diff_t_depth),
-                    ]
-                )
+            df["depth"] = np.concatenate(
+                [
+                    np.array([df["penetration_length"][0]]),
+                    np.array([df["penetration_length"][0]]) + np.cumsum(diff_t_depth),
+                ]
             )
-        return df.assign(depth=df["penetration_length"])
+        else:
+            df["depth"] = df["penetration_length"]
+
+        return df
 
     @staticmethod
     def correct_pre_excavated_depth(df, pre_excavated_depth):
-        atol = float(
-            np.mean(
-                np.diff(
-                    df.loc[(df["qc"] > 0) & (df["qc"] < 1000)][
-                        "penetration_length"
-                    ].values
+        if pre_excavated_depth is not None and pre_excavated_depth > 0:
+            # np.isclose doesn't accept null values
+            df = df.drop_nulls()
+
+            atol = float(
+                np.mean(
+                    np.diff(
+                        df[(df["qc"] > 0) & (df["qc"] < 1000)]["penetration_length"]
+                    )
                 )
+                / 2
             )
-            / 2
-        )
-        if (
-            pre_excavated_depth is not None
-            and pre_excavated_depth > 0
-            and np.any(
-                np.isclose(
-                    df["penetration_length"].values - pre_excavated_depth, 0, atol=atol
-                )
+
+            mask = np.isclose(
+                df["penetration_length"].drop_nulls(), pre_excavated_depth, atol=atol,
             )
-        ):
-            mask = np.isclose(df["penetration_length"], pre_excavated_depth, atol=atol)
-            start_idx = df[mask].reset_index(drop=False)["index"][0]
-            return df[start_idx:].reset_index(drop=True)
+            minimum_length = df[mask][0]["penetration_length"]
+
+            if minimum_length.len() > 0:
+                return df.filter(pl.col("penetration_length") >= minimum_length)
+
         return df
 
     @staticmethod
@@ -674,19 +678,26 @@ class ParseCPT:
             if columns_number is not None:
                 columns_info = []
                 for column_number in range(1, columns_number + 1):
-                    column_info = utils.parse_column_info(
-                        header_s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+                    columns_info.append(
+                        utils.parse_column_info(
+                            header_s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+                        )
                     )
-                    columns_info.append(column_info)
         new_data = data_s.replace("!", "")
         separator = utils.find_separator(header_s)
-        return pd.read_csv(
+
+        return pl.read_csv(
             io.StringIO(new_data),
             sep=separator,
-            names=columns_info,
-            index_col=False,
-            engine="python",
+            new_columns=columns_info,
+            has_headers=False,
         )
+
+    @staticmethod
+    def make_depth_absolute(df):
+        df["depth"] = np.abs(df["depth"])
+
+        return df
 
 
 class ParseBORE:
@@ -716,38 +727,28 @@ class ParseBORE:
             .pipe(self.parse_data_soil_code, data_rows_soil)
             .pipe(self.parse_data_soil_type, data_rows_soil)
             .pipe(self.parse_add_info_as_string, data_rows_soil)
-        ).join(self.data_soil_quantified(data_rows_soil))[
-            [
-                "depth_top",
-                "depth_bottom",
-                "Soil_code",
-                "Gravel",
-                "Sand",
-                "Clay",
-                "Loam",
-                "Peat",
-                "Silt",
-                "remarks",
-            ]
-        ]
-        self.df.columns = [
-            "depth_top",
-            "depth_bottom",
-            "soil_code",
-            "G",
-            "S",
-            "C",
-            "L",
-            "P",
-            "SI",
-            "Remarks",
-        ]
+            .pipe(self.parse_soil_quantification, data_rows_soil)
+            .drop(
+                [
+                    "sand_median",
+                    "gravel_median",
+                    "lutum_percentage",
+                    "silt_percentage",
+                    "sand_percentage",
+                    "gravel_percentage",
+                    "organic_matter_percentage",
+                    "soil_type",
+                ]
+            )
+        )
 
     @staticmethod
     def parse_add_info_as_string(df, data_rows_soil):
-        return df.assign(
-            remarks=[utils.parse_add_info("".join(row[1::])) for row in data_rows_soil]
-        )
+        df["remarks"] = [
+            utils.parse_add_info("".join(row[1::])) for row in data_rows_soil
+        ]
+
+        return df
 
     @staticmethod
     def extract_soil_info(data_s_rows, columns_number, column_separator):
@@ -770,33 +771,52 @@ class ParseBORE:
                     range(1, columns_number + 1),
                 )
             )
-            return pd.read_csv(
-                io.StringIO(data_s), sep=sep, names=col, index_col=False, usecols=col
-            )
-        else:
-            return pd.read_csv(
+            return pl.read_csv(
                 io.StringIO(data_s),
                 sep=sep,
-                names=columns_info,
-                index_col=False,
-                usecols=columns_info,
+                new_columns=col,
+                has_headers=False,
+                projection=list(range(0, len(col))),
+            )
+        else:
+            return pl.read_csv(
+                io.StringIO(data_s),
+                sep=sep,
+                new_columns=columns_info,
+                has_headers=False,
             )
 
     @staticmethod
     def parse_data_soil_type(df, data_rows_soil):
-        return df.assign(
-            Soil_type=list(map(lambda x: utils.create_soil_type(x[0]), data_rows_soil))
+        df["soil_type"] = list(
+            map(lambda x: utils.create_soil_type(x[0]), data_rows_soil)
         )
+
+        return df
 
     @staticmethod
     def parse_data_soil_code(df, data_rows_soil):
-        return df.assign(
-            Soil_code=list(map(lambda x: utils.parse_soil_code(x[0]), data_rows_soil))
+        df["soil_code"] = list(
+            map(lambda x: utils.parse_soil_code(x[0]), data_rows_soil)
         )
 
+        return df
+
     @staticmethod
-    def data_soil_quantified(data_rows_soil):
-        return pd.DataFrame(
-            list(map(lambda x: utils.soil_quantification(x[0]), data_rows_soil)),
-            columns=["Gravel", "Sand", "Clay", "Loam", "Peat", "Silt"],
-        )
+    def parse_soil_quantification(df, data_rows_soil):
+        data = np.array([utils.soil_quantification(x[0]) for x in data_rows_soil])
+
+        # Gravel
+        df["g"] = data[:, 0]
+        # Sand
+        df["s"] = data[:, 1]
+        # Clay
+        df["c"] = data[:, 2]
+        # Loam
+        df["l"] = data[:, 3]
+        # Peat
+        df["p"] = data[:, 4]
+        # Silt
+        df["si"] = data[:, 5]
+
+        return df

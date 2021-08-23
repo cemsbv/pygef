@@ -10,6 +10,6 @@ setup(
     url="https://www.ritchievink.com",
     license="mit",
     packages=["pygef", "pygef.been_jefferies", "pygef.robertson"],
-    install_requires=["pandas>= 1.1.5", "matplotlib>= 3.4.2"],
+    install_requires=["polars>= 0.8.23", "matplotlib>= 3.4.2"],
     python_requires=">=3.6",
 )

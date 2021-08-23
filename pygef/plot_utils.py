@@ -1,6 +1,7 @@
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.patches as mpatches
+import polars as pl
 
 colours_robertson = {
     "Peat": "#a76b29",
@@ -137,26 +138,46 @@ def assign_color(df, classification, colors):
     """
     if colors is None:
         if classification == "robertson":
+            df = (
+                df.lazy()
+                .with_column(
+                    pl.col("soil_type")
+                    .apply(lambda row: colours_robertson[row])
+                    .alias("colour")
+                )
+                .collect()
+            )
+
             return (
-                df.assign(
-                    colour=df.apply(
-                        lambda row: colours_robertson[row["soil_type"]], axis=1
-                    )
-                ),
+                df,
                 "Robertson",
             )
         elif classification == "been_jefferies":
+            df = (
+                df.lazy()
+                .with_column(
+                    pl.col("soil_type")
+                    .apply(lambda row: colours_been_jefferies[row])
+                    .alias("colour")
+                )
+                .collect()
+            )
+
             return (
-                df.assign(
-                    colour=df.apply(
-                        lambda row: colours_been_jefferies[row["soil_type"]], axis=1
-                    )
-                ),
+                df,
                 "Been Jefferies",
             )
     else:
+        df = (
+            df.lazy()
+            .with_column(
+                pl.col("soil_type").apply(lambda row: colors[row]).alias("colour")
+            )
+            .collect()
+        )
+
         return (
-            df.assign(colour=df.apply(lambda row: colors[row["soil_type"]], axis=1)),
+            df,
             "User defined",
         )
 
@@ -171,8 +192,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
     :return:
     """
     ax = fig.add_subplot(1, num_col, 3)
-    df = df.copy()
-    df.loc[df["soil_type"].isna(), "soil_type"] = "UNKNOWN"
+    df[df["soil_type"].is_null(), "soil_type"] = "UNKNOWN"
     for st in np.unique(df["soil_type"]):
         partial_df = df[df["soil_type"] == st]
         if z_NAP:
@@ -248,7 +268,7 @@ def plot_merged_cpt_bore(df, figsize=None, show=True):
     if "SI" in df.columns:
         df = df.copy()
         df["L"] += df["SI"]
-    v = df[["G", "S", "L", "C", "P"]].values
+    v = df[["G", "S", "L", "C", "P"]]
 
     c = ["#a76b29", "#578E57", "#0078C1", "#DBAD4B", "#708090"]
     for i in range(5):
@@ -265,21 +285,24 @@ def plot_merged_cpt_bore(df, figsize=None, show=True):
 
 
 def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
-    df = df.copy()
-
     fig = plt.figure(figsize=figsize, dpi=dpi)
 
-    v = df[["G", "S", "L", "C", "P"]].values
-    v[:, 2] += df["SI"].values
-    v[np.argwhere(v.sum(1) < 0)] = np.nan
+    v = df[["g", "s", "l", "c", "p"]]
+
+    # TODO: replace with proper polars code
+    vp = v.to_pandas()
+    vp.iloc[:, 2] += df.to_pandas()["si"]
+
+    # TODO: what does this do?
+    # vp[vp.sum(1) < 0] = np.nan
 
     c = ["#a76b29", "#578E57", "#0078C1", "#DBAD4B", "#708090"]
 
     for i in range(5):
         plt.fill_betweenx(
             -np.repeat(df["depth_top"], 2),
-            np.zeros(v.shape[0] * 2),
-            np.roll(np.repeat(np.cumsum(v, axis=1)[:, -(i + 1)], 2), 1),
+            np.zeros(vp.shape[0] * 2),
+            np.roll(np.repeat(np.cumsum(vp, axis=1).iloc[:, -(i + 1)], 2), 1),
             color=c[i],
         )
 
