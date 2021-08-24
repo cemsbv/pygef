@@ -592,8 +592,13 @@ class ParseCPT:
             .pipe(self.replace_column_void, self.column_void)
             .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(self.correct_depth_with_inclination)
-            .pipe(self.make_depth_absolute)
-            .pipe(self.calculate_elevation_with_respect_to_nap, zid, height_system)
+            .select(
+                [
+                    pl.all().exclude("depth"),
+                    self.make_depth_absolute(),
+                    self.calculate_elevation_with_respect_to_nap(zid, height_system),
+                ]
+            )
             .pipe(self.calculate_friction_number)
         )
 
@@ -619,11 +624,11 @@ class ParseCPT:
         return df
 
     @staticmethod
-    def calculate_elevation_with_respect_to_nap(df, zid, height_system):
+    def calculate_elevation_with_respect_to_nap(zid, height_system):
         if zid is not None and height_system == 31000:
-            df["elevation_with_respect_to_NAP"] = np.subtract(zid, df["depth"])
+            return (zid - pl.col("depth")).alias("elevation_with_respect_to_NAP")
 
-        return df
+        return None
 
     @staticmethod
     def correct_depth_with_inclination(df):
@@ -694,10 +699,8 @@ class ParseCPT:
         )
 
     @staticmethod
-    def make_depth_absolute(df):
-        df["depth"] = np.abs(df["depth"])
-
-        return df
+    def make_depth_absolute():
+        return pl.col("depth").map(lambda x: np.abs(x))
 
 
 class ParseBORE:
