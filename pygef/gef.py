@@ -146,7 +146,7 @@ class ParseGEF:
         *Always present:*
             df: polars.DataFrame
                 DataFrame containing the same column contained in the original .gef file and
-                some additional columns [depth, elevation_with_respect_to_NAP]
+                some additional columns [depth, elevation_with_respect_to_nap]
 
                 Tip: Use depth column instead of the penetration_length, the depth is corrected
                 with the inclination(if present).
@@ -210,17 +210,17 @@ class ParseGEF:
                                                     "depth_top",
                                                     "depth_bottom",
                                                     "soil_code",
-                                                    "G", gravel component
-                                                    "S", sand component
-                                                    "C", clay component
-                                                    "L", loam component
-                                                    "P", peat component
-                                                    "SI", silt component
+                                                    "g", gravel component
+                                                    "s", sand component
+                                                    "c", clay component
+                                                    "l", loam component
+                                                    "p", peat component
+                                                    "si", silt component
                                                     "Remarks",
                                                 ]
     """
 
-    def __init__(self, path=None, string=None):
+    def __init__(self, path=None, string=None, old_column_names=False):
         """
         Base class of gef parser. It switches between the cpt or borehole parser.
 
@@ -232,6 +232,8 @@ class ParseGEF:
             Path to the *.gef file.
         string: str
             String version of the *.gef file.
+        old_column_names: bool
+            Use deprecated column names.
         """
         self.path = path
         self.df = None
@@ -272,6 +274,20 @@ class ParseGEF:
 
         # Convert all NaN to None and drop them
         self.df = self.df.fill_nan(None).drop_nulls()
+
+        if old_column_names:
+            # Use deprecated naming standards
+            self.df = self.df.rename(
+                {
+                    "g": "G",
+                    "s": "S",
+                    "c": "C",
+                    "l": "L",
+                    "p": "P",
+                    "si": "SI",
+                    "remarks": "Remarks",
+                }
+            )
 
     def plot(
         self,
@@ -486,13 +502,14 @@ class ParseGEF:
 
 
 class ParseCPT:
-    def __init__(self, header_s, data_s, zid, height_system):
+    def __init__(self, header_s, data_s, zid, height_system, old_column_names=True):
         """
         Parser of the cpt file.
 
         :param header_s: (str) Header of the file
         :param data_s: (str) Data of the file
         :param zid: (flt) Z attribute.
+        :param old_column_names: (bool) Use deprecated column names.
         """
 
         self.type = "cpt"
@@ -602,6 +619,12 @@ class ParseCPT:
             .pipe(self.calculate_friction_number)
         )
 
+        if old_column_names:
+            # Use deprecated naming standards
+            self.df = self.df.rename(
+                {"elevation_with_respect_to_nap": "elevation_with_respect_to_NAP"}
+            )
+
     @staticmethod
     def replace_column_void(df, column_void):
         # TODO: add interpolation for none values
@@ -626,7 +649,9 @@ class ParseCPT:
     @staticmethod
     def calculate_elevation_with_respect_to_nap(zid, height_system):
         if zid is not None and height_system == 31000:
-            return (zid - pl.col("depth")).alias("elevation_with_respect_to_NAP")
+            return (pl.lit(zid) - pl.col("depth")).alias(
+                "elevation_with_respect_to_nap"
+            )
 
         return None
 
@@ -704,12 +729,13 @@ class ParseCPT:
 
 
 class ParseBORE:
-    def __init__(self, header_s, data_s):
+    def __init__(self, header_s, data_s, old_column_names=False):
         """
         Parser of the borehole file.
 
         :param header_s: (str) Header of the file
         :param data_s: (str) Data of the file
+        :param old_column_names: (bool) Use deprecated column names
         """
         self.type = "bore"
         self.project_id = utils.parse_project_type(header_s, "bore")
@@ -744,6 +770,12 @@ class ParseBORE:
                 ]
             )
         )
+
+        if old_column_names:
+            # Use deprecated naming standards
+            self.df = self.df.rename(
+                {"g": "G", "s": "S", "c": "C", "l": "L", "p": "P", "si": "SI"}
+            )
 
     @staticmethod
     def parse_add_info_as_string(df, data_rows_soil):
