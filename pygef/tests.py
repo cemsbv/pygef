@@ -372,13 +372,13 @@ class GefTest(unittest.TestCase):
         assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_replace_column_void(self):
+        column_void = 999.0
         df1 = pl.DataFrame(
             {
-                "penetration_length": [999.0, 1.0, 2.0, 3.0, 4.0],
-                "qc": [999.0, 0.5, 0.6, 0.7, 0.8],
+                "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
+                "qc": [column_void, 0.5, 0.6, 0.7, 0.8],
             }
         )
-        column_void = 999.0
         df_calculated = ParseCPT.replace_column_void(df1, column_void)
         df = pl.DataFrame(
             {"penetration_length": [1.0, 2.0, 3.0, 4.0], "qc": [0.5, 0.6, 0.7, 0.8],}
@@ -386,14 +386,14 @@ class GefTest(unittest.TestCase):
         assert df_calculated.frame_equal(df, null_equal=True)
 
         df1 = pl.DataFrame(
-            {"penetration_length": [1.0, 2.0, 999.0, 4.0], "qc": [0.5, 0.6, 999.0, 0.8]}
+            {
+                "penetration_length": [1.0, 2.0, 3.0, 4.0],
+                "qc": [0.5, 0.6, column_void, 0.8],
+            }
         )
 
         df_calculated = ParseCPT.replace_column_void(df1, column_void)
-        # TODO: replace with frame_equal when rounding is supported
-        # assert df_calculated.frame_equal(df, null_equal=True)
-        for column in df_calculated.columns:
-            assert df_calculated[column].round(6) == df[column]
+        assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_calculate_friction_number(self):
         df1 = pl.DataFrame(
