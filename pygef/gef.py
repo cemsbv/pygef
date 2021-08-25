@@ -627,15 +627,28 @@ class ParseCPT:
 
     @staticmethod
     def replace_column_void(df, column_void):
-        # TODO: add interpolation for none values
-        if column_void is not None:
-            # TODO: what to do with multiple columnvoids?
-            if isinstance(column_void, list):
-                df = df.filter(pl.col("*") != column_void[0])
-            else:
-                df = df.filter(pl.col("*") != column_void)
+        if column_void is None:
+            return df
 
-        return df
+        # TODO: what to do with multiple columnvoids?
+        if isinstance(column_void, list):
+            column_void = column_void[0]
+
+        return (
+            # Get all values matching column_void and change them to null
+            df.lazy()
+            .select(
+                pl.when(pl.all() == pl.lit(column_void))
+                .then(pl.lit(None))
+                .otherwise(pl.all())
+                .keep_name()
+            )
+            # Interpolate all null values
+            .select(pl.all().interpolate())
+            # Remove the rows with null values
+            .drop_nulls()
+            .collect(predicate_pushdown=False)
+        )
 
     @staticmethod
     def calculate_friction_number(df):
