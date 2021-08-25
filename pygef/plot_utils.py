@@ -66,8 +66,8 @@ def plot_cpt(
         else:
             title_group = "User defined filter"
     if z_NAP:
-        depth_max = df["elevation_with_respect_to_NAP"].min()
-        depth_min = df["elevation_with_respect_to_NAP"].max()
+        depth_max = df["elevation_with_respect_to_nap"].min()
+        depth_min = df["elevation_with_respect_to_nap"].max()
     else:
         depth_max = df["depth"].max()
         depth_min = df["depth"].min()
@@ -79,7 +79,7 @@ def plot_cpt(
         n += 1
         ax = fig.add_subplot(1, num_col, n)
         if z_NAP:
-            plt.plot(df[c], df["elevation_with_respect_to_NAP"], "C0")
+            plt.plot(df[c], df["elevation_with_respect_to_nap"], "C0")
             if n == 1:
                 ax.set_ylabel("Z NAP [m]")
         else:
@@ -185,7 +185,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
         partial_df = df[df["soil_type"] == st]
         if z_NAP:
             plt.hlines(
-                y=partial_df["elevation_with_respect_to_NAP"],
+                y=partial_df["elevation_with_respect_to_nap"],
                 xmin=0,
                 xmax=1,
                 colors=partial_df["colour"],
@@ -221,7 +221,7 @@ def add_grouped_classification(
     for i, layer in enumerate(df["soil_type"]):
         if z_NAP:
             plt.barh(
-                y=df["z_centr_NAP"][i],
+                y=df["z_centr_nap"][i],
                 height=df["thickness"][i],
                 width=5,
                 color=df["colour"][i],
@@ -253,10 +253,18 @@ def plot_merged_cpt_bore(df, figsize=None, show=True):
 
     subplot_val += 1
     plt.subplot(subplot_val)
-    if "SI" in df.columns:
+    if "silt_component" in df.columns:
         df = df.copy()
-        df["L"] += df["SI"]
-    v = df[["G", "S", "L", "C", "P"]]
+        df["loam_component"] += df["silt_component"]
+    v = df[
+        [
+            "gravel_component",
+            "sand_component",
+            "loam_component",
+            "clay_component",
+            "peat_component",
+        ]
+    ]
 
     c = ["#a76b29", "#578E57", "#0078C1", "#DBAD4B", "#708090"]
     for i in range(5):
@@ -275,11 +283,19 @@ def plot_merged_cpt_bore(df, figsize=None, show=True):
 def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
     fig = plt.figure(figsize=figsize, dpi=dpi)
 
-    v = df[["g", "s", "l", "c", "p"]]
+    v = df[
+        [
+            "gravel_component",
+            "sand_component",
+            "loam_component",
+            "clay_component",
+            "peat_component",
+        ]
+    ]
 
     # TODO: replace with proper polars code
     vp = v.to_pandas()
-    vp.iloc[:, 2] += df.to_pandas()["si"]
+    vp.iloc[:, 2] += df.to_pandas()["silt_component"]
 
     # TODO: what does this do?
     # vp[vp.sum(1) < 0] = np.nan
