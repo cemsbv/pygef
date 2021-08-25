@@ -957,9 +957,20 @@ class BoreTest(unittest.TestCase):
         )
 
     def test_sum_to_one(self):
-        df = self.bore.df[["g", "s", "c", "l", "p", "si"]].sum(1)
-        df[df["g"] < 0.0, "g"] = 1.0
-        self.assertTrue(np.all(np.isclose(df["g"], 1)))
+        df = self.bore.df[
+            [
+                "gravel_component",
+                "sand_component",
+                "clay_component",
+                "loam_component",
+                "peat_component",
+                "silt_component",
+            ]
+        ].sum(1)
+
+        df[df["gravel_component"] < 0.0, "gravel_component"] = 1.0
+
+        self.assertTrue(np.all(np.isclose(df["gravel_component"], 1)))
 
 
 class PlotTest(unittest.TestCase):

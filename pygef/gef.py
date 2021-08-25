@@ -21,8 +21,8 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {
     6: "u2",  # 6
     7: "u3",  # 7
     8: "inclination",  # 8
-    9: "inclination_NS",  # 9
-    10: "inclination_EW",  # 10
+    9: "inclination_ns",  # 9
+    10: "inclination_ew",  # 10
     11: "corrected_depth",  # 11
     12: "time",  # 12
     13: "corrected_qc",  # 13
@@ -33,19 +33,19 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {
     18: "initial_pore_pressure",  # 18
     19: "total_vertical_soil_pressure",  # 19
     20: "effective_vertical_soil_pressure",
-    21: "Inclination_in_X_direction",
-    22: "Inclination_in_Y_direction",
-    23: "Electric_conductivity",
+    21: "inclination_in_x_direction",
+    22: "inclination_in_y_direction",
+    23: "electric_conductivity",
     31: "magnetic_field_x",
     32: "magnetic_field_y",
     33: "magnetic_field_z",
     34: "total_magnetic_field",
     35: "magnetic_inclination",
     36: "magnetic_declination",
-    99: "Classification_zone_Robertson_1990",
+    99: "classification_zone_robertson_1990",
     # found in:#COMPANYID= Fugro GeoServices B.V., NL005621409B08, 31
     131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
-    135: "Temperature_C",  # found in:#COMPANYID= Inpijn-Blokpoel,
+    135: "Temperature_c",  # found in:#COMPANYID= Inpijn-Blokpoel,
     250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
     251: "magneto_slope_x",
 }  # found in:COMPANYID= Danny, Tjaden, 31
@@ -210,13 +210,13 @@ class ParseGEF:
                                                     "depth_top",
                                                     "depth_bottom",
                                                     "soil_code",
-                                                    "g", gravel component
-                                                    "s", sand component
-                                                    "c", clay component
-                                                    "l", loam component
-                                                    "p", peat component
-                                                    "si", silt component
-                                                    "Remarks",
+                                                    "gravel_component",
+                                                    "sand_component",
+                                                    "clay_component",
+                                                    "loam_component",
+                                                    "peat_component",
+                                                    "silt_component",
+                                                    "remarks",
                                                 ]
     """
 
@@ -279,12 +279,12 @@ class ParseGEF:
             # Use deprecated naming standards
             self.df = self.df.rename(
                 {
-                    "g": "G",
-                    "s": "S",
-                    "c": "C",
-                    "l": "L",
-                    "p": "P",
-                    "si": "SI",
+                    "gravel_component": "G",
+                    "sand_component": "S",
+                    "clay_component": "C",
+                    "loam_component": "L",
+                    "peat_component": "P",
+                    "silt_component": "SI",
                     "remarks": "Remarks",
                 }
             )
@@ -787,7 +787,14 @@ class ParseBORE:
         if old_column_names:
             # Use deprecated naming standards
             self.df = self.df.rename(
-                {"g": "G", "s": "S", "c": "C", "l": "L", "p": "P", "si": "SI"}
+                {
+                    "gravel_component": "G",
+                    "sand_component": "S",
+                    "clay_component": "C",
+                    "loam_component": "L",
+                    "peat_component": "P",
+                    "silt_component": "SI",
+                }
             )
 
     @staticmethod
@@ -855,16 +862,16 @@ class ParseBORE:
         data = np.array([utils.soil_quantification(x[0]) for x in data_rows_soil])
 
         # Gravel
-        df["g"] = data[:, 0]
+        df["gravel_component"] = data[:, 0]
         # Sand
-        df["s"] = data[:, 1]
+        df["sand_component"] = data[:, 1]
         # Clay
-        df["c"] = data[:, 2]
+        df["clay_component"] = data[:, 2]
         # Loam
-        df["l"] = data[:, 3]
+        df["loam_component"] = data[:, 3]
         # Peat
-        df["p"] = data[:, 4]
+        df["peat_component"] = data[:, 4]
         # Silt
-        df["si"] = data[:, 5]
+        df["silt_component"] = data[:, 5]
 
         return df
