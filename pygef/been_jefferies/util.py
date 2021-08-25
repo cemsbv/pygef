@@ -4,8 +4,6 @@ import polars as pl
 import pygef.utils as utils
 from pygef import geo
 
-# TODO: at test coverage to travis.yaml Nice to have. :)
-
 
 def excess_pore_pressure_ratio(df):
     """
