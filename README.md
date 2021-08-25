@@ -23,10 +23,13 @@ from pygef.gef import ParseGEF
 gef = ParseGEF("./my-gef-file.gef")
 ```
 
-### Pandas dataframe is accessible via the `df` attribute
+### Polars dataframe is accessible via the `df` attribute
 
 ```python
 print(gef.df)
+
+# Pandas dataframe
+print(gef.df.to_pandas())
 
 # Save to csv
 gef.df.to_csv("my-file.csv")
