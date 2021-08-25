@@ -138,14 +138,10 @@ def assign_color(df, classification, colors):
     """
     if colors is None:
         if classification == "robertson":
-            df = (
-                df.lazy()
-                .with_column(
-                    pl.col("soil_type")
-                    .apply(lambda row: colours_robertson[row])
-                    .alias("colour")
-                )
-                .collect()
+            df = df.with_column(
+                pl.col("soil_type")
+                .apply(lambda row: colours_robertson[row])
+                .alias("colour")
             )
 
             return (
@@ -153,14 +149,10 @@ def assign_color(df, classification, colors):
                 "Robertson",
             )
         elif classification == "been_jefferies":
-            df = (
-                df.lazy()
-                .with_column(
-                    pl.col("soil_type")
-                    .apply(lambda row: colours_been_jefferies[row])
-                    .alias("colour")
-                )
-                .collect()
+            df = df.with_column(
+                pl.col("soil_type")
+                .apply(lambda row: colours_been_jefferies[row])
+                .alias("colour")
             )
 
             return (
@@ -168,12 +160,8 @@ def assign_color(df, classification, colors):
                 "Been Jefferies",
             )
     else:
-        df = (
-            df.lazy()
-            .with_column(
-                pl.col("soil_type").apply(lambda row: colors[row]).alias("colour")
-            )
-            .collect()
+        df = df.with_column(
+            pl.col("soil_type").apply(lambda row: colors[row]).alias("colour")
         )
 
         return (
