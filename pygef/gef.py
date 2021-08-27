@@ -3,6 +3,7 @@ import logging
 
 import numpy as np
 import polars as pl
+from polars import lit, col, when
 
 import pygef.plot_utils as plot
 import pygef.utils as utils
@@ -606,8 +607,8 @@ class ParseCPT:
 
         self.df = (
             self.parse_data(header_s, data_s)
-            .pipe(self.replace_column_void, self.column_void)
-            .pipe(self.correct_pre_excavated_depth, self.pre_excavated_depth)
+            .pipe(replace_column_void, self.column_void)
+            .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(self.correct_depth_with_inclination)
             .select(
                 [
@@ -624,31 +625,6 @@ class ParseCPT:
             self.df = self.df.rename(
                 {"elevation_with_respect_to_nap": "elevation_with_respect_to_NAP"}
             )
-
-    @staticmethod
-    def replace_column_void(df, column_void):
-        if column_void is None:
-            return df
-
-        # TODO: what to do with multiple columnvoids?
-        if isinstance(column_void, list):
-            column_void = column_void[0]
-
-        return (
-            # Get all values matching column_void and change them to null
-            df.lazy()
-            .select(
-                pl.when(pl.all() == pl.lit(column_void))
-                .then(pl.lit(None))
-                .otherwise(pl.all())
-                .keep_name()
-            )
-            # Interpolate all null values
-            .select(pl.all().interpolate())
-            # Remove the rows with null values
-            .drop_nulls()
-            .collect(predicate_pushdown=False)
-        )
 
     @staticmethod
     def calculate_friction_number(df):
@@ -686,31 +662,6 @@ class ParseCPT:
             )
         else:
             df["depth"] = df["penetration_length"]
-
-        return df
-
-    @staticmethod
-    def correct_pre_excavated_depth(df, pre_excavated_depth):
-        if pre_excavated_depth is not None and pre_excavated_depth > 0:
-            # np.isclose doesn't accept null values
-            df = df.drop_nulls()
-
-            atol = float(
-                np.mean(
-                    np.diff(
-                        df[(df["qc"] > 0) & (df["qc"] < 1000)]["penetration_length"]
-                    )
-                )
-                / 2
-            )
-
-            mask = np.isclose(
-                df["penetration_length"].drop_nulls(), pre_excavated_depth, atol=atol,
-            )
-            minimum_length = df[mask][0]["penetration_length"]
-
-            if minimum_length.len() > 0:
-                return df.filter(pl.col("penetration_length") >= minimum_length)
 
         return df
 
@@ -875,3 +826,32 @@ class ParseBORE:
         df["silt_component"] = data[:, 5]
 
         return df
+
+
+def replace_column_void(lf: pl.LazyFrame, column_void) -> pl.LazyFrame:
+    if column_void is None:
+        return lf
+
+    # TODO: what to do with multiple columnvoids?
+    if isinstance(column_void, list):
+        column_void = column_void[0]
+
+    return (
+        # Get all values matching column_void and change them to null
+        lf.select(
+            pl.when(pl.all() == pl.lit(column_void))
+            .then(pl.lit(None))
+            .otherwise(pl.all())
+            .keep_name()
+        )
+        # Interpolate all null values
+        .select(pl.all().interpolate())
+        # Remove the rows with null values
+        .drop_nulls()
+    )
+
+
+def correct_pre_excavated_depth(lf: pl.LazyFrame, pre_excavated_depth) -> pl.LazyFrame:
+    if pre_excavated_depth is not None and pre_excavated_depth > 0:
+        return lf.filter(col("penetration_length") >= pre_excavated_depth)
+    return lf
