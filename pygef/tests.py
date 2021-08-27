@@ -14,6 +14,7 @@ from pygef.gef import (
     ParseGEF,
     replace_column_void,
     correct_pre_excavated_depth,
+    correct_depth_with_inclination,
 )
 from pygef.grouping import GroupClassification
 
@@ -184,7 +185,7 @@ class GefTest(unittest.TestCase):
         df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
         data_s = "\n1,1,1\n2,2,2\n3,3,3\n".replace(",", " ")
         df_parsed = ParseCPT.parse_data(
-            header_s, data_s, columns_number=3, columns_info=["col1", "col2", "col3"]
+            header_s, data_s, columns_info=["col1", "col2", "col3"]
         )
         # TODO: why aren't these equal with df.frame_equal?
         assert df_parsed.frame_equal(df, null_equal=True)
@@ -316,7 +317,7 @@ class GefTest(unittest.TestCase):
 
     def test_correct_depth_with_inclination(self):
         df1 = pl.DataFrame({"penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8]})
-        df_calculated = ParseCPT.correct_depth_with_inclination(df1)
+        df_calculated = df1.with_column(correct_depth_with_inclination(df1.columns))
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
@@ -331,7 +332,7 @@ class GefTest(unittest.TestCase):
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
-        df_calculated = ParseCPT.correct_depth_with_inclination(df2)
+        df_calculated = df2.with_column(correct_depth_with_inclination(df2.columns))
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
@@ -345,7 +346,7 @@ class GefTest(unittest.TestCase):
                 ],
             }
         )
-        assert df_calculated.frame_equal(df, null_equal=True)
+        assert np.isclose(df_calculated["depth"], df["depth"]).all()
 
         df2 = pl.DataFrame(
             {
@@ -354,7 +355,7 @@ class GefTest(unittest.TestCase):
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
-        df_calculated = ParseCPT.correct_depth_with_inclination(df2)
+        df_calculated = df2.with_column(correct_depth_with_inclination(df2.columns))
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
@@ -362,7 +363,7 @@ class GefTest(unittest.TestCase):
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
-        assert df_calculated.frame_equal(df, null_equal=True)
+        assert np.isclose(df_calculated["depth"], df["depth"]).all()
 
     def test_pre_excavated_depth(self):
         df1 = pl.DataFrame(
