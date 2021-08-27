@@ -1,5 +1,6 @@
 import io
 import logging
+from typing import List
 
 import numpy as np
 import polars as pl
@@ -605,21 +606,20 @@ class ParseCPT:
         )
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
-        columns_info = determine_columns_info(header_s)
+        column_names = determine_column_names(header_s)
         self.df = (
-            self.parse_data(header_s, data_s, columns_info)
+            self.parse_data(header_s, data_s, column_names)
             .pipe(replace_column_void, self.column_void)
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
-            .pipe(lambda df: df.with_column(correct_depth_with_inclination(df.columns)))
-            # .pipe(self.correct_depth_with_inclination)
+            .with_column(correct_depth_with_inclination(column_names))
             .select(
                 [
-                    pl.all().exclude("depth"),
-                    self.make_depth_absolute(),
+                    pl.all().exclude(["depth", "friction_number"]),
+                    col("depth").abs(),
                     self.calculate_elevation_with_respect_to_nap(zid, height_system),
+                    calculate_friction_number(column_names),
                 ]
             )
-            .pipe(self.calculate_friction_number)
         )
 
         if old_column_names:
@@ -627,15 +627,6 @@ class ParseCPT:
             self.df = self.df.rename(
                 {"elevation_with_respect_to_nap": "elevation_with_respect_to_NAP"}
             )
-
-    @staticmethod
-    def calculate_friction_number(df):
-        if "fs" in df.columns and "qc" in df.columns:
-            df["friction_number"] = df["fs"] / df["qc"] * 100
-        if "friction_number" not in df.columns:
-            df["friction_number"] = np.zeros(df.shape[0])
-
-        return df
 
     @staticmethod
     def calculate_elevation_with_respect_to_nap(zid, height_system):
@@ -860,7 +851,7 @@ def correct_depth_with_inclination(columns):
         return col("penetration_length").alias("depth")
 
 
-def determine_columns_info(header_s, columns_number=None, columns_info=None):
+def determine_column_names(header_s, columns_number=None, columns_info=None):
     if columns_number is None and columns_info is None:
         columns_number = utils.parse_columns_number(header_s)
         if columns_number is not None:
@@ -873,3 +864,10 @@ def determine_columns_info(header_s, columns_number=None, columns_info=None):
                 )
 
     return columns_info
+
+
+def calculate_friction_number(column_names: List[str]) -> "pl.Expr":
+    if "fs" in column_names and "qc" in column_names:
+        return (col("fs") / col("qc") * 100.0).alias("friction_number")
+    else:
+        return lit(0.0).alias("friction_number")

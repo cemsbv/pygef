@@ -682,10 +682,7 @@ def parse_add_info(s):
 
 
 def assign_multiple_columns(df, columns, partial_df):
-    # TODO: figure out a way to not use a transpose here
-    return pl.from_pandas(
-        df.to_pandas().assign(**dict(zip(columns, partial_df.to_pandas().values.T)))
-    )
+    return df.drop(columns).hstack(partial_df[columns])
 
 
 def kpa_to_mpa(df, columns):

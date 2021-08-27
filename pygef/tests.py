@@ -15,6 +15,7 @@ from pygef.gef import (
     replace_column_void,
     correct_pre_excavated_depth,
     correct_depth_with_inclination,
+    calculate_friction_number,
 )
 from pygef.grouping import GroupClassification
 
@@ -408,7 +409,7 @@ class GefTest(unittest.TestCase):
         df1 = pl.DataFrame(
             {"qc": [0.5, 0.5, 0.6, 0.7, 0.8], "fs": [0.0, 0.05, 0.06, 0.07, 0.08]}
         )
-        df_calculated = ParseCPT.calculate_friction_number(df1)
+        df_calculated = df1.with_column(calculate_friction_number(df1.columns))
         df = pl.DataFrame(
             {
                 "qc": [0.5, 0.5, 0.6, 0.7, 0.8],
