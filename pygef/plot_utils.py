@@ -181,7 +181,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
     """
     ax = fig.add_subplot(1, num_col, 3)
     df[df["soil_type"].is_null(), "soil_type"] = "UNKNOWN"
-    for st in np.unique(df["soil_type"]):
+    for st in df["soil_type"].unique():
         partial_df = df[df["soil_type"] == st]
         if z_NAP:
             plt.hlines(
