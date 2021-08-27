@@ -7,7 +7,14 @@ import polars as pl
 import pygef.geo as geo
 import pygef.grouping as grouping
 import pygef.utils as utils
-from pygef.gef import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT, ParseBORE, ParseCPT, ParseGEF
+from pygef.gef import (
+    MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT,
+    ParseBORE,
+    ParseCPT,
+    ParseGEF,
+    replace_column_void,
+    correct_pre_excavated_depth,
+)
 from pygef.grouping import GroupClassification
 
 
@@ -365,7 +372,8 @@ class GefTest(unittest.TestCase):
             }
         )
         pre_excavated_depth = 2
-        df_calculated = ParseCPT.correct_pre_excavated_depth(df1, pre_excavated_depth)
+        df_calculated = correct_pre_excavated_depth(df1, pre_excavated_depth)
+        print(df_calculated)
         df = pl.DataFrame(
             {"penetration_length": [2.0, 3.0, 4.0], "qc": [0.6, 0.7, 0.8]}
         )
@@ -379,7 +387,7 @@ class GefTest(unittest.TestCase):
                 "qc": [column_void, 0.5, 0.6, 0.7, 0.8],
             }
         )
-        df_calculated = ParseCPT.replace_column_void(df1, column_void)
+        df_calculated = replace_column_void(df1, column_void)
         df = pl.DataFrame(
             {"penetration_length": [1.0, 2.0, 3.0, 4.0], "qc": [0.5, 0.6, 0.7, 0.8],}
         )
@@ -392,7 +400,7 @@ class GefTest(unittest.TestCase):
             }
         )
 
-        df_calculated = ParseCPT.replace_column_void(df1, column_void)
+        df_calculated = replace_column_void(df1, column_void)
         assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_calculate_friction_number(self):
