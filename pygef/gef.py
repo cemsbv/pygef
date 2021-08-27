@@ -605,11 +605,13 @@ class ParseCPT:
         )
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
+        columns_info = determine_columns_info(header_s)
         self.df = (
-            self.parse_data(header_s, data_s)
+            self.parse_data(header_s, data_s, columns_info)
             .pipe(replace_column_void, self.column_void)
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
-            .pipe(self.correct_depth_with_inclination)
+            .pipe(lambda df: df.with_column(correct_depth_with_inclination(df.columns)))
+            # .pipe(self.correct_depth_with_inclination)
             .select(
                 [
                     pl.all().exclude("depth"),
@@ -645,38 +647,7 @@ class ParseCPT:
         return None
 
     @staticmethod
-    def correct_depth_with_inclination(df):
-        if "corrected_depth" in df.columns:
-            df = df.rename(mapping={"corrected_depth": "depth"})
-        elif "inclination" in df.columns:
-            inclination = df.select(pl.col("inclination").fill_none(0))[:-1]
-            diff_t_depth = np.diff(df["penetration_length"]) * np.cos(
-                np.radians(inclination)
-            )
-            # corrected depth
-            df["depth"] = np.concatenate(
-                [
-                    np.array([df["penetration_length"][0]]),
-                    np.array([df["penetration_length"][0]]) + np.cumsum(diff_t_depth),
-                ]
-            )
-        else:
-            df["depth"] = df["penetration_length"]
-
-        return df
-
-    @staticmethod
-    def parse_data(header_s, data_s, columns_number=None, columns_info=None):
-        if columns_number is None and columns_info is None:
-            columns_number = utils.parse_columns_number(header_s)
-            if columns_number is not None:
-                columns_info = []
-                for column_number in range(1, columns_number + 1):
-                    columns_info.append(
-                        utils.parse_column_info(
-                            header_s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
-                        )
-                    )
+    def parse_data(header_s, data_s, columns_info=None):
         new_data = data_s.replace("!", "")
         separator = utils.find_separator(header_s)
 
@@ -836,6 +807,7 @@ def replace_column_void(lf: pl.LazyFrame, column_void) -> pl.LazyFrame:
     if isinstance(column_void, list):
         column_void = column_void[0]
 
+    # TODO: those drop nulls should be done at the end.
     return (
         # Get all values matching column_void and change them to null
         lf.select(
@@ -855,3 +827,49 @@ def correct_pre_excavated_depth(lf: pl.LazyFrame, pre_excavated_depth) -> pl.Laz
     if pre_excavated_depth is not None and pre_excavated_depth > 0:
         return lf.filter(col("penetration_length") >= pre_excavated_depth)
     return lf
+
+
+def correct_depth_with_inclination(columns):
+    """
+    Return the expression needed to correct depth
+    """
+    if "corrected_depth" in columns:
+        return col("corrected_depth").alias("depth")
+    elif "inclination" in columns:
+        pt = "penetration_length"
+
+        # every different in depth needs to be corrected with the angle
+        correction_factor = (
+            col("inclination")
+            .cast(pl.Float32)
+            .fill_none(0)
+            .map(lambda s: np.cos(np.radians(s)))
+        )
+
+        # different in depth
+        diff_depth = col(pt) - col("penetration_length").shift()
+
+        corrected_depth = (correction_factor * diff_depth).cum_sum()
+        return (
+            pl.when(corrected_depth.is_null())
+            .then(col(pt))
+            .otherwise(corrected_depth)
+            .alias("depth")
+        )
+    else:
+        return col("penetration_length").alias("depth")
+
+
+def determine_columns_info(header_s, columns_number=None, columns_info=None):
+    if columns_number is None and columns_info is None:
+        columns_number = utils.parse_columns_number(header_s)
+        if columns_number is not None:
+            columns_info = []
+            for column_number in range(1, columns_number + 1):
+                columns_info.append(
+                    utils.parse_column_info(
+                        header_s, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+                    )
+                )
+
+    return columns_info
