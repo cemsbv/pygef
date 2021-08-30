@@ -47,34 +47,27 @@ def ic_to_gamma(water_level):
     )
 
 
-def ic_to_soil_type(df):
+def ic_to_soil_type():
     """
     Assign the soil type to the corresponding Ic.
-
-    :param df: (DataFrame) Original DataFrame.
-    :return: (DataFrame) Updated DataFrame.
     """
-    # TODO: how to fill it properly with the same initial values?
-    df["soil_type"] = np.tile("", len(df.rows()))
-
-    ic_mask = df["type_index"] > 3.22
-    df[ic_mask, "soil_type"] = "Peat"
-
-    ic_mask = df["type_index"] <= 3.22
-    df[ic_mask, "soil_type"] = "Clays"
-
-    ic_mask = df["type_index"] <= 2.76
-    df[ic_mask, "soil_type"] = "Clayey silt to silty clay"
-
-    ic_mask = df["type_index"] <= 2.40
-    df[ic_mask, "soil_type"] = "Silty sand to sandy silt"
-
-    ic_mask = df["type_index"] <= 1.80
-    df[ic_mask, "soil_type"] = "Sands: clean sand to silty"
-
-    ic_mask = df["type_index"] <= 1.25
-    df[ic_mask, "soil_type"] = "Gravelly sands"
-    return df
+    ti = col("type_index")
+    return (
+        pl.when(ti > 3.22)
+        .then("Peat")
+        .when((ti <= 3.22) & (ti > 2.67))
+        .then("Clays")
+        .when((ti <= 2.67) & (ti > 2.4))
+        .then("Clayey silt to silty clay")
+        .when((ti <= 2.4) & (ti > 1.8))
+        .then("Silty sand to sandy silt")
+        .when((ti <= 1.8) & (ti > 1.25))
+        .then("Sands: clean sand to silty")
+        .when(ti <= 1.25)
+        .then("Gravelly sands")
+        .otherwise("")
+        .alias("soil_type")
+    )
 
 
 def type_index(df):
@@ -131,7 +124,7 @@ def iterate_been_jeffrey(
         else:
             gamma = df["gamma_predict"]
 
-    return df.pipe(ic_to_soil_type)
+    return df.with_column(ic_to_soil_type())
 
 
 def been_jeffrey(
