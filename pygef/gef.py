@@ -833,7 +833,7 @@ def correct_depth_with_inclination(columns):
         correction_factor = (
             col("inclination")
             .cast(pl.Float32)
-            .fill_none(0)
+            .fill_null(0)
             .map(lambda s: np.cos(np.radians(s)))
         )
 
