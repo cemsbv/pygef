@@ -141,7 +141,7 @@ def been_jeffrey(
     :return: (DataFrame)
     """
     df = (
-        df.pipe(geo.delta_depth, pre_excavated_depth)
+        df.with_column(col("depth").diff().alias("delta_depth"))
         .pipe(geo.soil_pressure)
         .pipe(geo.qt, area_quotient_cone_tip)
         .pipe(geo.water_pressure, water_level)
@@ -154,7 +154,7 @@ def been_jeffrey(
         .pipe(geo.normalized_cone_resistance)
         .pipe(geo.normalized_friction_ratio)
         .pipe(utils.none_to_zero)
-        .with_column(type_index())
+        .with_columns([type_index()])
         .with_column(ic_to_gamma(water_level))
     )
     return df
