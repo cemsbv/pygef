@@ -105,7 +105,7 @@ def ic_to_soil_type(df):
 
 
 def none_to_zero(df):
-    return df.fill_none(0)
+    return df.fill_null(0)
 
 
 def iterate_robertson(
