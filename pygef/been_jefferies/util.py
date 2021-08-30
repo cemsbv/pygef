@@ -70,34 +70,22 @@ def ic_to_soil_type():
     )
 
 
-def type_index(df):
-    # return df.with_column((
-    #         (
-    #                 3.0
-    #                 - np.log10(
-    #             col("normalized_cone_resistance")
-    #             * (1.0 - ("excess_pore_pressure_ratio")
-    #             + 1.0
-    #         )
-    #         )
-    #         ** 2
-    #         + (1.5 + 1.3 * np.log10(col("normalized_friction_ratio"))) ** 2
-    # ) ** 0.5).alias("type_index"))
-
-    df["type_index"] = (
+def type_index() -> pl.Expr:
+    return (
         (
-            3
-            - np.log10(
-                df["normalized_cone_resistance"].to_numpy()
-                * (1 - df["excess_pore_pressure_ratio"].to_numpy())
-                + 1
+            (
+                pl.lit(3.0)
+                - np.log10(
+                    col("normalized_cone_resistance")
+                    * (1.0 - col("excess_pore_pressure_ratio"))
+                    + 1.0
+                )
             )
+            ** 2
+            + (1.5 + 1.3 * np.log10(col("normalized_friction_ratio"))) ** 2
         )
-        ** 2
-        + (1.5 + 1.3 * np.log10(df["normalized_friction_ratio"].to_numpy())) ** 2
-    ) ** 0.5
-
-    return df
+        ** 0.5
+    ).alias("type_index")
 
 
 def iterate_been_jeffrey(
@@ -166,7 +154,7 @@ def been_jeffrey(
         .pipe(geo.normalized_cone_resistance)
         .pipe(geo.normalized_friction_ratio)
         .pipe(utils.none_to_zero)
-        .pipe(type_index)
+        .with_column(type_index())
         .with_column(ic_to_gamma(water_level))
     )
     return df
