@@ -67,7 +67,7 @@ class BeenJeffreyTest(unittest.TestCase):
         df1 = pl.DataFrame(
             {"type_index": [2.208177, 2.408926, 2.793642], "depth": [0.5, 1, 4]}
         )
-        v = util.ic_to_gamma(df1, water_level)
+        df1 = df1.with_column(util.ic_to_gamma(water_level))
         df = pl.DataFrame(
             {
                 "type_index": [2.208177, 2.408926, 2.793642],
@@ -75,7 +75,7 @@ class BeenJeffreyTest(unittest.TestCase):
                 "gamma_predict": [18, 18, 16],
             }
         )
-        assert v.frame_equal(df, null_equal=True)
+        assert df1.frame_equal(df, null_equal=True)
 
     def test_ic_to_soil_type(self):
         df1 = pl.DataFrame({"type_index": [2.208177, 2.408926, 2.793642]})
