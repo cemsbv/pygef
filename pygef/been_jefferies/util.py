@@ -32,7 +32,6 @@ def ic_to_gamma(df, water_level):
     :param water_level: (int) Water level with respect to ground level.
     :return: Updated DataFrame.
     """
-    print(df["depth"])
     mask_below_water = (1.0 - df["depth"]) < water_level
     # TODO: how to fill it properly with the same initial values?
     df["gamma_predict"] = np.tile(1.0, len(df.rows()))
