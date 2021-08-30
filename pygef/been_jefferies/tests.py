@@ -14,7 +14,7 @@ class BeenJeffreyTest(unittest.TestCase):
                 "excess_pore_pressure_ratio": [0.5, 0.5, 0.5],
             }
         )
-        v = util.type_index(df1)
+        v = df1.with_column(util.type_index())
         df = pl.DataFrame(
             {
                 "normalized_cone_resistance": [28.982146, 24.709059, 22.507572],
