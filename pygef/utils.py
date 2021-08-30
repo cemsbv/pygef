@@ -5,6 +5,7 @@ from datetime import datetime
 import numpy as np
 import polars as pl
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -49,228 +50,312 @@ def parse_end_of_header(s):
     return parse_regex_cast(r"(#EOH[=\s+]+)", s, str, 1)
 
 
-def parse_column_void(s):
+def parse_column_void(headers):
     """
     Function that parses the column void.
 
-    :param s:(str) String to search for regex pattern.
-    :return:(str) List of all the possible column void.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return:([str]) List of all the possible column void.
     """
-    column_void = None
-    g = re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", s)
-    if g:
-        column_void = list(
-            map(float, re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", s))
-        )
-        return column_void
+    if isinstance(headers, dict):
+        if "COLUMNVOID" in headers:
+            # Return a list of all the second float values of all COLUMN_VOID lines
+            return map(lambda values: float(values[1]), headers["COLUMNVOID"])
     else:
-        return (
-            -9999
-        )  # standard value, if some gef files the column void is not specified but used anyway
+        column_void = None
+        g = re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", headers)
+        if g:
+            column_void = list(
+                map(
+                    float,
+                    re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", headers),
+                )
+            )
+            return column_void
+
+    # Standard value, if some gef files the column void is not specified but used anyway
+    return -9999
 
 
-def parse_measurement_var_as_float(s, var_number):
+def parse_measurement_var_as_float(headers, var_number):
     """
     Function that returns a measurement variable as a float.
 
-    :param s: (str) String from which the variable is parsed.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :param var_number: (int) Variable number.
     :return: Variable value.
     """
-    try:
-        # Convert the variable number to a string so it's cheaper to compare
-        var_number_str = str(var_number)
+    # Convert the variable number to a string so it's cheaper to compare
+    var_number_str = str(var_number)
 
-        # Find all '#MEASUREMENTVAR= **,' strings first
-        for match in re.finditer(r"#MEASUREMENTVAR[=\s+]+(\d+)[, ]+([\d-]+\.?\d*)", s):
-            # The first group is the variable number
-            if match.group(1) == var_number_str:
-                # The second group is the actual value
-                return cast_string(float, match.group(2))
+    try:
+        if isinstance(headers, dict):
+            if "MEASUREMENTVAR" in headers:
+                # Loop over all headers to find the right number
+                for values in headers["MEASUREMENTVAR"]:
+                    if values[0] == var_number_str:
+                        return float(values[1])
+        else:
+            # Find all '#MEASUREMENTVAR= **,' strings first
+            for match in re.finditer(
+                r"#MEASUREMENTVAR[=\s+]+(\d+)[, ]+([\d-]+\.?\d*)", headers
+            ):
+                # The first group is the variable number
+                if match.group(1) == var_number_str:
+                    # The second group is the actual value
+                    return cast_string(float, match.group(2))
+
     except ValueError:
         pass
-    return None
 
 
-def parse_cone_id(s):
+def parse_cone_id(headers):
     """
     Function that returns the cone id specified in GEF-CPT file.
 
-    :param s: (str) String from which the cone_id is parsed.
-    :return: cone_id.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return: cone id.
     """
-    try:
-        measurement_text = parse_regex_cast(
-            r"#MEASUREMENTTEXT[=\s+]+4[, ]+([\w.-]+)", s, str, 1
-        )
-    except ValueError:
-        measurement_text = None
-    return measurement_text
+    if isinstance(headers, dict):
+        if "PROJECTID" in headers:
+            # Get the second number from the first found match
+            return headers["PROJECTID"][0][1]
+    else:
+        try:
+            return parse_regex_cast(
+                r"#MEASUREMENTTEXT[=\s+]+4[, ]+([\w.-]+)", headers, str, 1
+            )
+        except ValueError:
+            return None
 
 
-def parse_cpt_class(s):
+def parse_cpt_class(headers):
     """
     Function that returns the class of the cpt as an int.
     The word class or klasse has to be defined in the parsed string.
 
-    :param s: (str) String from which the project type is parsed.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: Cpt class.
     """
-    cpt_class = None
-    all_definition = parse_regex_cast(r"#MEASUREMENTTEXT[=\s+]+6[, ](.*)", s, str, 1)
-    if all_definition is not None:
-        cpt_class = parse_regex_cast(
-            r"^.*?(klasse|class).*?(\d{1})", all_definition.lower(), int, 2
+    if isinstance(headers, dict):
+        # Get the first number from the first found match
+        return int(headers["MEASUREMENTTEXT"][0][0])
+    else:
+        all_definition = parse_regex_cast(
+            r"#MEASUREMENTTEXT[=\s+]+6[, ](.*)", headers, str, 1
         )
-    return cpt_class
+        if all_definition is not None:
+            return parse_regex_cast(
+                r"^.*?(klasse|class).*?(\d{1})", all_definition.lower(), int, 2
+            )
 
 
-def parse_project_type(s, gef_type):
+def parse_project_type(headers, gef_type):
     """
     Function that returns the project type as an int.
 
-    :param s: (str) String from which the project type is parsed.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :param gef_type: (str) String from which the gef type is given.
     :return: Project type number.
     """
-    project_id = None
-    if gef_type == "cpt":
-        project_id = parse_regex_cast(r"PROJECTID[\s=a-zA-Z,]*(\d*)", s, int, 1)
-    elif gef_type == "bore":
-        project_id = parse_regex_cast(r"#PROJECTID+[^a-zA-Z]+([\w-]+)", s, str, 1)
-    return project_id
+    if isinstance(headers, dict):
+        if gef_type == "cpt":
+            # Get the second number from the first found match
+            return int(headers["PROJECTID"][0][1])
+        elif gef_type == "bore":
+            # Get the first string from the first found match
+            return headers["PROJECTID"][0][0]
+    else:
+        if gef_type == "cpt":
+            return parse_regex_cast(r"PROJECTID[\s=a-zA-Z,]*(\d*)", headers, int, 1)
+        elif gef_type == "bore":
+            return parse_regex_cast(r"#PROJECTID+[^a-zA-Z]+([\w-]+)", headers, str, 1)
 
 
-def parse_zid_as_float(s):
+def parse_zid_as_float(headers):
     """
     Function that returns the zid as a float.
 
-    :param s: (str) String from which the zid is parsed.
-    :return: ZID number.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return:(float) ZID number.
     """
-    return parse_regex_cast(r"#ZID[=\s+]+[^,]*[,\s+]+([^?!,$|\s$]+)", s, float, 1)
+    if isinstance(headers, dict):
+        if "ZID" in headers:
+            # Get the second number from the first found ZID
+            return float(headers["ZID"][0][1])
+    else:
+        return parse_regex_cast(
+            r"#ZID[=\s+]+[^,]*[,\s+]+([^?!,$|\s$]+)", headers, float, 1
+        )
 
 
-def parse_height_system(s):
+def parse_height_system(headers):
     """
     Function that returns the zid as a float.
 
-    :param s: (str) String from which the zid is parsed.
-    :return: ZID number.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return:(float) ZID number.
     """
-    return parse_regex_cast(r"#ZID[=\s+]+([^,]*)", s, float, 1)
+    if isinstance(headers, dict):
+        if "ZID" in headers:
+            # Get the first number from the first found ZID
+            return float(headers["ZID"][0][0])
+    else:
+        return parse_regex_cast(r"#ZID[=\s+]+([^,]*)", headers, float, 1)
 
 
-def parse_xid_as_float(s):
+def parse_xid_as_float(headers):
     """
     Function that returns the x coordinate as a float.
 
-    :param s:(str) String from which the xid is parsed.
-    :return: xid value.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return:(float) x coordinate value.
     """
-    return parse_regex_cast(
-        r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", s, float, 1
-    )
+    if isinstance(headers, dict):
+        if "XYID" in headers:
+            # Get the second number from the first found match
+            return float(headers["XYID"][0][1])
+    else:
+        return parse_regex_cast(
+            r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, float, 1
+        )
 
 
-def parse_yid_as_float(s):
+def parse_yid_as_float(headers):
     """
     Function that returns the y coordinate as a float.
 
-    :param s: (str) String from which the yid is parsed.
-    :return: yid value.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return:(float) y coordinate value.
     """
-    return parse_regex_cast(
-        r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", s, float, 3
-    )
+    if isinstance(headers, dict):
+        if "XYID" in headers:
+            # Get the third number from the first found match
+            return float(headers["XYID"][0][2])
+    else:
+        return parse_regex_cast(
+            r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, float, 3
+        )
 
 
-def parse_gef_type(s):
+def parse_gef_type(headers):
     """
     Function that returns the gef type.
 
-    :param s: (str) String to search for regex pattern.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: (str) Gef type.
     """
-    if parse_regex_cast(
-        r"#PROCEDURECODE[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 1
-    ) and parse_regex_cast(r"#REPORTCODE[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 1):
-        proc_code = parse_regex_cast(
-            r"#REPORTCODE[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 1
-        )
+    proc_code = ""
+    if isinstance(headers, dict):
+        if "REPORTCODE" in headers:
+            # Get the first string from the first found match
+            proc_code = headers["REPORTCODE"][0][0].lower()
+        elif "PROCEDURECODE" in headers:
+            # Get the first string from the first found match
+            proc_code = headers["PROCEDURECODE"][0][0].lower()
+        else:
+            return None
     else:
-        proc_code = parse_regex_cast(
-            r"#(REPORTCODE|PROCEDURECODE)[^a-zA-Z]+([\w-]+)", s, lambda x: x.lower(), 2
-        )
+        if parse_regex_cast(
+            r"#PROCEDURECODE[^a-zA-Z]+([\w-]+)", headers, lambda x: x.lower(), 1
+        ) and parse_regex_cast(
+            r"#REPORTCODE[^a-zA-Z]+([\w-]+)", headers, lambda x: x.lower(), 1
+        ):
+            proc_code = parse_regex_cast(
+                r"#REPORTCODE[^a-zA-Z]+([\w-]+)", headers, lambda x: x.lower(), 1
+            )
+        else:
+            proc_code = parse_regex_cast(
+                r"#(REPORTCODE|PROCEDURECODE)[^a-zA-Z]+([\w-]+)",
+                headers,
+                lambda x: x.lower(),
+                2,
+            )
+
+    print(proc_code)
 
     if "cpt" in proc_code or "dis" in proc_code:
-        gef_type = "cpt"
+        return "cpt"
     elif "bore" in proc_code and not "borehole" in proc_code:
-        gef_type = "bore"
+        return "bore"
     elif "borehole" in proc_code:
-        gef_type = "borehole-report"
-    else:
-        gef_type = None
-
-    return gef_type
+        return "borehole-report"
 
 
-def parse_file_date(s):
+def parse_file_date(headers):
     """
     Fuction to parse the file date.
 
-    :param s: (str) String to search for regex pattern.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: File date.
     """
-    g = re.search(r"#FILEDATE[\s=]*(\d+[,\s+]+\d+[,\s+]+\d+)", s)
+    date_string = ""
+    if isinstance(headers, dict):
+        if "FILEDATE" in headers:
+            # Get the first string from the first found match
+            date_string = headers["FILEDATE"][0][1]
+    else:
+        g = re.search(r"#FILEDATE[\s=]*(\d+[,\s+]+\d+[,\s+]+\d+)", headers)
+        if g:
+            date_string = g.group(1)
 
-    if g:
-        try:
-            file_date = g.group(1).replace(",", "-").replace(" ", "").replace("\t", "")
-        except ValueError as e:
-            logger.warning(f"Could not parse file_date: {e}")
-            return None
-        try:
-            date = datetime.strptime(file_date, "%Y-%m-%d")
-        except ValueError:
-            date = None
-        return date
+    try:
+        date_string.replace(",", "-").replace(" ", "").replace("\t", "")
+    except ValueError as e:
+        logger.warning(f"Could not parse file_date: {e}")
+        return None
+
+    try:
+        return datetime.strptime(date_string, "%Y-%m-%d")
+    except ValueError:
+        return None
 
 
-def parse_columns_number(s):
+def parse_columns_number(headers):
     """
     Function that returns the columns number as an int.
 
-    :param s: (str) String from which the yid is parsed.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: Columns number value.
     """
-    columns_number = None
-    g = re.findall(r"#COLUMNINFO[=\s+]+(\d*)", s)
-    if g:
-        columns_number = max(map(int, re.findall(r"#COLUMNINFO[=\s+]+(\d*)", s)))
-    return columns_number
+    if isinstance(headers, dict):
+        if "COLUMNINFO" in headers:
+            # Get the maximum of all the first columns of COLUMNINFO
+            return max([int(values[0]) for values in headers["COLUMNINFO"]])
+    else:
+        g = re.findall(r"#COLUMNINFO[=\s+]+(\d*)", headers)
+        if g:
+            return max(map(int, re.findall(r"#COLUMNINFO[=\s+]+(\d*)", headers)))
 
 
-def parse_quantity_number(s, column_number):
+def parse_quantity_number(headers, column_number):
     """
     Function to parse the quantity number.
 
-    :param s: (str) String from which the yid is parsed.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :param column_number: (int) Number of the column.
     :return: Quantity number.
     """
-    try:
-        # Convert the variable number to a string so it's cheaper to compare
-        column_number_str = str(column_number)
+    # Convert the variable number to a string so it's cheaper to compare
+    column_number_str = str(column_number)
 
-        # Find all '#COLUMNINFO= **,' strings first
-        for match in re.finditer(
-            r"#COLUMNINFO[=\s+]+(\d+)+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)", s
-        ):
-            # The first group is the column number
-            if match.group(1) == column_number_str:
-                # The second group is the actual value
-                return cast_string(float, match.group(2))
+    try:
+        if isinstance(headers, dict):
+            if "COLUMNINFO" in headers:
+                # Loop over all headers to find the right number
+                for values in headers["COLUMNINFO"]:
+                    if values[0] == column_number_str:
+                        return float(values[1])
+        else:
+            # Find all '#COLUMNINFO= **,' strings first
+            for match in re.finditer(
+                r"#COLUMNINFO[=\s+]+(\d+)+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)", headers
+            ):
+                # The first group is the column number
+                if match.group(1) == column_number_str:
+                    # The second group is the actual value
+                    return cast_string(float, match.group(2))
+
     except ValueError:
         pass
     return None
@@ -294,27 +379,38 @@ def parse_column_info(s, column_number, dictionary):
     return column_info
 
 
-def parse_column_separator(s):
+def parse_column_separator(headers):
     """
     Function to parse the column separator. It is used only in the borehole class.
 
-    :param s: (str) String to search for regex pattern.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: Column separator.
     """
-    return parse_regex_cast(r"#COLUMNSEPARATOR+[=\s+]+(.)", s, str, 1)
+    if isinstance(headers, dict):
+        if "COLUMNSEPARATOR" in headers:
+            # Get the first string from the first found match
+            return headers["COLUMNSEPARATOR"][0][0]
+    else:
+        return parse_regex_cast(r"#COLUMNSEPARATOR+[=\s+]+(.)", headers, str, 1)
 
 
-def parse_test_id(s):
+def parse_test_id(headers):
     """
     Function to parse the test id.
 
-    :param s: (str) String to search for regex pattern.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: test id.
     """
-    result = parse_regex_cast(r"#TESTID+[=\s+]+(.*)", s, str, 1)
+    result = None
+    if isinstance(headers, dict):
+        if "TESTID" in headers:
+            # Get the first string from the first found match
+            result = headers["TESTID"][0][0]
+    else:
+        result = parse_regex_cast(r"#TESTID+[=\s+]+(.*)", headers, str, 1)
+
     if result is not None:
-        result = result.strip()
-    return result
+        return result.strip()
 
 
 def parse_record_separator(s):
@@ -463,11 +559,11 @@ def soil_quantification(s):
     return dist
 
 
-def parse_add_info(s):
+def parse_add_info(headers):
     """
     Function to parse all the additional informations.
 
-    :param s: (str) String that contain the addtional information and the soil code.
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: (str) Additional informations.
     """
     dict_add_info = {
@@ -665,20 +761,24 @@ def parse_add_info(s):
         "TW": "Formatie van Twente ",
         "WA": "Formatie van Waalre ",
     }
-    string_noquote = s[1:-1]
-    string2list = string_noquote.split("''")
-    add_info = ""
-    for i, string in enumerate(string2list):
-        if string:
-            add_info += "{}) ".format(i + 1) + "".join(
-                [
-                    dict_add_info[string_split]
-                    if string_split in dict_add_info
-                    else string_split + " "
-                    for string_split in string.split(" ")
-                ]
-            )
-    return add_info
+
+    if isinstance(headers, dict):
+        raise Exception("todo")
+    else:
+        string_noquote = headers[1:-1]
+        string2list = string_noquote.split("''")
+        add_info = ""
+        for i, string in enumerate(string2list):
+            if string:
+                add_info += "{}) ".format(i + 1) + "".join(
+                    [
+                        dict_add_info[string_split]
+                        if string_split in dict_add_info
+                        else string_split + " "
+                        for string_split in string.split(" ")
+                    ]
+                )
+        return add_info
 
 
 def assign_multiple_columns(df, columns, partial_df):

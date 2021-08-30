@@ -11,6 +11,15 @@ import pygef.utils as utils
 from pygef import been_jefferies, robertson
 from pygef.grouping import GroupClassification
 
+# Try to import the optimized Rust header parsing but if that doesn't succeed
+# use the built-in python regex methods
+try:
+    import gef
+
+    USE_RUST_PARSED_HEADERS = True
+except ImportError:
+    USE_RUST_PARSED_HEADERS = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -245,28 +254,34 @@ class ParseGEF:
         if string is None:
             with open(path, encoding="utf-8", errors="ignore") as f:
                 string = f.read()
-        self.s = string
 
-        end_of_header = utils.parse_end_of_header(self.s)
-        header_s, data_s = self.s.split(end_of_header)
-        self.zid = utils.parse_zid_as_float(header_s)
-        self.height_system = utils.parse_height_system(header_s)
-        self.x = utils.parse_xid_as_float(header_s)
-        self.y = utils.parse_yid_as_float(header_s)
-        self.file_date = utils.parse_file_date(header_s)
-        self.test_id = utils.parse_test_id(header_s)
+        if USE_RUST_PARSED_HEADERS:
+            # Use the Rust optimized header parser
+            data, headers = gef.parse(string)
+        else:
+            # Use the fallback python regex parser
+            end_of_header = utils.parse_end_of_header(string)
+            headers, data = string.split(end_of_header)
 
-        self.type = utils.parse_gef_type(string)
+        self.zid = utils.parse_zid_as_float(headers)
+        self.height_system = utils.parse_height_system(headers)
+        self.x = utils.parse_xid_as_float(headers)
+        self.y = utils.parse_yid_as_float(headers)
+        self.file_date = utils.parse_file_date(headers)
+        self.test_id = utils.parse_test_id(headers)
+        self.type = utils.parse_gef_type(headers)
+
         if self.type == "cpt":
-            parsed = ParseCPT(header_s, data_s, self.zid, self.height_system)
+            parsed = ParseCPT(headers, data, self.zid, self.height_system)
         elif self.type == "bore":
-            parsed = ParseBORE(header_s, data_s)
+            parsed = ParseBORE(headers, data)
         elif self.type == "borehole-report":
             raise ValueError(
                 "The selected gef file is a GEF-BOREHOLE-Report. Can only parse "
                 "GEF-CPT-Report and GEF-BORE-Report. Check the PROCEDURECODE."
             )
         else:
+            print(string, headers)
             raise ValueError(
                 "The selected gef file is not a cpt nor a borehole. "
                 "Check the REPORTCODE or the PROCEDURECODE."

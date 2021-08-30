@@ -7,3 +7,4 @@ build/
 dev/
 *html
 .coverage
+target/
