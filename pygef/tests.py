@@ -186,7 +186,7 @@ class GefTest(unittest.TestCase):
         df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
         data_s = "\n1,1,1\n2,2,2\n3,3,3\n".replace(",", " ")
         df_parsed = ParseCPT.parse_data(
-            header_s, data_s, columns_info=["col1", "col2", "col3"]
+            header_s, data_s, column_names=["col1", "col2", "col3"]
         )
         # TODO: why aren't these equal with df.frame_equal?
         assert df_parsed.frame_equal(df, null_equal=True)

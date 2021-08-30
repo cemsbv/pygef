@@ -274,9 +274,6 @@ class ParseGEF:
 
         self.__dict__.update(parsed.__dict__)
 
-        # Convert all NaN to None and drop them
-        self.df = self.df.fill_nan(None).drop_nulls()
-
         if old_column_names:
             # Use deprecated naming standards
             self.df = self.df.rename(
@@ -607,8 +604,10 @@ class ParseCPT:
         self.mileage = utils.parse_measurement_var_as_float(header_s, 41)
 
         column_names = determine_column_names(header_s)
+
         self.df = (
             self.parse_data(header_s, data_s, column_names)
+            .lazy()
             .pipe(replace_column_void, self.column_void)
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
             .with_column(correct_depth_with_inclination(column_names))
@@ -620,6 +619,7 @@ class ParseCPT:
                     calculate_friction_number(column_names),
                 ]
             )
+            .collect()
         )
 
         if old_column_names:
@@ -631,27 +631,21 @@ class ParseCPT:
     @staticmethod
     def calculate_elevation_with_respect_to_nap(zid, height_system):
         if zid is not None and height_system == 31000:
-            return (pl.lit(zid) - pl.col("depth")).alias(
-                "elevation_with_respect_to_nap"
-            )
+            return (zid - pl.col("depth")).alias("elevation_with_respect_to_nap")
 
         return None
 
     @staticmethod
-    def parse_data(header_s, data_s, columns_info=None):
+    def parse_data(header_s, data_s, column_names=None):
         new_data = data_s.replace("!", "")
         separator = utils.find_separator(header_s)
 
         return pl.read_csv(
-            io.StringIO(new_data),
+            new_data.encode(),
             sep=separator,
-            new_columns=columns_info,
+            new_columns=column_names,
             has_headers=False,
         )
-
-    @staticmethod
-    def make_depth_absolute():
-        return pl.col("depth").map(lambda x: np.abs(x))
 
 
 class ParseBORE:
@@ -798,7 +792,6 @@ def replace_column_void(lf: pl.LazyFrame, column_void) -> pl.LazyFrame:
     if isinstance(column_void, list):
         column_void = column_void[0]
 
-    # TODO: those drop nulls should be done at the end.
     return (
         # Get all values matching column_void and change them to null
         lf.select(
@@ -830,17 +823,11 @@ def correct_depth_with_inclination(columns):
         pt = "penetration_length"
 
         # every different in depth needs to be corrected with the angle
-        correction_factor = (
-            col("inclination")
-            .cast(pl.Float32)
-            .fill_null(0)
-            .map(lambda s: np.cos(np.radians(s)))
+        correction_factor = np.cos(
+            np.radians(col("inclination").cast(pl.Float32).fill_null(0))
         )
 
-        # different in depth
-        diff_depth = col(pt) - col("penetration_length").shift()
-
-        corrected_depth = (correction_factor * diff_depth).cum_sum()
+        corrected_depth = (correction_factor * col(pt).diff()).cumsum()
         return (
             pl.when(corrected_depth.is_null())
             .then(col(pt))
@@ -868,6 +855,8 @@ def determine_column_names(header_s, columns_number=None, columns_info=None):
 
 def calculate_friction_number(column_names: List[str]) -> "pl.Expr":
     if "fs" in column_names and "qc" in column_names:
-        return (col("fs") / col("qc") * 100.0).alias("friction_number")
+        return (
+            col("fs") / when(col("qc") == 0.0).then(None).otherwise(col("qc")) * 100.0
+        ).alias("friction_number")
     else:
         return lit(0.0).alias("friction_number")
