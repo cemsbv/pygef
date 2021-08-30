@@ -99,7 +99,7 @@ class BeenJeffreyTest(unittest.TestCase):
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
                 "u2": [0.002, 0.002, 0.002],
-                "depth": [0, 0.5, 1],
+                "depth": [0.0, 0.5, 1.0],
                 "gamma": [18, 18, 18],
             }
         )
@@ -152,7 +152,7 @@ class BeenJeffreyTest(unittest.TestCase):
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
                 "u2": [0.002, 0.002, 0.002],
-                "depth": [0, 0.5, 1],
+                "depth": [0.0, 0.5, 1.0],
                 "gamma": [18, 18, 18],
             }
         )
