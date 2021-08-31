@@ -20,7 +20,7 @@ def delta_depth(df, pre_excavated_depth=None):
 
 
 def soil_pressure(df):
-    df["soil_pressure"] = (df["gamma"] * df["delta_depth"]).cum_sum()
+    df["soil_pressure"] = (df["gamma"] * df["delta_depth"]).cumsum()
 
     return df
 

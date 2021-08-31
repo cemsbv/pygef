@@ -1,6 +1,6 @@
 import numpy as np
 import polars as pl
-from polars import col
+from polars import col, lit
 
 import pygef.utils as utils
 from pygef import geo
@@ -47,51 +47,45 @@ def ic_to_gamma(water_level):
     )
 
 
-def ic_to_soil_type(df):
+def ic_to_soil_type():
     """
     Assign the soil type to the corresponding Ic.
-
-    :param df: (DataFrame) Original DataFrame.
-    :return: (DataFrame) Updated DataFrame.
     """
-    # TODO: how to fill it properly with the same initial values?
-    df["soil_type"] = np.tile("", len(df.rows()))
-
-    ic_mask = df["type_index"] > 3.22
-    df[ic_mask, "soil_type"] = "Peat"
-
-    ic_mask = df["type_index"] <= 3.22
-    df[ic_mask, "soil_type"] = "Clays"
-
-    ic_mask = df["type_index"] <= 2.76
-    df[ic_mask, "soil_type"] = "Clayey silt to silty clay"
-
-    ic_mask = df["type_index"] <= 2.40
-    df[ic_mask, "soil_type"] = "Silty sand to sandy silt"
-
-    ic_mask = df["type_index"] <= 1.80
-    df[ic_mask, "soil_type"] = "Sands: clean sand to silty"
-
-    ic_mask = df["type_index"] <= 1.25
-    df[ic_mask, "soil_type"] = "Gravelly sands"
-    return df
+    ti = col("type_index")
+    return (
+        pl.when(ti > 3.22)
+        .then("Peat")
+        .when((ti <= 3.22) & (ti > 2.67))
+        .then("Clays")
+        .when((ti <= 2.67) & (ti > 2.4))
+        .then("Clayey silt to silty clay")
+        .when((ti <= 2.4) & (ti > 1.8))
+        .then("Silty sand to sandy silt")
+        .when((ti <= 1.8) & (ti > 1.25))
+        .then("Sands: clean sand to silty")
+        .when(ti <= 1.25)
+        .then("Gravelly sands")
+        .otherwise("")
+        .alias("soil_type")
+    )
 
 
-def type_index(df):
-    df["type_index"] = (
+def type_index() -> pl.Expr:
+    return (
         (
-            3
-            - np.log10(
-                df["normalized_cone_resistance"].to_numpy()
-                * (1 - df["excess_pore_pressure_ratio"].to_numpy())
-                + 1
+            (
+                pl.lit(3.0)
+                - np.log10(
+                    col("normalized_cone_resistance")
+                    * (1.0 - col("excess_pore_pressure_ratio"))
+                    + 1.0
+                )
             )
+            ** 2
+            + (1.5 + 1.3 * np.log10(col("normalized_friction_ratio"))) ** 2
         )
-        ** 2
-        + (1.5 + 1.3 * np.log10(df["normalized_friction_ratio"].to_numpy())) ** 2
-    ) ** 0.5
-
-    return df
+        ** 0.5
+    ).alias("type_index")
 
 
 def iterate_been_jeffrey(
@@ -131,7 +125,7 @@ def iterate_been_jeffrey(
         else:
             gamma = df["gamma_predict"]
 
-    return df.pipe(ic_to_soil_type)
+    return df.with_column(ic_to_soil_type())
 
 
 def been_jeffrey(
@@ -147,7 +141,7 @@ def been_jeffrey(
     :return: (DataFrame)
     """
     df = (
-        df.pipe(geo.delta_depth, pre_excavated_depth)
+        df.with_column(col("depth").diff().alias("delta_depth"))
         .pipe(geo.soil_pressure)
         .pipe(geo.qt, area_quotient_cone_tip)
         .pipe(geo.water_pressure, water_level)
@@ -160,7 +154,7 @@ def been_jeffrey(
         .pipe(geo.normalized_cone_resistance)
         .pipe(geo.normalized_friction_ratio)
         .pipe(utils.none_to_zero)
-        .pipe(type_index)
+        .with_columns([type_index()])
         .with_column(ic_to_gamma(water_level))
     )
     return df

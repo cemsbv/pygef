@@ -14,7 +14,7 @@ class BeenJeffreyTest(unittest.TestCase):
                 "excess_pore_pressure_ratio": [0.5, 0.5, 0.5],
             }
         )
-        v = util.type_index(df1)
+        v = df1.with_column(util.type_index())
         df = pl.DataFrame(
             {
                 "normalized_cone_resistance": [28.982146, 24.709059, 22.507572],
@@ -78,8 +78,9 @@ class BeenJeffreyTest(unittest.TestCase):
         assert df1.frame_equal(df, null_equal=True)
 
     def test_ic_to_soil_type(self):
-        df1 = pl.DataFrame({"type_index": [2.208177, 2.408926, 2.793642]})
-        v = util.ic_to_soil_type(df1)
+        df1 = pl.DataFrame({"type_index": [2.208177, 2.408926, 2.793642]}).with_column(
+            util.ic_to_soil_type()
+        )
         df = pl.DataFrame(
             {
                 "type_index": [2.208177, 2.408926, 2.793642],
@@ -90,7 +91,7 @@ class BeenJeffreyTest(unittest.TestCase):
                 ],
             }
         )
-        assert v.frame_equal(df, null_equal=True)
+        assert df1.frame_equal(df, null_equal=True)
 
     def test_been_jeffrey(self):
         water_level = -0.5

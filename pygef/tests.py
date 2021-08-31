@@ -186,7 +186,7 @@ class GefTest(unittest.TestCase):
         df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
         data_s = "\n1,1,1\n2,2,2\n3,3,3\n".replace(",", " ")
         df_parsed = ParseCPT.parse_data(
-            header_s, data_s, columns_info=["col1", "col2", "col3"]
+            header_s, data_s, column_names=["col1", "col2", "col3"]
         )
         # TODO: why aren't these equal with df.frame_equal?
         assert df_parsed.frame_equal(df, null_equal=True)
@@ -967,20 +967,27 @@ class BoreTest(unittest.TestCase):
         )
 
     def test_sum_to_one(self):
-        df = self.bore.df[
+        cols = [
+            "gravel_component",
+            "sand_component",
+            "clay_component",
+            "loam_component",
+            "peat_component",
+            "silt_component",
+        ]
+        s = self.bore.df.select(
             [
-                "gravel_component",
-                "sand_component",
-                "clay_component",
-                "loam_component",
-                "peat_component",
-                "silt_component",
+                pl.fold(
+                    pl.lit(0),
+                    lambda a, b: a + b,
+                    [
+                        pl.when(pl.col(a) < 0).then(1 / len(cols)).otherwise(pl.col(a))
+                        for a in cols
+                    ],
+                ).alias("sum")
             ]
-        ].sum(1)
-
-        df[df["gravel_component"] < 0.0, "gravel_component"] = 1.0
-
-        self.assertTrue(np.all(np.isclose(df["gravel_component"], 1)))
+        )
+        self.assertTrue(np.all(np.isclose(s, 1)))
 
 
 class PlotTest(unittest.TestCase):

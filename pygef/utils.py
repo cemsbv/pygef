@@ -792,7 +792,7 @@ def kpa_to_mpa(df, columns):
 
 
 def none_to_zero(df):
-    return df.fill_none(0.0)
+    return df.fill_null(0.0)
 
 
 def nap_to_depth(zid, nap):

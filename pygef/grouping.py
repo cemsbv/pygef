@@ -72,7 +72,7 @@ def group_significant_layers(df_group, min_thickness, start_depth):
     # Create a new column z_in by shifting zf and filling the empty first spot
     # with the starting depth
     df_group = df_group.with_column(
-        pl.col("zf").shift(periods=1).fill_none(start_depth).alias("z_in")
+        pl.col("zf").shift(periods=1).fill_null(start_depth).alias("z_in")
     )
 
     # TODO: df_group[-1, df_group.columns.get_loc("zf")] = depth
