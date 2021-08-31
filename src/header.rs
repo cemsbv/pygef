@@ -43,7 +43,12 @@ impl<'a> Header<'a> {
                         "the header values",
                         // Get the comma-space separated values
                         nom::multi::separated_list0(
-                            nom::bytes::complete::tag(", "),
+                            // Get until the ',' character and trim the spaces
+                            nom::sequence::delimited(
+                                nom::character::complete::space0,
+                                nom::bytes::complete::tag(","),
+                                nom::character::complete::space0,
+                            ),
                             nom::bytes::complete::take_till(|c| c == ',' || c == '\n'),
                         ),
                     ),
@@ -167,6 +172,64 @@ mod tests {
                     values: vec!["2"]
                 }
             ]
+        );
+    }
+
+    #[test]
+    fn test_gef_file() {
+        let (csv, _) = parse_headers(
+            "
+#GEFID = 1,1,0
+#COLUMNTEXT = 1, aan
+#COLUMNSEPARATOR = ;
+#RECORDSEPARATOR = !
+#FILEOWNER = DINO
+#FILEDATE = 2010,9,1
+#PROJECTID = DINO-BOR
+#COLUMN = 9
+#COLUMNINFO = 1, m, Diepte bovenkant laag, 1
+#COLUMNINFO = 2, m, Diepte onderkant laag, 2
+#COLUMNINFO = 3, mm, Zandmediaan, 8
+#COLUMNINFO = 4, mm, Grindmediaan, 9
+#COLUMNINFO = 5, %, Lutum percentage, 3
+#COLUMNINFO = 6, %, Silt percentage, 4
+#COLUMNINFO = 7, %, Zand percentage, 5
+#COLUMNINFO = 8, %, Grind percentage, 6
+#COLUMNINFO = 9, %, Organische stof percentage, 7
+#COLUMNVOID = 1, -9999.99
+#COLUMNVOID = 2, -9999.99
+#COLUMNVOID = 3, -9999.99
+#COLUMNVOID = 4, -9999.99
+#COLUMNVOID = 5, -9999.99
+#COLUMNVOID = 6, -9999.99
+#COLUMNVOID = 7, -9999.99
+#COLUMNVOID = 8, -9999.99
+#COLUMNVOID = 9, -9999.99
+#LASTSCAN = 44
+#REPORTCODE = GEF-BORE-Report,1,0,0
+#MEASUREMENTCODE = Onbekend
+#TESTID = B25G0304
+#XYID = 31000,120870,483400
+#ZID = 31000,2.0
+#MEASUREMENTVAR = 19, 1, -, aantal peilbuizen
+#EOH =
+0.00;1.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zgh2';'TGR \
+             GE';'ZMFO';'CA3';!
+1.20;3.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zg';'ON';'ZMGO';'FN2';'\
+             CA2';!
+3
+",
+        )
+        .unwrap();
+
+        assert_eq!(
+            csv,
+            "0.00;1.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zgh2';'TGR \
+             GE';'ZMFO';'CA3';!
+1.20;3.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zg';'ON';'ZMGO';'FN2';'\
+             CA2';!
+3
+"
         );
     }
 }

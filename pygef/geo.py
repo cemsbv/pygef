@@ -1,5 +1,4 @@
 import numpy as np
-import polars as pl
 
 
 def delta_depth(df, pre_excavated_depth=None):

@@ -67,6 +67,9 @@ mod tests {
         assert!(headers.contains_key("PROCEDURECODE"));
         assert_eq!(headers["COLUMNVOID"].len(), 9);
 
-        assert!(csv.starts_with("0.0000e+000 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003"));
+        assert!(csv.starts_with(
+            "0.0000e+000 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003 9.9990e+003 \
+             9.9990e+003 9.9990e+003"
+        ));
     }
 }

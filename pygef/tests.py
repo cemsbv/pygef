@@ -26,9 +26,17 @@ class GefTest(unittest.TestCase):
         v = utils.parse_measurement_var_as_float(s, 41)
         self.assertAlmostEqual(v, -15)
 
+        h = {"MEASUREMENTVAR": [["41", "-15.000000"]]}
+        v = utils.parse_measurement_var_as_float(h, 41)
+        self.assertAlmostEqual(v, -15)
+
     def test_measurement_var_without_minus_sign(self):
         s = r"#MEASUREMENTVAR= 41, 15.000000, "
         v = utils.parse_measurement_var_as_float(s, 41)
+        self.assertAlmostEqual(v, 15)
+
+        h = {"MEASUREMENTVAR": [["41", "15.000000", ""]]}
+        v = utils.parse_measurement_var_as_float(h, 41)
         self.assertAlmostEqual(v, 15)
 
     def test_measurement_var_integer(self):
@@ -36,9 +44,17 @@ class GefTest(unittest.TestCase):
         v = utils.parse_measurement_var_as_float(s, 41)
         self.assertAlmostEqual(v, 0.0)
 
+        h = {"MEASUREMENTVAR": [["41", "0", "deg", ""]]}
+        v = utils.parse_measurement_var_as_float(h, 41)
+        self.assertAlmostEqual(v, 0.0)
+
     def test_measurement_var_big_integer(self):
         s = r"#MEASUREMENTVAR= 41, 10000, deg, "
         v = utils.parse_measurement_var_as_float(s, 41)
+        self.assertAlmostEqual(v, 10000)
+
+        h = {"MEASUREMENTVAR": [["41", "10000", "deg", ""]]}
+        v = utils.parse_measurement_var_as_float(h, 41)
         self.assertAlmostEqual(v, 10000)
 
     def test_measurement_var_different_space(self):
@@ -46,9 +62,17 @@ class GefTest(unittest.TestCase):
         v = utils.parse_measurement_var_as_float(s, 41)
         self.assertAlmostEqual(v, 0.0)
 
+        h = {"MEASUREMENTVAR": [["41", "0", "deg", ""]]}
+        v = utils.parse_measurement_var_as_float(h, 41)
+        self.assertAlmostEqual(v, 0.0)
+
     def test_measurement_var_different_comma(self):
         s = r"#MEASUREMENTVAR= 41 , 0, deg, "
         v = utils.parse_measurement_var_as_float(s, 41)
+        self.assertAlmostEqual(v, 0.0)
+
+        h = {"MEASUREMENTVAR": [["41", "0", "deg", ""]]}
+        v = utils.parse_measurement_var_as_float(h, 41)
         self.assertAlmostEqual(v, 0.0)
 
     def test_parse_cpt_class(self):
@@ -56,35 +80,95 @@ class GefTest(unittest.TestCase):
         v = utils.parse_cpt_class(s)
         self.assertEqual(v, None)
 
+        h = {
+            "MEASUREMENTTEXT": [
+                ["6", "NEN 5140 / klasse onbekend", "sondeernorm en kwaliteitsklasse"]
+            ]
+        }
+        v = utils.parse_cpt_class(h)
+        self.assertEqual(v, None)
+
         s = r"#MEASUREMENTTEXT= 6, NEN-EN-ISO22476-1 / klasse 2 / TE2, gehanteerde norm en klasse en type sondering"
         v = utils.parse_cpt_class(s)
+        self.assertEqual(v, 2.0)
+
+        h = {
+            "MEASUREMENTTEXT": [
+                [
+                    "6",
+                    "NEN-EN-ISO22476-1 / klasse 2 / TE2",
+                    "gehanteerde norm en klasse en type sondering",
+                ]
+            ]
+        }
+        v = utils.parse_cpt_class(h)
         self.assertEqual(v, 2.0)
 
         s = r"#MEASUREMENTTEXT= 6, Norm : NEN 5140; Klasse : 2, De norm waaraan deze sondering moet voldoen."
         v = utils.parse_cpt_class(s)
         self.assertEqual(v, 2.0)
 
+        h = {
+            "MEASUREMENTTEXT": [
+                [
+                    "6",
+                    "Norm : NEN 5140; Klasse : 2",
+                    "De norm waaraan deze sondering moet voldoen.",
+                ]
+            ]
+        }
+        v = utils.parse_cpt_class(h)
+        self.assertEqual(v, 2.0)
+
         s = r"#MEASUREMENTTEXT= 6, Norm : NEN 5140; class : 2, De norm waaraan deze sondering moet voldoen."
+        v = utils.parse_cpt_class(s)
+        self.assertEqual(v, 2.0)
+
+        h = {
+            "MEASUREMENTTEXT": [
+                [
+                    "6",
+                    "Norm : NEN 5140; class : 2",
+                    "De norm waaraan deze sondering moet voldoen.",
+                ]
+            ]
+        }
         v = utils.parse_cpt_class(s)
         self.assertEqual(v, 2.0)
 
     def test_file_date(self):
         s = r"#FILEDATE= 2004, 1, 14"
         v = utils.parse_file_date(s)
-        self.assertTrue(v.date() == datetime(2004, 1, 14).date())
+        self.assertTrue(v == datetime(2004, 1, 14).date())
+
+        h = {"FILEDATE": [["2004", "1", "14"]]}
+        v = utils.parse_file_date(h)
+        self.assertTrue(v == datetime(2004, 1, 14).date())
 
     def test_project_id(self):
         s = r"#PROJECTID= CPT, 146203"
         v = utils.parse_project_type(s, "cpt")
         self.assertEqual(v, 146203)
 
+        h = {"PROJECTID": [["CPT", "146203"]]}
+        v = utils.parse_project_type(h, "cpt")
+        self.assertEqual(v, 146203)
+
         s = r"#PROJECTID = DINO-BOR"
         v = utils.parse_project_type(s, "bore")
+        self.assertEqual(v, "DINO-BOR")
+
+        h = {"PROJECTID": [["DINO-BOR"]]}
+        v = utils.parse_project_type(h, "bore")
         self.assertEqual(v, "DINO-BOR")
 
     def test_zid(self):
         s = r"#ZID= 31000, 1.3, 0.0"
         v = utils.parse_zid_as_float(s)
+        self.assertEqual(v, 1.3)
+
+        h = {"ZID": [["31000", "1.3", "0.0"]]}
+        v = utils.parse_zid_as_float(h)
         self.assertEqual(v, 1.3)
 
         s = r"""#TESTID = B38C2094
@@ -94,17 +178,40 @@ class GefTest(unittest.TestCase):
         v = utils.parse_zid_as_float(s)
         self.assertEqual(v, -1.5)
 
+        h = {
+            "TESTID": [["B38C2094"]],
+            "XYID": [["31000", "108025", "432470"]],
+            "ZID": [["31000", "-1.5"]],
+            "MEASUREMENTTEXT": [["9", "maaiveld", "vast horizontaal niveau"]],
+        }
+        v = utils.parse_zid_as_float(h)
+        self.assertEqual(v, -1.5)
+
     def test_cone_id(self):
         s = "#MEASUREMENTTEXT= 4, CFI, conus type"
         v = utils.parse_cone_id(s)
+        self.assertEqual("CFI", v)
+
+        h = {"MEASUREMENTTEXT": [["4", "CFI", "conus type"]]}
+        v = utils.parse_cone_id(h)
         self.assertEqual("CFI", v)
 
         s = "#MEASUREMENTTEXT = 4, C10CFIIP.C18469, cone type and serial number"
         v = utils.parse_cone_id(s)
         self.assertEqual("C10CFIIP.C18469", v)
 
+        h = {
+            "MEASUREMENTTEXT": [["4", "C10CFIIP.C18469", "cone type and serial number"]]
+        }
+        v = utils.parse_cone_id(h)
+        self.assertEqual("C10CFIIP.C18469", v)
+
         s = "#MEASUREMENTTEXT=4, S15CFII.d82, Cone Type"
         v = utils.parse_cone_id(s)
+        self.assertEqual("S15CFII.d82", v)
+
+        h = {"MEASUREMENTTEXT": [["4", "S15CFII.d82", "Cone Type"]]}
+        v = utils.parse_cone_id(h)
         self.assertEqual("S15CFII.d82", v)
 
     def test_parse_test_id(self):
@@ -113,9 +220,17 @@ class GefTest(unittest.TestCase):
         v = utils.parse_test_id(s)
         self.assertEqual("CPT-01", v)
 
+        h = {"TESTID": [["CPT-01"]]}
+        v = utils.parse_test_id(h)
+        self.assertEqual("CPT-01", v)
+
         # Test ID without spaces on a single line and trailing white space
         s = "#TESTID= CPT-02   "
         v = utils.parse_test_id(s)
+        self.assertEqual("CPT-02", v)
+
+        h = {"TESTID": [["CPT-02"]]}
+        v = utils.parse_test_id(h)
         self.assertEqual("CPT-02", v)
 
         # Test ID with a space on a single line
@@ -123,9 +238,17 @@ class GefTest(unittest.TestCase):
         v = utils.parse_test_id(s)
         self.assertEqual("CPT 03", v)
 
+        h = {"TESTID": [["CPT 03"]]}
+        v = utils.parse_test_id(h)
+        self.assertEqual("CPT 03", v)
+
         # Test ID with a space and trailing whitespace
         s = "#TESTID= CPT 03   "
         v = utils.parse_test_id(s)
+        self.assertEqual("CPT 03", v)
+
+        h = {"TESTID": [["CPT 03"]]}
+        v = utils.parse_test_id(h)
         self.assertEqual("CPT 03", v)
 
         # Test ID with 2 spaces in the name
@@ -133,15 +256,29 @@ class GefTest(unittest.TestCase):
         v = utils.parse_test_id(s)
         self.assertEqual("CPTU17.7 + 83BITE", v)
 
+        h = {"TESTID": [["CPTU17.7 + 83BITE"]]}
+        v = utils.parse_test_id(h)
+        self.assertEqual("CPTU17.7 + 83BITE", v)
+
     def test_parse_gef_type(self):
         s = r"#PROCEDURECODE= GEF-CPT-Report"
         v = utils.parse_gef_type(s)
+        self.assertEqual(v, "cpt")
+
+        h = {"PROCEDURECODE": [["GEF-CPT-Report"]]}
+        v = utils.parse_gef_type(h)
         self.assertEqual(v, "cpt")
 
     def test_xyid(self):
         s = r"#XYID= 31000, 132127.181, 458102.351, 0.000, 0.000"
         x = utils.parse_xid_as_float(s)
         y = utils.parse_yid_as_float(s)
+        self.assertEqual(x, 132127.181)
+        self.assertEqual(y, 458102.351)
+
+        h = {"XYID": [["31000", "132127.181", "458102.351", "0.000", "0.000"]]}
+        x = utils.parse_xid_as_float(h)
+        y = utils.parse_yid_as_float(h)
         self.assertEqual(x, 132127.181)
         self.assertEqual(y, 458102.351)
 
@@ -159,21 +296,41 @@ class GefTest(unittest.TestCase):
         v = utils.parse_quantity_number(s, 1)
         self.assertEqual(v, 1)
 
+        h = {"COLUMNINFO": [["1", "m", "Sondeerlengte", "1"]]}
+        v = utils.parse_quantity_number(h, 1)
+        self.assertEqual(v, 1)
+
         s = r"#COLUMNINFO= 7, m, Gecorrigeerde diepte, 11"
         v = utils.parse_quantity_number(s, 7)
+        self.assertEqual(v, 11)
+
+        h = {"COLUMNINFO": [["7", "m", "Gecorrigeerde diepte", "11"]]}
+        v = utils.parse_quantity_number(h, 7)
         self.assertEqual(v, 11)
 
         s = r"#COLUMNINFO= 4, %, Wrijvingsgetal Rf, 4"
         v = utils.parse_quantity_number(s, 4)
         self.assertEqual(v, 4)
 
+        h = {"COLUMNINFO": [["4", "%", "Wrijvingsgetal Rf", "4"]]}
+        v = utils.parse_quantity_number(h, 4)
+        self.assertEqual(v, 4)
+
         s = r"#COLUMNINFO= 4, Graden(deg), Helling, 8"
         v = utils.parse_quantity_number(s, 4)
+        self.assertEqual(v, 8)
+
+        h = {"COLUMNINFO": [["4", "Graden(deg)", "Helling", "8"]]}
+        v = utils.parse_quantity_number(h, 4)
         self.assertEqual(v, 8)
 
     def test_column_info(self):
         s = r"#COLUMNINFO= 1, m, Sondeerlengte, 1"
         v = utils.parse_column_info(s, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
+        self.assertEqual(v, "penetration_length")
+
+        h = {"COLUMNINFO": [["1", "m", "Sondeerlengte", "1"]]}
+        v = utils.parse_column_info(h, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
         self.assertEqual(v, "penetration_length")
 
     def test_end_of_the_header(self):
@@ -196,15 +353,28 @@ class GefTest(unittest.TestCase):
         v = utils.parse_column_separator(s)
         self.assertEqual(v, ";")
 
+        h = {"COLUMNSEPARATOR": [[";"]]}
+        v = utils.parse_column_separator(h)
+        self.assertEqual(v, ";")
+
     def test_parse_record_separator(self):
         s = r"#RECORDSEPARATOR = !"
         v = utils.parse_record_separator(s)
+        self.assertEqual(v, "!")
+
+        h = {"RECORDSEPARATOR": [["!"]]}
+        v = utils.parse_record_separator(h)
         self.assertEqual(v, "!")
 
     def test_find_separator(self):
         s = r"#COLUMNSEPARATOR = ;"
         v = utils.find_separator(s)
         self.assertEqual(v, ";")
+
+        h = {"COLUMNSEPARATOR": [[";"]]}
+        v = utils.find_separator(h)
+        self.assertEqual(v, ";")
+
         s = r"I'm sorry the column separator is not in this gef file, even if he wanted to be there."
         v = utils.find_separator(s)
         self.assertEqual(v, r" ")
@@ -375,7 +545,6 @@ class GefTest(unittest.TestCase):
         )
         pre_excavated_depth = 2
         df_calculated = correct_pre_excavated_depth(df1, pre_excavated_depth)
-        print(df_calculated)
         df = pl.DataFrame(
             {"penetration_length": [2.0, 3.0, 4.0], "qc": [0.6, 0.7, 0.8]}
         )
