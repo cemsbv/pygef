@@ -22,7 +22,8 @@ impl<'a> Header<'a> {
 
     /// Parse a header string.
     ///
-    /// The string shouldn't contain a '#' character at the begin nor a newline at the end.
+    /// The string shouldn't contain a '#' character at the begin nor a newline
+    /// at the end.
     fn from_str(s: &'a str) -> IResult<Self> {
         // Get the name of the header, the left hand side
         let (s, name) = nom::error::context(
@@ -55,15 +56,19 @@ impl<'a> Header<'a> {
 ///
 /// Return the parsed headers and a reference to the rest of the file.
 pub(crate) fn parse_headers(gef: &'_ str) -> Result<(&'_ str, Vec<Header<'_>>)> {
-    // Loop over all sequences starting with # until the newline character
-    nom::multi::many0(nom::error::context(
-        "a header line",
-        nom::sequence::delimited(
-            nom::character::complete::char('#'),
-            Header::from_str,
-            nom::character::complete::newline,
-        ),
-    ))(gef)
+    nom::sequence::preceded(
+        // Ignore the whitespace before the first header line
+        nom::character::complete::multispace0,
+        // Loop over all sequences starting with # until the newline character
+        nom::multi::many0(nom::error::context(
+            "a header line",
+            nom::sequence::delimited(
+                nom::character::complete::char('#'),
+                Header::from_str,
+                nom::character::complete::newline,
+            ),
+        )),
+    )(gef)
     // Convert the nom error to our own error type
     .map_err(|err| Error::Parsing(err.to_string()))
 }
@@ -115,6 +120,26 @@ mod tests {
     #[test]
     fn test_header_names() {
         let (rest, headers) = parse_headers("#A= 1\n#B= 2\nrest").unwrap();
+
+        assert_eq!(rest, "rest");
+        assert_eq!(
+            headers,
+            vec![
+                Header {
+                    name: "A",
+                    values: vec!["1"]
+                },
+                Header {
+                    name: "B",
+                    values: vec!["2"]
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_whitespace_prefix() {
+        let (rest, headers) = parse_headers("\n\t\n  \n#A= 1\n#B= 2\nrest").unwrap();
 
         assert_eq!(rest, "rest");
         assert_eq!(

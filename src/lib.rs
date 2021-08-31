@@ -32,7 +32,8 @@ pub fn parse(gef: &'_ str) -> Result<(&'_ str, HeaderMap<'_>)> {
     // Parse the errors as a list
     let (data, headers) = header::parse_headers(gef)?;
 
-    // Group the list by the column name, so we'll get an array of array of arguments
+    // Group the list by the column name, so we'll get an array of array of
+    // arguments
     let headers_map = headers
         .into_iter()
         // Create a tuple from the header

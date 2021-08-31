@@ -138,8 +138,9 @@ def parse_cpt_class(headers):
     :return: Cpt class.
     """
     if isinstance(headers, dict):
-        # Get the first number from the first found match
-        return int(headers["MEASUREMENTTEXT"][0][0])
+        if "MEASUREMENTTEXT" in headers:
+            # Get the first number from the first found match
+            return int(headers["MEASUREMENTTEXT"][0][0])
     else:
         all_definition = parse_regex_cast(
             r"#MEASUREMENTTEXT[=\s+]+6[, ](.*)", headers, str, 1
@@ -159,12 +160,13 @@ def parse_project_type(headers, gef_type):
     :return: Project type number.
     """
     if isinstance(headers, dict):
-        if gef_type == "cpt":
-            # Get the second number from the first found match
-            return int(headers["PROJECTID"][0][1])
-        elif gef_type == "bore":
-            # Get the first string from the first found match
-            return headers["PROJECTID"][0][0]
+        if "PROJECTID" in headers:
+            if gef_type == "cpt":
+                # Get the second number from the first found match
+                return int(headers["PROJECTID"][0][1])
+            elif gef_type == "bore":
+                # Get the first string from the first found match
+                return headers["PROJECTID"][0][0]
     else:
         if gef_type == "cpt":
             return parse_regex_cast(r"PROJECTID[\s=a-zA-Z,]*(\d*)", headers, int, 1)
