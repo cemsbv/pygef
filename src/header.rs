@@ -28,25 +28,30 @@ impl<'a> Header<'a> {
         // Get the name of the header, the left hand side
         let (s, name) = nom::error::context(
             "the name of the header",
-            nom::bytes::complete::take_until("="),
+            nom::character::complete::alphanumeric1,
         )(s)?;
 
-        let (s, values) = nom::branch::alt((
-            // Get the values between the '=' char and the end of the line
-            nom::sequence::preceded(
-                nom::bytes::complete::tag("= "),
-                nom::error::context(
-                    "the header values",
-                    // Get the comma-space separated values
-                    nom::multi::separated_list0(
-                        nom::bytes::complete::tag(", "),
-                        nom::bytes::complete::take_till(|c| c == ',' || c == '\n'),
+        let (s, values) = nom::sequence::preceded(
+            // Take all whitespace between the column header name and the = symbol
+            nom::character::complete::space0,
+            nom::branch::alt((
+                // Get the values between the '=' char and the end of the line
+                nom::sequence::preceded(
+                    // Take all spaces and = characters
+                    nom::bytes::complete::tag("= "),
+                    nom::error::context(
+                        "the header values",
+                        // Get the comma-space separated values
+                        nom::multi::separated_list0(
+                            nom::bytes::complete::tag(", "),
+                            nom::bytes::complete::take_till(|c| c == ',' || c == '\n'),
+                        ),
                     ),
                 ),
-            ),
-            // Don't return any values if the rest of the line is just '='
-            nom::combinator::map(nom::character::complete::char('='), |_| vec![]),
-        ))(s)?;
+                // Don't return any values if the rest of the line is just '='
+                nom::combinator::map(nom::character::complete::char('='), |_| vec![]),
+            )),
+        )(s)?;
 
         Ok((s, Self { name, values }))
     }
@@ -81,6 +86,14 @@ mod tests {
     fn test_single_header() {
         assert_eq!(
             Header::from_str("A= 1").unwrap().1,
+            Header {
+                name: "A",
+                values: vec!["1"]
+            }
+        );
+
+        assert_eq!(
+            Header::from_str("A = 1").unwrap().1,
             Header {
                 name: "A",
                 values: vec!["1"]
