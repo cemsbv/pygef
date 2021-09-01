@@ -4,7 +4,7 @@ from typing import List
 
 import numpy as np
 import polars as pl
-from polars import lit, col, when
+from polars import col, lit, when
 
 import pygef.plot_utils as plot
 import pygef.utils as utils
@@ -536,14 +536,14 @@ class ParseCPT:
         self.nom_surface_area_friction_element = utils.parse_measurement_var_as_float(
             headers, 2
         )
-        self.net_surface_area_quotient_of_the_cone_tip = utils.parse_measurement_var_as_float(
-            headers, 3
+        self.net_surface_area_quotient_of_the_cone_tip = (
+            utils.parse_measurement_var_as_float(headers, 3)
         )
-        self.net_surface_area_quotient_of_the_friction_casing = utils.parse_measurement_var_as_float(
-            headers, 4
+        self.net_surface_area_quotient_of_the_friction_casing = (
+            utils.parse_measurement_var_as_float(headers, 4)
         )
-        self.distance_between_cone_and_centre_of_friction_casing = utils.parse_measurement_var_as_float(
-            headers, 5
+        self.distance_between_cone_and_centre_of_friction_casing = (
+            utils.parse_measurement_var_as_float(headers, 5)
         )
         self.friction_present = utils.parse_measurement_var_as_float(headers, 6)
         self.ppt_u1_present = utils.parse_measurement_var_as_float(headers, 7)
@@ -567,53 +567,53 @@ class ParseCPT:
             headers, 16
         )
         self.stop_criteria = utils.parse_measurement_var_as_float(headers, 17)
-        self.zero_measurement_cone_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 20
+        self.zero_measurement_cone_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 20)
         )
-        self.zero_measurement_cone_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 21
+        self.zero_measurement_cone_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 21)
         )
-        self.zero_measurement_friction_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 22
+        self.zero_measurement_friction_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 22)
         )
-        self.zero_measurement_friction_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 23
+        self.zero_measurement_friction_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 23)
         )
-        self.zero_measurement_ppt_u1_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 24
+        self.zero_measurement_ppt_u1_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 24)
         )
-        self.zero_measurement_ppt_u1_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 25
+        self.zero_measurement_ppt_u1_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 25)
         )
-        self.zero_measurement_ppt_u2_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 26
+        self.zero_measurement_ppt_u2_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 26)
         )
-        self.zero_measurement_ppt_u2_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 27
+        self.zero_measurement_ppt_u2_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 27)
         )
-        self.zero_measurement_ppt_u3_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 28
+        self.zero_measurement_ppt_u3_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 28)
         )
-        self.zero_measurement_ppt_u3_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 29
+        self.zero_measurement_ppt_u3_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 29)
         )
-        self.zero_measurement_inclination_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 30
+        self.zero_measurement_inclination_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 30)
         )
-        self.zero_measurement_inclination_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 31
+        self.zero_measurement_inclination_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 31)
         )
-        self.zero_measurement_inclination_ns_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 32
+        self.zero_measurement_inclination_ns_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 32)
         )
-        self.zero_measurement_inclination_ns_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 33
+        self.zero_measurement_inclination_ns_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 33)
         )
-        self.zero_measurement_inclination_ew_before_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 34
+        self.zero_measurement_inclination_ew_before_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 34)
         )
-        self.zero_measurement_inclination_ew_after_penetration_test = utils.parse_measurement_var_as_float(
-            headers, 35
+        self.zero_measurement_inclination_ew_after_penetration_test = (
+            utils.parse_measurement_var_as_float(headers, 35)
         )
         self.mileage = utils.parse_measurement_var_as_float(headers, 41)
 

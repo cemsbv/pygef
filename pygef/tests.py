@@ -12,10 +12,10 @@ from pygef.gef import (
     ParseBORE,
     ParseCPT,
     ParseGEF,
-    replace_column_void,
-    correct_pre_excavated_depth,
-    correct_depth_with_inclination,
     calculate_friction_number,
+    correct_depth_with_inclination,
+    correct_pre_excavated_depth,
+    replace_column_void,
 )
 from pygef.grouping import GroupClassification
 
@@ -560,7 +560,10 @@ class GefTest(unittest.TestCase):
         )
         df_calculated = replace_column_void(df1, column_void)
         df = pl.DataFrame(
-            {"penetration_length": [1.0, 2.0, 3.0, 4.0], "qc": [0.5, 0.6, 0.7, 0.8],}
+            {
+                "penetration_length": [1.0, 2.0, 3.0, 4.0],
+                "qc": [0.5, 0.6, 0.7, 0.8],
+            }
         )
         assert df_calculated.frame_equal(df, null_equal=True)
 
