@@ -5,6 +5,9 @@ use crate::{
     nom::IResult,
 };
 
+/// Separator used between values in the GEF file.
+const VALUE_SEPARATOR: char = ',';
+
 /// References to the strings of the file where the header is and it's values.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Header<'a> {
@@ -46,10 +49,13 @@ impl<'a> Header<'a> {
                             // Get until the ',' character and trim the spaces
                             nom::sequence::delimited(
                                 nom::character::complete::space0,
-                                nom::bytes::complete::tag(","),
+                                nom::character::complete::char(VALUE_SEPARATOR),
                                 nom::character::complete::space0,
                             ),
-                            nom::bytes::complete::take_till(|c| c == ',' || c == '\n'),
+                            // Take until the end of the line or until a separator is found
+                            nom::bytes::complete::take_till(|c: char| {
+                                c == VALUE_SEPARATOR || c.is_control()
+                            }),
                         ),
                     ),
                 ),
