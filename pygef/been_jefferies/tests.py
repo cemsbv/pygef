@@ -164,7 +164,7 @@ class BeenJeffreyTest(unittest.TestCase):
                 "qc": [1, 1, 1],
                 "fs": [0.5, 0.5, 0.5],
                 "u2": [0.002, 0.002, 0.002],
-                "depth": [0, 0.5, 1],
+                "depth": [0.0, 0.5, 1],
                 "gamma": [11, 11, 11],
                 "delta_depth": [0.0, 0.5, 0.5],
                 "soil_pressure": [0.0, 0.0055, 0.011],

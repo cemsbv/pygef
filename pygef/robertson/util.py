@@ -19,9 +19,9 @@ def n_exponent(df, p_a):
 def normalized_cone_resistance_n(df, p_a):
     # We have to convert the series to numpy because they don't support pow
     df["normalized_cone_resistance"] = (
-        (df["qt"] - df["soil_pressure"]).to_numpy()
+        (df["qt"] - df["soil_pressure"])
         / p_a
-        * (p_a / df["effective_soil_pressure"]).to_numpy() ** df["n"].to_numpy()
+        * (p_a / df["effective_soil_pressure"]) ** df["n"]
     )
     df[df["normalized_cone_resistance"] < 0.0, "normalized_cone_resistance"] = 1.0
 
@@ -31,8 +31,8 @@ def normalized_cone_resistance_n(df, p_a):
 def type_index(df):
     # We have to convert the series to numpy because they don't support pow
     df["type_index"] = (
-        (3.47 - np.log10(df["normalized_cone_resistance"].to_numpy())) ** 2.0
-        + (np.log10(df["normalized_friction_ratio"].to_numpy()) + 1.22) ** 2.0
+        (3.47 - np.log10(df["normalized_cone_resistance"])) ** 2.0
+        + (np.log10(df["normalized_friction_ratio"]) + 1.22) ** 2.0
     ) ** 0.5
 
     return df
