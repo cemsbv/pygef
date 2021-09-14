@@ -10,7 +10,11 @@ Compatible with Python 3.7.
 
 ## Installation
 
+Latest stable version:
+
 `$ pip install pygef`
+
+Cutting-edge version (might break):
 
 `$ pip install git+https://github.com/ritchie46/pygef.git`
 
