@@ -12,9 +12,7 @@ def delta_depth(df, pre_excavated_depth=None):
     :param pre_excavated_depth: (flt)
     :return: (DataFrame) [depth, delta_depth]
     """
-    df["delta_depth"] = np.r_[
-        np.array([df["depth"].to_numpy()[0]]), np.diff(df["depth"].to_numpy())
-    ]
+    df["delta_depth"] = np.r_[np.array([df["depth"][0]]), np.diff(df["depth"])]
 
     return df
 
