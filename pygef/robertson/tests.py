@@ -190,7 +190,7 @@ class RobertsonTest(unittest.TestCase):
                     -0.0008100000000000005,
                     0.003285,
                 ],
-                "normalized_cone_resistance": [0, 0, 21.73844],
+                "normalized_cone_resistance": [0.0, 0.0, 21.73844],
                 "normalized_friction_ratio": [
                     50.0,
                     50.45408678102926,
