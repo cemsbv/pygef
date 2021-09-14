@@ -7,3 +7,5 @@ build/
 dev/
 *html
 .coverage
+target/
+Cargo.lock
