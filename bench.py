@@ -1,7 +1,8 @@
-from pygef import ParseGEF
-import numpy as np
-import os
 import cProfile
+import os
+
+import numpy as np
+from pygef import ParseGEF
 
 cwd = os.path.dirname(__file__)
 

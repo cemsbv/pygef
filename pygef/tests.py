@@ -3,7 +3,6 @@ from datetime import datetime
 
 import numpy as np
 import polars as pl
-
 import pygef.geo as geo
 import pygef.grouping as grouping
 import pygef.utils as utils

@@ -4,10 +4,9 @@ from typing import List
 
 import numpy as np
 import polars as pl
-from polars import col, lit, when
-
 import pygef.plot_utils as plot
 import pygef.utils as utils
+from polars import col, lit, when
 from pygef import been_jefferies, robertson
 from pygef.grouping import GroupClassification
 

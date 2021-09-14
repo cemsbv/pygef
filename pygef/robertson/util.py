@@ -1,6 +1,5 @@
 import numpy as np
 import polars as pl
-
 import pygef.utils as utils
 from pygef import geo
 

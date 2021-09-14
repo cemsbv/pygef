@@ -1,7 +1,6 @@
 import unittest
 
 import polars as pl
-
 import pygef.been_jefferies.util as util
 
 
