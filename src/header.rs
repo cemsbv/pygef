@@ -81,7 +81,7 @@ pub(crate) fn parse_headers(gef: &'_ str) -> Result<(&'_ str, Vec<Header<'_>>)> 
             nom::sequence::delimited(
                 nom::character::complete::char('#'),
                 Header::from_str,
-                nom::character::complete::newline,
+                nom::character::complete::line_ending,
             ),
         )),
     )(gef)
@@ -179,6 +179,13 @@ mod tests {
                 }
             ]
         );
+    }
+
+    #[test]
+    fn test_carriage_return() {
+        let (data, _) = parse_headers(" #BLA= bla\r\n#EOH=\r\n   data data\r\n   data ").unwrap();
+
+        assert_eq!(data, "   data data\r\n   data ");
     }
 
     #[test]
