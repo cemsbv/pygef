@@ -1,6 +1,6 @@
 [package]
 name = "gef"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 
 [lib]
@@ -11,8 +11,8 @@ crate-type = ["cdylib"]
 [dependencies]
 itertools = "0.10.1"
 nom = "7.0.0"
-pyo3 = { version = "0.14.4", features = ["extension-module"] }
-thiserror = "1.0.26"
+pyo3 = { version = "0.14.5", features = ["extension-module"] }
+thiserror = "1.0.29"
 
 [package.metadata.maturin]
 python-source = "pygef"

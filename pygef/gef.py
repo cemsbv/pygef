@@ -1,5 +1,6 @@
 import io
 import logging
+import re
 from typing import List
 
 import numpy as np
@@ -650,7 +651,13 @@ class ParseCPT:
 
     @staticmethod
     def parse_data(headers, data_s, column_names=None):
-        new_data = data_s.replace("!", "")
+        # Remove multiple whitespaces
+        # TODO: find a way for polars to handle columns with variable amounts of whitespace
+        new_data = re.sub(" +", " ", data_s.replace("!", ""))
+
+        # Remove whitespace at the beginning and end of lines
+        new_data = "\n".join([line.strip() for line in new_data.splitlines()])
+
         separator = utils.find_separator(headers)
 
         return pl.read_csv(

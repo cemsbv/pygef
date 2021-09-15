@@ -352,7 +352,13 @@ class GefTest(unittest.TestCase):
         df_parsed = ParseCPT.parse_data(
             header_s, data_s, column_names=["col1", "col2", "col3"]
         )
-        # TODO: why aren't these equal with df.frame_equal?
+        assert df_parsed.frame_equal(df, null_equal=True)
+
+        # Test terribly formatted columns
+        data_s = "\n 1  1 1 \n2 2 2  \n3 3 3\n"
+        df_parsed = ParseCPT.parse_data(
+            header_s, data_s, column_names=["col1", "col2", "col3"]
+        )
         assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_parse_column_separator(self):
