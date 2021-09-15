@@ -177,12 +177,12 @@ def parse_project_type(headers, gef_type):
     """
     if isinstance(headers, dict):
         if gef_type == "cpt":
-            return first_header_value(headers, "PROJECTID", index=1, cast=int)
+            return first_header_value(headers, "PROJECTID", index=1)
         elif gef_type == "bore":
             return first_header_value(headers, "PROJECTID")
     else:
         if gef_type == "cpt":
-            return parse_regex_cast(r"PROJECTID[\s=a-zA-Z,]*(\d*)", headers, int, 1)
+            return parse_regex_cast(r"PROJECTID[\s=a-zA-Z,]*([\w-]+)", headers, str, 1)
         elif gef_type == "bore":
             return parse_regex_cast(r"#PROJECTID+[^a-zA-Z]+([\w-]+)", headers, str, 1)
 

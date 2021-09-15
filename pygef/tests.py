@@ -147,11 +147,11 @@ class GefTest(unittest.TestCase):
     def test_project_id(self):
         s = r"#PROJECTID= CPT, 146203"
         v = utils.parse_project_type(s, "cpt")
-        self.assertEqual(v, 146203)
+        self.assertEqual(v, "146203")
 
         h = {"PROJECTID": [["CPT", "146203"]]}
         v = utils.parse_project_type(h, "cpt")
-        self.assertEqual(v, 146203)
+        self.assertEqual(v, "146203")
 
         s = r"#PROJECTID = DINO-BOR"
         v = utils.parse_project_type(s, "bore")
@@ -160,6 +160,14 @@ class GefTest(unittest.TestCase):
         h = {"PROJECTID": [["DINO-BOR"]]}
         v = utils.parse_project_type(h, "bore")
         self.assertEqual(v, "DINO-BOR")
+
+        s = r"#PROJECTID = CPT, 1018-0347-000, -"
+        v = utils.parse_project_type(s, "cpt")
+        self.assertEqual(v, "1018-0347-000")
+
+        h = {"PROJECTID": [["CPT", "1018-0347-000", "-"]]}
+        v = utils.parse_project_type(h, "cpt")
+        self.assertEqual(v, "1018-0347-000")
 
     def test_zid(self):
         s = r"#ZID= 31000, 1.3, 0.0"
