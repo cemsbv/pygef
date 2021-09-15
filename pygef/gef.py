@@ -697,19 +697,21 @@ class ParseBORE:
             .pipe(self.parse_data_soil_type, data_rows_soil)
             .pipe(self.parse_add_info_as_string, data_rows_soil)
             .pipe(self.parse_soil_quantification, data_rows_soil)
-            .drop(
-                [
-                    "sand_median",
-                    "gravel_median",
-                    "lutum_percentage",
-                    "silt_percentage",
-                    "sand_percentage",
-                    "gravel_percentage",
-                    "organic_matter_percentage",
-                    "soil_type",
-                ]
-            )
         )
+
+        # Drop the columns if they exist, do nothing if they don't
+        for column in [
+            "sand_median",
+            "gravel_median",
+            "lutum_percentage",
+            "silt_percentage",
+            "sand_percentage",
+            "gravel_percentage",
+            "organic_matter_percentage",
+            "soil_type",
+        ]:
+            if column in self.df.columns:
+                self.df.drop_in_place(column)
 
         if old_column_names:
             # Use deprecated naming standards
