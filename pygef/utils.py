@@ -111,9 +111,10 @@ def parse_measurement_var_as_float(headers, var_number):
     try:
         if isinstance(headers, dict):
             # Loop over all headers to find the right number
-            for values in headers["MEASUREMENTVAR"]:
-                if values[0] == var_number_str:
-                    return float(values[1])
+            if "MEASUREMENTVAR" in headers:
+                for values in headers["MEASUREMENTVAR"]:
+                    if values[0] == var_number_str:
+                        return float(values[1])
         else:
             # Find all '#MEASUREMENTVAR= **,' strings first
             for match in re.finditer(
@@ -177,7 +178,12 @@ def parse_project_type(headers, gef_type):
     """
     if isinstance(headers, dict):
         if gef_type == "cpt":
-            return first_header_value(headers, "PROJECTID", index=1)
+            try:
+                # Try to get the second value first
+                return first_header_value(headers, "PROJECTID", index=1)
+            except Exception:
+                # If that fails get the first one
+                return first_header_value(headers, "PROJECTID")
         elif gef_type == "bore":
             return first_header_value(headers, "PROJECTID")
     else:
@@ -195,7 +201,8 @@ def parse_zid_as_float(headers):
     :return:(float) ZID number.
     """
     if isinstance(headers, dict):
-        return first_header_value(headers, "ZID", index=1, cast=float)
+        if "ZID" in headers:
+            return first_header_value(headers, "ZID", index=1, cast=float)
     else:
         return parse_regex_cast(
             r"#ZID[=\s+]+[^,]*[,\s+]+([^?!,$|\s$]+)", headers, float, 1

@@ -272,9 +272,15 @@ class ParseGEF:
         self.type = utils.parse_gef_type(headers)
 
         if self.type == "cpt":
-            parsed = ParseCPT(headers, data, self.zid, self.height_system)
+            parsed = ParseCPT(
+                headers,
+                data,
+                self.zid,
+                self.height_system,
+                old_column_names=old_column_names,
+            )
         elif self.type == "bore":
-            parsed = ParseBORE(headers, data)
+            parsed = ParseBORE(headers, data, old_column_names=old_column_names)
         elif self.type == "borehole-report":
             raise ValueError(
                 "The selected gef file is a GEF-BOREHOLE-Report. Can only parse "
@@ -626,11 +632,18 @@ class ParseCPT:
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
             .with_column(correct_depth_with_inclination(column_names))
             .select(
+                # Remove None values since they throw an error
                 [
-                    pl.all().exclude(["depth", "friction_number"]),
-                    col("depth").abs(),
-                    self.calculate_elevation_with_respect_to_nap(zid, height_system),
-                    calculate_friction_number(column_names),
+                    expr
+                    for expr in [
+                        pl.all().exclude(["depth", "friction_number"]),
+                        col("depth").abs(),
+                        calculate_friction_number(column_names),
+                        self.calculate_elevation_with_respect_to_nap(
+                            zid, height_system
+                        ),
+                    ]
+                    if expr is not None
                 ]
             )
             .collect()
@@ -644,21 +657,30 @@ class ParseCPT:
 
     @staticmethod
     def calculate_elevation_with_respect_to_nap(zid, height_system):
-        if zid is not None and height_system == 31000:
+        if zid is not None and height_system == 31000.0:
             return (zid - pl.col("depth")).alias("elevation_with_respect_to_nap")
 
         return None
 
     @staticmethod
     def parse_data(headers, data_s, column_names=None):
+        separator = utils.find_separator(headers)
+
         # Remove multiple whitespaces
         # TODO: find a way for polars to handle columns with variable amounts of whitespace
-        new_data = re.sub(" +", " ", data_s.replace("!", ""))
+        if separator == " ":
+            new_data = re.sub("[ \t]+", " ", data_s.replace("!", ""))
+        else:
+            # If we have another separator remove all whitespace around it
+            new_data = re.sub(
+                f"[\t ]*{re.escape(separator)}[\t ]*",
+                separator,
+                data_s.replace(separator + "!", "").replace("!", ""),
+            )
 
-        # Remove whitespace at the beginning and end of lines
-        new_data = "\n".join([line.strip() for line in new_data.splitlines()])
-
-        separator = utils.find_separator(headers)
+        # Remove whitespace at the beginning and end of lines, and remove the
+        # last trailing line
+        new_data = "\n".join([line.strip() for line in new_data.splitlines()]).rstrip()
 
         return pl.read_csv(
             new_data.encode(),
