@@ -1063,6 +1063,33 @@ class GefTest(unittest.TestCase):
         cpt = ParseGEF(string=cpt)
         assert np.isclose(cpt.df[0, "depth"], 1.51)
 
+    def test_bore_with_reduced_columns(self):
+        ParseGEF(
+            string="""
+#PROJECTID= redacted, 1234, -
+#COLUMN= 2
+#COLUMNINFO= 1, m, Laag van, 1
+#COLUMNINFO= 2, m, Laag tot, 2
+#DATAFORMAT= ASCII
+#COLUMNSEPARATOR= ;
+#COLUMNTEXT= 1
+#PROCEDURECODE= GEF-BORE-Report, 1, 0, 0, -
+#REPORTCODE= GEF-BORE-Report, 1, 0, 0, -
+#RECORDSEPARATOR= !
+#OS= DOS
+#LANGUAGE= NL
+#EOH=
+0.0000e+000;2.0000e-001;'Zs1';'ZUF';'DO TGR BR';;;!
+2.0000e-001;4.0000e-001;'Vz3';;'DO BR';;;!
+4.0000e-001;6.0000e-001;'Zs1';'ZUF';'DO TBR GR';;;!
+6.0000e-001;1.0000e+000;'Zs1';'ZUF';'LI BR';;;!
+1.0000e+000;1.4000e+000;'Vk1';;'DO TRO BR';;;!
+1.4000e+000;2.2000e+000;'Zs1';'ZUF';'LI BR';'Restante BZB.: PR (zwak)';;!
+2.2000e+000;2.6000e+000;'Zs1g1';'ZUF';'LI TBE BR';'Restante BZB.: PR (zwak)';;!
+2.6000e+000;3.2000e+000;'Zs1g1';'ZUF';'LI GR';;;!
+"""
+        )
+
 
 class BoreTest(unittest.TestCase):
     def setUp(self):
