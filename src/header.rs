@@ -37,32 +37,34 @@ impl<'a> Header<'a> {
         let (s, values) = nom::sequence::preceded(
             // Take all whitespace between the column header name and the = symbol
             nom::character::complete::space0,
-            nom::branch::alt((
-                // Get the values between the '=' char and the end of the line
+            // Get the values between the '=' char and the end of the line
+            nom::sequence::preceded(
+                // Take all spaces and = characters
                 nom::sequence::preceded(
-                    // Take all spaces and = characters
-                    nom::bytes::complete::tag("= "),
-                    nom::error::context(
-                        "the header values",
-                        // Get the comma-space separated values
-                        nom::multi::separated_list0(
-                            // Get until the ',' character and trim the spaces
-                            nom::sequence::delimited(
-                                nom::character::complete::space0,
-                                nom::character::complete::char(VALUE_SEPARATOR),
-                                nom::character::complete::space0,
-                            ),
-                            // Take until the end of the line or until a separator is found
-                            nom::bytes::complete::take_till(|c: char| {
-                                c == VALUE_SEPARATOR || c.is_control()
-                            }),
+                    nom::character::complete::char('='),
+                    nom::character::complete::space0,
+                ),
+                nom::error::context(
+                    "the header values",
+                    // Get the comma-space separated values
+                    nom::multi::separated_list0(
+                        // Get until the ',' character and trim the spaces
+                        nom::sequence::delimited(
+                            nom::character::complete::space0,
+                            nom::character::complete::char(VALUE_SEPARATOR),
+                            nom::character::complete::space0,
                         ),
+                        // Take until the end of the line or until a separator is found
+                        nom::bytes::complete::take_till(|c: char| {
+                            c == VALUE_SEPARATOR || c.is_control()
+                        }),
                     ),
                 ),
-                // Don't return any values if the rest of the line is just '='
-                nom::combinator::map(nom::character::complete::char('='), |_| vec![]),
-            )),
+            ),
         )(s)?;
+
+        // Make empty lists actually empty
+        let values = if values == [""] { Vec::new() } else { values };
 
         Ok((s, Self { name, values }))
     }
@@ -81,7 +83,8 @@ pub(crate) fn parse_headers(gef: &'_ str) -> Result<(&'_ str, Vec<Header<'_>>)> 
             nom::sequence::delimited(
                 nom::character::complete::char('#'),
                 Header::from_str,
-                nom::character::complete::line_ending,
+                // Allow multiple lines
+                nom::multi::many1(nom::character::complete::line_ending),
             ),
         )),
     )(gef)
@@ -144,6 +147,26 @@ mod tests {
     #[test]
     fn test_header_names() {
         let (rest, headers) = parse_headers("#A= 1\n#B= 2\nrest").unwrap();
+
+        assert_eq!(rest, "rest");
+        assert_eq!(
+            headers,
+            vec![
+                Header {
+                    name: "A",
+                    values: vec!["1"]
+                },
+                Header {
+                    name: "B",
+                    values: vec!["2"]
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_header_empty_lines() {
+        let (rest, headers) = parse_headers("#A= 1\n\n\n#B= 2\nrest").unwrap();
 
         assert_eq!(rest, "rest");
         assert_eq!(
@@ -243,6 +266,104 @@ mod tests {
              CA2';!
 3
 "
+        );
+    }
+
+    #[test]
+    fn test_horrible_format() {
+        let (csv, headers) = parse_headers(
+            "
+#GEFID  = 1,0,0
+#COLUMN = 2
+#COLUMNINFO   = 1, m, Sondeerlengte, 1
+#COLUMNINFO   = 2, MPa, Conusweerstand, 2
+#COMPANYID   = REDACT, 1, 0
+#FILEOWNER   = REDACT
+#PROJECTNAME = REDACT ED FILE
+#PROJECTID   = 0
+#TESTID      = REDACT sondering
+#FILEDATE     =2021,3,10
+#STARTDATE    =2021,3,10
+#STARTTIME    =14,17,45
+#LASTSCAN    =769
+#PROCEDURECODE = GEF-CPT-Report, 1, 0, 0, -
+#ZID = 31000,-2.94, 0.1
+#XYID = 31000,0,0, 0.1, 0.1
+#EOH=
+0.000  0.36
+0.033  0.43
+0.065  0.64
+0.099  0.71
+",
+        )
+        .unwrap();
+
+        assert_eq!(
+            headers[0],
+            Header {
+                name: "GEFID",
+                values: ["1", "0", "0"].to_vec(),
+            }
+        );
+        assert_eq!(
+            headers[1],
+            Header {
+                name: "COLUMN",
+                values: ["2"].to_vec(),
+            }
+        );
+
+        assert_eq!(
+            csv,
+            "0.000  0.36
+0.033  0.43
+0.065  0.64
+0.099  0.71
+"
+        );
+
+        let (csv, _) = parse_headers(
+            "
+#GEFID          = 1,1,0
+#FILEDATE       = 2021, 04, 12
+#REPORTCODE     = GEF-CPT-Report,1,1,0
+#COLUMNSEPARATOR= |
+#RECORDSEPARATOR= !
+
+#COMMENT=*****************     ADMINISTRATIVE TEST DATA      ********************
+#FILEOWNER      = Unknown
+
+#COMMENT=******************    REMARKS ADDED AFTER TEST     *********************
+
+#COMMENT=****************** REFERENCE LEVEL AND COORDINATES *********************
+#MEASUREMENTTEXT= 9, Ground Level, fixed horizontal level
+#ZID            = 00000,  0.10
+
+#COMMENT=*****************       MEASURED PARAMETERS         ********************
+#MEASUREMENTVAR = 20,0.00, MPa    , zero measurement cone before test
+
+#COMMENT=*****************        COLUMN PARAMETERS         *********************
+#COLUMN         = 4
+#COLUMNVOID     = 4, -99999
+#LASTSCAN       = 1184
+#EOH            =
+  0.00|   0.22|   0.00279|   0.00|!
+  0.01|   0.34|   0.00333|   0.00|!
+  0.02|   0.47|   0.00387|   0.00|!
+  0.03|   0.59|   0.00443|   0.00|!
+  0.04|   0.70|   0.00504|   0.00|!
+  0.05|   0.80|   0.00574|   0.00|!",
+        )
+        .unwrap();
+
+        assert_eq!(
+            csv,
+            "  0.00|   0.22|   0.00279|   0.00|!
+  0.01|   0.34|   0.00333|   0.00|!
+  0.02|   0.47|   0.00387|   0.00|!
+  0.03|   0.59|   0.00443|   0.00|!
+  0.04|   0.70|   0.00504|   0.00|!
+  0.05|   0.80|   0.00574|   0.00|!"
         );
     }
 }

@@ -494,7 +494,7 @@ class GefTest(unittest.TestCase):
         df = pl.DataFrame(
             {
                 "depth": [0.0, 1.0, 2.0, 3.0, 4.0],
-                "elevation_with_respect_to_NAP": [-3.0, -4.0, -5.0, -6.0, -7.0],
+                "elevation_with_respect_to_nap": [-3.0, -4.0, -5.0, -6.0, -7.0],
             }
         )
         assert df_calculated.frame_equal(df, null_equal=True)
@@ -641,7 +641,7 @@ class GefTest(unittest.TestCase):
                 "qc": [7.1000e-001, 7.3000e-001, 6.9000e-001],
                 "fs": [4.6500e-002, 4.2750e-002, 3.9000e-002],
                 "depth": [1.0200e000, 1.0400e000, 1.0600e000],
-                "elevation_with_respect_to_NAP": [0.28, 0.26, 0.24],
+                "elevation_with_respect_to_nap": [0.28, 0.26, 0.24],
                 "friction_number": [6.54929577, 5.85616438, 5.65217391],
             }
         )
@@ -748,7 +748,7 @@ class GefTest(unittest.TestCase):
                 "friction_number": [0.579935, 0.578253],
                 "u1": [0.003011, 0.003336],
                 "depth": [1.510000, 1.529999],
-                "elevation_with_respect_to_NAP": [-1.90, -1.919999],
+                "elevation_with_respect_to_nap": [-1.90, -1.919999],
             }
         )
         # TODO: replace with frame_equal when rounding is supported
@@ -892,7 +892,7 @@ class GefTest(unittest.TestCase):
                     "Silt mixtures - clayey silt to silty clay",
                     "Sand",
                 ],
-                "elevation_with_respect_to_NAP": [2, 1, 0, -1, -2, -3, -4],
+                "elevation_with_respect_to_nap": [2, 1, 0, -1, -2, -3, -4],
             }
         )
         group = GroupClassification(2, df_group, 0.2)
