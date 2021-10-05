@@ -255,6 +255,8 @@ class ParseGEF:
             with open(path, encoding="utf-8", errors="ignore") as f:
                 string = f.read()
 
+        self.s = string
+
         if USE_RUST_PARSED_HEADERS:
             # Use the Rust optimized header parser
             data, headers = gef.parse(string)
