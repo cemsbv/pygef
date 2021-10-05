@@ -55,3 +55,13 @@ gef.plot(classification='robertson', water_level_NAP= -1, min_thickness= 0.2, sh
 ```
 
 ![](img/gef_classified_grouped.png)
+
+## Documentation
+
+Install the requirements:
+
+`pip install -r requirements_docs.txt`
+
+Build the docs:
+
+`sphinx-build -b html docs public`

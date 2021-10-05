@@ -9,3 +9,4 @@ dev/
 .coverage
 target/
 Cargo.lock
+public/
