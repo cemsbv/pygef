@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Reference &#8212; pygef 0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Getting started" href="getting_started.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting started"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pygef 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Reference</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<section id="parsegef">
+<h2>ParseGEF<a class="headerlink" href="#parsegef" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pygef.ParseGEF">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pygef.</span></span><span class="sig-name descname"><span class="pre">ParseGEF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_column_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pygef.ParseGEF" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ParseGEF file can be used to parse a <a href="#id1"><span class="problematic" id="id2">*</span></a>.gef file and use it as an ParseGEF object.</p>
+<p>The gef parser is built following the conventional format described in:
+<a class="reference external" href="https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&amp;modificationDate=1409732008000&amp;api=v2">https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&amp;modificationDate=1409732008000&amp;api=v2</a></p>
+<p>For more information on initialization of this class type:
+print(ParseGEF.__init__.__doc__)</p>
+<dl class="simple">
+<dt>To check the available methods, type:</dt><dd><p>print(dir(ParseGEF))</p>
+</dd>
+</dl>
+<p><strong>Attributes</strong>:
+The ParseGEF class accept as input the <a href="#id3"><span class="problematic" id="id4">*</span></a>.gef file of a bore or cpt type.</p>
+<p>Some attributes are common for the both types, other are specific to the type(cpt or bore).</p>
+<p>Check the list below for the available attributes.</p>
+<blockquote>
+<div><p>** Common attributes:**
+type: str</p>
+<blockquote>
+<div><p>Type of the gef file</p>
+</div></blockquote>
+<dl class="simple">
+<dt>project_id: str</dt><dd><p>Project id</p>
+</dd>
+<dt>x: float</dt><dd><p>X coordinate respect to the coordinate system</p>
+</dd>
+<dt>y: float</dt><dd><p>Y coordinate respect to the coordinate system</p>
+</dd>
+<dt>zid: float</dt><dd><p>Z coordinate respect to the height system</p>
+</dd>
+<dt>height_system: float</dt><dd><p>Type of coordinate system, 31000 is NAP</p>
+</dd>
+<dt>file_date: datatime.datetime</dt><dd><p>Start date time</p>
+</dd>
+<dt>test_id: str</dt><dd><p>Identifying name of gef file.</p>
+</dd>
+<dt>s: str</dt><dd><p>String version of gef file.</p>
+</dd>
+</dl>
+<p>** Cpt attributes:**
+<em>Always present:</em></p>
+<blockquote>
+<div><dl>
+<dt>df: polars.DataFrame</dt><dd><p>DataFrame containing the same column contained in the original .gef file and
+some additional columns [depth, elevation_with_respect_to_nap]</p>
+<p>Tip: Use depth column instead of the penetration_length, the depth is corrected
+with the inclination(if present).</p>
+<p>Note that the Friction ratio is always calculated from the fs and qc values and not parsed from the file.</p>
+<p>If this attribute is called after the classify method the columns relative to the classification
+are also contained.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><em>Not always present</em> default: None
+The description is added only for the most important attributes, for the others check:
+<a class="reference external" href="https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&amp;modificationDate=1409732008000&amp;api=v2">https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&amp;modificationDate=1409732008000&amp;api=v2</a></p>
+<blockquote>
+<div><dl class="simple">
+<dt>cpt_class: str</dt><dd><p>Cpt class. The format is not standard so it might be not always properly parsed.</p>
+</dd>
+<dt>column_void: str</dt><dd><p>It is the definition of no value for the gef file</p>
+</dd>
+<dt>nom_surface_area_cone_tip: float</dt><dd><p>Nom. surface area of cone tip [mm2]</p>
+</dd>
+<dt>nom_surface_area_friction_element: float</dt><dd><p>Nom. surface area of friction casing [mm2]</p>
+</dd>
+<dt>net_surface_area_quotient_of_the_cone_tip: float</dt><dd><p>Net surface area quotient of cone tip [-]</p>
+</dd>
+<dt>net_surface_area_quotient_of_the_friction_casing: float</dt><dd><p>Net surface area quotient of friction casing [-]</p>
+</dd>
+</dl>
+<p>distance_between_cone_and_centre_of_friction_casing: float
+friction_present: float
+ppt_u1_present: float
+ppt_u2_present: float
+ppt_u3_present: float
+inclination_measurement_present: float
+use_of_back_flow_compensator: float
+type_of_cone_penetration_test: float
+pre_excavated_depth: float</p>
+<blockquote>
+<div><p>Pre excavate depth [m]</p>
+</div></blockquote>
+<dl class="simple">
+<dt>groundwater_level: float</dt><dd><p>Ground water level [m]</p>
+</dd>
+</dl>
+<p>water_depth_offshore_activities: float
+end_depth_of_penetration_test: float
+stop_criteria: float
+zero_measurement_cone_before_penetration_test: float
+zero_measurement_cone_after_penetration_test: float
+zero_measurement_friction_before_penetration_test: float
+zero_measurement_friction_after_penetration_test: float
+zero_measurement_ppt_u1_before_penetration_test: float
+zero_measurement_ppt_u1_after_penetration_test: float
+zero_measurement_ppt_u2_before_penetration_test: float
+zero_measurement_ppt_u2_after_penetration_test: float
+zero_measurement_ppt_u3_before_penetration_test: float
+zero_measurement_ppt_u3_after_penetration_test: float
+zero_measurement_inclination_before_penetration_test: float
+zero_measurement_inclination_after_penetration_test: float
+zero_measurement_inclination_ns_before_penetration_test: float
+zero_measurement_inclination_ns_after_penetration_test: float
+zero_measurement_inclination_ew_before_penetration_test: float
+zero_measurement_inclination_ew_after_penetration_test : float
+mileage: float</p>
+</div></blockquote>
+<dl>
+<dt>** Bore attributes:**</dt><dd><dl>
+<dt>df: polars.DataFrame</dt><dd><dl>
+<dt>DataFrame containing the columns: [</dt><dd><blockquote>
+<div><p>“depth_top”,
+“depth_bottom”,
+“soil_code”,
+“gravel_component”,
+“sand_component”,
+“clay_component”,
+“loam_component”,
+“peat_component”,
+“silt_component”,
+“remarks”,</p>
+</div></blockquote>
+<p>]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="pygef.ParseGEF.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_column_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pygef.ParseGEF.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class of gef parser. It switches between the cpt or borehole parser.</p>
+<p>It takes as input either the path to the gef file or the gef file as string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Path to the <a href="#id5"><span class="problematic" id="id6">*</span></a>.gef file.</p></li>
+<li><p><strong>string</strong> (<em>str</em>) – String version of the <a href="#id7"><span class="problematic" id="id8">*</span></a>.gef file.</p></li>
+<li><p><strong>old_column_names</strong> (<em>bool</em>) – Use deprecated column names.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pygef.ParseGEF.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_level_NAP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_level_wrt_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(11,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_grouping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_step_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_NAP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pygef.ParseGEF.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the <a href="#id9"><span class="problematic" id="id10">*</span></a>.gef file and return matplotlib.pyplot.figure .</p>
+<p>It works both with a cpt or borehole type file. If no argument it is passed it returns:
+- CPT: plot of qc [MPa] and Friction ratio [%]
+- BOREHOLE: plot of soil components over the depth.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>classification</strong> (<em>str</em><em>, </em><em>only for cpt type</em>) – If classification (“robertson”, “been_jefferies”) is specified a subplot is added with the classification
+for each cpt row.</p></li>
+<li><p><strong>water_level_NAP</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>necessary for the classification: give this</em><em> or </em><em>water_level_wrt_depth</em>) – Water level with respect to NAP</p></li>
+<li><p><strong>water_level_wrt_depth</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>necessary for the classification: give this</em><em> or </em><em>water_level_NAP</em>) – Water level with respect to the ground_level [0], it should be a negative value.</p></li>
+<li><p><strong>min_thickness</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification</em><em> [</em><em>m</em><em>]</em>) – If specified together with the do_grouping set to True, a group classification is added to the plot.
+The grouping is a simple algorithm that merge all the layers &lt; min_thickness with the last above one &gt;
+min_thickness.
+In order to not make a big error do not use a value bigger then 0.2 m</p></li>
+<li><p><strong>p_a</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification</em>) – Atmospheric pressure. Default: 0.1 MPa.</p></li>
+<li><p><strong>new</strong> (<em>bool</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification default:True</em>) – If True and the classification is robertson, the new(2016) implementation of robertson is used.</p></li>
+<li><p><strong>show</strong> (<em>bool</em>) – If True the plot is showed, else the matplotlib.pytplot.figure is returned</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Figsize of the plot, default (11, 8).</p></li>
+<li><p><strong>df_group</strong> (<em>polars.DataFrame</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification</em>) – <p>Use this argument to plot a defined soil layering next to the other subplots.
+It should contain the columns:</p>
+<blockquote>
+<div><ul>
+<li><dl class="simple">
+<dt>layer</dt><dd><p>Name of layer, should be either BeenJefferies of Robertson soil type,
+if it is different then also the argument colors should be passed.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>z_centr_NAP</dt><dd><p>Z value of the middle of the layer</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>thickness</dt><dd><p>Thickness of the layer</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>do_grouping</strong> (<em>bool</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification</em>) – If True a group classification is added to the plot.</p></li>
+<li><p><strong>grid_step_x</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>default: None</em>) – Grid step for qc and Fr subplots.</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>) – Dpi figure</p></li>
+<li><p><strong>colors</strong> (<em>dict</em>) – Dictionary containing the colors associated to each soil type, if specified</p></li>
+<li><p><strong>z_NAP</strong> (<em>bool</em>) – If True the Z-axis is with respect to NAP.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>matplotlib.pyplot.figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pygef.ParseGEF.classify">
+<span class="sig-name descname"><span class="pre">classify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classification</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_level_NAP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_level_wrt_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_grouping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pygef.ParseGEF.classify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Classify each row of the cpt type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>classification</strong> (<em>str</em>) – Specify the classification, possible choices : “robertson”, “been_jefferies”.</p></li>
+<li><p><strong>water_level_NAP</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>necessary for the classification: give this</em><em> or </em><em>water_level_wrt_depth</em>) – Water level with respect to NAP</p></li>
+<li><p><strong>water_level_wrt_depth</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>necessary for the classification: give this</em><em> or </em><em>water_level_NAP</em>) – Water level with respect to the ground_level [0], it should be a negative value.</p></li>
+<li><p><strong>p_a</strong> (<em>float</em>) – Atmospheric pressure. Default: 0.1 MPa.</p></li>
+<li><p><strong>new</strong> (<em>bool</em><em>, </em><em>default:True</em>) – If True and the classification is robertson, the new(2016) implementation of robertson is used.</p></li>
+<li><p><strong>do_grouping</strong> (<em>bool</em><em>,  </em><em>optional for the classification</em>) – If True a group classification is added to the plot.</p></li>
+<li><p><strong>min_thickness</strong> (<em>float</em><em>, </em><em>optional for the classification</em><em> [</em><em>m</em><em>]</em>) – If specified together with the do_grouping set to True, a group classification is added to the plot.
+The grouping is a simple algorithm that merge all the layers &lt; min_thickness with the last above one &gt; min_thickness.
+In order to not make a big error do not use a value bigger then 0.2 m</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>df</strong> (<em>polars.DataFrame</em>)</p></li>
+<li><p><em>If do_grouping is True a polars.DataFrame with the grouped layer is returned otherwise a polars.DataFrame with</em></p></li>
+<li><p><em>a classification for each row is returned.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Reference</a><ul>
+<li><a class="reference internal" href="#parsegef">ParseGEF</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="getting_started.html"
+                        title="previous chapter">Getting started</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tree/reference.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting started"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pygef 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Reference</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Crux BV.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>
