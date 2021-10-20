@@ -61,7 +61,7 @@ fn gef(_py: Python, module: &PyModule) -> PyResult<()> {
 mod tests {
     #[test]
     fn example() {
-        let (csv, headers) = super::parse(&include_str!("../pygef/files/example.gef")).unwrap();
+        let (csv, headers) = super::parse(&include_str!("../test_files/example.gef")).unwrap();
 
         assert!(headers.contains_key("GEFID"));
         assert!(headers.contains_key("PROCEDURECODE"));

@@ -272,11 +272,16 @@ class ParseGEF:
 
 
 class ParseGefCpt(ParseGEF):
-    def __init__(self, path=None, string=None, old_column_names=True):
+    def __init__(self, path=None, string=None):
         """
         Parser of the cpt file.
 
-        :param old_column_names: (bool) Use deprecated column names.
+        Parameters
+        ----------
+        path: str
+            Path to the *.gef file.
+        string: str
+            String version of the *.gef file.
         """
         super().__init__(path=path, string=string)
         if not self.type == "cpt":
@@ -404,12 +409,6 @@ class ParseGefCpt(ParseGEF):
             .collect()
         )
 
-        if old_column_names:
-            # Use deprecated naming standards
-            self.df = self.df.rename(
-                {"elevation_with_respect_to_nap": "elevation_with_respect_to_NAP"}
-            )
-
     @staticmethod
     def calculate_elevation_with_respect_to_nap(zid, height_system):
         if zid is not None and height_system == 31000.0:
@@ -446,11 +445,16 @@ class ParseGefCpt(ParseGEF):
 
 
 class ParseGefBore(ParseGEF):
-    def __init__(self, path=None, string=None, old_column_names=True):
+    def __init__(self, path=None, string=None):
         """
         Parser of the borehole file.
 
-        :param old_column_names: (bool) Use deprecated column names
+        Parameters
+        ----------
+        path: str
+            Path to the *.gef file.
+        string: str
+            String version of the *.gef file.
         """
         super().__init__(path=path, string=string)
         if self.type == "bore":
@@ -500,20 +504,6 @@ class ParseGefBore(ParseGEF):
         ]:
             if column in self.df.columns:
                 self.df.drop_in_place(column)
-
-        if old_column_names:
-            # Use deprecated naming standards
-            self.df = self.df.rename(
-                {
-                    "gravel_component": "G",
-                    "sand_component": "S",
-                    "clay_component": "C",
-                    "loam_component": "L",
-                    "peat_component": "P",
-                    "silt_component": "SI",
-                    "remarks": "Remarks",
-                }
-            )
 
     @staticmethod
     def parse_add_info_as_string(df, data_rows_soil):

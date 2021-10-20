@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class Cpt(BaseParser):
-    def __init__(self, path=None, content: dict = None, old_column_names=True):
+    def __init__(self, path=None, content: dict = None):
         """
         Cpt class.
 
@@ -37,15 +37,13 @@ class Cpt(BaseParser):
             ), f"file_type can be only one of [gef, xml] "
             assert content["string"] is not None, "content['string'] must be specified"
             if content["file_type"] == "gef":
-                parsed = ParseGefCpt(
-                    string=content["string"], old_column_names=old_column_names
-                )
+                parsed = ParseGefCpt(string=content["string"])
             elif content["file_type"] == "xml":
                 parsed = ParseBroXmlCpt(string=content["string"])
 
         elif path is not None:
             if path.lower().endswith("gef"):
-                parsed = ParseGefCpt(path, old_column_names=old_column_names)
+                parsed = ParseGefCpt(path)
             elif path.lower().endswith("xml"):
                 parsed = ParseBroXmlCpt(path)
         else:

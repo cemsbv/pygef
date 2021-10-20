@@ -5,7 +5,7 @@ from pygef.broxml import ParseBroXmlBore
 
 
 class Bore(BaseParser):
-    def __init__(self, path=None, content: dict = None, old_column_names=True):
+    def __init__(self, path=None, content: dict = None):
         """
         Bore class.
 
@@ -28,9 +28,7 @@ class Bore(BaseParser):
             ), f"file_type can be only one of [gef, xml] "
             assert content["string"] is not None, "content['string'] must be specified"
             if content["file_type"] == "gef":
-                parsed = ParseGefBore(
-                    string=content["string"], old_column_names=old_column_names
-                )
+                parsed = ParseGefBore(string=content["string"])
             elif content["file_type"] == "xml":
                 parsed = ParseBroXmlBore(string=content["string"])
 
