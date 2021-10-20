@@ -10,13 +10,14 @@ from pygef.gef import (
     MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT,
     ParseBORE,
     ParseCPT,
-    ParseGEF,
     calculate_friction_number,
     correct_depth_with_inclination,
     correct_pre_excavated_depth,
     replace_column_void,
 )
 from pygef.grouping import GroupClassification
+from pygef.cpt import Cpt
+from pygef.bore import Bore
 
 
 class GefTest(unittest.TestCase):
@@ -605,7 +606,7 @@ class GefTest(unittest.TestCase):
         assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_parse_cpt(self):
-        cpt = ParseGEF(
+        cpt = Cpt(
             string="""
 #GEFID= 1, 1, 0
 #FILEOWNER= Wagen 2
@@ -652,7 +653,7 @@ class GefTest(unittest.TestCase):
             assert df_calculated[column].round(6) == df[column]
 
     def test_parse_bore(self):
-        cpt = ParseGEF(
+        cpt = Bore(
             string="""
 #GEFID = 1,1,0
 #COLUMNTEXT = 1, aan
@@ -715,7 +716,7 @@ class GefTest(unittest.TestCase):
         assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_parse_pre_excavated_dept_with_void_inclination(self):
-        cpt = ParseGEF(
+        cpt = Cpt(
             string="""
 #COLUMN= 6
 #COLUMNINFO= 1, m, Sondeerlengte, 1
@@ -1060,11 +1061,11 @@ class GefTest(unittest.TestCase):
 1.8700e+000 3.6954e-001 5.2590e-003 9.9502e-002 1.4635e+000
 1.8900e+000 3.6954e-001 5.8176e-003 1.1194e-001 1.5781e+000
         """
-        cpt = ParseGEF(string=cpt)
+        cpt = Cpt(string=cpt)
         assert np.isclose(cpt.df[0, "depth"], 1.51)
 
     def test_bore_with_reduced_columns(self):
-        ParseGEF(
+        Bore(
             string="""
 #PROJECTID= redacted, 1234, -
 #COLUMN= 2
@@ -1093,7 +1094,7 @@ class GefTest(unittest.TestCase):
 
 class BoreTest(unittest.TestCase):
     def setUp(self):
-        self.bore = ParseGEF(
+        self.bore = Bore(
             string="""
 #GEFID = 1,1,0
 #COLUMNTEXT = 1, aan
@@ -1204,21 +1205,21 @@ class BoreTest(unittest.TestCase):
 
 class PlotTest(unittest.TestCase):
     def test_plot_cpt(self):
-        gef = ParseGEF("./pygef/files/example.gef")
+        gef = Cpt("files/example.gef")
         gef.plot(show=False)
 
     def test_plot_bore(self):
-        gef = ParseGEF("./pygef/files/example_bore.gef")
+        gef = Bore("files/example_bore.gef")
         gef.plot(show=False, figsize=(4, 12))
 
     def test_plot_classification(self):
-        gef = ParseGEF("./pygef/files/example.gef")
+        gef = Cpt("files/example.gef")
         gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
 
 
 class TestRobertson(unittest.TestCase):
     def setUp(self):
-        self.gef = ParseGEF("./pygef/files/example.gef")
+        self.gef = Cpt("files/example.gef")
 
     def test_nan_dropped(self):
         self.assertAlmostEqual(self.gef.df["qc"][0], 16.72)
