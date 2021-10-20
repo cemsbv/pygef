@@ -4,12 +4,14 @@ from pygef.base import BaseParser
 from pygef import been_jefferies, robertson
 from pygef.grouping import GroupClassification
 import pygef.plot_utils as plot
+from pygef.gef import ParseGefCpt
+from pygef.broxml import ParseBroXmlCpt
 
 logger = logging.getLogger(__name__)
 
 
 class Cpt(BaseParser):
-    def __init__(self, path=None, string=None, file_type=None):
+    def __init__(self, path=None, content: dict = None, old_column_names=True):
         """
         Cpt class.
 
@@ -17,15 +19,39 @@ class Cpt(BaseParser):
         ----------
         path:
             Path to the file.
-        string: str
-            String version of the file.
-        file_type:
-            One of [gef, xml]
+        content: dict
+            Dictionary with keys: ["string", "file_type"]
+                -string: str
+                    String version of the file.
+                -file_type:
+                    One of [gef, xml]
         """
         self.net_surface_area_quotient_of_the_cone_tip = None
         self.pre_excavated_depth = None
 
-        super().__init__(path=path, string=string, file_type=file_type)
+        super().__init__()
+
+        if content is not None:
+            assert (
+                content["file_type"] == "gef" or content["file_type"] == "xml"
+            ), f"file_type can be only one of [gef, xml] "
+            assert content["string"] is not None, "content['string'] must be specified"
+            if content["file_type"] == "gef":
+                parsed = ParseGefCpt(
+                    string=content["string"], old_column_names=old_column_names
+                )
+            elif content["file_type"] == "xml":
+                parsed = ParseBroXmlCpt(string=content["string"])
+
+        elif path is not None:
+            if path.lower().endswith("gef"):
+                parsed = ParseGefCpt(path, old_column_names=old_column_names)
+            elif path.lower().endswith("xml"):
+                parsed = ParseBroXmlCpt(path)
+        else:
+            raise ValueError("One of [path, (string, file_type)] should be not None.")
+
+        self.__dict__.update(parsed.__dict__)
 
     def classify(
         self,

@@ -1,9 +1,11 @@
 from pygef.base import BaseParser
 import pygef.plot_utils as plot
+from pygef.gef import ParseGefBore
+from pygef.broxml import ParseBroXmlBore
 
 
 class Bore(BaseParser):
-    def __init__(self, path=None, string=None, file_type=None):
+    def __init__(self, path=None, content: dict = None, old_column_names=True):
         """
         Bore class.
 
@@ -11,12 +13,36 @@ class Bore(BaseParser):
         ----------
         path:
             Path to the file.
-        string: str
-            String version of the file.
-        file_type:
-            One of [gef, xml]
+        content: dict
+            Dictionary with keys: ["string", "file_type"]
+                -string: str
+                    String version of the file.
+                -file_type:
+                    One of [gef, xml]
         """
-        super().__init__(path=path, string=string, file_type=file_type)
+        super().__init__()
+
+        if content is not None:
+            assert (
+                content["file_type"] == "gef" or content["file_type"] == "xml"
+            ), f"file_type can be only one of [gef, xml] "
+            assert content["string"] is not None, "content['string'] must be specified"
+            if content["file_type"] == "gef":
+                parsed = ParseGefBore(
+                    string=content["string"], old_column_names=old_column_names
+                )
+            elif content["file_type"] == "xml":
+                parsed = ParseBroXmlBore(string=content["string"])
+
+        elif path is not None:
+            if path.lower().endswith("gef"):
+                parsed = ParseGefBore(path)
+            elif path.lower().endswith("xml"):
+                parsed = ParseBroXmlBore(path)
+        else:
+            raise ValueError("One of [path, (string, file_type)] should be not None.")
+
+        self.__dict__.update(parsed.__dict__)
 
     def plot(self, figsize=(11, 8), show=False, dpi=100):
         """
