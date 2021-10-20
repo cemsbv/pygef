@@ -1,23 +1,26 @@
+# pylint: disable=E1136
+
 import unittest
 from datetime import datetime
 
 import numpy as np
 import polars as pl
+
 import pygef.geo as geo
 import pygef.grouping as grouping
 import pygef.utils as utils
+from pygef.bore import Bore
+from pygef.cpt import Cpt
 from pygef.gef import (
     MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT,
-    ParseGefBore,
-    ParseGefCpt,
+    _GefBore,
+    _GefCpt,
     calculate_friction_number,
     correct_depth_with_inclination,
     correct_pre_excavated_depth,
     replace_column_void,
 )
 from pygef.grouping import GroupClassification
-from pygef.cpt import Cpt
-from pygef.bore import Bore
 
 
 class GefTest(unittest.TestCase):
@@ -350,14 +353,14 @@ class GefTest(unittest.TestCase):
         header_s = "This is an header"
         df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
         data_s = "\n1,1,1\n2,2,2\n3,3,3\n".replace(",", " ")
-        df_parsed = ParseGefCpt.parse_data(
+        df_parsed = _GefCpt.parse_data(
             header_s, data_s, column_names=["col1", "col2", "col3"]
         )
         assert df_parsed.frame_equal(df, null_equal=True)
 
         # Test terribly formatted columns
         data_s = "\n 1  1 1 \n2 2 2  \n3 3 3\n"
-        df_parsed = ParseGefCpt.parse_data(
+        df_parsed = _GefCpt.parse_data(
             header_s, data_s, column_names=["col1", "col2", "col3"]
         )
         assert df_parsed.frame_equal(df, null_equal=True)
@@ -403,7 +406,7 @@ class GefTest(unittest.TestCase):
         df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
         data_s = "\n1;1;1\n2;2;2\n3;3;3\n"
         sep = ";"
-        df_parsed = ParseGefBore.parse_data_column_info(
+        df_parsed = _GefBore.parse_data_column_info(
             header_s, data_s, sep, 3, columns_info=["col1", "col2", "col3"]
         )
         assert df_parsed.frame_equal(df, null_equal=True)
@@ -419,7 +422,7 @@ class GefTest(unittest.TestCase):
             }
         )
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
-        df_parsed = ParseGefBore.parse_data_soil_type(pl.DataFrame({}), data_s)
+        df_parsed = _GefBore.parse_data_soil_type(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_parse_add_info(self):
@@ -455,7 +458,7 @@ class GefTest(unittest.TestCase):
             ["'Kz2'", "'KEL DR'", "''"],
         ]
 
-        df_parsed = ParseGefBore.parse_add_info_as_string(pl.DataFrame({}), data_s)
+        df_parsed = _GefBore.parse_add_info_as_string(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_soil_quantification(self):
@@ -474,7 +477,7 @@ class GefTest(unittest.TestCase):
     def test_parse_data_soil_code(self):
         df = pl.DataFrame({"Soil_code": ["Kz", "Kz1", "Kz2"]})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
-        df_parsed = ParseGefBore.parse_data_soil_code(pl.DataFrame({}), data_s)
+        df_parsed = _GefBore.parse_data_soil_code(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_data_soil_quantified(self):
@@ -483,14 +486,14 @@ class GefTest(unittest.TestCase):
             lst, columns=["Gravel", "Sand", "Clay", "Loam", "Peat", "Silt"]
         )
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"]]
-        df_parsed = ParseGefBore.parse_soil_quantification(pl.DataFrame({}), data_s)
+        df_parsed = _GefBore.parse_soil_quantification(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_calculate_elevation_respect_to_NAP(self):
         df1 = pl.DataFrame({"depth": [0.0, 1.0, 2.0, 3.0, 4.0]})
         zid = -3
         df_calculated = df1.with_column(
-            ParseGefCpt.calculate_elevation_with_respect_to_nap(zid, 31000)
+            _GefCpt.calculate_elevation_with_respect_to_nap(zid, 31000)
         )
         df = pl.DataFrame(
             {

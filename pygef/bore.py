@@ -1,10 +1,12 @@
-from pygef.base import BaseParser
+from typing import Union
+
 import pygef.plot_utils as plot
-from pygef.gef import ParseGefBore
-from pygef.broxml import ParseBroXmlBore
+from pygef.base import Base
+from pygef.broxml import _BroXmlBore
+from pygef.gef import _GefBore
 
 
-class Bore(BaseParser):
+class Bore(Base):
     def __init__(self, path=None, content: dict = None):
         """
         Bore class.
@@ -22,21 +24,23 @@ class Bore(BaseParser):
         """
         super().__init__()
 
+        parsed: Union[_BroXmlBore, _GefBore]
+
         if content is not None:
             assert (
                 content["file_type"] == "gef" or content["file_type"] == "xml"
             ), f"file_type can be only one of [gef, xml] "
             assert content["string"] is not None, "content['string'] must be specified"
             if content["file_type"] == "gef":
-                parsed = ParseGefBore(string=content["string"])
+                parsed = _GefBore(string=content["string"])
             elif content["file_type"] == "xml":
-                parsed = ParseBroXmlBore(string=content["string"])
+                parsed = _BroXmlBore(string=content["string"])
 
         elif path is not None:
             if path.lower().endswith("gef"):
-                parsed = ParseGefBore(path)
+                parsed = _GefBore(path)
             elif path.lower().endswith("xml"):
-                parsed = ParseBroXmlBore(path)
+                parsed = _BroXmlBore(path)
         else:
             raise ValueError("One of [path, (string, file_type)] should be not None.")
 

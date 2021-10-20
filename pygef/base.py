@@ -1,7 +1,7 @@
 from abc import ABC
 
 
-class BaseParser(ABC):
+class Base(ABC):
     def __init__(self):
         """
         Abstract base class to parse cpt and boreholes in gef or xml format.

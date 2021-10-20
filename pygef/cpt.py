@@ -1,16 +1,17 @@
 import logging
+from typing import Union
 
-from pygef.base import BaseParser
-from pygef import been_jefferies, robertson
-from pygef.grouping import GroupClassification
 import pygef.plot_utils as plot
-from pygef.gef import ParseGefCpt
-from pygef.broxml import ParseBroXmlCpt
+from pygef import been_jefferies, robertson
+from pygef.base import Base
+from pygef.broxml import _BroXmlCpt
+from pygef.gef import _GefCpt
+from pygef.grouping import GroupClassification
 
 logger = logging.getLogger(__name__)
 
 
-class Cpt(BaseParser):
+class Cpt(Base):
     def __init__(self, path=None, content: dict = None):
         """
         Cpt class.
@@ -23,7 +24,7 @@ class Cpt(BaseParser):
             Dictionary with keys: ["string", "file_type"]
                 -string: str
                     String version of the file.
-                -file_type:
+                -file_type: str
                     One of [gef, xml]
         """
         self.net_surface_area_quotient_of_the_cone_tip = None
@@ -31,21 +32,23 @@ class Cpt(BaseParser):
 
         super().__init__()
 
+        parsed: Union[_BroXmlCpt, _GefCpt]
+
         if content is not None:
             assert (
                 content["file_type"] == "gef" or content["file_type"] == "xml"
             ), f"file_type can be only one of [gef, xml] "
             assert content["string"] is not None, "content['string'] must be specified"
             if content["file_type"] == "gef":
-                parsed = ParseGefCpt(string=content["string"])
+                parsed = _GefCpt(string=content["string"])
             elif content["file_type"] == "xml":
-                parsed = ParseBroXmlCpt(string=content["string"])
+                parsed = _BroXmlCpt(string=content["string"])
 
         elif path is not None:
             if path.lower().endswith("gef"):
-                parsed = ParseGefCpt(path)
+                parsed = _GefCpt(path)
             elif path.lower().endswith("xml"):
-                parsed = ParseBroXmlCpt(path)
+                parsed = _BroXmlCpt(path)
         else:
             raise ValueError("One of [path, (string, file_type)] should be not None.")
 

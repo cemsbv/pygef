@@ -5,9 +5,9 @@ from typing import List
 
 import numpy as np
 import polars as pl
-import pygef.utils as utils
 from polars import col, lit, when
 
+import pygef.utils as utils
 
 # Try to import the optimized Rust header parsing but if that doesn't succeed
 # use the built-in python regex methods
@@ -111,7 +111,7 @@ dict_soil_type_been = {
 }
 
 
-class ParseGEF:
+class _Gef:
     """
     The ParseGEF file can be used to parse a *.gef file and use it as an ParseGEF object.
 
@@ -271,7 +271,7 @@ class ParseGEF:
         self.type = utils.parse_gef_type(self._headers)
 
 
-class ParseGefCpt(ParseGEF):
+class _GefCpt(_Gef):
     def __init__(self, path=None, string=None):
         """
         Parser of the cpt file.
@@ -289,7 +289,6 @@ class ParseGefCpt(ParseGEF):
                 "The selected gef file is not a cpt. "
                 "Check the REPORTCODE or the PROCEDURECODE."
             )
-        self.type = "cpt"
         self.project_id = utils.parse_project_type(self._headers, "cpt")
         self.cone_id = utils.parse_cone_id(self._headers)
         self.cpt_class = utils.parse_cpt_class(self._headers)
@@ -444,7 +443,7 @@ class ParseGefCpt(ParseGEF):
         )
 
 
-class ParseGefBore(ParseGEF):
+class _GefBore(_Gef):
     def __init__(self, path=None, string=None):
         """
         Parser of the borehole file.
@@ -466,7 +465,7 @@ class ParseGefBore(ParseGEF):
             )
         else:
             raise ValueError(
-                "The selected gef file is not a cpt nor a borehole. "
+                "The selected gef file is not a borehole. "
                 "Check the REPORTCODE or the PROCEDURECODE."
             )
 
