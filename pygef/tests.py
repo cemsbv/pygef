@@ -1223,21 +1223,31 @@ class BoreTest(unittest.TestCase):
 
 class PlotTest(unittest.TestCase):
     def test_plot_cpt(self):
-        gef = Cpt("test_files/example.gef")
+        gef = Cpt("./pygef/test_files/example.gef")
         gef.plot(show=False)
 
     def test_plot_bore(self):
-        gef = Bore("test_files/example_bore.gef")
+        gef = Bore("./pygef/test_files/example_bore.gef")
         gef.plot(show=False, figsize=(4, 12))
 
     def test_plot_classification(self):
-        gef = Cpt("test_files/example.gef")
+        gef = Cpt("./pygef/test_files/example.gef")
         gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
+
+    def test_plot_classification_grouped(self):
+        gef = Cpt("./pygef/test_files/cpt.gef")
+        gef.plot(
+            show=False,
+            classification="robertson",
+            do_grouping=True,
+            min_thickness=0.2,
+            water_level_NAP=-10,
+        )
 
 
 class TestRobertson(unittest.TestCase):
     def setUp(self):
-        self.gef = Cpt("test_files/example.gef")
+        self.gef = Cpt("./pygef/test_files/example.gef")
 
     def test_nan_dropped(self):
         self.assertAlmostEqual(self.gef.df["qc"][0], 16.72)

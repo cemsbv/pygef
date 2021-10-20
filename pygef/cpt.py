@@ -12,6 +12,116 @@ logger = logging.getLogger(__name__)
 
 
 class Cpt(Base):
+    """
+    ** Cpt attributes:**
+        *Always present:*
+            type: str
+                Type of the gef file
+            project_id: str
+                Project id
+            x: float
+                X coordinate respect to the coordinate system
+            y: float
+                Y coordinate respect to the coordinate system
+            zid: float
+                Z coordinate respect to the height system
+            height_system: float
+                Type of coordinate system, 31000 is NAP
+            file_date: datatime.datetime
+                Start date time
+            test_id: str
+                Identifying name of gef file.
+            s: str
+                String version of gef file.
+            df: polars.DataFrame
+                DataFrame containing the same column contained in the original .gef file and
+                some additional columns [depth, elevation_with_respect_to_nap]
+
+                Tip: Use depth column instead of the penetration_length, the depth is corrected
+                with the inclination(if present).
+
+                Note that the Friction ratio is always calculated from the fs and qc values and not parsed from the file.
+
+                If this attribute is called after the classify method the columns relative to the classification
+                are also contained.
+
+        *Not always present*
+
+            default: None
+            The description is added only for the most important attributes, for the others check:
+            https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&modificationDate=1409732008000&api=v2
+
+            cpt_class: str
+                Cpt class. The format is not standard so it might be not always properly parsed.
+            column_void: str
+                It is the definition of no value for the gef file
+            nom_surface_area_cone_tip: float
+                Nom. surface area of cone tip [mm2]
+            nom_surface_area_friction_element: float
+                Nom. surface area of friction casing [mm2]
+            net_surface_area_quotient_of_the_cone_tip: float
+                Net surface area quotient of cone tip [-]
+            net_surface_area_quotient_of_the_friction_casing: float
+                Net surface area quotient of friction casing [-]
+            distance_between_cone_and_centre_of_friction_casing: float
+
+            friction_present: float
+
+            ppt_u1_present: float
+
+            ppt_u2_present: float
+
+            ppt_u3_present: float
+
+            inclination_measurement_present: float
+
+            use_of_back_flow_compensator: float
+
+            type_of_cone_penetration_test: float
+
+            pre_excavated_depth: float
+                 Pre excavate depth [m]
+            groundwater_level: float
+                Ground water level [m]
+            water_depth_offshore_activities: float
+            end_depth_of_penetration_test: float
+            stop_criteria: float
+
+            zero_measurement_cone_before_penetration_test: float
+
+            zero_measurement_cone_after_penetration_test: float
+
+            zero_measurement_friction_before_penetration_test: float
+
+            zero_measurement_friction_after_penetration_test: float
+
+            zero_measurement_ppt_u1_before_penetration_test: float
+
+            zero_measurement_ppt_u1_after_penetration_test: float
+
+            zero_measurement_ppt_u2_before_penetration_test: float
+
+            zero_measurement_ppt_u2_after_penetration_test: float
+
+            zero_measurement_ppt_u3_before_penetration_test: float
+
+            zero_measurement_ppt_u3_after_penetration_test: float
+
+            zero_measurement_inclination_before_penetration_test: float
+
+            zero_measurement_inclination_after_penetration_test: float
+
+            zero_measurement_inclination_ns_before_penetration_test: float
+
+            zero_measurement_inclination_ns_after_penetration_test: float
+
+            zero_measurement_inclination_ew_before_penetration_test: float
+
+            zero_measurement_inclination_ew_after_penetration_test : float
+
+            mileage: float
+    """
+
     def __init__(self, path=None, content: dict = None):
         """
         Cpt class.
@@ -22,9 +132,9 @@ class Cpt(Base):
             Path to the file.
         content: dict
             Dictionary with keys: ["string", "file_type"]
-                -string: str
+                - string: str
                     String version of the file.
-                -file_type: str
+                - file_type: str
                     One of [gef, xml]
         """
         self.net_surface_area_quotient_of_the_cone_tip = None
@@ -89,8 +199,8 @@ class Cpt(Base):
         Returns
         -------
         df: polars.DataFrame
-        If do_grouping is True a polars.DataFrame with the grouped layer is returned otherwise a polars.DataFrame with
-        a classification for each row is returned.
+            If do_grouping is True a polars.DataFrame with the grouped layer is returned otherwise a polars.DataFrame
+            with a classification for each row is returned.
 
         """
         # todo: refactor arguments, the arguments connected to each other
@@ -158,11 +268,7 @@ class Cpt(Base):
         z_NAP=False,
     ):
         """
-        Plot the *.gef file and return matplotlib.pyplot.figure .
-
-        It works both with a cpt or borehole type file. If no argument it is passed it returns:
-        - CPT: plot of qc [MPa] and Friction ratio [%]
-        - BOREHOLE: plot of soil components over the depth.
+        Plot the cpt file and return matplotlib.pyplot.figure .
 
         Parameters
         ----------

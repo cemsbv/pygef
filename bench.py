@@ -10,7 +10,7 @@ cwd = os.path.dirname(__file__)
 
 def main():
     for _ in range(0, 1000):
-        gef = Cpt("/test_files/example.gef")
+        gef = Cpt("./pygef/test_files/example.gef")
 
 
 if __name__ == "__main__":

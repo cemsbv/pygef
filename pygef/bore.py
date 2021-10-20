@@ -7,6 +7,41 @@ from pygef.gef import _GefBore
 
 
 class Bore(Base):
+    """
+    ** Bore attributes:**
+        type: str
+            Type of the gef file
+        project_id: str
+            Project id
+        x: float
+            X coordinate respect to the coordinate system
+        y: float
+            Y coordinate respect to the coordinate system
+        zid: float
+            Z coordinate respect to the height system
+        height_system: float
+            Type of coordinate system, 31000 is NAP
+        file_date: datatime.datetime
+            Start date time
+        test_id: str
+            Identifying name of gef file.
+        s: str
+            String version of gef file.
+        df: polars.DataFrame
+            DataFrame containing the columns: [
+                                                "depth_top",
+                                                "depth_bottom",
+                                                "soil_code",
+                                                "gravel_component",
+                                                "sand_component",
+                                                "clay_component",
+                                                "loam_component",
+                                                "peat_component",
+                                                "silt_component",
+                                                "remarks",
+                                            ]
+    """
+
     def __init__(self, path=None, content: dict = None):
         """
         Bore class.
