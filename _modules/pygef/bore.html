@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pygef.bore &mdash; pygef 0.6.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/index.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pygef
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/reference.html">Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pygef</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>pygef.bore</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pygef.bore</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">pygef.plot_utils</span> <span class="k">as</span> <span class="nn">plot</span>
+<span class="kn">from</span> <span class="nn">pygef.base</span> <span class="kn">import</span> <span class="n">Base</span>
+<span class="kn">from</span> <span class="nn">pygef.broxml</span> <span class="kn">import</span> <span class="n">_BroXmlBore</span>
+<span class="kn">from</span> <span class="nn">pygef.gef</span> <span class="kn">import</span> <span class="n">_GefBore</span>
+
+
+<div class="viewcode-block" id="Bore"><a class="viewcode-back" href="../../tree/reference.html#pygef.Bore">[docs]</a><span class="k">class</span> <span class="nc">Bore</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ** Bore attributes:**</span>
+<span class="sd">        type: str</span>
+<span class="sd">            Type of the gef file</span>
+<span class="sd">        project_id: str</span>
+<span class="sd">            Project id</span>
+<span class="sd">        x: float</span>
+<span class="sd">            X coordinate respect to the coordinate system</span>
+<span class="sd">        y: float</span>
+<span class="sd">            Y coordinate respect to the coordinate system</span>
+<span class="sd">        zid: float</span>
+<span class="sd">            Z coordinate respect to the height system</span>
+<span class="sd">        height_system: float</span>
+<span class="sd">            Type of coordinate system, 31000 is NAP</span>
+<span class="sd">        file_date: datatime.datetime</span>
+<span class="sd">            Start date time</span>
+<span class="sd">        test_id: str</span>
+<span class="sd">            Identifying name of gef file.</span>
+<span class="sd">        s: str</span>
+<span class="sd">            String version of gef file.</span>
+<span class="sd">        df: polars.DataFrame</span>
+<span class="sd">            DataFrame containing the columns: [</span>
+<span class="sd">                                                &quot;depth_top&quot;,</span>
+<span class="sd">                                                &quot;depth_bottom&quot;,</span>
+<span class="sd">                                                &quot;soil_code&quot;,</span>
+<span class="sd">                                                &quot;gravel_component&quot;,</span>
+<span class="sd">                                                &quot;sand_component&quot;,</span>
+<span class="sd">                                                &quot;clay_component&quot;,</span>
+<span class="sd">                                                &quot;loam_component&quot;,</span>
+<span class="sd">                                                &quot;peat_component&quot;,</span>
+<span class="sd">                                                &quot;silt_component&quot;,</span>
+<span class="sd">                                                &quot;remarks&quot;,</span>
+<span class="sd">                                            ]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Bore.__init__"><a class="viewcode-back" href="../../tree/reference.html#pygef.Bore.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Bore class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path:</span>
+<span class="sd">            Path to the file.</span>
+<span class="sd">        content: dict</span>
+<span class="sd">            Dictionary with keys: [&quot;string&quot;, &quot;file_type&quot;]</span>
+<span class="sd">                -string: str</span>
+<span class="sd">                    String version of the file.</span>
+<span class="sd">                -file_type:</span>
+<span class="sd">                    One of [gef, xml]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">parsed</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_BroXmlBore</span><span class="p">,</span> <span class="n">_GefBore</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">&quot;file_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;gef&quot;</span> <span class="ow">or</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;file_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;xml&quot;</span>
+            <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;file_type can be only one of [gef, xml] &quot;</span>
+            <span class="k">assert</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;content[&#39;string&#39;] must be specified&quot;</span>
+            <span class="k">if</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;file_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;gef&quot;</span><span class="p">:</span>
+                <span class="n">parsed</span> <span class="o">=</span> <span class="n">_GefBore</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;file_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;xml&quot;</span><span class="p">:</span>
+                <span class="n">parsed</span> <span class="o">=</span> <span class="n">_BroXmlBore</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;gef&quot;</span><span class="p">):</span>
+                <span class="n">parsed</span> <span class="o">=</span> <span class="n">_GefBore</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;xml&quot;</span><span class="p">):</span>
+                <span class="n">parsed</span> <span class="o">=</span> <span class="n">_BroXmlBore</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One of [path, (string, file_type)] should be not None.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Bore.plot"><a class="viewcode-back" href="../../tree/reference.html#pygef.Bore.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot plot of soil components over the depth.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        show: bool</span>
+<span class="sd">            If True the plot is showed, else the matplotlib.pytplot.figure is returned</span>
+<span class="sd">        figsize: tuple</span>
+<span class="sd">            Figsize of the plot, default (11, 8).</span>
+<span class="sd">        dpi: int</span>
+<span class="sd">            Dpi figure</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib.pyplot.figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_bore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, CEMS BV.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
