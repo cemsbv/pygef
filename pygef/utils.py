@@ -93,7 +93,7 @@ def parse_column_void(headers):
             )
             return column_void
 
-    # Standard value, if some gef files the column void is not specified but used anyway
+    # Standard value, if some gef test_files the column void is not specified but used anyway
     return -9999
 
 

@@ -21,10 +21,10 @@ Cutting-edge version (might break):
 ### Read BORE and CPT files
 
 ```python
-from pygef.gef import ParseGEF
+from pygef import Cpt
 
 # Read *.gef file
-gef = ParseGEF("./my-gef-file.gef")
+gef = Cpt("./my-gef-file.gef")
 ```
 
 ### Polars dataframe is accessible via the `df` attribute

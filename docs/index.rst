@@ -1,7 +1,7 @@
 Welcome to pygef's documentation!
 ===================================
 
-The pygef library is a library to read your .gef files and use them in a digital version.
+The pygef library is a library to read your cpts and boreholes files and use them in a digital version.
 
 Indices and tables
 ==================

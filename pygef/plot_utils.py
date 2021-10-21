@@ -1,3 +1,5 @@
+from copy import copy
+
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -58,8 +60,8 @@ def plot_cpt(
     if classification is not None:
         df, title = assign_color(df, classification, colors)
     if df_group is not None:
-        df_group = df_group.copy()
-        df_group = df_group.rename(columns={"layer": "soil_type"})
+        df_group = copy(df_group)
+        df_group = df_group.rename({"layer": "soil_type"})
         df_group, title_group = assign_color(df_group, classification, colors=colors)
         if colors is None:
             title_group = "Filtered"

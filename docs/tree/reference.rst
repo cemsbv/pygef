@@ -2,10 +2,20 @@
 Reference
 =========
 
-ParseGEF
+Cpt
 --------
 
-.. autoclass:: pygef.ParseGEF
+.. autoclass:: pygef.Cpt
+    :members:
+    :inherited-members:
+    :member-order: bysource
+
+    .. automethod:: __init__
+
+Bore
+--------
+
+.. autoclass:: pygef.Bore
     :members:
     :inherited-members:
     :member-order: bysource
