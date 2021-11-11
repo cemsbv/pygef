@@ -14,7 +14,7 @@ import pygef.utils as utils
 try:
     import gef
 
-    USE_RUST_PARSED_HEADERS = True
+    USE_RUST_PARSED_HEADERS = False
 except ImportError:
     USE_RUST_PARSED_HEADERS = False
 
@@ -358,6 +358,7 @@ class _GefBore(_Gef):
             )
 
         self.project_id = utils.parse_project_type(self._headers, "bore")
+        self.nen_version = "NEN 5104"
 
         # This is usually not correct for the boringen
         columns_number = utils.parse_columns_number(self._headers)

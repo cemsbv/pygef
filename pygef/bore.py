@@ -61,6 +61,8 @@ class Bore(Base):
 
         parsed: Union[_BroXmlBore, _GefBore]
 
+        self.nen_version = None
+
         if content is not None:
             assert (
                 content["file_type"] == "gef" or content["file_type"] == "xml"
@@ -97,4 +99,11 @@ class Bore(Base):
         -------
         matplotlib.pyplot.figure
         """
-        return plot.plot_bore(self.df, figsize=figsize, show=show, dpi=dpi)
+        if self.nen_version == "NEN 5104":
+            return plot.plot_bore(self.df, figsize=figsize, show=show, dpi=dpi)
+        elif self.nen_version == "NEN-EN-ISO 14688":
+            pass
+        else:
+            raise ValueError(
+                "Supported NEN version are only: 'NEN 5104' and 'NEN-EN-ISO 14688'"
+            )

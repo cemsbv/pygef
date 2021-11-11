@@ -1,5 +1,5 @@
 # pylint: disable=E1136
-
+import os
 import unittest
 from datetime import datetime
 
@@ -1261,3 +1261,33 @@ class TestRobertson(unittest.TestCase):
             "robertson", water_level_NAP=None, water_level_wrt_depth=-7
         )
         self.assertEqual(df["water_pressure"][0], 0)
+
+
+class TestBoreXml(unittest.TestCase):
+    def setUp(self):
+        self.bore = Bore("./pygef/test_files/bore.xml")
+
+    def test_bore_main_attributes(self):
+
+        assert type(self.bore.s) == str
+        assert np.isclose(self.bore.zid, 12.34)
+        assert np.isclose(self.bore.x, 155197.16)
+        assert np.isclose(self.bore.y, 443108.25)
+        assert self.bore.file_date == datetime(2021, 9, 14).date()
+        assert self.bore.test_id == "78379_HB335"
+
+    def test_df_bore(self):
+
+        assert self.bore.df.columns == ["depth_top", "depth_bottom", "soil_name"]
+
+    # def test_all_xml(self):
+    #     path_folder = "../dev/"
+    #     soil_types = []
+    #     for file in os.listdir(path_folder):
+    #         if file.lower().endswith("xml"):
+    #             try:
+    #                 bore = Bore(f"{path_folder}/{file}")
+    #                 soil_types.append(bore.df["soil_name"].to_list())
+    #             except:
+    #                 print(file)
+    #     print(np.unique(soil_types))
