@@ -1,0 +1,269 @@
+<ns1:registrationRequest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns="http://www.broservices.nl/xsd/brocommon/3.0" xmlns:ns1="http://www.broservices.nl/xsd/isbhr-gt/2.1" xmlns:ns2="http://www.opengis.net/gml/3.2" xmlns:ns3="http://www.broservices.nl/xsd/bhrgtcommon/2.1" xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <ns:requestReference>78379_HB423_(DP65+005_HB_VL)</ns:requestReference>
+  <ns:deliveryAccountableParty>30276831</ns:deliveryAccountableParty>
+  <ns:qualityRegime>IMBRO</ns:qualityRegime>
+  <ns1:sourceDocument>
+    <ns1:BHR_GT_CompleteReport_V1 ns2:id="id_00000000">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <ns1:boreholeSampleDescription>
+        <ns3:descriptionReportDate>
+          <ns:date>2021-10-07</ns:date>
+        </ns3:descriptionReportDate>
+        <ns3:descriptionProcedure codeSpace="urn:bro:bhrgt:DescriptionProcedure">ISO14688d1v2019c2020</ns3:descriptionProcedure>
+        <ns3:descriptionOperator>
+          <ns:chamberOfCommerceNumber>02095434</ns:chamberOfCommerceNumber>
+        </ns3:descriptionOperator>
+        <ns3:descriptiveBoreholeLog>
+          <ns3:descriptionQuality codeSpace="urn:bro:bhrgt:DescriptionQuality">klasse2geroerd</ns3:descriptionQuality>
+          <ns3:continuouslySampled>nee</ns3:continuouslySampled>
+          <ns3:descriptionLocation codeSpace="urn:bro:bhrgt:DescriptionLocation">veld</ns3:descriptionLocation>
+          <ns3:describedMaterial codeSpace="urn:bro:bhrgt:DescribedMaterial">grond</ns3:describedMaterial>
+          <ns3:sampleMoistness codeSpace="urn:bro:bhrgt:SampleMoistness">veldvochtig</ns3:sampleMoistness>
+          <ns3:boreholeLogChecked>nee</ns3:boreholeLogChecked>
+          <ns3:meanHighestGroundwaterLevel uom="m">0.5</ns3:meanHighestGroundwaterLevel>
+          <ns3:meanLowestGroundwaterLevel uom="m">2.5</ns3:meanLowestGroundwaterLevel>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">0.0</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">0.5</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>ja</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">klei</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">plantenrestenNietHoutigWeinig</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">donkerbruin</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">zwakOrganisch</ns3:organicMatterContentClass>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">0.5</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">1.5</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>ja</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">klei</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardBruin</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">nietOrganisch</ns3:organicMatterContentClass>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">1.5</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">2.0</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>ja</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">klei</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardBruin</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">nietOrganisch</ns3:organicMatterContentClass>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">2.0</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">2.5</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>ja</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">klei</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardBruin</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">nietOrganisch</ns3:organicMatterContentClass>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">2.5</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">2.9</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>nee</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">klei</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardGrijs</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">zwakOrganisch</ns3:organicMatterContentClass>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">2.9</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">3.9</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>nee</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">sterkZandigeKlei</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardGrijs</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">zwakOrganisch</ns3:organicMatterContentClass>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">3.9</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">4.9</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>nee</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">zand</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardGrijs</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">nietOrganisch</ns3:organicMatterContentClass>
+              <ns3:sandMedianClass codeSpace="urn:bro:bhrgt:SandMedianClass">fijn</ns3:sandMedianClass>
+              <ns3:grainshape>
+                <ns3:sizeFraction codeSpace="urn:bro:bhrgt:SizeFraction">zand</ns3:sizeFraction>
+                <ns3:angularity codeSpace="urn:bro:bhrgt:Angularity">subrond</ns3:angularity>
+                <ns3:sphericity codeSpace="urn:bro:bhrgt:Sphericity">bol</ns3:sphericity>
+              </ns3:grainshape>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">4.9</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">5.5</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>nee</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">zand</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardGrijs</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">nietOrganisch</ns3:organicMatterContentClass>
+              <ns3:sandMedianClass codeSpace="urn:bro:bhrgt:SandMedianClass">fijn</ns3:sandMedianClass>
+              <ns3:grainshape>
+                <ns3:sizeFraction codeSpace="urn:bro:bhrgt:SizeFraction">zand</ns3:sizeFraction>
+                <ns3:angularity codeSpace="urn:bro:bhrgt:Angularity">subrond</ns3:angularity>
+                <ns3:sphericity codeSpace="urn:bro:bhrgt:Sphericity">bol</ns3:sphericity>
+              </ns3:grainshape>
+            </ns3:soil>
+          </ns3:layer>
+          <ns3:layer>
+            <ns3:upperBoundary uom="m">5.5</ns3:upperBoundary>
+            <ns3:upperBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:upperBoundaryDetermination>
+            <ns3:lowerBoundary uom="m">6.0</ns3:lowerBoundary>
+            <ns3:lowerBoundaryDetermination codeSpace="urn:bro:bhrgt:BoundaryPositioningMethod">afgeleid</ns3:lowerBoundaryDetermination>
+            <ns3:anthropogenic>nee</ns3:anthropogenic>
+            <ns3:soil>
+              <ns3:geotechnicalSoilName codeSpace="urn:bro:bhrgt:GeotechnicalSoilName">zwakGrindigZand</ns3:geotechnicalSoilName>
+              <ns3:tertiaryConstituent codeSpace="urn:bro:bhrgt:TertiaryConstituent">geen</ns3:tertiaryConstituent>
+              <ns3:colour codeSpace="urn:bro:bhrgt:Colour">standaardGrijs</ns3:colour>
+              <ns3:dispersedInhomogeneity codeSpace="urn:bro:bhrgt:DispersedInhomogeneity">geen</ns3:dispersedInhomogeneity>
+              <ns3:organicMatterContentClass codeSpace="urn:bro:bhrgt:OrganicMatterContentClass">nietOrganisch</ns3:organicMatterContentClass>
+              <ns3:sandMedianClass codeSpace="urn:bro:bhrgt:SandMedianClass">middelgrof</ns3:sandMedianClass>
+              <ns3:grainshape>
+                <ns3:sizeFraction codeSpace="urn:bro:bhrgt:SizeFraction">zand</ns3:sizeFraction>
+                <ns3:angularity codeSpace="urn:bro:bhrgt:Angularity">subrond</ns3:angularity>
+                <ns3:sphericity codeSpace="urn:bro:bhrgt:Sphericity">bol</ns3:sphericity>
+              </ns3:grainshape>
+            </ns3:soil>
+          </ns3:layer>
+        </ns3:descriptiveBoreholeLog>
+      </ns1:boreholeSampleDescription>
+      <ns1:objectIdAccountableParty>78379_HB423</ns1:objectIdAccountableParty>
+      <ns1:deliveryContext codeSpace="urn:bro:bhrgt:DeliveryContext">publiekeTaak</ns1:deliveryContext>
+      <ns1:surveyPurpose codeSpace="urn:bro:bhrgt:SurveyPurpose">waterkering</ns1:surveyPurpose>
+      <ns1:discipline codeSpace="urn:bro:bhrgt:Discipline">geotechniek</ns1:discipline>
+      <ns1:surveyProcedure codeSpace="urn:bro:bhrgt:SurveyProcedure">EN1997d2v2007</ns1:surveyProcedure>
+      <ns1:researchOperator>
+        <ns:chamberOfCommerceNumber>02095434</ns:chamberOfCommerceNumber>
+      </ns1:researchOperator>
+      <ns1:siteCharacteristicDetermined>ja</ns1:siteCharacteristicDetermined>
+      <ns1:deliveredLocation>
+        <ns3:location>
+          <ns2:Point ns2:id="id_0123abc-01" srsName="urn:ogc:def:crs:EPSG::28992">
+            <ns2:pos>154154 443248.0</ns2:pos>
+          </ns2:Point>
+        </ns3:location>
+        <ns3:horizontalPositioningDate>
+          <ns:date>2021-10-07</ns:date>
+        </ns3:horizontalPositioningDate>
+        <ns3:horizontalPositioningMethod codeSpace="urn:bro:bhrgt:HorizontalPositioningMethod">RTKGPS5tot10cm</ns3:horizontalPositioningMethod>
+        <ns3:horizontalPositioningOperator>
+          <ns:chamberOfCommerceNumber>02095434</ns:chamberOfCommerceNumber>
+        </ns3:horizontalPositioningOperator>
+      </ns1:deliveredLocation>
+      <ns1:deliveredVerticalPosition>
+        <ns3:localVerticalReferencePoint codeSpace="urn:bro:bhrgt:LocalVerticalReferencePoint">maaiveld</ns3:localVerticalReferencePoint>
+        <ns3:offset uom="m">4.49</ns3:offset>
+        <ns3:verticalDatum codeSpace="urn:bro:bhrgt:VerticalDatum">NAP</ns3:verticalDatum>
+        <ns3:verticalPositioningDate>
+          <ns:date>2021-10-07</ns:date>
+        </ns3:verticalPositioningDate>
+        <ns3:verticalPositioningMethod codeSpace="urn:bro:bhrgt:VerticalPositioningMethod">RTKGPS4tot10cm</ns3:verticalPositioningMethod>
+        <ns3:verticalPositioningOperator>
+          <ns:chamberOfCommerceNumber>02095434</ns:chamberOfCommerceNumber>
+        </ns3:verticalPositioningOperator>
+      </ns1:deliveredVerticalPosition>
+      <ns1:boring>
+        <ns3:boringStartDate>
+          <ns:date>2021-10-05</ns:date>
+        </ns3:boringStartDate>
+        <ns3:boringEndDate>
+          <ns:date>2021-10-05</ns:date>
+        </ns3:boringEndDate>
+        <ns3:boringOperator>
+          <ns:chamberOfCommerceNumber>02095434</ns:chamberOfCommerceNumber>
+        </ns3:boringOperator>
+        <ns3:preparation codeSpace="urn:bro:bhrgt:Preparation">geen</ns3:preparation>
+        <ns3:trajectoryExcavated>nee</ns3:trajectoryExcavated>
+        <ns3:rockReached>nee</ns3:rockReached>
+        <ns3:boringProcedure codeSpace="urn:bro:bhrgt:BoringProcedure">SIKB2001vanafV6.0</ns3:boringProcedure>
+        <ns3:finalDepthBoring uom="m">6.0</ns3:finalDepthBoring>
+        <ns3:stopCriterion codeSpace="urn:bro:bhrgt:StopCriterion">einddoel</ns3:stopCriterion>
+        <ns3:temporaryCasingUsed>nee</ns3:temporaryCasingUsed>
+        <ns3:groundwaterLevel uom="m">1.5</ns3:groundwaterLevel>
+        <ns3:samplingProcedure codeSpace="urn:bro:bhrgt:SamplingProcedure">ISO22475d1v2006</ns3:samplingProcedure>
+        <ns3:finalDepthSampling uom="m">6.0</ns3:finalDepthSampling>
+        <ns3:subsurfaceContaminated>nee</ns3:subsurfaceContaminated>
+        <ns3:boreholeCompleted>ja</ns3:boreholeCompleted>
+        <ns3:boredInterval>
+          <ns3:beginDepth uom="m">0.0</ns3:beginDepth>
+          <ns3:endDepth uom="m">3.9</ns3:endDepth>
+          <ns3:boringTechnique codeSpace="urn:bro:bhrgt:BoringTechnique">handDraaien</ns3:boringTechnique>
+          <ns3:boredDiameter uom="mm">100.0</ns3:boredDiameter>
+        </ns3:boredInterval>
+        <ns3:boredInterval>
+          <ns3:beginDepth uom="m">3.9</ns3:beginDepth>
+          <ns3:endDepth uom="m">6.0</ns3:endDepth>
+          <ns3:boringTechnique codeSpace="urn:bro:bhrgt:BoringTechnique">handDrukkenZuiger</ns3:boringTechnique>
+          <ns3:boredDiameter uom="mm">40.0</ns3:boredDiameter>
+        </ns3:boredInterval>
+        <ns3:sampledInterval>
+          <ns3:beginDepth uom="m">0.0</ns3:beginDepth>
+          <ns3:endDepth uom="m">6.0</ns3:endDepth>
+          <ns3:preTreatment codeSpace="urn:bro:bhrgt:PreTreatment">geen</ns3:preTreatment>
+          <ns3:samplingMethod codeSpace="urn:bro:bhrgt:SamplingMethod">opDiepteLosroeren</ns3:samplingMethod>
+          <ns3:samplingQuality codeSpace="urn:bro:bhrgt:SamplingQuality">klasseD</ns3:samplingQuality>
+        </ns3:sampledInterval>
+        <ns3:completedInterval>
+          <ns3:beginDepth uom="m">0.0</ns3:beginDepth>
+          <ns3:endDepth uom="m">4.0</ns3:endDepth>
+          <ns3:permanentCasingPresent>nee</ns3:permanentCasingPresent>
+          <ns3:backfillMaterial codeSpace="urn:bro:bhrgt:BackfillMaterial">kleiZwelklasse2</ns3:backfillMaterial>
+          <ns3:backfillMaterialCertified>ja</ns3:backfillMaterialCertified>
+        </ns3:completedInterval>
+        <ns3:completedInterval>
+          <ns3:beginDepth uom="m">4.0</ns3:beginDepth>
+          <ns3:endDepth uom="m">6.0</ns3:endDepth>
+          <ns3:permanentCasingPresent>nee</ns3:permanentCasingPresent>
+          <ns3:backfillMaterial codeSpace="urn:bro:bhrgt:BackfillMaterial">verwijderdMateriaal</ns3:backfillMaterial>
+        </ns3:completedInterval>
+      </ns1:boring>
+      <ns1:siteCharacteristic>
+        <ns3:soilUse codeSpace="urn:bro:bhrgt:SoilUse" xmlns="http://www.broservices.nl/xsd/bhrgtcommon/1.0">akker</ns3:soilUse>
+      </ns1:siteCharacteristic>
+      <ns1:researchReportDate>
+        <ns:date>2021-11-03</ns:date>
+      </ns1:researchReportDate>
+    </ns1:BHR_GT_CompleteReport_V1>
+  </ns1:sourceDocument>
+</ns1:registrationRequest>

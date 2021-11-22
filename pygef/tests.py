@@ -1265,10 +1265,9 @@ class TestRobertson(unittest.TestCase):
 
 class TestBoreXml(unittest.TestCase):
     def setUp(self):
-        self.bore = Bore("./pygef/test_files/bore.xml")
+        self.bore = Bore("./pygef/test_files/bore_xml/bore.xml")
 
     def test_bore_main_attributes(self):
-
         assert type(self.bore.s) == str
         assert np.isclose(self.bore.zid, 12.34)
         assert np.isclose(self.bore.x, 155197.16)
@@ -1278,16 +1277,29 @@ class TestBoreXml(unittest.TestCase):
 
     def test_df_bore(self):
 
-        assert self.bore.df.columns == ["depth_top", "depth_bottom", "soil_name"]
+        assert self.bore.df.columns == [
+            "depth_top",
+            "depth_bottom",
+            "soil_name",
+            "gravel_component",
+            "sand_component",
+            "clay_component",
+            "loam_component",
+            "peat_component",
+            "silt_component",
+        ]
 
-    # def test_all_xml(self):
-    #     path_folder = "../dev/"
-    #     soil_types = []
-    #     for file in os.listdir(path_folder):
-    #         if file.lower().endswith("xml"):
-    #             try:
-    #                 bore = Bore(f"{path_folder}/{file}")
-    #                 soil_types.append(bore.df["soil_name"].to_list())
-    #             except:
-    #                 print(file)
-    #     print(np.unique(soil_types))
+    def test_all_xml(self):
+        path_folder = "./pygef/test_files/bore_xml/"
+        for file in os.listdir(path_folder):
+            if file.lower().endswith("xml"):
+                bore = Bore(f"{path_folder}/{file}")
+                assert {
+                    "gravel_component",
+                    "sand_component",
+                    "clay_component",
+                    "loam_component",
+                    "peat_component",
+                    "silt_component",
+                }.issubset(set(bore.df.columns))
+                bore.plot()

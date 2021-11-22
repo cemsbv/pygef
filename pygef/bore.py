@@ -102,7 +102,7 @@ class Bore(Base):
         if self.nen_version == "NEN 5104":
             return plot.plot_bore(self.df, figsize=figsize, show=show, dpi=dpi)
         elif self.nen_version == "NEN-EN-ISO 14688":
-            pass
+            return plot.plot_bore(self.df, figsize=figsize, show=show, dpi=dpi)
         else:
             raise ValueError(
                 "Supported NEN version are only: 'NEN 5104' and 'NEN-EN-ISO 14688'"
