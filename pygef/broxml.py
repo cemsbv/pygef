@@ -19,8 +19,11 @@ class _BroXml(ABC):
         string
             Xml file as string
         """
+        assert (
+            any([path, string]) is not None
+        ), "One of [path, string] should be not none."
         self.path = path
-        if string is None:
+        if string is None and path is not None:
             with open(path, encoding="utf-8", errors="ignore") as f:
                 string = f.read()
 
@@ -29,7 +32,6 @@ class _BroXml(ABC):
         self.zid = None
         self.x = None
         self.y = None
-        self.file_date = None
         self.test_id = None
         self.height_system = None
 
