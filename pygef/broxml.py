@@ -2,6 +2,7 @@ from abc import ABC
 
 import xmlschema
 import numpy as np
+import os.path
 
 from datetime import datetime
 import polars as pl
@@ -59,7 +60,12 @@ class _BroXmlBore(_BroXml):
             )
             > 0.0
         ):  # version 1.0.
-            schema = xmlschema.XMLSchema("./pygef/resources/isbhr-gt-messages_v1.xsd")
+            schema = xmlschema.XMLSchema(
+                os.path.join(
+                    os.path.dirname(__file__), "resources", "isbhr-gt-messages_v1.xsd"
+                )
+            )
+
             self._schema_type = "isbhrgt:"
             self._schema2 = "bhrgtcom"
             self._schema3 = "gml"
@@ -75,7 +81,11 @@ class _BroXmlBore(_BroXml):
             )
             > 0
         ):  # version 2.1
-            schema = xmlschema.XMLSchema("./pygef/resources/isbhr-gt-messages_v2.1.xsd")
+            schema = xmlschema.XMLSchema(
+                os.path.join(
+                    os.path.dirname(__file__), "resources", "isbhr-gt-messages_v2.1.xsd"
+                )
+            )
             self._validate(schema)
             self._schema_type = "ns1:"
             self._schema2 = "ns3"
@@ -90,7 +100,12 @@ class _BroXmlBore(_BroXml):
             )
             > 0
         ):  # version 2.1
-            schema = xmlschema.XMLSchema("./pygef/resources/isbhr-gt-messages_v2.1.xsd")
+            schema = xmlschema.XMLSchema(
+                os.path.join(
+                    os.path.dirname(__file__), "resources", "isbhr-gt-messages_v2.1.xsd"
+                )
+            )
+
             self._validate(schema)
             self._schema_type = ""
             self._schema2 = "bhrgtcom"

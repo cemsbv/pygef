@@ -12,4 +12,5 @@ setup(
     packages=["pygef", "pygef.been_jefferies", "pygef.robertson"],
     install_requires=["polars>= 0.9.5", "matplotlib>= 3.4.2", "xmlschema==1.8.1"],
     python_requires=">=3.6",
+    include_package_data=True,
 )
