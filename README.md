@@ -8,6 +8,8 @@
 Simple parser for \*.gef files. These are ASCII based files used for soil properties measurements.
 Compatible with Python 3.7.
 
+Recently added parsing of xml boreholes file compatible with schema's defined in `./pygef/resources/`. 
+
 ## Installation
 
 Latest stable version:

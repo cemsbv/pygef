@@ -72,7 +72,9 @@ jobs:
         uses: github/super-linter@v4
         env:
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_PYTHON_MYPY: false
           VALIDATE_PYTHON_FLAKE8: false
+          VALIDATE_PYTHON_PYLINT: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_MARKDOWN: false
           VALIDATE_JSCPD: false
@@ -80,6 +82,8 @@ jobs:
           VALIDATE_CSS: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+          LINTER_RULES_PATH: /
+          PYTHON_MYPY_CONFIG_FILE: .mypy.ini
   test_docs:
     name: Test docs
     runs-on: ubuntu-latest

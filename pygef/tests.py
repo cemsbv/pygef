@@ -1,5 +1,5 @@
 # pylint: disable=E1136
-
+import os
 import unittest
 from datetime import datetime
 
@@ -1261,3 +1261,45 @@ class TestRobertson(unittest.TestCase):
             "robertson", water_level_NAP=None, water_level_wrt_depth=-7
         )
         self.assertEqual(df["water_pressure"][0], 0)
+
+
+class TestBoreXml(unittest.TestCase):
+    def setUp(self):
+        self.bore = Bore("./pygef/test_files/bore_xml/bore.xml")
+
+    def test_bore_main_attributes(self):
+        assert type(self.bore.s) == str
+        assert np.isclose(self.bore.zid, 12.34)
+        assert np.isclose(self.bore.x, 155197.16)
+        assert np.isclose(self.bore.y, 443108.25)
+        assert self.bore.file_date == datetime(2021, 9, 14).date()
+        assert self.bore.test_id == "78379_HB335"
+
+    def test_df_bore(self):
+
+        assert self.bore.df.columns == [
+            "depth_top",
+            "depth_bottom",
+            "soil_name",
+            "gravel_component",
+            "sand_component",
+            "clay_component",
+            "loam_component",
+            "peat_component",
+            "silt_component",
+        ]
+
+    def test_all_xml(self):
+        path_folder = "./pygef/test_files/bore_xml/"
+        for file in os.listdir(path_folder):
+            if file.lower().endswith("xml"):
+                bore = Bore(f"{path_folder}/{file}")
+                assert {
+                    "gravel_component",
+                    "sand_component",
+                    "clay_component",
+                    "loam_component",
+                    "peat_component",
+                    "silt_component",
+                }.issubset(set(bore.df.columns))
+                bore.plot()

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:isbhrgt="http://www.broservices.nl/xsd/isbhr-gt/1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:brocom="http://www.broservices.nl/xsd/brocommon/3.0"
+           xmlns:bhrgtcom="http://www.broservices.nl/xsd/bhrgtcommon/1.0"
+           xmlns:gml="http://www.opengis.net/gml/3.2"
+           xmlns:gmlsf="http://www.opengis.net/gmlsf/2.0"
+           targetNamespace="http://www.broservices.nl/xsd/isbhr-gt/1.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0.0">
+
+   <xs:annotation>
+      <xs:appinfo source="http://schemas.opengis.net/gmlsfProfile/2.0/gmlsfLevels.xsd">
+         <gmlsf:ComplianceLevel>0</gmlsf:ComplianceLevel>
+      </xs:appinfo>
+   </xs:annotation>
+
+   <xs:import namespace="http://www.broservices.nl/xsd/brocommon/3.0" schemaLocation="https://schema.broservices.nl/xsd/brocommon/3.0/brocommon.xsd"/>
+   <xs:import namespace="http://www.broservices.nl/xsd/bhrgtcommon/1.0" schemaLocation="https://schema.broservices.nl/xsd/bhrgtcommon/1.0/bhrgtcommon.xsd"/>
+   <xs:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="https://schema.broservices.nl/profile/gml/1.0/gml-profile.xsd"/>
+
+   <xs:element name="intakeResponse" type="brocom:IntakeResponseType" />
+   <xs:element name="parseFault" type="brocom:ParseFaultType" />
+
+   <xs:element name="correctionRequest" type="isbhrgt:CorrectionRequestType">
+      <xs:annotation>
+         <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het bericht CorrectionRequest is een specialisatie van de abstract klasse CorrectionRequest uit de package brocommon, waaraan het een correctionReason en een sourceDocument toevoegt. Met dit bericht kunnen onjuiste gegevens van een in de BRO geregistreerd booronderzoek worden vervangen.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:complexType name="CorrectionRequestType">
+      <xs:complexContent>
+         <xs:extension base="brocom:CorrectionRequestType">
+            <xs:sequence>
+               <xs:element name="correctionReason"
+                           minOccurs="1"
+                           maxOccurs="1"
+                           type="isbhrgt:CorrectionReasonType">
+                  <xs:annotation>
+                     <xs:appinfo>
+                        <CodeListName>CorrectionReason</CodeListName>
+                        <CodeListURI>urn:bro:bhrgt:CorrectionReason</CodeListURI>
+                     </xs:appinfo>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Reden waarom de geregistreerde gegevens gecorrigeerd worden.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="sourceDocument"
+                           type="isbhrgt:SourceDocumentType"
+                           minOccurs="1"
+                           maxOccurs="1">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het element sourceDocument bevat de gecorrigeerde gegevens die de nu in het BRO-systeem geregistreerde gegevens zullen vervangen en die in de catalogus van het registratieobject zijn gespecificeerd, met uitzondering van de gegevens die door het BRO-systeem worden gegenereerd of afgeleid uit het innameverzoek.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+
+   <xs:element name="registrationRequest" type="isbhrgt:RegistrationRequestType">
+      <xs:annotation>
+         <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het bericht RegistrationRequest is een specialisatie van de abstract klasse RegistrationRequest uit de package brocommon, waaraan het een sourceDocument toevoegt. Met dit bericht kan een nog niet geregistreerd booronderzoek in de BRO worden opgenomen.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:complexType name="RegistrationRequestType">
+      <xs:complexContent>
+         <xs:extension base="brocom:RegistrationRequestType">
+            <xs:sequence>
+               <xs:element name="sourceDocument"
+                           type="isbhrgt:SourceDocumentType"
+                           minOccurs="1"
+                           maxOccurs="1">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het element sourceDocument bevat gegevens die in het BRO-systeem geregistreerd zullen worden en die in de catalogus van het registratieobject zijn gespecificeerd, met uitzondering van de gegevens die door het BRO-systeem worden gegenereerd of afgeleid uit het innameverzoek.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+
+   <xs:element name="BHR_GT_CompleteReport_V1"
+               type="isbhrgt:BHR_GT_CompleteReport_V1Type"
+               substitutionGroup="isbhrgt:BHR_GT_StartReport_V1">
+      <xs:annotation>
+         <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het brondocument wordt aangeboden wanneer de rapportage van het geotechnisch booronderzoek uit 1 deelonderzoek bestaat en daarmee in een keer volledig wordt gerapporteerd. Het brondocument beschrijft het algemene deel (veldwerk), de boormonsterbeschrijving en een deel van de boormonsteranalyse en dat zijn de bepalingen verticale vervorming, maximale ongedraineerde schuifsterkte, korrelgrootteverdeling, watergehalte, organischestofgehalte, kalkgehalte, volumieke massa en volumieke massa vaste delen. De registratie is met dit brondocument direct voltooid.
+Explanation: Het brondocument BHR-GT-volledigRapport-v1 wordt aangeboden wanneer het geotechnisch booronderzoek bestaat uit 1 deelonderzoek en daarmee volledig wordt gerapporteerd. Het booronderzoek bestaat uit het algemene deel en de boormonsterbeschrijving of uit het algemeen deel en de boormonsteranalyse met bepalingen uit fase 1 maar niet uit beide.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:complexType name="BHR_GT_CompleteReport_V1Type">
+      <xs:complexContent>
+         <xs:extension base="isbhrgt:BHR_GT_StartReport_V1Type">
+            <xs:sequence>
+               <xs:element name="researchReportDate"
+                           type="brocom:PartialDateType"
+                           minOccurs="1"
+                           maxOccurs="1">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: De datum waarop de uitvoerder van het booronderzoek alle gegevens van het booronderzoek heeft vastgelegd en het resultaat aan de opdrachtgever kan worden aangeboden, dan wel de feitelijk datum van rapportage.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="BHR_GT_CompleteReport_V1PropertyType">
+      <xs:sequence minOccurs="1">
+         <xs:element ref="isbhrgt:BHR_GT_CompleteReport_V1"/>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:element name="BHR_GT_ContinuationReport_V1"
+               type="isbhrgt:BHR_GT_ContinuationReport_V1Type"
+               substitutionGroup="gml:AbstractFeature">
+      <xs:annotation>
+         <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het brondocument wordt aangeboden wanneer de rapportage van het geotechnisch booronderzoek wordt vervolgt en beschrijft de boormonsterbeschrijving en een deel van de boormonsteranalyse en dat zijn de bepalingen verticale vervorming, maximale ongedraineerde schuifsterkte, korrelgrootteverdeling, watergehalte, organischestofgehalte, kalkgehalte, volumieke massa en volumieke massa vaste delen. De registratie is met dit brondocument aangevuld.
+Explanation: Het brondocument BHR-GT-vervolgrapport-v1 wordt aangeboden wanneer het geotechnisch booronderzoek wordt aangevuld met een volgend deelonderzoek. De vervolgrapportage bestaat uit de boormonsterbeschrijving of uit de boormonsteranalyse met bepalingen uit fase 1. De geregistreerde gegevens worden in de toekomst aangevuld met boormonsterfotografie en/of boorgatlogging.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:complexType name="BHR_GT_ContinuationReport_V1Type">
+      <xs:complexContent>
+         <xs:extension base="gml:AbstractFeatureType">
+            <xs:sequence>
+               <xs:element minOccurs="0"
+                           maxOccurs="1"
+                           name="boreholeSampleDescription"
+                           nillable="false"
+                           type="bhrgtcom:BoreholeSampleDescriptionType">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het deel van het booronderzoek dat betrekking heeft op het beschrijven van de monsters en het verwerken van de resultaten tot een samenvattende beschrijving van de opbouw van de ondergrond.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element minOccurs="0"
+                           maxOccurs="1"
+                           name="boreholeSampleAnalysis"
+                           nillable="false"
+                           type="bhrgtcom:BoreholeSampleAnalysisType">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het deel van het booronderzoek dat betrekking heeft op het uitvoeren van metingen aan boormonsters.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="BHR_GT_ContinuationReport_V1PropertyType">
+      <xs:sequence minOccurs="1">
+         <xs:element ref="isbhrgt:BHR_GT_ContinuationReport_V1"/>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:element name="BHR_GT_EndReport_V1"
+               type="isbhrgt:BHR_GT_EndReport_V1Type"
+               substitutionGroup="isbhrgt:BHR_GT_ContinuationReport_V1">
+      <xs:annotation>
+         <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het brondocument wordt aangeboden wanneer de rapportage van het geotechnisch booronderzoek wordt vervolgt en daarmee is de rapportage voltooid. Het brondocument beschrijft de boormonsterbeschrijving en een deel van de boormonsteranalyse en dat zijn de bepalingen verticale vervorming, maximale ongedraineerde schuifsterkte, korrelgrootteverdeling, watergehalte, organischestofgehalte, kalkgehalte, volumieke massa en volumieke massa vaste delen. De registratie is met dit brondocument voltooid.
+Explanation: Het brondocument BHR-GT-eindrapport-v1 wordt aangeboden wanneer het geotechnisch booronderzoek wordt aangevuld met het laatste deelonderzoek en daarmee volledig is gerapporteerd. De aanvullende rapportage bestaat uit de boormonsterbeschrijving of uit de boormonsteranalyse met bepalingen uit fase 1.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:complexType name="BHR_GT_EndReport_V1Type">
+      <xs:complexContent>
+         <xs:extension base="isbhrgt:BHR_GT_ContinuationReport_V1Type">
+            <xs:sequence>
+               <xs:element name="researchReportDate"
+                           type="brocom:PartialDateType"
+                           minOccurs="1"
+                           maxOccurs="1">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: De datum waarop de uitvoerder van het booronderzoek alle gegevens van het booronderzoek heeft vastgelegd en het resultaat aan de opdrachtgever kan worden aangeboden, dan wel de feitelijk datum van rapportage.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="BHR_GT_EndReport_V1PropertyType">
+      <xs:sequence minOccurs="1">
+         <xs:element ref="isbhrgt:BHR_GT_EndReport_V1"/>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:element name="BHR_GT_StartReport_V1"
+               type="isbhrgt:BHR_GT_StartReport_V1Type"
+               substitutionGroup="isbhrgt:BHR_GT_ContinuationReport_V1">
+      <xs:annotation>
+         <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het brondocument wordt aangeboden wanneer de rapportage van het geotechnisch booronderzoek wordt gestart en beschrijft het algemene deel (veldwerk), de boormonsterbeschrijving en een deel van de boormonsteranalyse en dat zijn de bepalingen verticale vervorming, maximale ongedraineerde schuifsterkte, korrelgrootteverdeling, watergehalte, organischestofgehalte, kalkgehalte, volumieke massa en volumieke massa vaste delen. De registratie is met dit brondocument gestart.
+Explanation: Het brondocument BHR-GT-startRapport-v1 wordt aangeboden wanneer het geotechnisch booronderzoek uit meer deelonderzoeken bestaat en het eerste deelonderzoek wordt gerapporteerd. Het booronderzoek bestaat uit het algemeen deel en de boormonsterbeschrijving of uit het algemeen deel met de boormonsteranalyse met bepalingen uit fase 1. De geregistreerde gegevens worden in de toekomst aangevuld met boormonsteranalyse fase 2, boormonsterfotografie en/of boorgatlogging.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:complexType name="BHR_GT_StartReport_V1Type">
+      <xs:complexContent>
+         <xs:extension base="isbhrgt:BHR_GT_ContinuationReport_V1Type">
+            <xs:sequence>
+               <xs:element name="objectIdAccountableParty"
+                           minOccurs="1"
+                           maxOccurs="1"
+                           type="xs:string">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: De identificatie die door of voor de bronhouder is gebruikt om het object in de eigen administratie te kunnen vinden, voordat het was geregistreerd in de basisregistratie ondergrond.
+Explanation: Het gegeven wordt alleen uitgeleverd aan de dataleverancier en de bronhouder. Het is in de registratie opgenomen om de communicatie tussen de registerbeheerder en de bronhouder of dataleverancier te vergemakkelijken.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="deliveryContext"
+                           minOccurs="1"
+                           maxOccurs="1"
+                           type="bhrgtcom:DeliveryContextType">
+                  <xs:annotation>
+                     <xs:appinfo>
+                        <CodeListName>DeliveryContext</CodeListName>
+                        <CodeListURI/>
+                     </xs:appinfo>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: De rechtsgrond op basis waarvan, of bij afwezigheid daarvan, de activiteit naar aanleiding waarvan, het betreffende gegeven is aangeleverd aan de basisregistratie ondergrond.
+Explanation: De wetgever stipuleert dat het gegeven moet zijn vastgelegd om inzicht te geven in de relatie met de taken van een bestuursorgaan. Het gegeven geeft inzicht in de maatschappelijke betekenis van de informatie.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="surveyPurpose"
+                           minOccurs="1"
+                           maxOccurs="1"
+                           type="bhrgtcom:SurveyPurposeType">
+                  <xs:annotation>
+                     <xs:appinfo>
+                        <CodeListName>SurveyPurpose</CodeListName>
+                        <CodeListURI/>
+                     </xs:appinfo>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het doel waarvoor het onderzoek is uitgevoerd.
+Explanation: Onderzoek wordt normaliter projectmatig uitgevoerd, zelfs als het direct gebonden is aan een publieke taak. Het gegeven beschrijft het hogere doel van het project waarvoor het onderzoek is uitgevoerd of preciseert de taak.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="discipline"
+                           minOccurs="1"
+                           maxOccurs="1"
+                           type="bhrgtcom:DisciplineType">
+                  <xs:annotation>
+                     <xs:appinfo>
+                        <CodeListName>Discipline</CodeListName>
+                        <CodeListURI/>
+                     </xs:appinfo>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: De discipline waarbinnen het booronderzoek is uitgevoerd.
+Explanation: Het vakgebied bepaalt hoe het onderzoek is uitgevoerd en welke gegevens en categorieën van gegevens vastgelegd kunnen zijn. De gegevensdefinitie dekt het vakgebied geotechniek volledig, maar dat betekent niet dat alle geotechnisch booronderzoek er volledig mee beschreven kan worden. In de uitvoeringspraktijk komt het namelijk voor dat een geotechnisch booronderzoek de grenzen van het vakgebied enigszins overschrijdt en er naast geotechnische gegevens gegevens worden vastgelegd die eigenlijk in het domein van de milieukunde of de archeologie thuishoren. Omdat die disciplines buiten het bereik van de basisregistratie ondergrond liggen, zijn die extra gegevens niet gedefinieerd. Geotechnisch booronderzoek met een dergelijk multidisciplinair karakter wordt in de basisregistratie ondergrond opgenomen maar zonder die extra gegevens. Om gebruikers duidelijk te maken dat de onderzoeksresultaten niet volledig geregistreerd zijn wordt als waarde voor het vakgebied niet de waarde geotechniek vermeld, maar een waarde als geotechniekArcheologie.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="surveyProcedure"
+                           minOccurs="1"
+                           maxOccurs="1"
+                           type="bhrgtcom:SurveyProcedureType">
+                  <xs:annotation>
+                     <xs:appinfo>
+                        <CodeListName>SurveyProcedure</CodeListName>
+                        <CodeListURI/>
+                     </xs:appinfo>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: De procedure die de uitvoering van projecten waarbinnen het booronderzoek wordt uitgevoerd reguleert en daarmee de kaders bepaalt voor de uitvoering van het booronderzoek.
+Explanation: De procedure beschrijft de manier van werken, de passende hulpmiddelen en de eisen waaraan de uitvoering moet voldoen. Procedures zijn in het algemeen vastgelegd in een norm, protocol of richtlijn. Dat kan overigens een richtlijn zijn die de uitvoerder voor zichzelf gebruikt. Het gegeven is opgenomen omdat het inzicht biedt in de kwaliteit van het werk.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="researchOperator"
+                           type="brocom:OrganizationType"
+                           minOccurs="0"
+                           maxOccurs="1">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: Het KvK-nummer van de onderneming of de maatschappelijke activiteit van de rechtspersoon die voor de bronhouder geldt als verantwoordelijk voor de uitvoering van het booronderzoek, of het equivalent daarvan in een handelsregister van een andere lidstaat van de Europese Unie dan Nederland.
+Explanation: Het gegeven wordt alleen uitgeleverd aan de dataleverancier en de bronhouder.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="siteCharacteristicDetermined"
+                           type="brocom:IndicationYesNoType"
+                           minOccurs="0"
+                           maxOccurs="1">
+                  <xs:annotation>
+                     <xs:documentation source="http://www.imvertor.org/model-info/technical-documentation">Definition: De aanduiding die aangeeft of in het onderzoek gegevens over de toestand van het terrein zijn vastgelegd die van betekenis zijn voor de beoordeling van de resultaten.
+Explanation: Voor onderzoek dat onder IMBRO/A valt zijn zelden gegevens over de toestand van het terrein vastgelegd.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element minOccurs="1"
+                           maxOccurs="1"
+                           name="deliveredLocation"
+                           nillable="false"
+                           type="bhrgtcom:DeliveredLocationType"/>
+               <xs:element minOccurs="1"
+                           maxOccurs="1"
+                           name="deliveredVerticalPosition"
+                           nillable="false"
+                           type="bhrgtcom:DeliveredVerticalPositionType"/>
+               <xs:element minOccurs="1"
+                           maxOccurs="1"
+                           name="boring"
+                           nillable="false"
+                           type="bhrgtcom:BoringType"/>
+               <xs:element minOccurs="0"
+                           maxOccurs="1"
+                           name="siteCharacteristic"
+                           nillable="false"
+                           type="bhrgtcom:SiteCharacteristicType"/>
+               <xs:element minOccurs="0"
+                           maxOccurs="1"
+                           name="fluidMudLayer"
+                           nillable="false"
+                           type="bhrgtcom:FluidMudLayerType"/>
+            </xs:sequence>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="BHR_GT_StartReport_V1PropertyType">
+      <xs:sequence minOccurs="1">
+         <xs:element ref="isbhrgt:BHR_GT_StartReport_V1"/>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="CorrectionReasonType">
+      <xs:simpleContent>
+         <xs:restriction base="gml:CodeWithAuthorityType">
+            <xs:attribute name="codeSpace"
+                          type="xs:anyURI"
+                          use="required"
+                          fixed="urn:bro:bhrgt:CorrectionReason"/>
+         </xs:restriction>
+      </xs:simpleContent>
+   </xs:complexType>
+
+   <xs:complexType name="SourceDocumentType">
+      <xs:choice minOccurs="1" maxOccurs="1">
+         <xs:element name="BHR_GT_ContinuationReport_V1" type="isbhrgt:BHR_GT_ContinuationReport_V1Type"/>
+         <xs:element name="BHR_GT_EndReport_V1" type="isbhrgt:BHR_GT_EndReport_V1Type"/>
+         <xs:element name="BHR_GT_StartReport_V1" type="isbhrgt:BHR_GT_StartReport_V1Type"/>
+         <xs:element name="BHR_GT_CompleteReport_V1" type="isbhrgt:BHR_GT_CompleteReport_V1Type"/>
+      </xs:choice>
+   </xs:complexType>
+</xs:schema>

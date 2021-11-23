@@ -3,7 +3,6 @@ import re
 from datetime import date
 
 import numpy as np
-import polars as pl
 
 logger = logging.getLogger(__name__)
 
