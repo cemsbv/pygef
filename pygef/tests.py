@@ -1245,6 +1245,18 @@ class PlotTest(unittest.TestCase):
             water_level_NAP=-10,
         )
 
+    def test_plot_classification_grouped_2(self):
+        gef = Cpt("./pygef/test_files/cpt2.gef")
+        df_group = gef.classify("robertson", do_grouping=True)
+        assert len(df_group) == 4
+        gef.plot(
+            show=False,
+            classification="robertson",
+            do_grouping=True,
+            min_thickness=0.2,
+            water_level_NAP=-10,
+        )
+
 
 class TestRobertson(unittest.TestCase):
     def setUp(self):
