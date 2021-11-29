@@ -1,11 +1,10 @@
-from abc import ABC
-
-import xmlschema
-import numpy as np
 import os.path
-
+from abc import ABC
 from datetime import datetime
+
+import numpy as np
 import polars as pl
+import xmlschema
 
 
 class _BroXml(ABC):

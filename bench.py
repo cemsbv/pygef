@@ -2,7 +2,6 @@ import cProfile
 import os
 
 import numpy as np
-
 from pygef import Cpt
 
 cwd = os.path.dirname(__file__)

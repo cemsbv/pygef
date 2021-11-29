@@ -6,7 +6,6 @@ from pygef import been_jefferies, robertson
 from pygef.base import Base
 from pygef.broxml import _BroXmlCpt
 from pygef.gef import _GefCpt
-from pygef.grouping import GroupClassification
 
 logger = logging.getLogger(__name__)
 
@@ -171,8 +170,6 @@ class Cpt(Base):
         water_level_wrt_depth=None,
         p_a=0.1,
         new=True,
-        do_grouping=False,
-        min_thickness=None,
     ):
         """
         Classify each row of the cpt type.
@@ -189,18 +186,11 @@ class Cpt(Base):
             Atmospheric pressure. Default: 0.1 MPa.
         new: bool, default:True
             If True and the classification is robertson, the new(2016) implementation of robertson is used.
-        do_grouping: bool,  optional for the classification
-            If True a group classification is added to the plot.
-        min_thickness: float, optional for the classification [m]
-            If specified together with the do_grouping set to True, a group classification is added to the plot.
-            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one > min_thickness.
-            In order to not make a big error do not use a value bigger then 0.2 m
 
         Returns
         -------
         df: polars.DataFrame
-            If do_grouping is True a polars.DataFrame with the grouped layer is returned otherwise a polars.DataFrame
-            with a classification for each row is returned.
+            A polars.DataFrame with a classification for each row is returned.
 
         """
         # todo: refactor arguments, the arguments connected to each other
@@ -213,12 +203,6 @@ class Cpt(Base):
                 f"You did not input the water level, a default value of -1 m respect to the ground is used."
                 f" Change it using the kwagr water_level_NAP or water_level_wrt_depth."
             )
-        if min_thickness is None:
-            min_thickness = 0.2
-            logger.warning(
-                f"You did not input the accepted minimum thickness, a default value of 0.2 m is used."
-                f" Change it using th kwarg min_thickness"
-            )
 
         if classification == "robertson":
             df = robertson.classify(
@@ -230,8 +214,6 @@ class Cpt(Base):
                 pre_excavated_depth=self.pre_excavated_depth,
                 p_a=p_a,
             )
-            if do_grouping:
-                return GroupClassification(self.zid, df, min_thickness).df_group
             return df
 
         elif classification == "been_jefferies":
@@ -242,8 +224,6 @@ class Cpt(Base):
                 area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
                 pre_excavated_depth=self.pre_excavated_depth,
             )
-            if do_grouping:
-                return GroupClassification(self.zid, df, min_thickness).df_group
             return df
         else:
             raise ValueError(
@@ -261,7 +241,6 @@ class Cpt(Base):
         show=False,
         figsize=(11, 8),
         df_group=None,
-        do_grouping=False,
         grid_step_x=None,
         dpi=100,
         colors=None,
@@ -302,8 +281,6 @@ class Cpt(Base):
                     Z value of the middle of the layer
                 - thickness
                     Thickness of the layer
-        do_grouping: bool, only for cpt type, optional for the classification
-            If True a group classification is added to the plot.
         grid_step_x: float, only for cpt type, default: None
             Grid step for qc and Fr subplots.
         dpi: int
@@ -328,17 +305,6 @@ class Cpt(Base):
                 p_a=p_a,
                 new=new,
             )
-
-            if df_group is None and do_grouping is True:
-                df_group = self.classify(
-                    classification=classification,
-                    water_level_NAP=water_level_NAP,
-                    water_level_wrt_depth=water_level_wrt_depth,
-                    p_a=p_a,
-                    new=new,
-                    do_grouping=True,
-                    min_thickness=min_thickness,
-                )
 
         return plot.plot_cpt(
             df,
