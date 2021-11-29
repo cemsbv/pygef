@@ -5,9 +5,8 @@ from typing import List
 
 import numpy as np
 import polars as pl
-from polars import col, lit, when
-
 import pygef.utils as utils
+from polars import col, lit, when
 
 # Try to import the optimized Rust header parsing but if that doesn't succeed
 # use the built-in python regex methods
