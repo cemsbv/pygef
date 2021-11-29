@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; pygef 0.6.3 documentation</title>
+  <title>Getting started &mdash; pygef 0.7.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
@@ -55,8 +55,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#classify-a-cpt">Classify a cpt</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#robertson-classification-without-grouping">Robertson classification without grouping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#robertson-classification-with-grouping">Robertson classification with grouping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#robertson-classification">Robertson classification</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#plot-a-classified-cpt">Plot a classified cpt</a></li>
@@ -309,11 +308,9 @@ F_r &amp;= \frac{f_s}{q_t - \sigma_{vo}} \times 100, \\
 q_t &amp;= q_c + u_2 (1 - a)
 \end{align}\end{split}\]</div>
 <p>The classification is done for each row of the cpt, and you can get the result for each row.</p>
-<p>However, it is also possible to apply a grouping algorithm on the cpt, if you set <code class="code docutils literal notranslate"><span class="pre">do_grouping</span></code> to <code class="code docutils literal notranslate"><span class="pre">True</span></code>,
-and specify the <code class="code docutils literal notranslate"><span class="pre">min_thickness</span></code> for a layer to be considered, you will get back a much shorter <code class="code docutils literal notranslate"><span class="pre">polars.DataFrame</span></code> with the grouped layers.</p>
 <p>Check the reference to learn about all the arguments of the method.</p>
-<section id="robertson-classification-without-grouping">
-<h3>Robertson classification without grouping<a class="headerlink" href="#robertson-classification-without-grouping" title="Permalink to this headline"></a></h3>
+<section id="robertson-classification">
+<h3>Robertson classification<a class="headerlink" href="#robertson-classification" title="Permalink to this headline"></a></h3>
 <p>To get the classification we need to at least pass the attribute <code class="code docutils literal notranslate"><span class="pre">classification</span></code> and the water level.
 The water level can be given either as <code class="code docutils literal notranslate"><span class="pre">water_level_NAP</span></code> or <code class="code docutils literal notranslate"><span class="pre">water_level_wrt_depth</span></code>.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -402,84 +399,15 @@ The water level can be given either as <code class="code docutils literal notran
 </pre></div>
 </div>
 </section>
-<section id="robertson-classification-with-grouping">
-<h3>Robertson classification with grouping<a class="headerlink" href="#robertson-classification-with-grouping" title="Permalink to this headline"></a></h3>
-<p>We can also apply the grouping algorithm to get a series of layers.</p>
-<p>The grouping is a simple algorithm that merge all the layers with <code class="code docutils literal notranslate"><span class="pre">thickness</span></code> &lt; <code class="code docutils literal notranslate"><span class="pre">min_thickness</span></code>
-with the last layer with <code class="code docutils literal notranslate"><span class="pre">thickness</span></code> &gt; <code class="code docutils literal notranslate"><span class="pre">min_thickness</span></code>.</p>
-<p>In order to not make a big error do not use a value for the <code class="code docutils literal notranslate"><span class="pre">min_thickness</span></code> bigger then 0.2 m and check the classification made for each row.
-The <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code> method can be useful for this. (See example below)</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [18]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">do_grouping</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_thickness</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
-<span class="gh">Out[18]: </span><span class="go"></span>
-<span class="go">shape: (14, 8)</span>
-<span class="go">┌──────────────┬────────┬────────┬─────────────┬─────────┬─────────────┬─────────────┬─────────────┐</span>
-<span class="go">│ layer        ┆ z_in   ┆ zf     ┆ thickness   ┆ z_centr ┆ z_in_NAP    ┆ zf_NAP      ┆ z_centr_NAP │</span>
-<span class="go">│ ---          ┆ ---    ┆ ---    ┆ ---         ┆ ---     ┆ ---         ┆ ---         ┆ ---         │</span>
-<span class="go">│ str          ┆ f64    ┆ f64    ┆ f64         ┆ f64     ┆ f64         ┆ f64         ┆ f64         │</span>
-<span class="go">╞══════════════╪════════╪════════╪═════════════╪═════════╪═════════════╪═════════════╪═════════════╡</span>
-<span class="go">│ Sands -      ┆ 0.01   ┆ 0.57   ┆ 0.559999999 ┆ 0.29    ┆ -9.99999999 ┆ -6.59999999 ┆ -3.8e-1     │</span>
-<span class="go">│ clean sand   ┆        ┆        ┆ 9999999     ┆         ┆ 9999999e-2  ┆ 9999999e-1  ┆             │</span>
-<span class="go">│ to silty     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ sand         ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Sand         ┆ 0.57   ┆ 1.43   ┆ 0.86        ┆ 1       ┆ -6.59999999 ┆ -1.52e0     ┆ -1.09e0     │</span>
-<span class="go">│ mixtures -   ┆        ┆        ┆             ┆         ┆ 9999999e-1  ┆             ┆             │</span>
-<span class="go">│ silty sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ to sa...     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Silt         ┆ 1.43   ┆ 3.11   ┆ 1.68        ┆ 2.27    ┆ -1.52e0     ┆ -3.19999999 ┆ -2.36e0     │</span>
-<span class="go">│ mixtures -   ┆        ┆        ┆             ┆         ┆             ┆ 99999997e0  ┆             │</span>
-<span class="go">│ clayey silt  ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ to s...      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Clays -      ┆ 3.11   ┆ 9.289  ┆ 6.179       ┆ 6.1995  ┆ -3.19999999 ┆ -9.379e0    ┆ -6.28949999 │</span>
-<span class="go">│ silty clay   ┆        ┆        ┆             ┆         ┆ 99999997e0  ┆             ┆ 9999999e0   │</span>
-<span class="go">│ to clay      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ ...          ┆ ...    ┆ ...    ┆ ...         ┆ ...     ┆ ...         ┆ ...         ┆ ...         │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Sand         ┆ 14.879 ┆ 15.099 ┆ 0.220000000 ┆ 14.989  ┆ -1.4969e1   ┆ -1.5189e1   ┆ -1.5079e1   │</span>
-<span class="go">│ mixtures -   ┆        ┆        ┆ 00000064    ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ silty sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ to sa...     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Silt         ┆ 15.099 ┆ 16.094 ┆ 0.995000000 ┆ 15.5965 ┆ -1.5189e1   ┆ -1.6184e1   ┆ -1.56865e1  │</span>
-<span class="go">│ mixtures -   ┆        ┆        ┆ 000001      ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ clayey silt  ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ to s...      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Clays -      ┆ 16.094 ┆ 17.983 ┆ 1.888999999 ┆ 17.0385 ┆ -1.6184e1   ┆ -1.8073e1   ┆ -1.71285e1  │</span>
-<span class="go">│ silty clay   ┆        ┆        ┆ 9999993     ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ to clay      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Sand         ┆ 17.983 ┆ 18.3   ┆ 0.317000000 ┆ 18.1415 ┆ -1.8073e1   ┆ -1.839e1    ┆ -1.82315e1  │</span>
-<span class="go">│ mixtures -   ┆        ┆        ┆ 00000017    ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ silty sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ to sa...     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ Sands -      ┆ 18.3   ┆ 19.925 ┆ 1.625       ┆ 19.1125 ┆ -1.839e1    ┆ -2.0015e1   ┆ -1.92025e1  │</span>
-<span class="go">│ clean sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ to silty     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">│ sand         ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
-<span class="go">└──────────────┴────────┴────────┴─────────────┴─────────┴─────────────┴─────────────┴─────────────┘</span>
-</pre></div>
-</div>
-</section>
 </section>
 <section id="plot-a-classified-cpt">
 <h2>Plot a classified cpt<a class="headerlink" href="#plot-a-classified-cpt" title="Permalink to this headline"></a></h2>
 <p>Passing the argument <code class="code docutils literal notranslate"><span class="pre">classification</span></code> to the <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code> method a subplot with a classification is added.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [19]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
-<span class="gh">Out[19]: </span><span class="go">&lt;Figure size 1100x800 with 3 Axes&gt;</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [18]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
+<span class="gh">Out[18]: </span><span class="go">&lt;Figure size 1100x800 with 3 Axes&gt;</span>
 </pre></div>
 </div>
 <img alt="../_images/cpt_plot_classification.png" src="../_images/cpt_plot_classification.png" />
-<p>If we pass also the arguments <code class="code docutils literal notranslate"><span class="pre">do_grouping</span></code> and <code class="code docutils literal notranslate"><span class="pre">min_thickness</span></code> we can plot next to it a subplot with the grouped classification.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [20]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">do_grouping</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_thickness</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>  <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
-<span class="gh">Out[20]: </span><span class="go">&lt;Figure size 1100x800 with 4 Axes&gt;</span>
-</pre></div>
-</div>
-<img alt="../_images/cpt_plot_classification_grouped.png" src="../_images/cpt_plot_classification_grouped.png" />
 <p>Check the reference to learn about all the arguments of the method, you can for example control the grid and the figure size.</p>
 </section>
 </section>
