@@ -4,11 +4,9 @@ import unittest
 from datetime import datetime
 
 import numpy as np
-import polars as pl
 import pandas as pd
-
+import polars as pl
 import pygef.geo as geo
-import pygef.grouping as grouping
 import pygef.utils as utils
 from pygef.bore import Bore
 from pygef.cpt import Cpt
@@ -21,7 +19,6 @@ from pygef.gef import (
     correct_pre_excavated_depth,
     replace_column_void,
 )
-from pygef.grouping import GroupClassification
 
 
 class GefTest(unittest.TestCase):
@@ -893,125 +890,6 @@ class GefTest(unittest.TestCase):
         df = pl.DataFrame({"type_index": [0.0, 1.0, 2.0]})
         assert v.frame_equal(df, null_equal=True)
 
-    def test_group_equal_layers(self):
-        df_group = pl.DataFrame(
-            {
-                "depth": [0, 1, 2, 3, 4, 5, 6],
-                "soil_type": [
-                    "Peat",
-                    "Peat",
-                    "Peat",
-                    "Silt mixtures - clayey silt to silty clay",
-                    "Silt mixtures - clayey silt to silty clay",
-                    "Silt mixtures - clayey silt to silty clay",
-                    "Sand",
-                ],
-                "elevation_with_respect_to_nap": [2, 1, 0, -1, -2, -3, -4],
-            }
-        )
-        group = GroupClassification(2, df_group, 0.2)
-        v = group.group_equal_layers(df_group.to_pandas(), "soil_type", "depth", 0)
-        df = pd.DataFrame(
-            {
-                "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 2.0, 5.0],
-                "zf": [2, 5, 6],
-                "thickness": [2.0, 3.0, 1.0],
-                "z_centr": [1.0, 3.5, 5.5],
-                "z_in_NAP": [2.0, 0.0, -3.0],
-                "zf_NAP": [0, -3, -4],
-                "z_centr_NAP": [1.0, -1.5, -3.5],
-            }
-        )
-        assert v.equals(df)
-
-    def test_group_significant_layers(self):
-        df_group = pd.DataFrame(
-            {
-                "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 0.4, 5.0],
-                "zf": [0.4, 5, 6],
-                "thickness": [0.4, 4.6, 1.0],
-            }
-        )
-
-        v = grouping.group_significant_layers(df_group, 0.5, 0.0)
-
-        df = pd.DataFrame(
-            {
-                "layer": ["Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 5.0],
-                "zf": [5.0, 6.0],
-                "thickness": [5.0, 1.0],
-                "z_centr": [2.5, 5.5],
-            }
-        )
-
-        assert v.equals(df)
-
-    def test_calculate_thickness(self):
-        df_group = pd.DataFrame(
-            {
-                "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 0.4, 5.0],
-                "zf": [0.4, 5, 6],
-            }
-        )
-        v = grouping.calculate_thickness(df_group)
-        df = pd.DataFrame(
-            {
-                "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 0.4, 5.0],
-                "zf": [0.4, 5, 6],
-                "thickness": [0.4, 4.6, 1.0],
-            }
-        )
-        assert v.equals(df)
-
-    def test_calculate_z_centr(self):
-        df_group = pd.DataFrame(
-            {
-                "layer": ["Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 5.0],
-                "zf": [5.0, 6.0],
-            }
-        )
-        v = grouping.calculate_z_centr(df_group)
-        df = pd.DataFrame(
-            {
-                "layer": ["Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 5.0],
-                "zf": [5.0, 6.0],
-                "z_centr": [2.5, 5.5],
-            }
-        )
-        assert v.equals(df)
-
-    def test_calculate_zf_NAP(self):
-        df_group = pd.DataFrame(
-            {
-                "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 2.0, 5.0],
-                "zf": [2, 5, 6],
-                "thickness": [2.0, 3.0, 1.0],
-                "z_centr": [1.0, 3.5, 5.5],
-            }
-        )
-
-        v = grouping.calculate_zf_NAP(df_group, 2)
-
-        df = pd.DataFrame(
-            {
-                "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
-                "z_in": [0.0, 2.0, 5.0],
-                "zf": [2, 5, 6],
-                "thickness": [2.0, 3.0, 1.0],
-                "z_centr": [1.0, 3.5, 5.5],
-                "zf_NAP": [0, -3, -4],
-            }
-        )
-        assert v.equals(df)
-
     def test_bug_depth(self):
         cpt = """
 #FILEDATE= 2011, 5, 13
@@ -1223,27 +1101,11 @@ class PlotTest(unittest.TestCase):
         gef = Cpt("./pygef/test_files/example.gef")
         gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
 
-    def test_plot_classification_grouped(self):
         gef = Cpt("./pygef/test_files/cpt.gef")
-        gef.plot(
-            show=False,
-            classification="robertson",
-            do_grouping=True,
-            min_thickness=0.2,
-            water_level_NAP=-10,
-        )
+        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
 
-    def test_plot_classification_grouped_2(self):
         gef = Cpt("./pygef/test_files/cpt2.gef")
-        df_group = gef.classify("robertson", do_grouping=True)
-        assert len(df_group) == 4
-        gef.plot(
-            show=False,
-            classification="robertson",
-            do_grouping=True,
-            min_thickness=0.2,
-            water_level_NAP=-10,
-        )
+        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
 
 
 class TestRobertson(unittest.TestCase):

@@ -1,8 +1,7 @@
 import numpy as np
 import polars as pl
-from polars import col, lit
-
 import pygef.utils as utils
+from polars import col, lit
 from pygef import geo
 
 
