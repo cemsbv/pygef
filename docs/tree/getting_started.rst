@@ -195,13 +195,9 @@ where:
 
 The classification is done for each row of the cpt, and you can get the result for each row.
 
-However, it is also possible to apply a grouping algorithm on the cpt, if you set :code:`do_grouping` to :code:`True`,
-and specify the :code:`min_thickness` for a layer to be considered, you will get back a much shorter :code:`polars.DataFrame` with the grouped layers.
-
-
 Check the reference to learn about all the arguments of the method.
 
-Robertson classification without grouping
+Robertson classification
 .........................................
 
 To get the classification we need to at least pass the attribute :code:`classification` and the water level.
@@ -224,22 +220,6 @@ If you don't want to have so many columns you can just make a selection of them:
     df[["depth", "soil_type"]]
 
 
-Robertson classification with grouping
-.........................................
-We can also apply the grouping algorithm to get a series of layers.
-
-The grouping is a simple algorithm that merge all the layers with :code:`thickness` < :code:`min_thickness`
-with the last layer with :code:`thickness` > :code:`min_thickness`.
-
-In order to not make a big error do not use a value for the :code:`min_thickness` bigger then 0.2 m and check the classification made for each row.
-The :code:`.plot()` method can be useful for this. (See example below)
-
-.. ipython:: python
-    :okwarning:
-
-    cpt.classify(classification="robertson", do_grouping=True, min_thickness=0.2, water_level_NAP=-10)
-
-
 Plot a classified cpt
 ---------------------
 
@@ -250,15 +230,6 @@ Passing the argument :code:`classification` to the :code:`.plot()` method a subp
 
     @savefig cpt_plot_classification.png
     cpt.plot(classification="robertson", water_level_NAP=-10)
-
-
-If we pass also the arguments :code:`do_grouping` and :code:`min_thickness` we can plot next to it a subplot with the grouped classification.
-
-.. ipython:: python
-    :okwarning:
-
-    @savefig cpt_plot_classification_grouped.png
-    cpt.plot(classification="robertson", do_grouping=True, min_thickness=0.2,  water_level_NAP=-10)
 
 
 Check the reference to learn about all the arguments of the method, you can for example control the grid and the figure size.
