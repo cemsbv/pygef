@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; pygef 0.6.2 documentation</title>
+  <title>Getting started &mdash; pygef 0.6.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
@@ -17,7 +17,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -411,13 +411,57 @@ with the last layer with <code class="code docutils literal notranslate"><span c
 The <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code> method can be useful for this. (See example below)</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [18]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">do_grouping</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_thickness</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
 <span class="gh">Out[18]: </span><span class="go"></span>
-<span class="go">shape: (0, 8)</span>
-<span class="go">┌───────┬──────┬─────┬───────────┬─────────┬──────────┬────────┬─────────────┐</span>
-<span class="go">│ layer ┆ z_in ┆ zf  ┆ thickness ┆ z_centr ┆ z_in_NAP ┆ zf_NAP ┆ z_centr_NAP │</span>
-<span class="go">│ ---   ┆ ---  ┆ --- ┆ ---       ┆ ---     ┆ ---      ┆ ---    ┆ ---         │</span>
-<span class="go">│ str   ┆ f64  ┆ f64 ┆ f64       ┆ f64     ┆ f64      ┆ f64    ┆ f64         │</span>
-<span class="go">╞═══════╪══════╪═════╪═══════════╪═════════╪══════════╪════════╪═════════════╡</span>
-<span class="go">└───────┴──────┴─────┴───────────┴─────────┴──────────┴────────┴─────────────┘</span>
+<span class="go">shape: (14, 8)</span>
+<span class="go">┌──────────────┬────────┬────────┬─────────────┬─────────┬─────────────┬─────────────┬─────────────┐</span>
+<span class="go">│ layer        ┆ z_in   ┆ zf     ┆ thickness   ┆ z_centr ┆ z_in_NAP    ┆ zf_NAP      ┆ z_centr_NAP │</span>
+<span class="go">│ ---          ┆ ---    ┆ ---    ┆ ---         ┆ ---     ┆ ---         ┆ ---         ┆ ---         │</span>
+<span class="go">│ str          ┆ f64    ┆ f64    ┆ f64         ┆ f64     ┆ f64         ┆ f64         ┆ f64         │</span>
+<span class="go">╞══════════════╪════════╪════════╪═════════════╪═════════╪═════════════╪═════════════╪═════════════╡</span>
+<span class="go">│ Sands -      ┆ 0.01   ┆ 0.57   ┆ 0.559999999 ┆ 0.29    ┆ -9.99999999 ┆ -6.59999999 ┆ -3.8e-1     │</span>
+<span class="go">│ clean sand   ┆        ┆        ┆ 9999999     ┆         ┆ 9999999e-2  ┆ 9999999e-1  ┆             │</span>
+<span class="go">│ to silty     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ sand         ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Sand         ┆ 0.57   ┆ 1.43   ┆ 0.86        ┆ 1       ┆ -6.59999999 ┆ -1.52e0     ┆ -1.09e0     │</span>
+<span class="go">│ mixtures -   ┆        ┆        ┆             ┆         ┆ 9999999e-1  ┆             ┆             │</span>
+<span class="go">│ silty sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ to sa...     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Silt         ┆ 1.43   ┆ 3.11   ┆ 1.68        ┆ 2.27    ┆ -1.52e0     ┆ -3.19999999 ┆ -2.36e0     │</span>
+<span class="go">│ mixtures -   ┆        ┆        ┆             ┆         ┆             ┆ 99999997e0  ┆             │</span>
+<span class="go">│ clayey silt  ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ to s...      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Clays -      ┆ 3.11   ┆ 9.289  ┆ 6.179       ┆ 6.1995  ┆ -3.19999999 ┆ -9.379e0    ┆ -6.28949999 │</span>
+<span class="go">│ silty clay   ┆        ┆        ┆             ┆         ┆ 99999997e0  ┆             ┆ 9999999e0   │</span>
+<span class="go">│ to clay      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ ...          ┆ ...    ┆ ...    ┆ ...         ┆ ...     ┆ ...         ┆ ...         ┆ ...         │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Sand         ┆ 14.879 ┆ 15.099 ┆ 0.220000000 ┆ 14.989  ┆ -1.4969e1   ┆ -1.5189e1   ┆ -1.5079e1   │</span>
+<span class="go">│ mixtures -   ┆        ┆        ┆ 00000064    ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ silty sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ to sa...     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Silt         ┆ 15.099 ┆ 16.094 ┆ 0.995000000 ┆ 15.5965 ┆ -1.5189e1   ┆ -1.6184e1   ┆ -1.56865e1  │</span>
+<span class="go">│ mixtures -   ┆        ┆        ┆ 000001      ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ clayey silt  ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ to s...      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Clays -      ┆ 16.094 ┆ 17.983 ┆ 1.888999999 ┆ 17.0385 ┆ -1.6184e1   ┆ -1.8073e1   ┆ -1.71285e1  │</span>
+<span class="go">│ silty clay   ┆        ┆        ┆ 9999993     ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ to clay      ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Sand         ┆ 17.983 ┆ 18.3   ┆ 0.317000000 ┆ 18.1415 ┆ -1.8073e1   ┆ -1.839e1    ┆ -1.82315e1  │</span>
+<span class="go">│ mixtures -   ┆        ┆        ┆ 00000017    ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ silty sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ to sa...     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ Sands -      ┆ 18.3   ┆ 19.925 ┆ 1.625       ┆ 19.1125 ┆ -1.839e1    ┆ -2.0015e1   ┆ -1.92025e1  │</span>
+<span class="go">│ clean sand   ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ to silty     ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">│ sand         ┆        ┆        ┆             ┆         ┆             ┆             ┆             │</span>
+<span class="go">└──────────────┴────────┴────────┴─────────────┴─────────┴─────────────┴─────────────┴─────────────┘</span>
 </pre></div>
 </div>
 </section>
