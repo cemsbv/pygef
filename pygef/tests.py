@@ -5,6 +5,7 @@ from datetime import datetime
 
 import numpy as np
 import polars as pl
+import pandas as pd
 
 import pygef.geo as geo
 import pygef.grouping as grouping
@@ -909,8 +910,8 @@ class GefTest(unittest.TestCase):
             }
         )
         group = GroupClassification(2, df_group, 0.2)
-        v = group.group_equal_layers(df_group, "soil_type", "depth", 0)
-        df = pl.DataFrame(
+        v = group.group_equal_layers(df_group.to_pandas(), "soil_type", "depth", 0)
+        df = pd.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 2.0, 5.0],
@@ -922,18 +923,10 @@ class GefTest(unittest.TestCase):
                 "z_centr_NAP": [1.0, -1.5, -3.5],
             }
         )
-        # todo: grouping functionality should be fixed
-        # assert v.layer == df.layer
-        # assert v.z_in == df.z_in
-        # assert v.zf == df.zf
-        # assert v.thickness == df.thickness
-        # assert v.z_centr == df.z_centr
-        # assert v.z_in_NAP == df.z_in_NAP
-        # assert v.zf_NAP == df.zf_NAP
-        # assert v.z_centr_NAP == df.z_centr_NAP
+        assert v.equals(df)
 
     def test_group_significant_layers(self):
-        df_group = pl.DataFrame(
+        df_group = pd.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 0.4, 5.0],
@@ -944,7 +937,7 @@ class GefTest(unittest.TestCase):
 
         v = grouping.group_significant_layers(df_group, 0.5, 0.0)
 
-        df = pl.DataFrame(
+        df = pd.DataFrame(
             {
                 "layer": ["Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 5.0],
@@ -954,15 +947,10 @@ class GefTest(unittest.TestCase):
             }
         )
 
-        # TODO: use a better comparison method
-        assert v.zf == df.zf
-        assert v.layer == df.layer
-        assert v.z_in == df.z_in
-        assert v.thickness == df.thickness
-        assert v.z_centr == df.z_centr
+        assert v.equals(df)
 
     def test_calculate_thickness(self):
-        df_group = pl.DataFrame(
+        df_group = pd.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 0.4, 5.0],
@@ -970,7 +958,7 @@ class GefTest(unittest.TestCase):
             }
         )
         v = grouping.calculate_thickness(df_group)
-        df = pl.DataFrame(
+        df = pd.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 0.4, 5.0],
@@ -978,10 +966,10 @@ class GefTest(unittest.TestCase):
                 "thickness": [0.4, 4.6, 1.0],
             }
         )
-        assert v.frame_equal(df, null_equal=True)
+        assert v.equals(df)
 
     def test_calculate_z_centr(self):
-        df_group = pl.DataFrame(
+        df_group = pd.DataFrame(
             {
                 "layer": ["Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 5.0],
@@ -989,7 +977,7 @@ class GefTest(unittest.TestCase):
             }
         )
         v = grouping.calculate_z_centr(df_group)
-        df = pl.DataFrame(
+        df = pd.DataFrame(
             {
                 "layer": ["Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 5.0],
@@ -997,10 +985,10 @@ class GefTest(unittest.TestCase):
                 "z_centr": [2.5, 5.5],
             }
         )
-        assert v.frame_equal(df, null_equal=True)
+        assert v.equals(df)
 
     def test_calculate_zf_NAP(self):
-        df_group = pl.DataFrame(
+        df_group = pd.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 2.0, 5.0],
@@ -1012,7 +1000,7 @@ class GefTest(unittest.TestCase):
 
         v = grouping.calculate_zf_NAP(df_group, 2)
 
-        df = pl.DataFrame(
+        df = pd.DataFrame(
             {
                 "layer": ["Peat", "Silt mixtures - clayey silt to silty clay", "Sand"],
                 "z_in": [0.0, 2.0, 5.0],
@@ -1022,7 +1010,7 @@ class GefTest(unittest.TestCase):
                 "zf_NAP": [0, -3, -4],
             }
         )
-        assert v.frame_equal(df, null_equal=True)
+        assert v.equals(df)
 
     def test_bug_depth(self):
         cpt = """
@@ -1237,6 +1225,18 @@ class PlotTest(unittest.TestCase):
 
     def test_plot_classification_grouped(self):
         gef = Cpt("./pygef/test_files/cpt.gef")
+        gef.plot(
+            show=False,
+            classification="robertson",
+            do_grouping=True,
+            min_thickness=0.2,
+            water_level_NAP=-10,
+        )
+
+    def test_plot_classification_grouped_2(self):
+        gef = Cpt("./pygef/test_files/cpt2.gef")
+        df_group = gef.classify("robertson", do_grouping=True)
+        assert len(df_group) == 4
         gef.plot(
             show=False,
             classification="robertson",
