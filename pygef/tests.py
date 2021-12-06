@@ -22,6 +22,11 @@ from pygef.gef import (
 
 
 class GefTest(unittest.TestCase):
+    def test_xy(self):
+        cpt3 = Cpt("./pygef/test_files/cpt3.gef")
+        self.assertEqual(cpt3.x, 110885)
+        self.assertEqual(cpt3.y, 493345)
+
     def test_measurement_var_with_minus_sign(self):
         s = r"#MEASUREMENTVAR= 41, -15.000000, "
         v = utils.parse_measurement_var_as_float(s, 41)
