@@ -1,5 +1,6 @@
 .idea/
 .venv/
+.env/
 dist
 __pycache__
 *.egg-info
@@ -10,3 +11,4 @@ dev/
 target/
 Cargo.lock
 public/
+.vscode/

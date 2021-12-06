@@ -232,7 +232,7 @@ def parse_xid_as_float(headers):
         return first_header_value(headers, "XYID", index=1, cast=float)
     else:
         return parse_regex_cast(
-            r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, float, 1
+            r"#XYID[=\s+]*.*?,\s*(\d*\s*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, float, 1
         )
 
 
@@ -247,7 +247,7 @@ def parse_yid_as_float(headers):
         return first_header_value(headers, "XYID", index=2, cast=float)
     else:
         return parse_regex_cast(
-            r"#XYID[=\s+]*.*?,\s*(\d*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, float, 3
+            r"#XYID[=\s+]*.*?,\s*(\d*\s*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, float, 3
         )
 
 
