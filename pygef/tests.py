@@ -1170,3 +1170,12 @@ class TestBoreXml(unittest.TestCase):
                     "silt_component",
                 }.issubset(set(bore.df.columns))
                 bore.plot()
+
+    def test_read_as_string(self):
+        path = "./pygef/test_files/bore_xml/DP65+005_HB_VL.xml"
+        with open(path, encoding="utf-8", errors="ignore") as f:
+            string = f.read()
+
+        bore = Bore(content=dict(string=string, file_type="xml"))
+        assert type(bore.s_bin) == bytes
+        assert type(bore.s) == str

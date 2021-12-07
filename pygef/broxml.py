@@ -5,6 +5,13 @@ import numpy as np
 import polars as pl
 from lxml import etree
 
+NS_MAP_VALUES = [
+    "http://www.broservices.nl/xsd/brocommon/",
+    "http://www.broservices.nl/xsd/isbhr-gt/",
+    "http://www.opengis.net/gml/",
+    "http://www.broservices.nl/xsd/bhrgtcommon/",
+]
+
 
 class _BroXml(ABC):
     def __init__(self, path: str = None, string: str = None):
@@ -24,7 +31,11 @@ class _BroXml(ABC):
         self.path = path
         if string is None and path is not None:
             with open(path, "rb") as f:
+                self.s_bin = f.read()
+            with open(path, encoding="utf-8", errors="ignore") as f:
                 string = f.read()
+        elif string is not None:
+            self.s_bin = string.encode("ascii")
 
         self.s = string
         # Initialize attributes
@@ -51,18 +62,12 @@ class _BroXmlBore(_BroXml):
         super().__init__(path=path, string=string)
         self.nen_version = "NEN-EN-ISO 14688"
         self.type = "bore"
-        self._root = etree.fromstring(self.s)
+        self._root = etree.fromstring(self.s_bin)
         self._ns_map_keys = list(self._root.nsmap.keys())
 
-        ns_map_values = [
-            "http://www.broservices.nl/xsd/brocommon/",
-            "http://www.broservices.nl/xsd/isbhr-gt/",
-            "http://www.opengis.net/gml/",
-            "http://www.broservices.nl/xsd/bhrgtcommon/",
-        ]
         # find versions
         self._ns_map_values = []
-        for pos in ns_map_values:
+        for pos in NS_MAP_VALUES:
             for val in list(self._root.nsmap.values()):
                 if pos in val:
                     self._ns_map_values.append(val)
