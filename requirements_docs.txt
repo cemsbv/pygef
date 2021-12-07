@@ -1,6 +1,0 @@
-Sphinx>=3.3.1
-sphinx-autodoc-typehints>=1.11.1
-ipython
-asteroid-sphinx-theme
-sphinx_rtd_theme
-m2r2

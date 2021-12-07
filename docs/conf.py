@@ -37,7 +37,6 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
     "matplotlib.sphinxext.plot_directive",
-    "m2r2",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
