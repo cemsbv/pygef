@@ -8,7 +8,8 @@
 Simple parser for \*.gef files. These are ASCII based files used for soil properties measurements.
 Compatible with Python 3.7.
 
-Recently added parsing of xml boreholes file compatible with schema's defined in `./pygef/resources/`. 
+Recently added the parsing of xml boreholes file, the xml parsing is still in a preliminary phase,
+not all the files are supported. If you find a file that doesn't work with pygef, please make an issue about it or PR :)
 
 ## Installation
 
@@ -18,7 +19,7 @@ Latest stable version:
 
 Cutting-edge version (might break):
 
-`$ pip install git+https://github.com/ritchie46/pygef.git`
+`$ pip install git+https://github.com/cemsbv/pygef.git`
 
 ### Read BORE and CPT files
 
