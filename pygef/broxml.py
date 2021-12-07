@@ -66,7 +66,7 @@ class _BroXmlBore(_BroXml):
             for val in list(self._root.nsmap.values()):
                 if pos in val:
                     self._ns_map_values.append(val)
-                    continue
+                    break
 
         self._parse_attributes()
 

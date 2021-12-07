@@ -1169,4 +1169,4 @@ class TestBoreXml(unittest.TestCase):
                     "peat_component",
                     "silt_component",
                 }.issubset(set(bore.df.columns))
-                bore.plot(show=True)
+                bore.plot()
