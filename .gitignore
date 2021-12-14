@@ -12,3 +12,4 @@ target/
 Cargo.lock
 public/
 .vscode/
+venv/
