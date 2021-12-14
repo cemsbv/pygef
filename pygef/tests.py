@@ -417,7 +417,7 @@ class GefTest(unittest.TestCase):
     def test_parse_data_soil_type(self):
         df = pl.DataFrame(
             {
-                "Soil_type": [
+                "soil_type": [
                     "clay 100% with sand",
                     "clay 95% with sand 5%",
                     "clay 90% with sand 10%",
@@ -478,7 +478,7 @@ class GefTest(unittest.TestCase):
         self.assertTrue(np.all(np.isclose(v, [0.0, 0.05, 0.9, 0.0, 0.0, 0.05])))
 
     def test_parse_data_soil_code(self):
-        df = pl.DataFrame({"Soil_code": ["Kz", "Kz1", "Kz2"]})
+        df = pl.DataFrame({"soil_code": ["Kz", "Kz1", "Kz2"]})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
         df_parsed = _GefBore.parse_data_soil_code(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
@@ -486,7 +486,15 @@ class GefTest(unittest.TestCase):
     def test_data_soil_quantified(self):
         lst = [[0.0, 0.05, 0.95, 0.0, 0.0, 0.0], [0.0, 0.05, 0.95, 0.0, 0.0, 0.0]]
         df = pl.DataFrame(
-            lst, columns=["Gravel", "Sand", "Clay", "Loam", "Peat", "Silt"]
+            lst,
+            columns=[
+                "gravel_component",
+                "sand_component",
+                "clay_component",
+                "loam_component",
+                "peat_component",
+                "silt_component",
+            ],
         )
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"]]
         df_parsed = _GefBore.parse_soil_quantification(pl.DataFrame({}), data_s)
@@ -717,12 +725,12 @@ class GefTest(unittest.TestCase):
                     "1) ON 2) ZMGO 3) weinig fijn grind (1-25%) 4) kalkarm ",
                     "1) brown-black 2) ZMO 3) kalkloos ",
                 ],
-                "g": [0.05, 0.05, 0.00],
-                "s": [0.85, 0.95, 0.05],
-                "c": [0.0, 0.0, 0.0],
-                "l": [0.0, 0.0, 0.0],
-                "p": [0.10, 0.00, 0.95],
-                "si": [0.0, 0.0, 0.0],
+                "gravel_component": [0.05, 0.05, 0.00],
+                "sand_component": [0.85, 0.95, 0.05],
+                "clay_component": [0.0, 0.0, 0.0],
+                "loam_component": [0.0, 0.0, 0.0],
+                "peat_component": [0.10, 0.00, 0.95],
+                "silt_component": [0.0, 0.0, 0.0],
             }
         )
         assert df_calculated.frame_equal(df, null_equal=True)
