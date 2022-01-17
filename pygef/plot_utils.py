@@ -81,11 +81,13 @@ def plot_cpt(
         n += 1
         ax = fig.add_subplot(1, num_col, n)
         if z_NAP:
-            plt.plot(df[c], df["elevation_with_respect_to_nap"], "C0")
+            plt.plot(
+                df[c].to_numpy(), df["elevation_with_respect_to_nap"].to_numpy(), "C0"
+            )
             if n == 1:
                 ax.set_ylabel("Z NAP [m]")
         else:
-            plt.plot(df[c], df["depth"], "C0")
+            plt.plot(df[c].to_numpy(), df["depth"].to_numpy(), "C0")
             if n == 1:
                 ax.set_ylabel("Z [m]")
         if n > 1:
@@ -247,11 +249,11 @@ def plot_merged_cpt_bore(df, figsize=None, show=True):
     fig = plt.figure(figsize=figsize)
     subplot_val = 131
     plt.subplot(subplot_val)
-    plt.plot(df["qc"], -df["depth"])
+    plt.plot(df["qc"].to_numpy(), -df["depth"].to_numpy())
 
     subplot_val += 1
     plt.subplot(subplot_val)
-    plt.plot(df["friction_number"], -df["depth"])
+    plt.plot(df["friction_number"].to_numpy(), -df["depth"].to_numpy())
 
     subplot_val += 1
     plt.subplot(subplot_val)
