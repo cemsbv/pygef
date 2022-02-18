@@ -13,7 +13,7 @@ setup(
     install_requires=[
         "polars>= 0.9.5",
         "matplotlib>= 3.4.2",
-        "lxml==4.7.1",
+        "lxml==4.8.0",
     ],
     python_requires=">=3.7",
     include_package_data=True,
