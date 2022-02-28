@@ -170,16 +170,16 @@ def soil_name_to_percentages(df):
         "klei": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
         "kleiigVeen": [0.0, 0.0, 0.3, 0.0, 0.7, 0.0],
         "kleiigZand": [0.0, 0.7, 0.3, 0.0, 0.0, 0.0],
-        "kleiigZandMetGrind": [0.5, 0.65, 0.3, 0.0, 0.0, 0.0],
+        "kleiigZandMetGrind": [0.05, 0.65, 0.3, 0.0, 0.0, 0.0],
         "puin": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],  # specialMaterial
         "siltigZand": [0.0, 0.7, 0.0, 0.0, 0.0, 0.3],
-        "siltigZandMetGrind": [0.5, 0.65, 0.0, 0.0, 0.0, 0.3],
+        "siltigZandMetGrind": [0.05, 0.65, 0.0, 0.0, 0.0, 0.3],
         "sterkGrindigZand": [0.3, 0.7, 0.0, 0.0, 0.0, 0.0],
         "sterkGrindigeKlei": [0.3, 0.0, 0.7, 0.0, 0.0, 0.0],
         "sterkZandigGrind": [0.7, 0.3, 0.0, 0.0, 0.0, 0.0],
         "sterkZandigSilt": [0.0, 0.3, 0.0, 0.0, 0.0, 0.7],
         "sterkZandigeKlei": [0.0, 0.3, 0.7, 0.0, 0.0, 0.0],
-        "sterkZandigeKleiMetGrind": [0.5, 0.3, 0.65, 0.0, 0.0, 0.0],
+        "sterkZandigeKleiMetGrind": [0.05, 0.3, 0.65, 0.0, 0.0, 0.0],
         "veen": [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
         "zand": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
         "zwakGrindigZand": [0.1, 0.9, 0.0, 0.0, 0.0, 0.0],
@@ -187,7 +187,7 @@ def soil_name_to_percentages(df):
         "zwakZandigGrind": [0.9, 0.1, 0.0, 0.0, 0.0, 0.0],
         "zwakZandigVeen": [0.0, 0.1, 0.0, 0.0, 0.9, 0.0],
         "zwakZandigeKlei": [0.0, 0.1, 0.9, 0.0, 0.0, 0.0],
-        "zwakZandigeKleiMetGrind": [0.5, 0.1, 0.85, 0.0, 0.0, 0.0],
+        "zwakZandigeKleiMetGrind": [0.05, 0.1, 0.85, 0.0, 0.0, 0.0],
     }
 
     array_ = np.array(
