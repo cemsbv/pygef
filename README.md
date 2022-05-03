@@ -52,7 +52,7 @@ gef.df.to_csv("my-file.csv")
 ### Plotting and classifications
 
 ```python
-gef.plot(classification='robertson', water_level_NAP= -1, min_thickness= 0.2, show=True)
+gef.plot(classification="robertson", water_level_NAP=-1, min_thickness=0.2, show=True)
 
 # available classifications: robertson, been_jeffries
 ```

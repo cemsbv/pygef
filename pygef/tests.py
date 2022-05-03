@@ -582,8 +582,6 @@ class GefTest(unittest.TestCase):
         )
         assert np.isclose(df_calculated["depth"], df["depth"]).all()
 
-
-
     def test_pre_excavated_depth(self):
         df1 = pl.DataFrame(
             {
