@@ -789,7 +789,7 @@ def assign_multiple_columns(df, columns, partial_df):
 
 
 def kpa_to_mpa(df, columns):
-    return assign_multiple_columns(df, columns, df[columns] * 10 ** -3)
+    return assign_multiple_columns(df, columns, df[columns] * 10**-3)
 
 
 def none_to_zero(df):
