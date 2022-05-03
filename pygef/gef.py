@@ -504,7 +504,7 @@ def correct_depth_with_inclination(columns):
     Return the expression needed to correct depth
     """
     if "corrected_depth" in columns:
-        return col("corrected_depth").alias("depth")
+        return col("corrected_depth").abs().alias("depth")
     elif "inclination" in columns:
         pt = "penetration_length"
 
