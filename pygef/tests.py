@@ -564,6 +564,26 @@ class GefTest(unittest.TestCase):
         )
         assert np.isclose(df_calculated["depth"], df["depth"]).all()
 
+    def test_negative_corrected_depth(self):
+        df2 = pl.DataFrame(
+            {
+                "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
+                "corrected_depth": [-0.0, -0.10, -0.25, -0.40, -0.60],
+                "inclination": [45, 45, 45, 45, 45],
+            }
+        )
+        df_calculated = df2.with_column(correct_depth_with_inclination(df2.columns))
+        df = pl.DataFrame(
+            {
+                "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
+                "depth": [0.0, 0.10, 0.25, 0.40, 0.60],
+                "inclination": [45, 45, 45, 45, 45],
+            }
+        )
+        assert np.isclose(df_calculated["depth"], df["depth"]).all()
+
+
+
     def test_pre_excavated_depth(self):
         df1 = pl.DataFrame(
             {
