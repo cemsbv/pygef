@@ -7,7 +7,7 @@ setup(
     version=__version__,
     author="Ritchie Vink",
     author_email="ritchie46@gmail.com",
-    url="https://www.ritchievink.com",
+    url="https://github.com/cemsbv/pygef",
     license="mit",
     packages=["pygef", "pygef.been_jefferies", "pygef.robertson"],
     install_requires=[
