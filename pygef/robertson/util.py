@@ -2,6 +2,7 @@ import numpy as np
 import polars as pl
 import pygef.utils as utils
 from pygef import geo
+import pygef.expressions as exprs
 
 
 def n_exponent(df, p_a):
@@ -33,41 +34,6 @@ def type_index(df):
         (3.47 - np.log10(df["normalized_cone_resistance"])) ** 2.0
         + (np.log10(df["normalized_friction_ratio"]) + 1.22) ** 2.0
     ) ** 0.5
-
-    return df
-
-
-def ic_to_gamma(df, water_level):
-    """
-    Assign the right gamma (unit soil weight kN/m^3) to the corresponding Ic.
-
-    :param df: (DataFrame) Original DataFrame.
-    :param water_level: (int) Water level with respect to ground level.
-    :return: Updated DataFrame.
-    """
-    mask_below_water = (1.0 - df["depth"]) < water_level
-    # TODO: how to fill it properly with the same initial values?
-    df["gamma_predict"] = np.tile(1.0, len(df.rows()))
-
-    ic_mask = df["type_index"] > 3.6
-    # gamma_(sat) and ic > 3.6
-    df[ic_mask, "gamma_predict"] = 11.0
-
-    ic_mask = df["type_index"] <= 3.6
-    # gamma_(sat) and ic < 3.6
-    df[ic_mask, "gamma_predict"] = 16.0
-
-    ic_mask = df["type_index"] <= 2.95
-    # gamma_(sat) and ic < x
-    df[ic_mask, "gamma_predict"] = 18.0
-
-    ic_mask = df["type_index"] <= 2.6
-    # gamma_sat and ic < x
-    df[ic_mask & mask_below_water, "gamma_predict"] = 19.0
-
-    ic_mask = df["type_index"] <= 2.05
-    # gamma_sat and ic < x
-    df[ic_mask & mask_below_water, "gamma_predict"] = 20.0
 
     return df
 
@@ -201,7 +167,7 @@ def old_robertson(
         .pipe(geo.normalized_friction_ratio)
         .pipe(utils.none_to_zero)
         .pipe(type_index)
-        .pipe(ic_to_gamma, water_level)
+        .pipe(lambda df: df.with_column(exprs.ic_to_gamma(water_level)))
     )
 
     return df
@@ -235,6 +201,6 @@ def new_robertson(
         .pipe(geo.normalized_friction_ratio)
         .pipe(utils.none_to_zero)
         .pipe(type_index)
-        .pipe(ic_to_gamma, water_level)
+        .pipe(lambda df: df.with_column(exprs.ic_to_gamma(water_level)))
     )
     return df

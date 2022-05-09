@@ -16,3 +16,6 @@ test:
 	$(PYTHON_BIN)/pytest pygef/*
 	$(PYTHON_BIN)/pytest pygef/robertson/*
 	$(PYTHON_BIN)/pytest pygef/been_jefferies/*
+
+pre-commit:
+	$(python) black .
