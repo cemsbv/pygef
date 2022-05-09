@@ -1,8 +1,8 @@
 import numpy as np
 import polars as pl
 import pygef.utils as utils
-from polars import col, lit
 from pygef import geo
+from pygef.expressions import ic_to_soil_type, type_index, ic_to_gamma
 
 
 def excess_pore_pressure_ratio(df):
@@ -22,69 +22,6 @@ def excess_pore_pressure_ratio(df):
     )
 
     return df
-
-
-def ic_to_gamma(water_level):
-    """
-    Return the expression needed to compute "gamma_predict"
-    """
-    below_water = (1.0 - col("depth")) < water_level
-    ti = col("type_index")
-    return (
-        pl.when(ti > 3.22)
-        .then(11.0)
-        .when((ti <= 3.22) & (ti > 2.76))
-        .then(16.0)
-        .when((ti <= 2.76) & ~(below_water))
-        .then(18.0)
-        .when((ti <= 2.40) & below_water)
-        .then(19.0)
-        .when((ti <= 1.80) & below_water)
-        .then(20.0)
-        .otherwise(1.0)
-        .alias("gamma_predict")
-    )
-
-
-def ic_to_soil_type():
-    """
-    Assign the soil type to the corresponding Ic.
-    """
-    ti = col("type_index")
-    return (
-        pl.when(ti > 3.22)
-        .then("Peat")
-        .when((ti <= 3.22) & (ti > 2.67))
-        .then("Clays")
-        .when((ti <= 2.67) & (ti > 2.4))
-        .then("Clayey silt to silty clay")
-        .when((ti <= 2.4) & (ti > 1.8))
-        .then("Silty sand to sandy silt")
-        .when((ti <= 1.8) & (ti > 1.25))
-        .then("Sands: clean sand to silty")
-        .when(ti <= 1.25)
-        .then("Gravelly sands")
-        .otherwise("")
-        .alias("soil_type")
-    )
-
-
-def type_index() -> pl.Expr:
-    return (
-        (
-            (
-                pl.lit(3.0)
-                - np.log10(
-                    col("normalized_cone_resistance")
-                    * (1.0 - col("excess_pore_pressure_ratio"))
-                    + 1.0
-                )
-            )
-            ** 2
-            + (1.5 + 1.3 * np.log10(col("normalized_friction_ratio"))) ** 2
-        )
-        ** 0.5
-    ).alias("type_index")
 
 
 def iterate_been_jeffrey(
@@ -140,7 +77,7 @@ def been_jeffrey(
     :return: (DataFrame)
     """
     df = (
-        df.with_column(col("depth").diff().alias("delta_depth"))
+        df.with_column(pl.col("depth").diff().alias("delta_depth"))
         .pipe(geo.soil_pressure)
         .pipe(geo.qt, area_quotient_cone_tip)
         .pipe(geo.water_pressure, water_level)
@@ -153,7 +90,7 @@ def been_jeffrey(
         .pipe(geo.normalized_cone_resistance)
         .pipe(geo.normalized_friction_ratio)
         .pipe(utils.none_to_zero)
-        .with_columns([type_index()])
+        .with_column(type_index())
         .with_column(ic_to_gamma(water_level))
     )
     return df
