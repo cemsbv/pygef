@@ -16,6 +16,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -89,14 +90,14 @@
            <div itemprop="articleBody">
              
   <section id="getting-started">
-<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
 <p>Getting started with pygef is easy done by importing the <code class="code docutils literal notranslate"><span class="pre">pygef</span></code> library:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">Cpt</span><span class="p">,</span> <span class="n">Bore</span>
 </pre></div>
 </div>
 <p>or any equivalent <code class="code docutils literal notranslate"><span class="pre">import</span></code> statement.</p>
 <section id="load-a-cpt-bore-file">
-<h2>Load a Cpt/Bore file<a class="headerlink" href="#load-a-cpt-bore-file" title="Permalink to this headline"></a></h2>
+<h2>Load a Cpt/Bore file<a class="headerlink" href="#load-a-cpt-bore-file" title="Permalink to this heading"></a></h2>
 <p>The classes <code class="code docutils literal notranslate"><span class="pre">Cpt</span></code> and <code class="code docutils literal notranslate"><span class="pre">Bore</span></code> accept two possible inputs:</p>
 <ul>
 <li><p>the <code class="code docutils literal notranslate"><span class="pre">path</span></code> of the file</p></li>
@@ -127,7 +128,7 @@
 </div>
 </section>
 <section id="access-the-attributes">
-<h2>Access the attributes<a class="headerlink" href="#access-the-attributes" title="Permalink to this headline"></a></h2>
+<h2>Access the attributes<a class="headerlink" href="#access-the-attributes" title="Permalink to this heading"></a></h2>
 <p>Accessing the attributes of a pygef object is quite easy.
 If for example we want to know the (x, y, z) coordinates of the gef we can simply do:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">coordinates</span> <span class="o">=</span> <span class="p">(</span><span class="n">gef</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">gef</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">gef</span><span class="o">.</span><span class="n">zid</span><span class="p">)</span>
@@ -142,7 +143,7 @@ accessible as attribute of the <code class="code docutils literal notranslate"><
 <p>A common and very useful attribute is <code class="code docutils literal notranslate"><span class="pre">gef.df</span></code>, this is a <code class="code docutils literal notranslate"><span class="pre">polars.DataFrame</span></code> that contains all the rows and
 columns defined in the file.</p>
 <section id="cpt">
-<h3>Cpt<a class="headerlink" href="#cpt" title="Permalink to this headline"></a></h3>
+<h3>Cpt<a class="headerlink" href="#cpt" title="Permalink to this heading"></a></h3>
 <p>If we call <code class="code docutils literal notranslate"><span class="pre">cpt.df</span></code> on a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object we will get something like this:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">df</span>
 <span class="gh">Out[9]: </span><span class="go"></span>
@@ -181,7 +182,7 @@ columns defined in the file.</p>
 <p>Suggestion: Instead of using the column <code class="code docutils literal notranslate"><span class="pre">penetration_length</span></code> use the column <code class="code docutils literal notranslate"><span class="pre">depth</span></code> since this one is corrected with the inclination (if present).</p>
 </section>
 <section id="borehole">
-<h3>Borehole<a class="headerlink" href="#borehole" title="Permalink to this headline"></a></h3>
+<h3>Borehole<a class="headerlink" href="#borehole" title="Permalink to this heading"></a></h3>
 <p>If we call <code class="code docutils literal notranslate"><span class="pre">bore.df</span></code> on a <code class="code docutils literal notranslate"><span class="pre">bore</span></code> object we will get something like this:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="n">path_bore</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../pygef/test_files/example_bore.gef&quot;</span><span class="p">)</span>
 
@@ -266,10 +267,10 @@ columns defined in the file.</p>
 </section>
 </section>
 <section id="plot-a-gef-file">
-<h2>Plot a gef file<a class="headerlink" href="#plot-a-gef-file" title="Permalink to this headline"></a></h2>
+<h2>Plot a gef file<a class="headerlink" href="#plot-a-gef-file" title="Permalink to this heading"></a></h2>
 <p>We can plot a .gef file using the method <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code>, check the reference to know which are the arguments of the method.</p>
 <section id="id1">
-<h3>cpt<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<h3>cpt<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
 <p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object we get:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [13]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 <span class="gh">Out[13]: </span><span class="go">&lt;Figure size 600x800 with 2 Axes&gt;</span>
@@ -278,7 +279,7 @@ columns defined in the file.</p>
 <img alt="../_images/cpt_plot.png" src="../_images/cpt_plot.png" />
 </section>
 <section id="id2">
-<h3>borehole<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<h3>borehole<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
 <p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">bore</span></code> object we get:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [14]: </span><span class="n">bore</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="gh">Out[14]: </span><span class="go">&lt;Figure size 1100x800 with 1 Axes&gt;</span>
@@ -288,7 +289,7 @@ columns defined in the file.</p>
 </section>
 </section>
 <section id="classify-a-cpt">
-<h2>Classify a cpt<a class="headerlink" href="#classify-a-cpt" title="Permalink to this headline"></a></h2>
+<h2>Classify a cpt<a class="headerlink" href="#classify-a-cpt" title="Permalink to this heading"></a></h2>
 <p>We can classify a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object using the method <code class="code docutils literal notranslate"><span class="pre">.classify()</span></code>.
 The available classification are:</p>
 <ul class="simple">
@@ -350,7 +351,7 @@ q_t &amp;= q_c + u_2 (1 - a)
 <p>The classification is done for each row of the cpt, and you can get the result for each row.</p>
 <p>Check the reference to learn about all the arguments of the method.</p>
 <section id="robertson-classification">
-<h3>Robertson classification<a class="headerlink" href="#robertson-classification" title="Permalink to this headline"></a></h3>
+<h3>Robertson classification<a class="headerlink" href="#robertson-classification" title="Permalink to this heading"></a></h3>
 <p>To get the classification we need to at least pass the attribute <code class="code docutils literal notranslate"><span class="pre">classification</span></code> and the water level.
 The water level can be given either as <code class="code docutils literal notranslate"><span class="pre">water_level_NAP</span></code> or <code class="code docutils literal notranslate"><span class="pre">water_level_wrt_depth</span></code>.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -441,7 +442,7 @@ The water level can be given either as <code class="code docutils literal notran
 </section>
 </section>
 <section id="plot-a-classified-cpt">
-<h2>Plot a classified cpt<a class="headerlink" href="#plot-a-classified-cpt" title="Permalink to this headline"></a></h2>
+<h2>Plot a classified cpt<a class="headerlink" href="#plot-a-classified-cpt" title="Permalink to this heading"></a></h2>
 <p>Passing the argument <code class="code docutils literal notranslate"><span class="pre">classification</span></code> to the <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code> method a subplot with a classification is added.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [18]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
 <span class="gh">Out[18]: </span><span class="go">&lt;Figure size 1100x800 with 3 Axes&gt;</span>
