@@ -12,10 +12,10 @@ venv:
 clean:
 	@rm -r venv
 
-test:
+test: venv
 	$(PYTHON_BIN)/pytest pygef/*
 	$(PYTHON_BIN)/pytest pygef/robertson/*
 	$(PYTHON_BIN)/pytest pygef/been_jefferies/*
 
-pre-commit:
-	$(python) black .
+pre-commit: venv
+	$(PYTHON_BIN)/black .

@@ -1,3 +1,5 @@
+# needed for python 3.7
+from __future__ import annotations
 from copy import copy
 
 import matplotlib.patches as mpatches
@@ -5,25 +7,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
 
-colours_robertson = {
-    "Peat": "#a76b29",
-    "Clays - silty clay to clay": "#578E57",
-    "Silt mixtures - clayey silt to silty clay": "#0078C1",
-    "Sand mixtures - silty sand to sandy silt": "#DBAD4B",
-    "Sands - clean sand to silty sand": "#e5c581",
-    "Gravelly sand to dense sand": "#708090",
-    None: "black",
-}
 
-colours_been_jefferies = {
-    "Peat": "#a76b29",
-    "Clays": "#578E57",
-    "Clayey silt to silty clay": "#0078C1",
-    "Silty sand to sandy silt": "#DBAD4B",
-    "Sands: clean sand to silty": "#e5c581",
-    "Gravelly sands": "#708090",
-    None: "black",
-}
+def colors_robertson() -> dict[str, str]:
+    return {
+        "Peat": "#a76b29",
+        "Clays - silty clay to clay": "#578E57",
+        "Silt mixtures - clayey silt to silty clay": "#0078C1",
+        "Sand mixtures - silty sand to sandy silt": "#DBAD4B",
+        "Sands - clean sand to silty sand": "#e5c581",
+        "Gravelly sand to dense sand": "#708090",
+        None: "black",
+    }
+
+
+def colors_been_jefferies() -> dict[str, str]:
+    return {
+        "Peat": "#a76b29",
+        "Clays": "#578E57",
+        "Clayey silt to silty clay": "#0078C1",
+        "Silty sand to sandy silt": "#DBAD4B",
+        "Sands: clean sand to silty": "#e5c581",
+        "Gravelly sands": "#708090",
+        None: "black",
+    }
 
 
 def num_columns(classification, df_group):
@@ -58,6 +64,7 @@ def plot_cpt(
     title_group = None
 
     if classification is not None:
+        print(df)
         df, title = assign_color(df, classification, colors)
     if df_group is not None:
         df_group = copy(df_group)
@@ -142,10 +149,9 @@ def assign_color(df, classification, colors):
     """
     if colors is None:
         if classification == "robertson":
+            colors = colors_robertson()
             df = df.with_column(
-                pl.col("soil_type")
-                .apply(lambda row: colours_robertson[row])
-                .alias("colour")
+                pl.col("soil_type").apply(lambda row: colors[row]).alias("colour")
             )
 
             return (
@@ -153,10 +159,9 @@ def assign_color(df, classification, colors):
                 "Robertson",
             )
         elif classification == "been_jefferies":
+            colors = colors_been_jefferies()
             df = df.with_column(
-                pl.col("soil_type")
-                .apply(lambda row: colours_been_jefferies[row])
-                .alias("colour")
+                pl.col("soil_type").apply(lambda row: colors[row]).alias("colour")
             )
 
             return (
@@ -184,7 +189,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
     :return:
     """
     ax = fig.add_subplot(1, num_col, 3)
-    df[df["soil_type"].is_null(), "soil_type"] = "UNKNOWN"
+    df = df.with_column(pl.col("soil_type").fill_null("UNKNOWN"))
     for st in df["soil_type"].unique():
         partial_df = df[df["soil_type"] == st]
         if z_NAP:
@@ -333,10 +338,10 @@ def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
     return fig
 
 
-def get_legend(classification, colors):
+def get_legend(classification, colors) -> dict[str, str]:
     if colors is not None:
         return colors
     elif classification == "robertson":
-        return colours_robertson
+        return colors_robertson()
     elif classification == "been_jefferies":
-        return colours_been_jefferies
+        return colors_been_jefferies()

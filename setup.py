@@ -11,7 +11,7 @@ setup(
     license="mit",
     packages=["pygef", "pygef.been_jefferies", "pygef.robertson"],
     install_requires=[
-        "polars>= 0.9.5",
+        "polars>= 0.13.55",
         "matplotlib>= 3.4.2",
         "lxml==4.9.1",
     ],

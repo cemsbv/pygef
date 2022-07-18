@@ -38,35 +38,27 @@ def type_index(df):
     return df
 
 
-def ic_to_soil_type(df):
+def ic_to_soil_type(ti: pl.Expr = pl.col("type_index")):
     """
     Assign the soil type to the corresponding Ic.
-
-    :param df: (DataFrame) Original DataFrame.
-    :return: (DataFrame) Updated DataFrame.
     """
-    # TODO: how to fill it properly with the same initial values?
-    df["soil_type"] = np.tile("", len(df.rows()))
 
-    ic_mask = df["type_index"] > 3.6
-    df[ic_mask, "soil_type"] = "Peat"
-
-    ic_mask = df["type_index"] <= 3.6
-    df[ic_mask, "soil_type"] = "Clays - silty clay to clay"
-
-    ic_mask = df["type_index"] <= 2.95
-    df[ic_mask, "soil_type"] = "Silt mixtures - clayey silt to silty clay"
-
-    ic_mask = df["type_index"] <= 2.6
-    df[ic_mask, "soil_type"] = "Sand mixtures - silty sand to sandy silt"
-
-    ic_mask = df["type_index"] <= 2.05
-    df[ic_mask, "soil_type"] = "Sands - clean sand to silty sand"
-
-    ic_mask = df["type_index"] <= 1.31
-    df[ic_mask, "soil_type"] = "Gravelly sand to dense sand"
-
-    return df
+    return (
+        pl.when(ti > 3.6)
+        .then("Peat")
+        .when((ti <= 3.6) & (ti > 2.95))
+        .then("Clays - silty clay to clay")
+        .when((ti <= 2.95) & (ti > 2.6))
+        .then("Silt mixtures - clayey silt to silty clay")
+        .when((ti <= 2.6) & (ti > 2.05))
+        .then("Sand mixtures - silty sand to sandy silt")
+        .when((ti <= 2.05) & (ti > 1.31))
+        .then("Sands - clean sand to silty sand")
+        .when(ti <= 1.31)
+        .then("Gravelly sand to dense sand")
+        .otherwise("")
+        .alias("soil_type")
+    )
 
 
 def none_to_zero(df):
@@ -138,7 +130,7 @@ def iterate_robertson(
             if new:
                 n = df["n"]
 
-    return df.pipe(ic_to_soil_type)
+    return df.with_column(ic_to_soil_type())
 
 
 def old_robertson(

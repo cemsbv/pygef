@@ -24,11 +24,10 @@ def ic_to_gamma(water_level):
     )
 
 
-def ic_to_soil_type():
+def ic_to_soil_type(ti: pl.Expr = pl.col("type_index")):
     """
     Assign the soil type to the corresponding Ic.
     """
-    ti = pl.col("type_index")
     return (
         pl.when(ti > 3.22)
         .then("Peat")
