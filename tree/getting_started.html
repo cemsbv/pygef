@@ -445,6 +445,53 @@ The water level can be given either as <code class="code docutils literal notran
 <h2>Plot a classified cpt<a class="headerlink" href="#plot-a-classified-cpt" title="Permalink to this heading"></a></h2>
 <p>Passing the argument <code class="code docutils literal notranslate"><span class="pre">classification</span></code> to the <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code> method a subplot with a classification is added.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [18]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">shape: (999, 25)</span>
+<span class="go">┌────────────┬────────┬────────────┬───────┬─────┬────────────┬──────────┬────────────┬────────────┐</span>
+<span class="go">│ penetratio ┆ qc     ┆ corrected_ ┆ fs    ┆ ... ┆ normalized ┆ type_ind ┆ gamma_pred ┆ soil_type  │</span>
+<span class="go">│ n_length   ┆ ---    ┆ qc         ┆ ---   ┆     ┆ _friction_ ┆ ex       ┆ ict        ┆ ---        │</span>
+<span class="go">│ ---        ┆ f64    ┆ ---        ┆ f64   ┆     ┆ ratio      ┆ ---      ┆ ---        ┆ str        │</span>
+<span class="go">│ f64        ┆        ┆ f64        ┆       ┆     ┆ ---        ┆ f64      ┆ f64        ┆            │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆ f64        ┆          ┆            ┆            │</span>
+<span class="go">╞════════════╪════════╪════════════╪═══════╪═════╪════════════╪══════════╪════════════╪════════════╡</span>
+<span class="go">│ 0.01       ┆ 0.013  ┆ 0.013      ┆ 0.002 ┆ ... ┆ 15.515904  ┆ 4.396123 ┆ 11.0       ┆ Peat       │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ 0.03       ┆ 0.103  ┆ 0.107      ┆ 0.002 ┆ ... ┆ 1.867937   ┆ 3.231428 ┆ 11.0       ┆ Clays -    │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silty clay │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to clay    │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ 0.05       ┆ 0.489  ┆ 0.493      ┆ 0.009 ┆ ... ┆ 1.825373   ┆ 2.660013 ┆ 1.0        ┆ Silt       │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ mixtures - │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clayey     │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silt to    │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ s...       │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ 0.07       ┆ 0.691  ┆ 0.696      ┆ 0.012 ┆ ... ┆ 1.723568   ┆ 2.526979 ┆ 1.0        ┆ Sand       │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ mixtures - │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silty sand │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to sa...   │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ ...        ┆ ...    ┆ ...        ┆ ...   ┆ ... ┆ ...        ┆ ...      ┆ ...        ┆ ...        │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ 19.91      ┆ 14.912 ┆ 14.954     ┆ 0.055 ┆ ... ┆ 0.373992   ┆ 1.570723 ┆ 19.0       ┆ Sands -    │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ 19.93      ┆ 14.706 ┆ 14.748     ┆ 0.053 ┆ ... ┆ 0.365512   ┆ 1.571182 ┆ 19.0       ┆ Sands -    │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ 19.95      ┆ 14.625 ┆ 14.666     ┆ 0.05  ┆ ... ┆ 0.346768   ┆ 1.562199 ┆ 19.0       ┆ Sands -    │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
+<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
+<span class="go">│ 19.97      ┆ 14.698 ┆ 14.74      ┆ 0.05  ┆ ... ┆ 0.345026   ┆ 1.5593   ┆ 19.0       ┆ Sands -    │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
+<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
+<span class="go">└────────────┴────────┴────────────┴───────┴─────┴────────────┴──────────┴────────────┴────────────┘</span>
 <span class="gh">Out[18]: </span><span class="go">&lt;Figure size 1100x800 with 3 Axes&gt;</span>
 </pre></div>
 </div>
