@@ -92,8 +92,9 @@ class RobertsonTest(unittest.TestCase):
             assert v[column] == df[column]
 
     def test_ic_to_soil_type(self):
-        df1 = pl.DataFrame({"type_index": [2.208177, 2.408926, 2.793642]})
-        v = util.ic_to_soil_type(df1)
+        v = pl.DataFrame({"type_index": [2.208177, 2.408926, 2.793642]}).with_column(
+            util.ic_to_soil_type()
+        )
         df = pl.DataFrame(
             {
                 "type_index": [2.208177, 2.408926, 2.793642],
