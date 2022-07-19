@@ -1,0 +1,24 @@
+[project]
+name = "pygef"
+version = "0.7.3"
+dependencies = [
+    "polars>= 0.13.55",
+    "matplotlib>= 3.4.2",
+    "lxml==4.9.1",
+]
+requires-python = ">=3.7"
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+files = ["pygef"]
+
+[[tool.mypy.overrides]]
+module = ["matplotlib.*", "pkg_resources.*", "pandas.*", "lxml.*"]
+ignore_missing_imports = true
+
+# TODO! include these files
+[[tool.mypy.overrides]]
+module = ["pygef.plot_utils", "pygef.gef"]
+ignore_errors = true

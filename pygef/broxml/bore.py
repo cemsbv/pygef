@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import ABC
 from datetime import datetime
 
@@ -39,9 +40,9 @@ class _BroXml(ABC):
 
         self.s = string
         # Initialize attributes
-        self.zid = None
-        self.x = None
-        self.y = None
+        self.zid: float | None = None
+        self.x: float | None = None
+        self.y: float | None = None
         self.test_id = None
         self.height_system = None
 
