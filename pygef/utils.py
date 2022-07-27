@@ -362,15 +362,17 @@ def parse_quantity_number(headers, column_number):
         else:
             # Find all '#COLUMNINFO= **,' strings first
             for match in re.finditer(
-                r"#COLUMNINFO[=\s+]+(\d+)+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)", headers
+                r"#COLUMNINFO\s*=\s*(\d*)\s*,{1}\s*([^,]*)\s*,{1}([^,]*)\s*,{1}\s*(\d*)",
+                headers,
             ):
                 # The first group is the column number
                 if match.group(1) == column_number_str:
                     # The second group is the actual value
-                    return cast_string(float, match.group(2))
+                    return cast_string(int, match.group(4))
 
     except ValueError:
         pass
+
     return None
 
 
