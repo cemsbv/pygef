@@ -23,24 +23,24 @@ logger = logging.getLogger(__name__)
 
 MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {
     1: "penetration_length",
-    2: "qc",  # 2
-    3: "fs",  # 3
-    4: "friction_number",  # 4
-    5: "u1",  # 5
-    6: "u2",  # 6
-    7: "u3",  # 7
-    8: "inclination",  # 8
-    9: "inclination_ns",  # 9
-    10: "inclination_ew",  # 10
-    11: "corrected_depth",  # 11
-    12: "time",  # 12
-    13: "corrected_qc",  # 13
-    14: "net_cone_resistance",  # 14
-    15: "pore_ratio",  # 15
-    16: "cone_resistance_number",  # 16
-    17: "weight_per_unit_volume",  # 17
-    18: "initial_pore_pressure",  # 18
-    19: "total_vertical_soil_pressure",  # 19
+    2: "qc",
+    3: "fs",
+    4: "friction_number",
+    5: "u1",
+    6: "u2",
+    7: "u3",
+    8: "inclination",
+    9: "inclination_ns",
+    10: "inclination_ew",
+    11: "corrected_depth",
+    12: "time",
+    13: "corrected_qc",
+    14: "net_cone_resistance",
+    15: "pore_ratio",
+    16: "cone_resistance_number",
+    17: "weight_per_unit_volume",
+    18: "initial_pore_pressure",
+    19: "total_vertical_soil_pressure",
     20: "effective_vertical_soil_pressure",
     21: "inclination_in_x_direction",
     22: "inclination_in_y_direction",
@@ -51,13 +51,7 @@ MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {
     34: "total_magnetic_field",
     35: "magnetic_inclination",
     36: "magnetic_declination",
-    99: "classification_zone_robertson_1990",
-    # found in:#COMPANYID= Fugro GeoServices B.V., NL005621409B08, 31
-    131: "speed",  # found in:COMPANYID= Multiconsult, 09073590, 31
-    135: "Temperature_c",  # found in:#COMPANYID= Inpijn-Blokpoel,
-    250: "magneto_slope_y",  # found in:COMPANYID= Danny, Tjaden, 31
-    251: "magneto_slope_x",
-}  # found in:COMPANYID= Danny, Tjaden, 31
+}
 
 COLUMN_NAMES_BORE = [
     "depth_top",  # 1
