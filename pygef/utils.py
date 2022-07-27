@@ -322,7 +322,7 @@ def parse_file_date(headers):
     return date(year, month, day)
 
 
-def parse_columns_number(headers):
+def parse_columns_number(headers: Union[dict, str]) -> int:
     """
     Function that returns the columns number as an int.
 
@@ -330,11 +330,15 @@ def parse_columns_number(headers):
     :return: Columns number value.
     """
     if isinstance(headers, dict):
-        return max([int(values[0]) for values in headers["COLUMNINFO"]])
+        if "COLUMNINFO" in headers:
+            return len(headers["COLUMNINFO"])
+
     else:
-        g = re.findall(r"#COLUMNINFO[=\s+]+(\d*)", headers)
-        if g:
-            return max(map(int, re.findall(r"#COLUMNINFO[=\s+]+(\d*)", headers)))
+        col_numbers = re.findall(r"#COLUMNINFO[=\s]+(\d+)", headers)
+        if col_numbers:
+            return len(col_numbers)
+
+    return 0
 
 
 def parse_quantity_number(headers, column_number):
