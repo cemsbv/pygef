@@ -1,6 +1,7 @@
 import logging
 import re
 from datetime import date
+from typing import Union
 
 import numpy as np
 
@@ -430,14 +431,20 @@ def parse_record_separator(headers):
         return parse_regex_cast(r"#RECORDSEPARATOR+[=\s+]+(.)", headers, str, 1)
 
 
-def find_separator(headers):
+def get_column_separator(headers: Union[dict, str]) -> str:
     """
-
     :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return:
     """
-    # TODO: verify that this space is good enough for all use cases
     return parse_column_separator(headers) or " "
+
+
+def get_record_separator(headers: Union[dict, str]) -> str:
+    """
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return:
+    """
+    return parse_record_separator(headers) or "\n"
 
 
 def parse_soil_code(s):

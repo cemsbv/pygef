@@ -1,7 +1,7 @@
 import io
 import logging
 import re
-from typing import List
+from typing import List, Optional, Union
 
 import numpy as np
 import polars as pl
@@ -304,27 +304,33 @@ class _GefCpt(_Gef):
         return None
 
     @staticmethod
-    def parse_data(headers, data_s, column_names=None):
-        separator = utils.find_separator(headers)
+    def parse_data(
+        headers: Union[dict, str],
+        data_s: str,
+        column_names: Optional[Union[List[int], List[str]]] = None,
+    ) -> pl.DataFrame:
+        col_separator = utils.get_column_separator(headers)
+        rec_separator = utils.get_record_separator(headers)
 
         # Remove all horizontal whitespace characters around the column separator
         new_data = re.sub(
-            f"[^\S\r\n]*{re.escape(separator)}[^\S\r\n]*",
-            separator,
+            f"[^\S\r\n]*{re.escape(col_separator)}[^\S\r\n]*",
+            col_separator,
             data_s,
         )
 
-        # Remove all whitespaces and separators at the beginning and end of lines
+        # Split string by record separator into lines
+        # Remove all whitespaces and column separators at the beginning and end of lines
         # Also remove the last trailing line
-        regex = f"[\s!{re.escape(separator)}]+"
+        regex = f"[\s{re.escape(col_separator)}]+"
         new_data = "\n".join(
             re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line))
-            for line in new_data.splitlines()
+            for line in new_data.split(rec_separator)
         ).rstrip()
 
         return pl.read_csv(
             new_data.encode(),
-            sep=separator,
+            sep=col_separator,
             new_columns=column_names,
             has_headers=False,
         )

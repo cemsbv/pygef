@@ -380,7 +380,8 @@ class GefTest(unittest.TestCase):
         assert df_parsed.frame_equal(df, null_equal=True)
 
         # Test terribly formatted columns
-        data_s = "\n 1  1 1 !\n2 2 2 ! \n3 3 3\n"
+        header_s = "#RECORDSEPARATOR=!"
+        data_s = "!\n 1  1 1 !\n2 2 2 ! \n3 3 3\n!"
         df_parsed = _GefCpt.parse_data(
             header_s, data_s, column_names=["col1", "col2", "col3"]
         )
@@ -406,15 +407,15 @@ class GefTest(unittest.TestCase):
 
     def test_find_separator(self):
         s = r"#COLUMNSEPARATOR = ;"
-        v = utils.find_separator(s)
+        v = utils.get_column_separator(s)
         self.assertEqual(v, ";")
 
         h = {"COLUMNSEPARATOR": [[";"]]}
-        v = utils.find_separator(h)
+        v = utils.get_column_separator(h)
         self.assertEqual(v, ";")
 
         s = r"I'm sorry the column separator is not in this gef file, even if he wanted to be there."
-        v = utils.find_separator(s)
+        v = utils.get_column_separator(s)
         self.assertEqual(v, r" ")
 
     def test_create_soil_type(self):
