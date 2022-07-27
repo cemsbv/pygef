@@ -5,8 +5,9 @@ from typing import List
 
 import numpy as np
 import polars as pl
-import pygef.utils as utils
 from polars import col, lit, when
+
+import pygef.utils as utils
 
 # Try to import the optimized Rust header parsing but if that doesn't succeed
 # use the built-in python regex methods
@@ -306,21 +307,20 @@ class _GefCpt(_Gef):
     def parse_data(headers, data_s, column_names=None):
         separator = utils.find_separator(headers)
 
-        # Remove multiple whitespaces
-        # TODO: find a way for polars to handle columns with variable amounts of whitespace
-        if separator == " ":
-            new_data = re.sub("[ \t]+", " ", data_s.replace("!", ""))
-        else:
-            # If we have another separator remove all whitespace around it
-            new_data = re.sub(
-                f"[\t ]*{re.escape(separator)}[\t ]*",
-                separator,
-                data_s.replace(separator + "!", "").replace("!", ""),
-            )
+        # Remove all horizontal whitespace characters around the column separator
+        new_data = re.sub(
+            f"[^\S\r\n]*{re.escape(separator)}[^\S\r\n]*",
+            separator,
+            data_s,
+        )
 
-        # Remove whitespace at the beginning and end of lines, and remove the
-        # last trailing line
-        new_data = "\n".join([line.strip() for line in new_data.splitlines()]).rstrip()
+        # Remove all whitespaces and separators at the beginning and end of lines
+        # Also remove the last trailing line
+        regex = f"[\s!{re.escape(separator)}]+"
+        new_data = "\n".join(
+            re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line))
+            for line in new_data.splitlines()
+        ).rstrip()
 
         return pl.read_csv(
             new_data.encode(),

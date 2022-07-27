@@ -368,6 +368,13 @@ class GefTest(unittest.TestCase):
         )
         assert df_parsed.frame_equal(df, null_equal=True)
 
+        # Test terribly formatted columns
+        data_s = "\n 1  1 1 !\n2 2 2 ! \n3 3 3\n"
+        df_parsed = _GefCpt.parse_data(
+            header_s, data_s, column_names=["col1", "col2", "col3"]
+        )
+        assert df_parsed.frame_equal(df, null_equal=True)
+
     def test_parse_column_separator(self):
         s = r"#COLUMNSEPARATOR = ;"
         v = utils.parse_column_separator(s)
