@@ -4,8 +4,8 @@ import unittest
 from datetime import datetime
 
 import numpy as np
-import pandas as pd
 import polars as pl
+
 import pygef.geo as geo
 import pygef.utils as utils
 from pygef.bore import Bore
@@ -22,6 +22,17 @@ from pygef.gef import (
 
 
 class GefTest(unittest.TestCase):
+    def test_cpt_smoke(self):
+        """
+        Smoke test to see if no errors occur during creation of the Cpt object for valid
+        CPTs.
+        """
+        Cpt("./pygef/test_files/example.gef")
+        Cpt("./pygef/test_files/cpt.gef")
+        Cpt("./pygef/test_files/cpt2.gef")
+        Cpt("./pygef/test_files/cpt3.gef")
+        Cpt("./pygef/test_files/cpt4.gef")
+
     def test_xy(self):
         cpt3 = Cpt("./pygef/test_files/cpt3.gef")
         self.assertEqual(cpt3.x, 110885)
