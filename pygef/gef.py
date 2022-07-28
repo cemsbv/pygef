@@ -1,12 +1,13 @@
 import io
 import logging
 import re
-from typing import List
+from typing import List, Optional, Union
 
 import numpy as np
 import polars as pl
-import pygef.utils as utils
 from polars import col, lit, when
+
+import pygef.utils as utils
 
 # Try to import the optimized Rust header parsing but if that doesn't succeed
 # use the built-in python regex methods
@@ -303,28 +304,33 @@ class _GefCpt(_Gef):
         return None
 
     @staticmethod
-    def parse_data(headers, data_s, column_names=None):
-        separator = utils.find_separator(headers)
+    def parse_data(
+        headers: Union[dict, str],
+        data_s: str,
+        column_names: Optional[Union[List[int], List[str]]] = None,
+    ) -> pl.DataFrame:
+        col_separator = utils.get_column_separator(headers)
+        rec_separator = utils.get_record_separator(headers)
 
-        # Remove multiple whitespaces
-        # TODO: find a way for polars to handle columns with variable amounts of whitespace
-        if separator == " ":
-            new_data = re.sub("[ \t]+", " ", data_s.replace("!", ""))
-        else:
-            # If we have another separator remove all whitespace around it
-            new_data = re.sub(
-                f"[\t ]*{re.escape(separator)}[\t ]*",
-                separator,
-                data_s.replace(separator + "!", "").replace("!", ""),
-            )
+        # Remove all horizontal whitespace characters around the column separator
+        new_data = re.sub(
+            f"[^\S\r\n]*{re.escape(col_separator)}[^\S\r\n]*",
+            col_separator,
+            data_s,
+        )
 
-        # Remove whitespace at the beginning and end of lines, and remove the
-        # last trailing line
-        new_data = "\n".join([line.strip() for line in new_data.splitlines()]).rstrip()
+        # Split string by record separator into lines
+        # Remove all whitespaces and column separators at the beginning and end of lines
+        # Also remove the last trailing line
+        regex = f"[\s{re.escape(col_separator)}]+"
+        new_data = "\n".join(
+            re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line))
+            for line in new_data.split(rec_separator)
+        ).rstrip()
 
         return pl.read_csv(
             new_data.encode(),
-            sep=separator,
+            sep=col_separator,
             new_columns=column_names,
             has_headers=False,
         )

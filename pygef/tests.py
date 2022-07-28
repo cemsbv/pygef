@@ -4,8 +4,8 @@ import unittest
 from datetime import datetime
 
 import numpy as np
-import pandas as pd
 import polars as pl
+
 import pygef.geo as geo
 import pygef.utils as utils
 from pygef.bore import Bore
@@ -22,6 +22,17 @@ from pygef.gef import (
 
 
 class GefTest(unittest.TestCase):
+    def test_cpt_smoke(self):
+        """
+        Smoke test to see if no errors occur during creation of the Cpt object for valid
+        CPTs.
+        """
+        Cpt("./pygef/test_files/example.gef")
+        Cpt("./pygef/test_files/cpt.gef")
+        Cpt("./pygef/test_files/cpt2.gef")
+        Cpt("./pygef/test_files/cpt3.gef")
+        Cpt("./pygef/test_files/cpt4.gef")
+
     def test_xy(self):
         cpt3 = Cpt("./pygef/test_files/cpt3.gef")
         self.assertEqual(cpt3.x, 110885)
@@ -368,6 +379,14 @@ class GefTest(unittest.TestCase):
         )
         assert df_parsed.frame_equal(df, null_equal=True)
 
+        # Test terribly formatted columns
+        header_s = "#RECORDSEPARATOR=!"
+        data_s = "!\n 1  1 1 !\n2 2 2 ! \n3 3 3\n!"
+        df_parsed = _GefCpt.parse_data(
+            header_s, data_s, column_names=["col1", "col2", "col3"]
+        )
+        assert df_parsed.frame_equal(df, null_equal=True)
+
     def test_parse_column_separator(self):
         s = r"#COLUMNSEPARATOR = ;"
         v = utils.parse_column_separator(s)
@@ -388,15 +407,15 @@ class GefTest(unittest.TestCase):
 
     def test_find_separator(self):
         s = r"#COLUMNSEPARATOR = ;"
-        v = utils.find_separator(s)
+        v = utils.get_column_separator(s)
         self.assertEqual(v, ";")
 
         h = {"COLUMNSEPARATOR": [[";"]]}
-        v = utils.find_separator(h)
+        v = utils.get_column_separator(h)
         self.assertEqual(v, ";")
 
         s = r"I'm sorry the column separator is not in this gef file, even if he wanted to be there."
-        v = utils.find_separator(s)
+        v = utils.get_column_separator(s)
         self.assertEqual(v, r" ")
 
     def test_create_soil_type(self):
