@@ -2,7 +2,7 @@ import io
 import logging
 import re
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -166,14 +166,29 @@ class _Gef:
         column_quantities: List[int]
         col_separator: str
         rec_separator: str
+        column_voids: Dict[int, float]
+        default_void: float = float(-9999)
+
+        def __post_init__(self):
+
+            self.columns_number = len(self.column_numbers)
+            self.column_voids = self.fill_default_column_voids()
+
+            self.validate()
 
         @property
-        def columns_number(self) -> int:
-            """The amount of columns"""
-            return len(self.column_numbers)
+        def description_to_void_mapping(self) -> Dict[str, float]:
+            return {
+                desc: self.column_voids[num]
+                for num, desc in zip(self.column_numbers, self.descriptions)
+            }
 
-        def __post__init__(self):
-            self.validate()
+        def fill_default_column_voids(self) -> Dict[int, float]:
+            default_column_voids = {
+                num: self.default_void for num in self.column_numbers
+            }
+            default_column_voids.update(self.column_voids)
+            return default_column_voids
 
         def validate(self):
             if not len(self.column_numbers) == self.column_numbers[-1]:
@@ -261,7 +276,7 @@ class _GefCpt(_Gef):
         self.project_id = utils.parse_project_type(self._headers, "cpt")
         self.cone_id = utils.parse_cone_id(self._headers)
         self.cpt_class = utils.parse_cpt_class(self._headers)
-        self.column_void = utils.parse_column_void(self._headers)
+
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(
             self._headers, 1
         )
@@ -355,6 +370,7 @@ class _GefCpt(_Gef):
             *parse_all_columns_info(self._headers, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT),
             utils.get_column_separator(self._headers),
             utils.get_record_separator(self._headers),
+            utils.parse_column_void(self._headers),
         )
 
         self.df = (
@@ -365,7 +381,9 @@ class _GefCpt(_Gef):
                 self.data_info.descriptions,
             )
             .lazy()
-            .pipe(replace_column_void, self.column_void)
+            .pipe(replace_column_void, self.data_info.description_to_void_mapping)
+            # Remove the rows with null values
+            .drop_nulls()
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
             .with_column(correct_depth_with_inclination(self.data_info.descriptions))
             .select(
@@ -429,6 +447,7 @@ class _GefBore(_Gef):
             ),
             utils.get_column_separator(self._headers),
             utils.get_record_separator(self._headers),
+            utils.parse_column_void(self._headers),
         )
 
         data_s_rows = self._data.split(self.data_info.rec_separator)
@@ -443,6 +462,7 @@ class _GefBore(_Gef):
                 self.data_info.rec_separator,
                 self.data_info.descriptions,
             )
+            .pipe(replace_column_void, self.data_info.description_to_void_mapping)
             .pipe(self.parse_data_soil_code, data_rows_soil)
             .pipe(self.parse_data_soil_type, data_rows_soil)
             .pipe(self.parse_add_info_as_string, data_rows_soil)
@@ -462,6 +482,9 @@ class _GefBore(_Gef):
         ]:
             if column in self.df.columns:
                 self.df.drop_in_place(column)
+
+        # Remove the rows with null values
+        self.df.drop_nulls()
 
     @staticmethod
     def parse_add_info_as_string(df, data_rows_soil):
@@ -515,26 +538,27 @@ class _GefBore(_Gef):
         return df
 
 
-def replace_column_void(lf: pl.LazyFrame, column_void) -> pl.LazyFrame:
-    if column_void is None:
-        return lf
-
-    # TODO: what to do with multiple columnvoids?
-    if isinstance(column_void, list):
-        column_void = column_void[0]
+def replace_column_void(
+    lf: pl.LazyFrame, col_name_to_void_mapping: Dict[str, float]
+) -> pl.LazyFrame:
 
     return (
         # Get all values matching column_void and change them to null
         lf.select(
-            pl.when(pl.all() == pl.lit(column_void))
-            .then(pl.lit(None))
-            .otherwise(pl.all())
-            .keep_name()
+            [
+                pl.when(pl.col(col) == pl.lit(col_name_to_void_mapping[col]))
+                .then(pl.lit(None))
+                .otherwise(pl.col(col))
+                .keep_name()
+                for col in lf.columns
+            ]
         )
         # Interpolate all null values
         .select(pl.all().interpolate())
-        # Remove the rows with null values
-        .drop_nulls()
+    )
+
+    df.select(
+        pl.when(pl.col("a") == pl.lit(2)).then(pl.lit(None)).otherwise(pl.col(col))
     )
 
 

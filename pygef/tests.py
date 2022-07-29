@@ -8,6 +8,7 @@ import polars as pl
 
 import pygef.geo as geo
 import pygef.utils as utils
+from pygef import exceptions
 from pygef.bore import Bore
 from pygef.cpt import Cpt
 from pygef.gef import (
@@ -17,8 +18,8 @@ from pygef.gef import (
     calculate_friction_number,
     correct_depth_with_inclination,
     correct_pre_excavated_depth,
+    parse_all_columns_info,
     replace_column_void,
-    parse_all_columns_info
 )
 
 
@@ -591,9 +592,15 @@ class GefTest(unittest.TestCase):
         assert np.isclose(df_calculated["depth"], df["depth"]).all()
 
     def test_parse_column_void(self):
+        header = "\n#COLUMNVOID=1,-999\n#COLUMNVOID=2,-100.0\n#COLUMNVOID=3,999\n"
+        ans = {1: float(-999), 2: -100.0, 3: float(999)}
+        assert utils.parse_column_void(header) == ans
+
+        header = "\n#COLUMNVOID=1,-999\n#COLUMNVOID=2,\n#COLUMNVOID=3,-999\n"
+        self.assertRaises(exceptions.ParseGefError, utils.parse_column_void, header)
+
         header = "\n#COLUMNVOID=1,-999\n#COLUMNVOID=2,#COLUMNVOID=3,-999\n"
-        column_void = utils.parse_column_void(header)
-        pass
+        self.assertRaises(exceptions.ParseGefError, utils.parse_column_void, header)
 
     def test_pre_excavated_depth(self):
         df1 = pl.DataFrame(
@@ -610,26 +617,27 @@ class GefTest(unittest.TestCase):
         assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_replace_column_void(self):
-        column_void = 999.0
+        void_value = 999.0
+        column_void = {"penetration_length": void_value, "qc": void_value}
         df1 = pl.DataFrame(
             {
                 "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
-                "qc": [column_void, 0.5, 0.6, 0.7, 0.8],
+                "qc": [void_value, 0.5, 0.6, 0.7, 0.8],
             }
         )
         df_calculated = replace_column_void(df1, column_void)
         df = pl.DataFrame(
             {
-                "penetration_length": [1.0, 2.0, 3.0, 4.0],
-                "qc": [0.5, 0.6, 0.7, 0.8],
+                "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
+                "qc": [None, 0.5, 0.6, 0.7, 0.8],
             }
         )
         assert df_calculated.frame_equal(df, null_equal=True)
 
         df1 = pl.DataFrame(
             {
-                "penetration_length": [1.0, 2.0, 3.0, 4.0],
-                "qc": [0.5, 0.6, column_void, 0.8],
+                "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
+                "qc": [None, 0.5, 0.6, None, 0.8],
             }
         )
 

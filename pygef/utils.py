@@ -1,9 +1,11 @@
 import logging
 import re
 from datetime import date
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
+
+from pygef import exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -70,31 +72,56 @@ def parse_end_of_header(s):
     return parse_regex_cast(r"(#EOH[=\s+]+)", s, str, 1)
 
 
-def parse_column_void(headers):
+def parse_column_void(headers: Union[dict, str]) -> Dict[int, float]:
     """
-    Function that parses the column void.
+    Function that parses the column void headers and returns a dictionary that maps
+    column-numbers to their void value.
 
-    :param headers:(Union[Dict,str]) Dictionary or string of headers.
-    :return:([str]) List of all the possible column void.
+    Returns a ParseGefError on duplicates and ill header formats
+    Does not guarantee that all columns have a void value.
+
+    :param headers:(Union[Dict,str]) Gef headers
+    :return: (Dict[int, float]) Mapping of column-numbers to their void value.
     """
     if isinstance(headers, dict):
         # Return a list of all the second float values of all COLUMN_VOID lines
         if "COLUMNVOID" in headers:
-            return list(map(lambda values: float(values[1]), headers["COLUMNVOID"]))
-    else:
-        column_void = None
-        g = re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", headers)
-        if g:
-            column_void = list(
-                map(
-                    float,
-                    re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", headers),
-                )
-            )
-            return column_void
 
-    # Standard value, if some gef test_files the column void is not specified but used anyway
-    return -9999
+            try:
+                voids_info: List[Tuple[int, float]] = list(
+                    map(
+                        lambda values: (int(values[0]), float(values[1])),
+                        headers["COLUMNVOID"],
+                    )
+                )
+            except ValueError:
+                raise exceptions.ParseGefError(
+                    ": One of more #COLUMNVOID headers have an invalid format."
+                )
+
+    else:
+        voids_info = []
+
+        for void_line in re.finditer(r"#COLUMNVOID\s*=\s*(.*)", headers):
+
+            voids = re.search(r"^(\d+)\s*,\s*([-+]?\d+\.?\d*)", void_line.group(1))
+
+            if not voids:
+                raise exceptions.ParseGefError(
+                    ": One of more #COLUMNVOID headers have an invalid format."
+                )
+
+            voids_info.append((int(voids.group(1)), float(voids.group(2))))
+
+    col_numbers = list(map(lambda values: values[0], voids_info))
+    if any(np.unique(col_numbers, return_counts=True)[1] > 1):
+        raise exceptions.ParseGefError(
+            ": One or more #COLUMNVOID headers have duplicate definitions."
+        )
+
+    column_void = {item[0]: item[1] for item in voids_info}
+
+    return column_void
 
 
 def parse_measurement_var_as_float(headers, var_number):
