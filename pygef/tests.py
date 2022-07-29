@@ -18,6 +18,7 @@ from pygef.gef import (
     correct_depth_with_inclination,
     correct_pre_excavated_depth,
     replace_column_void,
+    parse_all_columns_info
 )
 
 
@@ -316,47 +317,45 @@ class GefTest(unittest.TestCase):
         v = utils.parse_columns_number(s)
         self.assertEqual(v, 4)
 
-    def test_quantity_number(self):
+    def test_parse_all_column_info(self):
+
+        dictionary = MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+
         s = r"#COLUMNINFO= 1, m, Sondeerlengte, 1"
-        v = utils.parse_quantity_number(s, 1)
-        self.assertEqual(v, 1)
+        ans = ([1], ["m"], ["penetration_length"], [1])
+        v = parse_all_columns_info(s, dictionary)
+        self.assertEqual(v, ans)
 
         h = {"COLUMNINFO": [["1", "m", "Sondeerlengte", "1"]]}
-        v = utils.parse_quantity_number(h, 1)
-        self.assertEqual(v, 1)
+        v = parse_all_columns_info(h, dictionary)
+        self.assertEqual(v, ans)
 
         s = r"#COLUMNINFO= 7, m, Gecorrigeerde diepte, 11"
-        v = utils.parse_quantity_number(s, 7)
-        self.assertEqual(v, 11)
+        ans = ([7], ["m"], ["corrected_depth"], [11])
+        v = parse_all_columns_info(s, dictionary)
+        self.assertEqual(v, ans)
 
         h = {"COLUMNINFO": [["7", "m", "Gecorrigeerde diepte", "11"]]}
-        v = utils.parse_quantity_number(h, 7)
-        self.assertEqual(v, 11)
+        v = parse_all_columns_info(h, dictionary)
+        self.assertEqual(v, ans)
 
         s = r"#COLUMNINFO= 4, %, Wrijvingsgetal Rf, 4"
-        v = utils.parse_quantity_number(s, 4)
-        self.assertEqual(v, 4)
+        ans = ([4], ["%"], ["friction_number"], [4])
+        v = parse_all_columns_info(s, dictionary)
+        self.assertEqual(v, ans)
 
         h = {"COLUMNINFO": [["4", "%", "Wrijvingsgetal Rf", "4"]]}
-        v = utils.parse_quantity_number(h, 4)
-        self.assertEqual(v, 4)
+        v = parse_all_columns_info(h, dictionary)
+        self.assertEqual(v, ans)
 
         s = r"#COLUMNINFO= 4, Graden(deg), Helling, 8"
-        v = utils.parse_quantity_number(s, 4)
-        self.assertEqual(v, 8)
+        ans = ([4], ["Graden(deg)"], ["inclination"], [8])
+        v = parse_all_columns_info(s, dictionary)
+        self.assertEqual(v, ans)
 
         h = {"COLUMNINFO": [["4", "Graden(deg)", "Helling", "8"]]}
-        v = utils.parse_quantity_number(h, 4)
-        self.assertEqual(v, 8)
-
-    def test_column_info(self):
-        s = r"#COLUMNINFO= 1, m, Sondeerlengte, 1"
-        v = utils.parse_column_info(s, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
-        self.assertEqual(v, "penetration_length")
-
-        h = {"COLUMNINFO": [["1", "m", "Sondeerlengte", "1"]]}
-        v = utils.parse_column_info(h, 1, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT)
-        self.assertEqual(v, "penetration_length")
+        v = parse_all_columns_info(h, dictionary)
+        self.assertEqual(v, ans)
 
     def test_end_of_the_header(self):
         s = r"#EOH="
@@ -366,16 +365,16 @@ class GefTest(unittest.TestCase):
     def test_parse_data(self):
         header_s = "This is an header"
         df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
-        data_s = "\n1,1,1\n2,2,2\n3,3,3\n".replace(",", " ")
+        data_s = "\n1,1,1\n2,2,2\n3,3,3\n"
         df_parsed = _GefCpt.parse_data(
-            header_s, data_s, column_names=["col1", "col2", "col3"]
+            data_s, ",", "\n", column_names=["col1", "col2", "col3"]
         )
         assert df_parsed.frame_equal(df, null_equal=True)
 
         # Test terribly formatted columns
         data_s = "\n 1  1 1 \n2 2 2  \n3 3 3\n"
         df_parsed = _GefCpt.parse_data(
-            header_s, data_s, column_names=["col1", "col2", "col3"]
+            data_s, " ", "\n", column_names=["col1", "col2", "col3"]
         )
         assert df_parsed.frame_equal(df, null_equal=True)
 
@@ -383,7 +382,7 @@ class GefTest(unittest.TestCase):
         header_s = "#RECORDSEPARATOR=!"
         data_s = "!\n 1  1 1 !\n2 2 2 ! \n3 3 3\n!"
         df_parsed = _GefCpt.parse_data(
-            header_s, data_s, column_names=["col1", "col2", "col3"]
+            data_s, " ", "!", column_names=["col1", "col2", "col3"]
         )
         assert df_parsed.frame_equal(df, null_equal=True)
 
@@ -422,16 +421,6 @@ class GefTest(unittest.TestCase):
         s = "'Kz'"
         v = utils.create_soil_type(s)
         self.assertEqual(v, "clay 100% with sand")
-
-    def test_parse_data_column_info(self):
-        header_s = "This is an header"
-        df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
-        data_s = "\n1;1;1\n2;2;2\n3;3;3\n"
-        sep = ";"
-        df_parsed = _GefBore.parse_data_column_info(
-            header_s, data_s, sep, 3, columns_info=["col1", "col2", "col3"]
-        )
-        assert df_parsed.frame_equal(df, null_equal=True)
 
     def test_parse_data_soil_type(self):
         df = pl.DataFrame(
@@ -600,6 +589,11 @@ class GefTest(unittest.TestCase):
             }
         )
         assert np.isclose(df_calculated["depth"], df["depth"]).all()
+
+    def test_parse_column_void(self):
+        header = "\n#COLUMNVOID=1,-999\n#COLUMNVOID=2,#COLUMNVOID=3,-999\n"
+        column_void = utils.parse_column_void(header)
+        pass
 
     def test_pre_excavated_depth(self):
         df1 = pl.DataFrame(

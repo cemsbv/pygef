@@ -1,13 +1,14 @@
 import io
 import logging
 import re
-from typing import List, Optional, Union
+from dataclasses import dataclass
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import polars as pl
 from polars import col, lit, when
 
-import pygef.utils as utils
+from pygef import exceptions, utils
 
 # Try to import the optimized Rust header parsing but if that doesn't succeed
 # use the built-in python regex methods
@@ -152,6 +153,92 @@ class _Gef:
         self.test_id = utils.parse_test_id(self._headers)
         self.type = utils.parse_gef_type(self._headers)
 
+    @dataclass
+    class ColumnsInfo:
+        """
+        Dataclass carrying the #COLUMNINFO headers
+        All inputs should be sorted on increasing column-number.
+        """
+
+        column_numbers: List[int]
+        units: List[str]
+        descriptions: List[str]
+        column_quantities: List[int]
+        col_separator: str
+        rec_separator: str
+
+        @property
+        def columns_number(self) -> int:
+            """The amount of columns"""
+            return len(self.column_numbers)
+
+        def __post__init__(self):
+            self.validate()
+
+        def validate(self):
+            if not len(self.column_numbers) == self.column_numbers[-1]:
+                raise exceptions.ParseGefError(
+                    "One or more #COLUMNINFO headers are missing: We counted "
+                    f"{len(self.column_numbers)} #COLUMNINFO headers, but the highest column index "
+                    f"is {self.column_numbers[-1]}"
+                )
+
+            if not self.column_numbers == list(range(1, self.column_numbers[-1] + 1)):
+                raise exceptions.ParseGefError(
+                    "One or more #COLUMNINFO headers have duplicates in the .gef file."
+                )
+
+    @staticmethod
+    def parse_data(
+        data_s: str,
+        col_separator: str,
+        rec_separator: str,
+        column_names: List[str],
+    ) -> pl.DataFrame:
+        """
+        Parses all data in the data string, returns a pl.DataFrame
+
+        Parameters
+        ----------
+        data_s: str
+            A string with the measurement data, in Delimiter-separated format.
+        col_separator: str
+            The character that separates the columns
+        rec_separator: str
+            The character that separates the records/rows
+        column_names: List[str]
+            List of column names
+
+        Returns
+        -------
+        df: pl.DataFrame
+            The DataFrame with measurement data
+        """
+
+        # Remove all horizontal whitespace characters around the column separator
+        new_data = re.sub(
+            f"[^\S\r\n]*{re.escape(col_separator)}[^\S\r\n]*",
+            col_separator,
+            data_s,
+        )
+
+        # Split string by record separator into lines
+        # Remove all whitespaces and column separators at the beginning and end of lines
+        # Also remove the last trailing line
+        regex = f"[\s{re.escape(col_separator)}]+"
+        new_data = "\n".join(
+            re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line))
+            for line in new_data.split(rec_separator)
+        ).rstrip()
+
+        return pl.read_csv(
+            new_data.encode(),
+            sep=col_separator,
+            new_columns=column_names,
+            has_headers=False,
+            projection=list(range(0, len(column_names))),
+        )
+
 
 class _GefCpt(_Gef):
     def __init__(self, path=None, string=None):
@@ -264,14 +351,23 @@ class _GefCpt(_Gef):
         )
         self.mileage = utils.parse_measurement_var_as_float(self._headers, 41)
 
-        column_names = determine_column_names(self._headers)
+        self.data_info = self.ColumnsInfo(
+            *parse_all_columns_info(self._headers, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT),
+            utils.get_column_separator(self._headers),
+            utils.get_record_separator(self._headers),
+        )
 
         self.df = (
-            self.parse_data(self._headers, self._data, column_names)
+            self.parse_data(
+                self._data,
+                self.data_info.col_separator,
+                self.data_info.rec_separator,
+                self.data_info.descriptions,
+            )
             .lazy()
             .pipe(replace_column_void, self.column_void)
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
-            .with_column(correct_depth_with_inclination(column_names))
+            .with_column(correct_depth_with_inclination(self.data_info.descriptions))
             .select(
                 # Remove None values since they throw an error
                 [
@@ -279,7 +375,7 @@ class _GefCpt(_Gef):
                     for expr in [
                         pl.all().exclude(["depth", "friction_number"]),
                         col("depth").abs(),
-                        calculate_friction_number(column_names),
+                        calculate_friction_number(self.data_info.descriptions),
                         self.calculate_elevation_with_respect_to_nap(
                             self.zid, self.height_system
                         ),
@@ -296,38 +392,6 @@ class _GefCpt(_Gef):
             return (zid - pl.col("depth")).alias("elevation_with_respect_to_nap")
 
         return None
-
-    @staticmethod
-    def parse_data(
-        headers: Union[dict, str],
-        data_s: str,
-        column_names: Optional[Union[List[int], List[str]]] = None,
-    ) -> pl.DataFrame:
-        col_separator = utils.get_column_separator(headers)
-        rec_separator = utils.get_record_separator(headers)
-
-        # Remove all horizontal whitespace characters around the column separator
-        new_data = re.sub(
-            f"[^\S\r\n]*{re.escape(col_separator)}[^\S\r\n]*",
-            col_separator,
-            data_s,
-        )
-
-        # Split string by record separator into lines
-        # Remove all whitespaces and column separators at the beginning and end of lines
-        # Also remove the last trailing line
-        regex = f"[\s{re.escape(col_separator)}]+"
-        new_data = "\n".join(
-            re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line))
-            for line in new_data.split(rec_separator)
-        ).rstrip()
-
-        return pl.read_csv(
-            new_data.encode(),
-            sep=col_separator,
-            new_columns=column_names,
-            has_headers=False,
-        )
 
 
 class _GefBore(_Gef):
@@ -359,18 +423,25 @@ class _GefBore(_Gef):
         self.project_id = utils.parse_project_type(self._headers, "bore")
         self.nen_version = "NEN 5104"
 
-        # This is usually not correct for the boringen
-        columns_number = utils.parse_columns_number(self._headers)
-        column_separator = utils.parse_column_separator(self._headers)
-        record_separator = utils.parse_record_separator(self._headers)
-        data_s_rows = self._data.split(record_separator)
+        self.data_info = self.ColumnsInfo(
+            *parse_all_columns_info(
+                self._headers, MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE
+            ),
+            utils.get_column_separator(self._headers),
+            utils.get_record_separator(self._headers),
+        )
+
+        data_s_rows = self._data.split(self.data_info.rec_separator)
         data_rows_soil = self.extract_soil_info(
-            data_s_rows, columns_number, column_separator
+            data_s_rows, self.data_info.columns_number, self.data_info.col_separator
         )
 
         self.df = (
-            self.parse_data_column_info(
-                self._headers, self._data, column_separator, columns_number
+            self.parse_data(
+                self._data,
+                self.data_info.col_separator,
+                self.data_info.rec_separator,
+                self.data_info.descriptions,
             )
             .pipe(self.parse_data_soil_code, data_rows_soil)
             .pipe(self.parse_data_soil_type, data_rows_soil)
@@ -407,32 +478,6 @@ class _GefBore(_Gef):
                 lambda x: x.split(column_separator)[columns_number:-1], data_s_rows[:-1]
             )
         )
-
-    @staticmethod
-    def parse_data_column_info(headers, data_s, sep, columns_number, columns_info=None):
-        if columns_info is None:
-            col = list(
-                map(
-                    lambda x: utils.parse_column_info(
-                        headers, x, MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE
-                    ),
-                    range(1, columns_number + 1),
-                )
-            )
-            return pl.read_csv(
-                io.StringIO(data_s),
-                sep=sep,
-                new_columns=col,
-                has_headers=False,
-                projection=list(range(0, len(col))),
-            )
-        else:
-            return pl.read_csv(
-                io.StringIO(data_s),
-                sep=sep,
-                new_columns=columns_info,
-                has_headers=False,
-            )
 
     @staticmethod
     def parse_data_soil_type(df, data_rows_soil):
@@ -524,19 +569,105 @@ def correct_depth_with_inclination(columns):
         return col("penetration_length").alias("depth")
 
 
-def determine_column_names(headers, columns_number=None, columns_info=None):
-    if columns_number is None and columns_info is None:
-        columns_number = utils.parse_columns_number(headers)
-        if columns_number is not None:
-            columns_info = []
-            for column_number in range(1, columns_number + 1):
-                columns_info.append(
-                    utils.parse_column_info(
-                        headers, column_number, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
-                    )
+def parse_all_columns_info_from_dict(
+    headers: dict, quantity_dict: dict
+) -> Tuple[List[Tuple[int, str, str, int]], int]:
+    """
+    Function that parses and returns all COLUMNINFO header data from a dictionary.
+    See the `parse_all_columns_info` function.
+    """
+
+    columns_info: List[Tuple[int, str, str, int]] = []
+
+    if "COLUMNINFO" in headers:
+        # Loop over all headers to find the right number
+        for values in headers["COLUMNINFO"]:
+
+            try:
+                col_number = int(values[0])
+                quantity = int(values[3])
+            except ValueError:
+                raise exceptions.ParseGefError(
+                    "One or more #COLUMNINFO headers do not have integers in the first "
+                    "and/or last positions, which is required."
                 )
 
+            unit = values[1]
+            description = utils.get_description(quantity, values[2], quantity_dict)
+
+            columns_info.append((col_number, unit, description, quantity))
+
     return columns_info
+
+
+def parse_all_columns_info_from_str(
+    headers: str, quantity_dict: dict
+) -> Tuple[List[Tuple[int, str, str, int]], int]:
+    """
+    Function that parses and returns all COLUMNINFO header data from a string.
+    See the `parse_all_columns_info` function
+    """
+
+    columns_info: List[Tuple[int, str, str, int]] = []
+
+    # Find all '#COLUMNINFO= **,' strings first
+    for match in re.finditer(
+        r"#COLUMNINFO\s*=\s*(\d+)\s*,{1}\s*([^,]+)\s*,{1}([^,]+)\s*,{1}\s*(\d+)",
+        headers,
+    ):
+        column_number = utils.cast_string(int, match.group(1))
+        column_quantity = utils.cast_string(int, match.group(4))
+
+        custom_description = match.group(3).strip()
+        description = utils.get_description(
+            column_quantity, custom_description, quantity_dict
+        )
+
+        if column_number is not None and column_quantity is not None:
+
+            columns_info.append(
+                (
+                    column_number,
+                    match.group(2).strip(),
+                    description,
+                    column_quantity,
+                )
+            )
+
+    return columns_info
+
+
+def parse_all_columns_info(
+    headers: Union[dict, str], quantity_dict: dict
+) -> Tuple[List[int], List[str], List[str], List[int]]:
+    """
+    Function that parses and returns all COLUMNINFO header data from a string or dictionary.
+
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :param quantity_dict: (dict) Dictionary that maps quanity numbers to descriptions
+    :return: Tuple with lists of column_numbers, units, descriptions and column_quantities, sorted by column_numbers
+    """
+
+    if isinstance(headers, dict):
+        columns_info = parse_all_columns_info_from_dict(headers, quantity_dict)
+
+    else:
+        columns_info = parse_all_columns_info_from_str(headers, quantity_dict)
+
+    columns_info.sort()
+
+    column_numbers = []
+    units = []
+    descriptions = []
+    column_quantities = []
+
+    for col in columns_info:
+        column_numbers.append(col[0])
+        units.append(col[1])
+        descriptions.append(col[2])
+        column_quantities.append(col[3])
+
+    return column_numbers, units, descriptions, column_quantities
 
 
 def calculate_friction_number(column_names: List[str]) -> "pl.Expr":

@@ -1,7 +1,7 @@
 import logging
 import re
 from datetime import date
-from typing import Union
+from typing import Dict, Optional, Union
 
 import numpy as np
 
@@ -341,57 +341,19 @@ def parse_columns_number(headers: Union[dict, str]) -> int:
     return 0
 
 
-def parse_quantity_number(headers, column_number):
+def get_description(
+    quantity_number: int,
+    custom_description: str,
+    dictionary: Optional[Dict[int, str]] = None,
+) -> str:
     """
-    Function to parse the quantity number.
-
-    :param headers:(Union[Dict,str]) Dictionary or string of headers.
-    :param column_number: (int) Number of the column.
-    :return: Quantity number.
+    Returns the default description of a quantity number if available in the
+    provided dictionary, else returns the custom_description.
     """
-    # Convert the variable number to a string so it's cheaper to compare
-    column_number_str = str(column_number)
 
-    try:
-        if isinstance(headers, dict):
-            if "COLUMNINFO" in headers:
-                # Loop over all headers to find the right number
-                for values in headers["COLUMNINFO"]:
-                    if values[0] == column_number_str:
-                        return float(values[3])
-        else:
-            # Find all '#COLUMNINFO= **,' strings first
-            for match in re.finditer(
-                r"#COLUMNINFO\s*=\s*(\d*)\s*,{1}\s*([^,]*)\s*,{1}([^,]*)\s*,{1}\s*(\d*)",
-                headers,
-            ):
-                # The first group is the column number
-                if match.group(1) == column_number_str:
-                    # The second group is the actual value
-                    return cast_string(int, match.group(4))
-
-    except ValueError:
-        pass
-
-    return None
-
-
-def parse_column_info(headers, column_number, dictionary):
-    """
-    Function that returns the column info assigned to a quantity number.
-
-    :param headers:(Union[Dict,str]) Dictionary or string of headers.
-    :param column_number: (int) Number of the column.
-    :param dictionary: (dict) Dictionary in which the quantity number is searched as a key.
-    :return: Column info (value) of each quantity number (key).
-    """
-    try:
-        quantity_number = parse_quantity_number(headers, column_number)
-        column_info = dictionary[quantity_number]
-    except KeyError:
-        column_info = "column_code=" + str(column_number)
-
-    return column_info
+    if dictionary is not None and quantity_number in dictionary:
+        return dictionary[quantity_number]
+    return custom_description
 
 
 def parse_column_separator(headers):
