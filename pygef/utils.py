@@ -1,9 +1,11 @@
 import logging
 import re
 from datetime import date
-from typing import Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
+
+from pygef import exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -70,31 +72,56 @@ def parse_end_of_header(s):
     return parse_regex_cast(r"(#EOH[=\s+]+)", s, str, 1)
 
 
-def parse_column_void(headers):
+def parse_column_void(headers: Union[dict, str]) -> Dict[int, float]:
     """
-    Function that parses the column void.
+    Function that parses the column void headers and returns a dictionary that maps
+    column-numbers to their void value.
 
-    :param headers:(Union[Dict,str]) Dictionary or string of headers.
-    :return:([str]) List of all the possible column void.
+    Returns a ParseGefError on duplicates and ill header formats
+    Does not guarantee that all columns have a void value.
+
+    :param headers:(Union[Dict,str]) Gef headers
+    :return: (Dict[int, float]) Mapping of column-numbers to their void value.
     """
     if isinstance(headers, dict):
         # Return a list of all the second float values of all COLUMN_VOID lines
         if "COLUMNVOID" in headers:
-            return list(map(lambda values: float(values[1]), headers["COLUMNVOID"]))
-    else:
-        column_void = None
-        g = re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", headers)
-        if g:
-            column_void = list(
-                map(
-                    float,
-                    re.findall(r"#COLUMNVOID[=\s+]+\d[,\s+]+([\d-]+\.?\d*)", headers),
-                )
-            )
-            return column_void
 
-    # Standard value, if some gef test_files the column void is not specified but used anyway
-    return -9999
+            try:
+                voids_info: List[Tuple[int, float]] = list(
+                    map(
+                        lambda values: (int(values[0]), float(values[1])),
+                        headers["COLUMNVOID"],
+                    )
+                )
+            except ValueError:
+                raise exceptions.ParseGefError(
+                    ": One of more #COLUMNVOID headers have an invalid format."
+                )
+
+    else:
+        voids_info = []
+
+        for void_line in re.finditer(r"#COLUMNVOID\s*=\s*(.*)", headers):
+
+            voids = re.search(r"^(\d+)\s*,\s*([-+]?\d+\.?\d*)", void_line.group(1))
+
+            if not voids:
+                raise exceptions.ParseGefError(
+                    ": One of more #COLUMNVOID headers have an invalid format."
+                )
+
+            voids_info.append((int(voids.group(1)), float(voids.group(2))))
+
+    col_numbers = list(map(lambda values: values[0], voids_info))
+    if any(np.unique(col_numbers, return_counts=True)[1] > 1):
+        raise exceptions.ParseGefError(
+            ": One or more #COLUMNVOID headers have duplicate definitions."
+        )
+
+    column_void = {item[0]: item[1] for item in voids_info}
+
+    return column_void
 
 
 def parse_measurement_var_as_float(headers, var_number):
@@ -322,7 +349,7 @@ def parse_file_date(headers):
     return date(year, month, day)
 
 
-def parse_columns_number(headers):
+def parse_columns_number(headers: Union[dict, str]) -> int:
     """
     Function that returns the columns number as an int.
 
@@ -330,62 +357,36 @@ def parse_columns_number(headers):
     :return: Columns number value.
     """
     if isinstance(headers, dict):
-        return max([int(values[0]) for values in headers["COLUMNINFO"]])
+        if "COLUMNINFO" in headers:
+            return len(headers["COLUMNINFO"])
+
     else:
-        g = re.findall(r"#COLUMNINFO[=\s+]+(\d*)", headers)
-        if g:
-            return max(map(int, re.findall(r"#COLUMNINFO[=\s+]+(\d*)", headers)))
+        col_numbers = re.findall(r"#COLUMNINFO[=\s]+(\d+)", headers)
+        if col_numbers:
+            return len(col_numbers)
+
+    return 0
 
 
-def parse_quantity_number(headers, column_number):
+def get_description(
+    quantity_number: int,
+    custom_description: str,
+    dictionary: Optional[Dict[int, str]] = None,
+) -> str:
     """
-    Function to parse the quantity number.
+    Returns the default description of a quantity number if available in the
+    provided dictionary, else returns the custom_description.
 
-    :param headers:(Union[Dict,str]) Dictionary or string of headers.
-    :param column_number: (int) Number of the column.
-    :return: Quantity number.
+    :param quantity_number: (int) The quantity number of the column
+    :param custom_description: (str) The column description from the .gef file
+    :param dictionary: (Optional[Dict[int, str]]) The dictionary that maps
+        quantity-numbers to descriptions
+    :return: (str) The column description
     """
-    # Convert the variable number to a string so it's cheaper to compare
-    column_number_str = str(column_number)
 
-    try:
-        if isinstance(headers, dict):
-            if "COLUMNINFO" in headers:
-                # Loop over all headers to find the right number
-                for values in headers["COLUMNINFO"]:
-                    if values[0] == column_number_str:
-                        return float(values[3])
-        else:
-            # Find all '#COLUMNINFO= **,' strings first
-            for match in re.finditer(
-                r"#COLUMNINFO[=\s+]+(\d+)+[,\s+][^,]*[,\s+]+[^,]*[,\s+]+(\d+)", headers
-            ):
-                # The first group is the column number
-                if match.group(1) == column_number_str:
-                    # The second group is the actual value
-                    return cast_string(float, match.group(2))
-
-    except ValueError:
-        pass
-    return None
-
-
-def parse_column_info(headers, column_number, dictionary):
-    """
-    Function that returns the column info assigned to a quantity number.
-
-    :param headers:(Union[Dict,str]) Dictionary or string of headers.
-    :param column_number: (int) Number of the column.
-    :param dictionary: (dict) Dictionary in which the quantity number is searched as a key.
-    :return: Column info (value) of each quantity number (key).
-    """
-    try:
-        quantity_number = parse_quantity_number(headers, column_number)
-        column_info = dictionary[quantity_number]
-    except KeyError:
-        column_info = "column_code=" + str(column_number)
-
-    return column_info
+    if dictionary is not None and quantity_number in dictionary:
+        return dictionary[quantity_number]
+    return custom_description
 
 
 def parse_column_separator(headers):
