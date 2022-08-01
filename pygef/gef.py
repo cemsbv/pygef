@@ -366,7 +366,7 @@ class _GefCpt(_Gef):
         )
         self.mileage = utils.parse_measurement_var_as_float(self._headers, 41)
 
-        self.data_info = self.ColumnsInfo(
+        self.columns_info = self.ColumnsInfo(
             *parse_all_columns_info(self._headers, MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT),
             utils.get_column_separator(self._headers),
             utils.get_record_separator(self._headers),
@@ -376,16 +376,16 @@ class _GefCpt(_Gef):
         self.df = (
             self.parse_data(
                 self._data,
-                self.data_info.col_separator,
-                self.data_info.rec_separator,
-                self.data_info.descriptions,
+                self.columns_info.col_separator,
+                self.columns_info.rec_separator,
+                self.columns_info.descriptions,
             )
             .lazy()
-            .pipe(replace_column_void, self.data_info.description_to_void_mapping)
+            .pipe(replace_column_void, self.columns_info.description_to_void_mapping)
             # Remove the rows with null values
             .drop_nulls()
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
-            .with_column(correct_depth_with_inclination(self.data_info.descriptions))
+            .with_column(correct_depth_with_inclination(self.columns_info.descriptions))
             .select(
                 # Remove None values since they throw an error
                 [
@@ -393,7 +393,7 @@ class _GefCpt(_Gef):
                     for expr in [
                         pl.all().exclude(["depth", "friction_number"]),
                         col("depth").abs(),
-                        calculate_friction_number(self.data_info.descriptions),
+                        calculate_friction_number(self.columns_info.descriptions),
                         self.calculate_elevation_with_respect_to_nap(
                             self.zid, self.height_system
                         ),
@@ -595,10 +595,13 @@ def correct_depth_with_inclination(columns):
 
 def parse_all_columns_info_from_dict(
     headers: dict, quantity_dict: dict
-) -> Tuple[List[Tuple[int, str, str, int]], int]:
+) -> List[Tuple[int, str, str, int]]:
     """
     Function that parses and returns all COLUMNINFO header data from a dictionary.
-    See the `parse_all_columns_info` function.
+
+    :param headers:(str) String of headers.
+    :param quantity_dict: (dict) Dictionary that maps quanity numbers to descriptions
+    :return: (List[Tuple[int, str, str, int]]) List of Tuples with the COLUMNINFO header values
     """
 
     columns_info: List[Tuple[int, str, str, int]] = []
@@ -626,10 +629,13 @@ def parse_all_columns_info_from_dict(
 
 def parse_all_columns_info_from_str(
     headers: str, quantity_dict: dict
-) -> Tuple[List[Tuple[int, str, str, int]], int]:
+) -> List[Tuple[int, str, str, int]]:
     """
     Function that parses and returns all COLUMNINFO header data from a string.
-    See the `parse_all_columns_info` function
+
+    :param headers:(dict) Dictionary of headers.
+    :param quantity_dict: (dict) Dictionary that maps quanity numbers to descriptions
+    :return: (List[Tuple[int, str, str, int]]) List of Tuples with the COLUMNINFO header values
     """
 
     columns_info: List[Tuple[int, str, str, int]] = []

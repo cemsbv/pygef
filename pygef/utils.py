@@ -376,6 +376,12 @@ def get_description(
     """
     Returns the default description of a quantity number if available in the
     provided dictionary, else returns the custom_description.
+
+    :param quantity_number: (int) The quantity number of the column
+    :param custom_description: (str) The column description from the .gef file
+    :param dictionary: (Optional[Dict[int, str]]) The dictionary that maps
+        quantity-numbers to descriptions
+    :return: (str) The column description
     """
 
     if dictionary is not None and quantity_number in dictionary:
