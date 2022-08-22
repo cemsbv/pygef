@@ -13,6 +13,24 @@ profile = "black"
 
 [tool.mypy]
 files = ["pygef"]
+namespace_packages = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = "pygef.broxml.*"
+disallow_untyped_defs = true
+disallow_subclassing_any = true
+no_implicit_optional = true
+strict_concatenate = true
+disallow_any_generics = true
+disallow_untyped_calls = true
+# warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true
+
 
 [[tool.mypy.overrides]]
 module = ["matplotlib.*", "pkg_resources.*", "pandas.*", "lxml.*"]
