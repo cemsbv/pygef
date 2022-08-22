@@ -51,14 +51,14 @@ def type_index() -> pl.Expr:
         (
             (
                 pl.lit(3.0)
-                - np.log10(
+                - (
                     pl.col("normalized_cone_resistance")
                     * (1.0 - pl.col("excess_pore_pressure_ratio"))
                     + 1.0
-                )
+                ).log10()
             )
             ** 2
-            + (1.5 + 1.3 * np.log10(pl.col("normalized_friction_ratio"))) ** 2
+            + (1.5 + 1.3 * (pl.col("normalized_friction_ratio")).log10()) ** 2
         )
         ** 0.5
     ).alias("type_index")

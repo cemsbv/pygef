@@ -1,0 +1,47 @@
+[build-system]
+requires = ["maturin>=0.13,<0.14"]
+build-backend = "maturin"
+
+
+[project]
+name = "pygef"
+version = "0.7.3"
+dependencies = [
+    "polars>= 0.13.55",
+    "matplotlib>= 3.4.2",
+    "lxml==4.9.1",
+]
+requires-python = ">=3.7"
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+files = ["pygef"]
+namespace_packages = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = "pygef.broxml.*"
+disallow_untyped_defs = true
+disallow_subclassing_any = true
+no_implicit_optional = true
+strict_concatenate = true
+disallow_any_generics = true
+disallow_untyped_calls = true
+# warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true
+
+
+[[tool.mypy.overrides]]
+module = ["matplotlib.*", "pkg_resources.*", "pandas.*", "lxml.*"]
+ignore_missing_imports = true
+
+# TODO! include these files
+[[tool.mypy.overrides]]
+module = ["pygef.plot_utils", "pygef.gef"]
+ignore_errors = true

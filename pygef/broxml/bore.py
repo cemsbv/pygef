@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import ABC
 from datetime import datetime
 
@@ -14,7 +15,7 @@ NS_MAP_VALUES = [
 
 
 class _BroXml(ABC):
-    def __init__(self, path: str = None, string: str = None):
+    def __init__(self, path: str | None = None, string: str | None = None):
         """
         Parser of xml files.
 
@@ -39,9 +40,9 @@ class _BroXml(ABC):
 
         self.s = string
         # Initialize attributes
-        self.zid = None
-        self.x = None
-        self.y = None
+        self.zid: float | None = None
+        self.x: float | None = None
+        self.y: float | None = None
         self.test_id = None
         self.height_system = None
 
@@ -58,7 +59,7 @@ class _BroXmlBore(_BroXml):
         Xml file as string
     """
 
-    def __init__(self, path=None, string=None):
+    def __init__(self, path: str | None = None, string: str | None = None):
         super().__init__(path=path, string=string)
         self.nen_version = "NEN-EN-ISO 14688"
         self.type = "bore"
@@ -143,7 +144,7 @@ class _BroXmlBore(_BroXml):
 
 
 class _BroXmlCpt(_BroXml):
-    def __init__(self, path=None, string=None):
+    def __init__(self, path: str | None = None, string: str | None = None):
         super().__init__(path=path, string=string)
 
         raise NotImplementedError(
@@ -151,7 +152,7 @@ class _BroXmlCpt(_BroXml):
         )
 
 
-def soil_name_to_percentages(df):
+def soil_name_to_percentages(df: pl.DataFrame) -> pl.DataFrame:
     """
     Adds the columns
     ["gravel_component", "sand_component", "clay_component", "loam_component", "peat_component", "silt_component"]
@@ -209,5 +210,4 @@ def soil_name_to_percentages(df):
             "silt_component",
         ],
     )
-    df = df.hstack(df_soils)
-    return df
+    return df.hstack(df_soils)

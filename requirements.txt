@@ -10,3 +10,4 @@ sphinx_rtd_theme==1.0.0
 pytest==7.1.2
 lxml==4.9.1
 black==22.6.0
+mypy==0.961
