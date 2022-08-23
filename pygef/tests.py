@@ -1149,33 +1149,6 @@ class PlotTest(unittest.TestCase):
         gef = Bore("./pygef/test_files/example_bore.gef")
         gef.plot(show=False, figsize=(4, 12))
 
-    def test_plot_classification(self):
-        gef = Cpt("./pygef/test_files/example.gef")
-        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
-
-        gef = Cpt("./pygef/test_files/cpt.gef")
-        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
-
-        gef = Cpt("./pygef/test_files/cpt2.gef")
-        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
-
-
-class TestRobertson(unittest.TestCase):
-    def setUp(self):
-        self.gef = Cpt("./pygef/test_files/example.gef")
-
-    def test_nan_dropped(self):
-        self.assertAlmostEqual(self.gef.df["qc"][0], 16.72)
-
-    def test_water_pressure(self):
-        """
-        depth starts at 6 meters, So -7 should lead to water pressure of 0
-        """
-        df = self.gef.classify(
-            "robertson", water_level_NAP=None, water_level_wrt_depth=-7
-        )
-        self.assertEqual(df["water_pressure"][0], 0)
-
 
 class TestBoreXml(unittest.TestCase):
     def setUp(self):

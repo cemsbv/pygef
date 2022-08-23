@@ -15,8 +15,6 @@ clean:
 
 test: venv
 	$(PYTHON_BIN)/pytest pygef/*.py
-	$(PYTHON_BIN)/pytest pygef/robertson/*.py
-	$(PYTHON_BIN)/pytest pygef/been_jefferies/*.py
 
 pre-commit: mypy
 	$(PYTHON_BIN)/black .
