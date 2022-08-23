@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from typing import Union
 
@@ -165,10 +167,10 @@ class Cpt(Base):
 
     def classify(
         self,
-        classification,
-        water_level_NAP=None,
-        water_level_wrt_depth=None,
-        p_a=0.1,
+        classification: str,
+        water_level_NAP: float | None = None,
+        water_level_wrt_depth: float | None = None,
+        p_a: float = 0.1,
         new=True,
     ):
         """
@@ -211,7 +213,6 @@ class Cpt(Base):
                 water_level_wrt_depth=water_level_wrt_depth,
                 new=new,
                 area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                pre_excavated_depth=self.pre_excavated_depth,
                 p_a=p_a,
             )
             return df
@@ -235,7 +236,6 @@ class Cpt(Base):
         classification=None,
         water_level_NAP=None,
         water_level_wrt_depth=None,
-        min_thickness=None,
         p_a=0.1,
         new=True,
         show=False,
@@ -258,11 +258,6 @@ class Cpt(Base):
             Water level with respect to NAP
         water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
             Water level with respect to the ground_level [0], it should be a negative value.
-        min_thickness: float, only for cpt type, optional for the classification [m]
-            If specified together with the do_grouping set to True, a group classification is added to the plot.
-            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one >
-            min_thickness.
-            In order to not make a big error do not use a value bigger then 0.2 m
         p_a: float, only for cpt type, optional for the classification
             Atmospheric pressure. Default: 0.1 MPa.
         new: bool, only for cpt type, optional for the classification default:True

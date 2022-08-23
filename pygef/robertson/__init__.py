@@ -7,7 +7,6 @@ def classify(
     water_level_wrt_depth=None,
     new=True,
     area_quotient_cone_tip=None,
-    pre_excavated_depth=None,
     p_a=0.1,
 ):
     """
@@ -41,6 +40,5 @@ def classify(
         water_level,
         new=new,
         area_quotient_cone_tip=area_quotient_cone_tip,
-        pre_excavated_depth=pre_excavated_depth,
         p_a=p_a,
     )

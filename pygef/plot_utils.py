@@ -1,7 +1,5 @@
 # needed for python 3.7
 from __future__ import annotations
-from copy import copy
-
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -49,7 +47,15 @@ def num_columns(classification, df_group):
 
 
 def plot_cpt(
-    df, df_group, classification, show, figsize, grid_step_x, colors, dpi, z_NAP
+    df: pl.DataFrame,
+    df_group: pl.DataFrame,
+    classification: str,
+    show: bool,
+    figsize,
+    grid_step_x,
+    colors,
+    dpi,
+    z_NAP,
 ):
     """
     Main function to plot qc, Fr and soil classification.
@@ -64,10 +70,8 @@ def plot_cpt(
     title_group = None
 
     if classification is not None:
-        print(df)
         df, title = assign_color(df, classification, colors)
     if df_group is not None:
-        df_group = copy(df_group)
         df_group = df_group.rename({"layer": "soil_type"})
         df_group, title_group = assign_color(df_group, classification, colors=colors)
         if colors is None:
@@ -138,7 +142,7 @@ def plot_cpt(
         return fig
 
 
-def assign_color(df, classification, colors):
+def assign_color(df: pl.DataFrame, classification: str, colors: dict):
     """
     Add to the dataframe the column 'colour' based on the chosen classification.
 
@@ -151,7 +155,10 @@ def assign_color(df, classification, colors):
         if classification == "robertson":
             colors = colors_robertson()
             df = df.with_column(
-                pl.col("soil_type").apply(lambda row: colors[row]).alias("colour")
+                pl.col("soil_type")
+                .apply(lambda row: colors[row])
+                .fill_null("black")
+                .alias("colour")
             )
 
             return (
@@ -161,7 +168,10 @@ def assign_color(df, classification, colors):
         elif classification == "been_jefferies":
             colors = colors_been_jefferies()
             df = df.with_column(
-                pl.col("soil_type").apply(lambda row: colors[row]).alias("colour")
+                pl.col("soil_type")
+                .apply(lambda row: colors[row])
+                .fill_null("black")
+                .alias("colour")
             )
 
             return (
@@ -179,7 +189,15 @@ def assign_color(df, classification, colors):
         )
 
 
-def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP):
+def add_plot_classification(
+    fig,
+    df: pl.DataFrame,
+    depth_max: float | int,
+    depth_min: float | int,
+    title: str,
+    num_col: int,
+    z_NAP: float,
+):
     """
     Add to the plot the selected classification.
 
@@ -191,7 +209,7 @@ def add_plot_classification(fig, df, depth_max, depth_min, title, num_col, z_NAP
     ax = fig.add_subplot(1, num_col, 3)
     df = df.with_column(pl.col("soil_type").fill_null("UNKNOWN"))
     for st in df["soil_type"].unique():
-        partial_df = df[df["soil_type"] == st]
+        partial_df = df.filter(pl.col("soil_type") == st)
         if z_NAP:
             plt.hlines(
                 y=partial_df["elevation_with_respect_to_nap"],
@@ -305,9 +323,6 @@ def plot_bore(df, figsize=(11, 8), show=True, dpi=100):
     # TODO: replace with proper polars code
     vp = v.to_pandas()
     vp.iloc[:, 2] += df.to_pandas()["silt_component"]
-
-    # TODO: what does this do?
-    # vp[vp.sum(1) < 0] = np.nan
 
     c = ["#a76b29", "#578E57", "#0078C1", "#DBAD4B", "#708090"]
 

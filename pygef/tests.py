@@ -1,4 +1,5 @@
 # pylint: disable=E1136
+from __future__ import annotations
 import os
 import unittest
 from datetime import datetime
@@ -433,7 +434,7 @@ class GefTest(unittest.TestCase):
                 ]
             }
         )
-        data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
+        data_s = [["'Kz'", ""], ["'Kz1'", ""], ["'Kz2'", ""]]
         df_parsed = _GefBore.parse_data_soil_type(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
@@ -827,7 +828,7 @@ class GefTest(unittest.TestCase):
 
     def test_soil_pressure(self):
         v = pl.DataFrame({"gamma": [0.0, 0.5, 1.0], "delta_depth": [0.0, 0.5, 0.5]})
-        geo.soil_pressure(v)
+        v = geo.soil_pressure(v)
         df = pl.DataFrame(
             {
                 "gamma": [0.0, 0.5, 1.0],
@@ -840,7 +841,7 @@ class GefTest(unittest.TestCase):
     def test_water_pressure(self):
         water_level = 0.5
         v = pl.DataFrame({"depth": [0.0, 0.5, 1.0]})
-        geo.water_pressure(v, water_level)
+        v = geo.water_pressure(v, water_level)
         df = pl.DataFrame(
             {"depth": [0.0, 0.5, 1.0], "water_pressure": [0.0, 0.0, 4.905]}
         )
@@ -909,11 +910,10 @@ class GefTest(unittest.TestCase):
                 "qt": [0.0, 1.5, 2.5],
                 "soil_pressure": [0.0, 0.25, 0.75],
                 "effective_soil_pressure": [0.0, 0.25, -4.155],
-                "normalized_cone_resistance": [-np.nan, 5.0, 1.0],
+                "normalized_cone_resistance": [float("nan"), 5.0, 0.0],
             }
         )
-        # TODO: why aren't these equal with df.frame_equal?
-        assert v.to_csv() == df.to_csv()
+        pl.testing.assert_frame_equal(v, df)
 
     def test_normalized_friction_ratio(self):
         df1 = pl.DataFrame(
