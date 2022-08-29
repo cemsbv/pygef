@@ -14,7 +14,7 @@ clean:
 	@rm -r venv
 
 test: venv
-	$(PYTHON_BIN)/pytest pygef/*.py
+	$(PYTHON_BIN)/pytest pygef/tests/gef/**
 
 pre-commit: mypy
 	$(PYTHON_BIN)/black .
