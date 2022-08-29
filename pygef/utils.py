@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 import re
 from datetime import date
@@ -458,7 +459,7 @@ def parse_soil_code(s):
     return s.replace("'", "")
 
 
-def create_soil_type(s):
+def create_soil_type(s: str) -> str:
     """
     Function to create the description of the soil type.
 

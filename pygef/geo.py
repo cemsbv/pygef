@@ -1,7 +1,8 @@
-import numpy as np
+from __future__ import annotations
+import polars as pl
 
 
-def delta_depth(df, pre_excavated_depth=None):
+def delta_depth(df: pl.DataFrame) -> pl.DataFrame:
     """
     Take pre-excavated depth into account.
 
@@ -11,58 +12,61 @@ def delta_depth(df, pre_excavated_depth=None):
     :param pre_excavated_depth: (flt)
     :return: (DataFrame) [depth, delta_depth]
     """
-    df["delta_depth"] = np.r_[np.array([df["depth"][0]]), np.diff(df["depth"])]
-
-    return df
-
-
-def soil_pressure(df):
-    df["soil_pressure"] = (df["gamma"] * df["delta_depth"]).cumsum()
-
-    return df
+    return df.with_column(
+        pl.col("depth")
+        .diff(n=1, null_behavior="ignore")
+        .fill_null(strategy="zero")
+        .alias("delta_depth")
+    )
 
 
-def water_pressure(df, water_level):
-    df["water_pressure"] = df["depth"].apply(lambda depth: (depth - water_level) * 9.81)
-    df[df["water_pressure"] < 0, "water_pressure"] = 0.0
+def soil_pressure(df: pl.DataFrame) -> pl.DataFrame:
+    return df.with_column(
+        (pl.col("gamma") * pl.col("delta_depth")).cumsum().alias("soil_pressure")
+    )
 
-    return df
+
+def water_pressure(df: pl.DataFrame, water_level: float) -> pl.DataFrame:
+    return df.with_column(
+        ((pl.col("depth") - water_level) * 9.81).clip_min(0.0).alias("water_pressure")
+    )
 
 
-def effective_soil_pressure(df):
-    df["effective_soil_pressure"] = df["soil_pressure"] - df["water_pressure"]
-
-    return df
+def effective_soil_pressure(df: pl.DataFrame):
+    return df.with_column(
+        (pl.col("soil_pressure") - pl.col("water_pressure")).alias(
+            "effective_soil_pressure"
+        )
+    )
 
 
 def qt(df, area_quotient_cone_tip=None):
     if "u2" in df.columns and area_quotient_cone_tip is not None:
-        df["qt"] = df["qc"] + df["u2"].apply(
-            lambda u2: u2 * (1.0 - area_quotient_cone_tip)
+        return df.with_column(
+            (pl.col("qc") + pl.col("u2") * (1.0 - area_quotient_cone_tip)).alias("qt")
         )
     else:
-        df["qt"] = df["qc"]
-
-    return df
+        return df.with_column(pl.col("qc").alias("qt"))
 
 
-def normalized_cone_resistance(df):
-    df["normalized_cone_resistance"] = (df["qt"] - df["soil_pressure"]) / df[
-        "effective_soil_pressure"
-    ]
-    df[df["normalized_cone_resistance"] < 0, "normalized_cone_resistance"] = 1.0
+def normalized_cone_resistance(df: pl.DataFrame) -> pl.DataFrame:
+    name = "normalized_cone_resistance"
+    return df.with_column(
+        ((pl.col("qt") - pl.col("soil_pressure")) / pl.col("effective_soil_pressure"))
+        .clip_min(0.0)
+        .alias(name)
+    )
 
-    return df
 
-
-def normalized_friction_ratio(df):
+def normalized_friction_ratio(df: pl.DataFrame) -> pl.DataFrame:
     if "fs" in df.columns:
-        fs = df["fs"]
+        fs = pl.col("fs")
     else:
-        fs = df["friction_number"] * df["qc"] / 100.0
+        fs = pl.col("friction_number") * pl.col("qc") / 100.0
 
-    df["normalized_friction_ratio"] = (fs / (df["qt"] - df["soil_pressure"])) * 100
-
-    df[df["normalized_friction_ratio"] < 0, "normalized_friction_ratio"] = 0.1
-
-    return df
+    name = "normalized_friction_ratio"
+    return df.with_column(
+        ((fs / (pl.col("qt") - pl.col("soil_pressure"))) * 100)
+        .clip_min(0.1)
+        .alias(name)
+    )

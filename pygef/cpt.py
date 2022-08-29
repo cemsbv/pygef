@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import logging
 from typing import Union
 
 import pygef.plot_utils as plot
-from pygef import been_jefferies, robertson
 from pygef.base import Base
 from pygef.broxml import _BroXmlCpt
 from pygef.gef import _GefCpt
@@ -163,79 +164,11 @@ class Cpt(Base):
 
         self.__dict__.update(parsed.__dict__)
 
-    def classify(
-        self,
-        classification,
-        water_level_NAP=None,
-        water_level_wrt_depth=None,
-        p_a=0.1,
-        new=True,
-    ):
-        """
-        Classify each row of the cpt type.
-
-        Parameters
-        ----------
-        classification: str
-            Specify the classification, possible choices : "robertson", "been_jefferies".
-        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth
-            Water level with respect to NAP
-        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
-            Water level with respect to the ground_level [0], it should be a negative value.
-        p_a: float
-            Atmospheric pressure. Default: 0.1 MPa.
-        new: bool, default:True
-            If True and the classification is robertson, the new(2016) implementation of robertson is used.
-
-        Returns
-        -------
-        df: polars.DataFrame
-            A polars.DataFrame with a classification for each row is returned.
-
-        """
-        # todo: refactor arguments, the arguments connected to each other
-        #  should be given as a dict or tuple, check order
-        water_level_and_zid_NAP = dict(water_level_NAP=water_level_NAP, zid=self.zid)
-
-        if water_level_NAP is None and water_level_wrt_depth is None:
-            water_level_wrt_depth = -1
-            logger.warning(
-                f"You did not input the water level, a default value of -1 m respect to the ground is used."
-                f" Change it using the kwagr water_level_NAP or water_level_wrt_depth."
-            )
-
-        if classification == "robertson":
-            df = robertson.classify(
-                self.df,
-                water_level_and_zid_NAP=water_level_and_zid_NAP,
-                water_level_wrt_depth=water_level_wrt_depth,
-                new=new,
-                area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                pre_excavated_depth=self.pre_excavated_depth,
-                p_a=p_a,
-            )
-            return df
-
-        elif classification == "been_jefferies":
-            df = been_jefferies.classify(
-                self.df,
-                water_level_and_zid_NAP=water_level_and_zid_NAP,
-                water_level_wrt_depth=water_level_wrt_depth,
-                area_quotient_cone_tip=self.net_surface_area_quotient_of_the_cone_tip,
-                pre_excavated_depth=self.pre_excavated_depth,
-            )
-            return df
-        else:
-            raise ValueError(
-                f"Could not find {classification}. Check the spelling or classification not defined in the library"
-            )
-
     def plot(
         self,
         classification=None,
         water_level_NAP=None,
         water_level_wrt_depth=None,
-        min_thickness=None,
         p_a=0.1,
         new=True,
         show=False,
@@ -258,11 +191,6 @@ class Cpt(Base):
             Water level with respect to NAP
         water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
             Water level with respect to the ground_level [0], it should be a negative value.
-        min_thickness: float, only for cpt type, optional for the classification [m]
-            If specified together with the do_grouping set to True, a group classification is added to the plot.
-            The grouping is a simple algorithm that merge all the layers < min_thickness with the last above one >
-            min_thickness.
-            In order to not make a big error do not use a value bigger then 0.2 m
         p_a: float, only for cpt type, optional for the classification
             Atmospheric pressure. Default: 0.1 MPa.
         new: bool, only for cpt type, optional for the classification default:True
@@ -293,21 +221,9 @@ class Cpt(Base):
         -------
         matplotlib.pyplot.figure
         """
-        # todo: refactor arguments, the arguments connected to each other should
-        #  be given as a dict or tuple, check order
-        if classification is None:
-            df = self.df
-        else:
-            df = self.classify(
-                classification=classification,
-                water_level_NAP=water_level_NAP,
-                water_level_wrt_depth=water_level_wrt_depth,
-                p_a=p_a,
-                new=new,
-            )
 
         return plot.plot_cpt(
-            df,
+            self.df,
             df_group,
             classification,
             show=show,

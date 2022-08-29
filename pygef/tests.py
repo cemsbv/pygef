@@ -1,4 +1,5 @@
 # pylint: disable=E1136
+from __future__ import annotations
 import os
 import unittest
 from datetime import datetime
@@ -433,7 +434,7 @@ class GefTest(unittest.TestCase):
                 ]
             }
         )
-        data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
+        data_s = [["'Kz'", ""], ["'Kz1'", ""], ["'Kz2'", ""]]
         df_parsed = _GefBore.parse_data_soil_type(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
@@ -827,7 +828,7 @@ class GefTest(unittest.TestCase):
 
     def test_soil_pressure(self):
         v = pl.DataFrame({"gamma": [0.0, 0.5, 1.0], "delta_depth": [0.0, 0.5, 0.5]})
-        geo.soil_pressure(v)
+        v = geo.soil_pressure(v)
         df = pl.DataFrame(
             {
                 "gamma": [0.0, 0.5, 1.0],
@@ -840,7 +841,7 @@ class GefTest(unittest.TestCase):
     def test_water_pressure(self):
         water_level = 0.5
         v = pl.DataFrame({"depth": [0.0, 0.5, 1.0]})
-        geo.water_pressure(v, water_level)
+        v = geo.water_pressure(v, water_level)
         df = pl.DataFrame(
             {"depth": [0.0, 0.5, 1.0], "water_pressure": [0.0, 0.0, 4.905]}
         )
@@ -909,11 +910,10 @@ class GefTest(unittest.TestCase):
                 "qt": [0.0, 1.5, 2.5],
                 "soil_pressure": [0.0, 0.25, 0.75],
                 "effective_soil_pressure": [0.0, 0.25, -4.155],
-                "normalized_cone_resistance": [-np.nan, 5.0, 1.0],
+                "normalized_cone_resistance": [float("nan"), 5.0, 0.0],
             }
         )
-        # TODO: why aren't these equal with df.frame_equal?
-        assert v.to_csv() == df.to_csv()
+        pl.testing.assert_frame_equal(v, df)
 
     def test_normalized_friction_ratio(self):
         df1 = pl.DataFrame(
@@ -1148,33 +1148,6 @@ class PlotTest(unittest.TestCase):
     def test_plot_bore(self):
         gef = Bore("./pygef/test_files/example_bore.gef")
         gef.plot(show=False, figsize=(4, 12))
-
-    def test_plot_classification(self):
-        gef = Cpt("./pygef/test_files/example.gef")
-        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
-
-        gef = Cpt("./pygef/test_files/cpt.gef")
-        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
-
-        gef = Cpt("./pygef/test_files/cpt2.gef")
-        gef.plot(show=False, classification="robertson", water_level_wrt_depth=-1)
-
-
-class TestRobertson(unittest.TestCase):
-    def setUp(self):
-        self.gef = Cpt("./pygef/test_files/example.gef")
-
-    def test_nan_dropped(self):
-        self.assertAlmostEqual(self.gef.df["qc"][0], 16.72)
-
-    def test_water_pressure(self):
-        """
-        depth starts at 6 meters, So -7 should lead to water pressure of 0
-        """
-        df = self.gef.classify(
-            "robertson", water_level_NAP=None, water_level_wrt_depth=-7
-        )
-        self.assertEqual(df["water_pressure"][0], 0)
 
 
 class TestBoreXml(unittest.TestCase):

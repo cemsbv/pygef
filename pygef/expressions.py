@@ -1,5 +1,5 @@
+from __future__ import annotations
 import polars as pl
-import numpy as np
 
 
 def ic_to_gamma(water_level):

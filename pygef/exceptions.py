@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 def concat_args(msg: str, args: tuple):
     if not isinstance(args, tuple):
         args = tuple(args)

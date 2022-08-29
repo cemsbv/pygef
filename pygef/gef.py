@@ -1,8 +1,8 @@
-import io
+from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import polars as pl
@@ -250,8 +250,8 @@ class _Gef:
             new_data.encode(),
             sep=col_separator,
             new_columns=column_names,
-            has_headers=False,
-            projection=list(range(0, len(column_names))),
+            has_header=False,
+            columns=list(range(0, len(column_names))),
         )
 
 
@@ -487,12 +487,15 @@ class _GefBore(_Gef):
         self.df.drop_nulls()
 
     @staticmethod
-    def parse_add_info_as_string(df, data_rows_soil):
-        df["remarks"] = [
-            utils.parse_add_info("".join(row[1::])) for row in data_rows_soil
-        ]
-
-        return df
+    def parse_add_info_as_string(
+        df: pl.DataFrame, data_rows_soil: list[list[str]]
+    ) -> pl.DataFrame:
+        return df.with_column(
+            pl.Series(
+                "remarks",
+                [utils.parse_add_info("".join(row[1::])) for row in data_rows_soil],
+            )
+        )
 
     @staticmethod
     def extract_soil_info(data_s_rows, columns_number, column_separator):
@@ -503,39 +506,48 @@ class _GefBore(_Gef):
         )
 
     @staticmethod
-    def parse_data_soil_type(df, data_rows_soil):
-        df["soil_type"] = list(
-            map(lambda x: utils.create_soil_type(x[0]), data_rows_soil)
+    def parse_data_soil_type(df: pl.DataFrame, data_rows_soil: list[str]):
+        # return df.with_column(pl.Series("soil_type", data_rows_soil).apply(utils.create_soil_type))
+
+        # todo1 remove me
+        return df.with_column(
+            pl.Series(
+                "soil_type",
+                (list(map(lambda x: utils.create_soil_type(x[0]), data_rows_soil))),
+            )
         )
 
-        return df
-
     @staticmethod
-    def parse_data_soil_code(df, data_rows_soil):
-        df["soil_code"] = list(
-            map(lambda x: utils.parse_soil_code(x[0]), data_rows_soil)
+    def parse_data_soil_code(df: pl.DataFrame, data_rows_soil: list[str]):
+        # return df.with_column(pl.Series("soil_code", data_rows_soil).apply(utils.parse_soil_code))
+        return df.with_column(
+            pl.Series(
+                "soil_code",
+                list(map(lambda x: utils.parse_soil_code(x[0]), data_rows_soil)),
+            )
         )
 
-        return df
-
     @staticmethod
-    def parse_soil_quantification(df, data_rows_soil):
+    def parse_soil_quantification(
+        df: pl.DataFrame, data_rows_soil: list[list[str]]
+    ) -> pl.DataFrame:
         data = np.array([utils.soil_quantification(x[0]) for x in data_rows_soil])
 
-        # Gravel
-        df["gravel_component"] = data[:, 0]
-        # Sand
-        df["sand_component"] = data[:, 1]
-        # Clay
-        df["clay_component"] = data[:, 2]
-        # Loam
-        df["loam_component"] = data[:, 3]
-        # Peat
-        df["peat_component"] = data[:, 4]
-        # Silt
-        df["silt_component"] = data[:, 5]
-
-        return df
+        return df.with_columns(
+            [
+                pl.Series(name, data[:, i])
+                for i, name in enumerate(
+                    [
+                        "gravel_component",
+                        "sand_component",
+                        "clay_component",
+                        "loam_component",
+                        "peat_component",
+                        "silt_component",
+                    ]
+                )
+            ]
+        )
 
 
 def replace_column_void(
@@ -544,21 +556,17 @@ def replace_column_void(
 
     return (
         # Get all values matching column_void and change them to null
+        # Interpolate all null values
         lf.select(
             [
                 pl.when(pl.col(col) == pl.lit(col_name_to_void_mapping[col]))
-                .then(pl.lit(None))
+                .then(None)
                 .otherwise(pl.col(col))
+                .interpolate()
                 .keep_name()
                 for col in lf.columns
             ]
         )
-        # Interpolate all null values
-        .select(pl.all().interpolate())
-    )
-
-    df.select(
-        pl.when(pl.col("a") == pl.lit(2)).then(pl.lit(None)).otherwise(pl.col(col))
     )
 
 
