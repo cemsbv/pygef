@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pygef.cpt &mdash; pygef unknown documentation</title>
+  <title>pygef.cpt &mdash; pygef 0.7.3 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
@@ -68,11 +68,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pygef.cpt</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">pygef.plot_utils</span> <span class="k">as</span> <span class="nn">plot</span>
-<span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">been_jefferies</span><span class="p">,</span> <span class="n">robertson</span>
 <span class="kn">from</span> <span class="nn">pygef.base</span> <span class="kn">import</span> <span class="n">Base</span>
 <span class="kn">from</span> <span class="nn">pygef.broxml</span> <span class="kn">import</span> <span class="n">_BroXmlCpt</span>
 <span class="kn">from</span> <span class="nn">pygef.gef</span> <span class="kn">import</span> <span class="n">_GefCpt</span>
@@ -233,79 +234,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Cpt.classify"><a class="viewcode-back" href="../../tree/reference.html#pygef.Cpt.classify">[docs]</a>    <span class="k">def</span> <span class="nf">classify</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">classification</span><span class="p">,</span>
-        <span class="n">water_level_NAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">water_level_wrt_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">p_a</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Classify each row of the cpt type.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        classification: str</span>
-<span class="sd">            Specify the classification, possible choices : &quot;robertson&quot;, &quot;been_jefferies&quot;.</span>
-<span class="sd">        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth</span>
-<span class="sd">            Water level with respect to NAP</span>
-<span class="sd">        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP</span>
-<span class="sd">            Water level with respect to the ground_level [0], it should be a negative value.</span>
-<span class="sd">        p_a: float</span>
-<span class="sd">            Atmospheric pressure. Default: 0.1 MPa.</span>
-<span class="sd">        new: bool, default:True</span>
-<span class="sd">            If True and the classification is robertson, the new(2016) implementation of robertson is used.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        df: polars.DataFrame</span>
-<span class="sd">            A polars.DataFrame with a classification for each row is returned.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># todo: refactor arguments, the arguments connected to each other</span>
-        <span class="c1">#  should be given as a dict or tuple, check order</span>
-        <span class="n">water_level_and_zid_NAP</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">water_level_NAP</span><span class="o">=</span><span class="n">water_level_NAP</span><span class="p">,</span> <span class="n">zid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zid</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">water_level_NAP</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">water_level_wrt_depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">water_level_wrt_depth</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;You did not input the water level, a default value of -1 m respect to the ground is used.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; Change it using the kwagr water_level_NAP or water_level_wrt_depth.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">classification</span> <span class="o">==</span> <span class="s2">&quot;robertson&quot;</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">robertson</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
-                <span class="n">water_level_and_zid_NAP</span><span class="o">=</span><span class="n">water_level_and_zid_NAP</span><span class="p">,</span>
-                <span class="n">water_level_wrt_depth</span><span class="o">=</span><span class="n">water_level_wrt_depth</span><span class="p">,</span>
-                <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">,</span>
-                <span class="n">area_quotient_cone_tip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">net_surface_area_quotient_of_the_cone_tip</span><span class="p">,</span>
-                <span class="n">pre_excavated_depth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_excavated_depth</span><span class="p">,</span>
-                <span class="n">p_a</span><span class="o">=</span><span class="n">p_a</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">df</span>
-
-        <span class="k">elif</span> <span class="n">classification</span> <span class="o">==</span> <span class="s2">&quot;been_jefferies&quot;</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">been_jefferies</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
-                <span class="n">water_level_and_zid_NAP</span><span class="o">=</span><span class="n">water_level_and_zid_NAP</span><span class="p">,</span>
-                <span class="n">water_level_wrt_depth</span><span class="o">=</span><span class="n">water_level_wrt_depth</span><span class="p">,</span>
-                <span class="n">area_quotient_cone_tip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">net_surface_area_quotient_of_the_cone_tip</span><span class="p">,</span>
-                <span class="n">pre_excavated_depth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_excavated_depth</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">df</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Could not find </span><span class="si">{</span><span class="n">classification</span><span class="si">}</span><span class="s2">. Check the spelling or classification not defined in the library&quot;</span>
-            <span class="p">)</span></div>
-
 <div class="viewcode-block" id="Cpt.plot"><a class="viewcode-back" href="../../tree/reference.html#pygef.Cpt.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">classification</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">water_level_NAP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">water_level_wrt_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_thickness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">p_a</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
         <span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -328,11 +261,6 @@
 <span class="sd">            Water level with respect to NAP</span>
 <span class="sd">        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP</span>
 <span class="sd">            Water level with respect to the ground_level [0], it should be a negative value.</span>
-<span class="sd">        min_thickness: float, only for cpt type, optional for the classification [m]</span>
-<span class="sd">            If specified together with the do_grouping set to True, a group classification is added to the plot.</span>
-<span class="sd">            The grouping is a simple algorithm that merge all the layers &lt; min_thickness with the last above one &gt;</span>
-<span class="sd">            min_thickness.</span>
-<span class="sd">            In order to not make a big error do not use a value bigger then 0.2 m</span>
 <span class="sd">        p_a: float, only for cpt type, optional for the classification</span>
 <span class="sd">            Atmospheric pressure. Default: 0.1 MPa.</span>
 <span class="sd">        new: bool, only for cpt type, optional for the classification default:True</span>
@@ -363,21 +291,9 @@
 <span class="sd">        -------</span>
 <span class="sd">        matplotlib.pyplot.figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># todo: refactor arguments, the arguments connected to each other should</span>
-        <span class="c1">#  be given as a dict or tuple, check order</span>
-        <span class="k">if</span> <span class="n">classification</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span>
-                <span class="n">classification</span><span class="o">=</span><span class="n">classification</span><span class="p">,</span>
-                <span class="n">water_level_NAP</span><span class="o">=</span><span class="n">water_level_NAP</span><span class="p">,</span>
-                <span class="n">water_level_wrt_depth</span><span class="o">=</span><span class="n">water_level_wrt_depth</span><span class="p">,</span>
-                <span class="n">p_a</span><span class="o">=</span><span class="n">p_a</span><span class="p">,</span>
-                <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">,</span>
-            <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_cpt</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
             <span class="n">df_group</span><span class="p">,</span>
             <span class="n">classification</span><span class="p">,</span>
             <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>

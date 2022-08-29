@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; pygef unknown documentation</title>
+  <title>Getting started &mdash; pygef 0.7.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
@@ -18,7 +18,6 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -55,11 +54,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#id2">borehole</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#classify-a-cpt">Classify a cpt</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#robertson-classification">Robertson classification</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#plot-a-classified-cpt">Plot a classified cpt</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
@@ -287,216 +281,6 @@ columns defined in the file.</p>
 </div>
 <img alt="../_images/bore_plot.png" src="../_images/bore_plot.png" />
 </section>
-</section>
-<section id="classify-a-cpt">
-<h2>Classify a cpt<a class="headerlink" href="#classify-a-cpt" title="Permalink to this heading"></a></h2>
-<p>We can classify a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object using the method <code class="code docutils literal notranslate"><span class="pre">.classify()</span></code>.
-The available classification are:</p>
-<ul class="simple">
-<li><p>Robertson(1990) and Robertson(2016)</p></li>
-<li><p>Jefferies&amp;Been: available only if <code class="code docutils literal notranslate"><span class="pre">u2</span></code> is in the columns of <code class="code docutils literal notranslate"><span class="pre">cpt.df</span></code>.</p></li>
-</ul>
-<p>It is possible to use the old (1990) or new(2006) implementation of Robertson.</p>
-<p>Robertson(1990):</p>
-<div class="math notranslate nohighlight">
-\[\begin{align}
-I_c = \sqrt{(3.47 - \log Q_t )^2 + (\log F_r + 1.22)^2}
-\end{align}\]</div>
-<p>where:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{align}
-Q_t &amp;= \frac{q_t - \sigma_{vo}}{\sigma_{vo}'}, \\
-F_r &amp;= \frac{f_s}{q_t - \sigma_{vo}} \times 100, \\
-\end{align}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{align}
-q_t =
-\begin{cases}
-q_c + u_2 (1 - a), &amp; \text{if} \&gt; u_2 \neq 0 \\
-q_c                &amp; \text{otherwise}
-\end{cases}
-\end{align}\end{split}\]</div>
-<p>Robertson(2006):</p>
-<div class="math notranslate nohighlight">
-\[\begin{align}
-I_c = \sqrt{(3.47 - \log Q_t )^2 + (\log F_r + 1.22)^2}
-\end{align}\]</div>
-<p>where:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{align}
-Q_t &amp;= \frac{q_t - \sigma_{vo}}{p_a}(\frac{p_a}{\sigma_{vo}'})^n, \\
-n &amp;= 0.381 \times I_c + 0.05 \frac{\sigma_{vo}'}{p_a} - 0.15, \\
-F_r &amp;= \frac{f_s}{q_t - \sigma_{vo}} \times 100, \\
-\end{align}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{align}
-q_t =
-\begin{cases}
-q_c + u_2 (1 - a), &amp; \text{if} \&gt; u_2 \neq 0 \\
-q_c                &amp; \text{otherwise}
-\end{cases}
-\end{align}\end{split}\]</div>
-<p>The implementation given by Jefferies&amp;Been is the following:</p>
-<div class="math notranslate nohighlight">
-\[\begin{align}
-I_c = \sqrt{(3 - \log (Q_t \times(1 - u_2) + 1))^2 + (1.5 +1.3 \times \log F_r)^2}
-\end{align}\]</div>
-<p>where:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{align}
-Q_t &amp;= \frac{q_t - \sigma_{vo}}{\sigma_{vo}'}, \\
-F_r &amp;= \frac{f_s}{q_t - \sigma_{vo}} \times 100, \\
-q_t &amp;= q_c + u_2 (1 - a)
-\end{align}\end{split}\]</div>
-<p>The classification is done for each row of the cpt, and you can get the result for each row.</p>
-<p>Check the reference to learn about all the arguments of the method.</p>
-<section id="robertson-classification">
-<h3>Robertson classification<a class="headerlink" href="#robertson-classification" title="Permalink to this heading"></a></h3>
-<p>To get the classification we need to at least pass the attribute <code class="code docutils literal notranslate"><span class="pre">classification</span></code> and the water level.
-The water level can be given either as <code class="code docutils literal notranslate"><span class="pre">water_level_NAP</span></code> or <code class="code docutils literal notranslate"><span class="pre">water_level_wrt_depth</span></code>.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="gh">Out[15]: </span><span class="go"></span>
-<span class="go">shape: (999, 25)</span>
-<span class="go">┌────────────┬────────┬────────────┬───────┬─────┬────────────┬──────────┬────────────┬────────────┐</span>
-<span class="go">│ penetratio ┆ qc     ┆ corrected_ ┆ fs    ┆ ... ┆ normalized ┆ type_ind ┆ gamma_pred ┆ soil_type  │</span>
-<span class="go">│ n_length   ┆ ---    ┆ qc         ┆ ---   ┆     ┆ _friction_ ┆ ex       ┆ ict        ┆ ---        │</span>
-<span class="go">│ ---        ┆ f64    ┆ ---        ┆ f64   ┆     ┆ ratio      ┆ ---      ┆ ---        ┆ str        │</span>
-<span class="go">│ f64        ┆        ┆ f64        ┆       ┆     ┆ ---        ┆ f64      ┆ f64        ┆            │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆ f64        ┆          ┆            ┆            │</span>
-<span class="go">╞════════════╪════════╪════════════╪═══════╪═════╪════════════╪══════════╪════════════╪════════════╡</span>
-<span class="go">│ 0.01       ┆ 0.013  ┆ 0.013      ┆ 0.002 ┆ ... ┆ 15.515904  ┆ 4.396123 ┆ 11.0       ┆ Peat       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.03       ┆ 0.103  ┆ 0.107      ┆ 0.002 ┆ ... ┆ 1.867937   ┆ 3.231428 ┆ 11.0       ┆ Clays -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silty clay │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to clay    │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.05       ┆ 0.489  ┆ 0.493      ┆ 0.009 ┆ ... ┆ 1.826632   ┆ 2.716985 ┆ 18.0       ┆ Silt       │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ mixtures - │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clayey     │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silt to    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ s...       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.07       ┆ 0.691  ┆ 0.696      ┆ 0.012 ┆ ... ┆ 1.725253   ┆ 2.613287 ┆ 18.0       ┆ Silt       │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ mixtures - │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clayey     │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silt to    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ s...       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ ...        ┆ ...    ┆ ...        ┆ ...   ┆ ... ┆ ...        ┆ ...      ┆ ...        ┆ ...        │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.91      ┆ 14.912 ┆ 14.954     ┆ 0.055 ┆ ... ┆ 0.374103   ┆ 1.483961 ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.93      ┆ 14.706 ┆ 14.748     ┆ 0.053 ┆ ... ┆ 0.365621   ┆ 1.484123 ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.95      ┆ 14.625 ┆ 14.666     ┆ 0.05  ┆ ... ┆ 0.346873   ┆ 1.4745   ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.97      ┆ 14.698 ┆ 14.74      ┆ 0.05  ┆ ... ┆ 0.345129   ┆ 1.471786 ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">└────────────┴────────┴────────────┴───────┴─────┴────────────┴──────────┴────────────┴────────────┘</span>
-</pre></div>
-</div>
-<p>The classification is given for each row of the cpt, all the parameters(Qt, qt, Bq, ecc..) used for the classification are also returned with the
-<code class="code docutils literal notranslate"><span class="pre">polars.DataFrame</span></code>.</p>
-<p>If you don’t want to have so many columns you can just make a selection of them:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [16]: </span><span class="n">df</span> <span class="o">=</span> <span class="n">cpt</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="gp">In [17]: </span><span class="n">df</span><span class="p">[[</span><span class="s2">&quot;depth&quot;</span><span class="p">,</span> <span class="s2">&quot;soil_type&quot;</span><span class="p">]]</span>
-<span class="gh">Out[17]: </span><span class="go"></span>
-<span class="go">shape: (999, 2)</span>
-<span class="go">┌────────┬─────────────────────────────────────┐</span>
-<span class="go">│ depth  ┆ soil_type                           │</span>
-<span class="go">│ ---    ┆ ---                                 │</span>
-<span class="go">│ f64    ┆ str                                 │</span>
-<span class="go">╞════════╪═════════════════════════════════════╡</span>
-<span class="go">│ 0.01   ┆ Peat                                │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.03   ┆ Clays - silty clay to clay          │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.05   ┆ Silt mixtures - clayey silt to s... │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.07   ┆ Silt mixtures - clayey silt to s... │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ ...    ┆ ...                                 │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.866 ┆ Sands - clean sand to silty sand    │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.886 ┆ Sands - clean sand to silty sand    │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.905 ┆ Sands - clean sand to silty sand    │</span>
-<span class="go">├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.925 ┆ Sands - clean sand to silty sand    │</span>
-<span class="go">└────────┴─────────────────────────────────────┘</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="plot-a-classified-cpt">
-<h2>Plot a classified cpt<a class="headerlink" href="#plot-a-classified-cpt" title="Permalink to this heading"></a></h2>
-<p>Passing the argument <code class="code docutils literal notranslate"><span class="pre">classification</span></code> to the <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code> method a subplot with a classification is added.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [18]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">classification</span><span class="o">=</span><span class="s2">&quot;robertson&quot;</span><span class="p">,</span> <span class="n">water_level_NAP</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
-<span class="go">shape: (999, 25)</span>
-<span class="go">┌────────────┬────────┬────────────┬───────┬─────┬────────────┬──────────┬────────────┬────────────┐</span>
-<span class="go">│ penetratio ┆ qc     ┆ corrected_ ┆ fs    ┆ ... ┆ normalized ┆ type_ind ┆ gamma_pred ┆ soil_type  │</span>
-<span class="go">│ n_length   ┆ ---    ┆ qc         ┆ ---   ┆     ┆ _friction_ ┆ ex       ┆ ict        ┆ ---        │</span>
-<span class="go">│ ---        ┆ f64    ┆ ---        ┆ f64   ┆     ┆ ratio      ┆ ---      ┆ ---        ┆ str        │</span>
-<span class="go">│ f64        ┆        ┆ f64        ┆       ┆     ┆ ---        ┆ f64      ┆ f64        ┆            │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆ f64        ┆          ┆            ┆            │</span>
-<span class="go">╞════════════╪════════╪════════════╪═══════╪═════╪════════════╪══════════╪════════════╪════════════╡</span>
-<span class="go">│ 0.01       ┆ 0.013  ┆ 0.013      ┆ 0.002 ┆ ... ┆ 15.515904  ┆ 4.396123 ┆ 11.0       ┆ Peat       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.03       ┆ 0.103  ┆ 0.107      ┆ 0.002 ┆ ... ┆ 1.867937   ┆ 3.231428 ┆ 11.0       ┆ Clays -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silty clay │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to clay    │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.05       ┆ 0.489  ┆ 0.493      ┆ 0.009 ┆ ... ┆ 1.825373   ┆ 2.660013 ┆ 1.0        ┆ Silt       │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ mixtures - │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clayey     │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silt to    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ s...       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 0.07       ┆ 0.691  ┆ 0.696      ┆ 0.012 ┆ ... ┆ 1.723568   ┆ 2.526979 ┆ 1.0        ┆ Sand       │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ mixtures - │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ silty sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to sa...   │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ ...        ┆ ...    ┆ ...        ┆ ...   ┆ ... ┆ ...        ┆ ...      ┆ ...        ┆ ...        │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.91      ┆ 14.912 ┆ 14.954     ┆ 0.055 ┆ ... ┆ 0.373992   ┆ 1.570723 ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.93      ┆ 14.706 ┆ 14.748     ┆ 0.053 ┆ ... ┆ 0.365512   ┆ 1.571182 ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.95      ┆ 14.625 ┆ 14.666     ┆ 0.05  ┆ ... ┆ 0.346768   ┆ 1.562199 ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
-<span class="go">│ 19.97      ┆ 14.698 ┆ 14.74      ┆ 0.05  ┆ ... ┆ 0.345026   ┆ 1.5593   ┆ 19.0       ┆ Sands -    │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ clean sand │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ to silty   │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆          ┆            ┆ sand       │</span>
-<span class="go">└────────────┴────────┴────────────┴───────┴─────┴────────────┴──────────┴────────────┴────────────┘</span>
-<span class="gh">Out[18]: </span><span class="go">&lt;Figure size 1100x800 with 3 Axes&gt;</span>
-</pre></div>
-</div>
-<img alt="../_images/cpt_plot_classification.png" src="../_images/cpt_plot_classification.png" />
-<p>Check the reference to learn about all the arguments of the method, you can for example control the grid and the figure size.</p>
 </section>
 </section>
 
