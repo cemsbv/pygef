@@ -5,7 +5,6 @@ from typing import Union
 
 import pygef.plot_utils as plot
 from pygef.base import Base
-from pygef.broxml import _BroXmlCpt
 from pygef.gef import _GefCpt
 
 logger = logging.getLogger(__name__)
@@ -122,7 +121,7 @@ class Cpt(Base):
             mileage: float
     """
 
-    def __init__(self, path=None, content: dict = None):
+    def __init__(self, path=None, content: dict | None = None):
         """
         Cpt class.
 
@@ -142,7 +141,7 @@ class Cpt(Base):
 
         super().__init__()
 
-        parsed: Union[_BroXmlCpt, _GefCpt]
+        parsed: Union[_GefCpt]
 
         if content is not None:
             assert (
@@ -152,13 +151,13 @@ class Cpt(Base):
             if content["file_type"] == "gef":
                 parsed = _GefCpt(string=content["string"])
             elif content["file_type"] == "xml":
-                parsed = _BroXmlCpt(string=content["string"])
+                pass
 
         elif path is not None:
             if path.lower().endswith("gef"):
                 parsed = _GefCpt(path)
             elif path.lower().endswith("xml"):
-                parsed = _BroXmlCpt(path)
+                pass
         else:
             raise ValueError("One of [path, (string, file_type)] should be not None.")
 

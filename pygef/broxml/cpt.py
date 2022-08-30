@@ -1,9 +1,11 @@
 from __future__ import annotations
+from dataclasses import dataclass
 
 import io
 from pathlib import Path
 
 
-class BroCPT:
-    def __init__(self, file: io.BytesIO | Path | str):
-        self.file = file
+@dataclass
+class CPTXml:
+    bro_id: str | None
+    research_report_date: str | None

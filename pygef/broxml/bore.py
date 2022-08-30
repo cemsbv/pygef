@@ -143,15 +143,6 @@ class _BroXmlBore(_BroXml):
         return df
 
 
-class _BroXmlCpt(_BroXml):
-    def __init__(self, path: str | None = None, string: str | None = None):
-        super().__init__(path=path, string=string)
-
-        raise NotImplementedError(
-            "The parsing of cpts in xml format is not yet available."
-        )
-
-
 def soil_name_to_percentages(df: pl.DataFrame) -> pl.DataFrame:
     """
     Adds the columns

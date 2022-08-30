@@ -13,14 +13,20 @@ venv:
 clean:
 	@rm -r venv
 
-test: venv
+test: venv test-xml test-gef
 	$(PYTHON_BIN)/pytest pygef/tests/gef/**
+
+test-gef: venv
+	$(PYTHON_BIN)/pytest pygef/tests/gef/**
+
+test-xml: venv
+	$(PYTHON_BIN)/pytest pygef/tests/xml/**
 
 pre-commit: mypy
 	$(PYTHON_BIN)/black .
 
 mypy: venv
-	$(PYTHON_BIN)/mypy pygef
+	$(PYTHON_BIN)/mypy
 
 lint: mypy
 
