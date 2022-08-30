@@ -75,7 +75,6 @@
 
 <span class="kn">import</span> <span class="nn">pygef.plot_utils</span> <span class="k">as</span> <span class="nn">plot</span>
 <span class="kn">from</span> <span class="nn">pygef.base</span> <span class="kn">import</span> <span class="n">Base</span>
-<span class="kn">from</span> <span class="nn">pygef.broxml</span> <span class="kn">import</span> <span class="n">_BroXmlCpt</span>
 <span class="kn">from</span> <span class="nn">pygef.gef</span> <span class="kn">import</span> <span class="n">_GefCpt</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -192,7 +191,7 @@
 <span class="sd">            mileage: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Cpt.__init__"><a class="viewcode-back" href="../../tree/reference.html#pygef.Cpt.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cpt.__init__"><a class="viewcode-back" href="../../tree/reference.html#pygef.Cpt.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Cpt class.</span>
 
@@ -212,7 +211,7 @@
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-        <span class="n">parsed</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_BroXmlCpt</span><span class="p">,</span> <span class="n">_GefCpt</span><span class="p">]</span>
+        <span class="n">parsed</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_GefCpt</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="p">(</span>
@@ -222,13 +221,13 @@
             <span class="k">if</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;file_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;gef&quot;</span><span class="p">:</span>
                 <span class="n">parsed</span> <span class="o">=</span> <span class="n">_GefCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">])</span>
             <span class="k">elif</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;file_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;xml&quot;</span><span class="p">:</span>
-                <span class="n">parsed</span> <span class="o">=</span> <span class="n">_BroXmlCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">])</span>
+                <span class="k">pass</span>
 
         <span class="k">elif</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;gef&quot;</span><span class="p">):</span>
                 <span class="n">parsed</span> <span class="o">=</span> <span class="n">_GefCpt</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;xml&quot;</span><span class="p">):</span>
-                <span class="n">parsed</span> <span class="o">=</span> <span class="n">_BroXmlCpt</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One of [path, (string, file_type)] should be not None.&quot;</span><span class="p">)</span>
 
