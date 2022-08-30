@@ -9,3 +9,4 @@ from pathlib import Path
 class CPTXml:
     bro_id: str | None
     research_report_date: str | None
+    cpt_standard: str | None

@@ -16,13 +16,34 @@ def read_cpt(file: io.BytesIO | Path | str) -> list[CPTXml]:
 
     out: list[CPTXml] = []
 
+    # maps keyword argument to:
+    # xpath: query passed to elementree.find
+    # resolver: A function that converts the string to the proper datatype
+    #           Fn(str) -> Any
+    attribs = {
+        "bro_id": {"xpath": "brocom:broId"},
+        "research_report_date": {"xpath": "./researchReportDate/brocom:date"},
+        "cpt_standard": {"xpath": "cptStandard"},
+    }
+
     cpts = dd.findall("./*")
     for cpt in cpts:
-        bro_id: str = cpt.find("brocom:broId", cpt.nsmap).text
-        research_report_date: str = cpt.find(
-            "./researchReportDate/brocom:date", cpt.nsmap
-        ).text
 
-        out.append(CPTXml(bro_id=bro_id, research_report_date=research_report_date))
+        # kwargs of attribute: value
+        resolved = dict()
+
+        for (atrib, d) in attribs.items():
+            el = cpt.find(d["xpath"], cpt.nsmap)
+
+            if el is not None:
+                if "resolver" in d:
+                    func = d["resolver"]
+                    # ignore mypy error as it thinks we get a
+                    # str from the dict
+                    resolved[atrib] = func(el.text)  # type: ignore
+                else:
+                    resolved[atrib] = el.text
+
+        out.append(CPTXml(**resolved))
 
     return out
