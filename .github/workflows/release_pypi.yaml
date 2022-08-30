@@ -3,9 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - '*'
-    branches:
-      - master
+      - 'pygef-v*'
 
 jobs:
   deploy:
