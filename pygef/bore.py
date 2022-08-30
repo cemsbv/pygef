@@ -43,7 +43,7 @@ class Bore(Base):
                                             ]
     """
 
-    def __init__(self, path=None, content: dict = None):
+    def __init__(self, path=None, content: dict | None = None):
         """
         Bore class.
 
