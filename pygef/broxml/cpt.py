@@ -18,4 +18,4 @@ class CPTXml:
     standardized_location: Location | None
     dissipationtest_performed: bool | None
     quality_class: str | None
-    data: pl.DataFrame | None
+    data: pl.DataFrame

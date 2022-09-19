@@ -14,10 +14,12 @@ from lxml import etree
 
 
 def process_cpt_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFrame:
+    namespaces = kwargs["namespaces"]
     """Resolver for conePenetrometerSurvey/cptcommon:conePenetrationTest/cptcommon:cptResult."""
-    text_enc = el.find(
-        "./swe:encoding/swe:TextEncoding", namespaces=kwargs["namespaces"]
-    )
+
+    prefix = "./cptcommon:conePenetrationTest/cptcommon:cptResult"
+
+    text_enc = el.find(f"{prefix}/swe:encoding/swe:TextEncoding", namespaces=namespaces)
     decimal_sep = text_enc.attrib["decimalSeparator"]
     if decimal_sep != ".":
         warn(
@@ -27,10 +29,27 @@ def process_cpt_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFr
     delimiter = text_enc.attrib["tokenSeparator"]
     new_line_char = text_enc.attrib["blockSeparator"]
 
+    columns = []
+    selection = []
+
+    i = 0
+    for param in el.find(
+        "./cptcommon:parameters", namespaces=namespaces
+    ).iterchildren():
+        name = param.tag.split("}")[1]
+        if parse_bool(param.text):
+            columns.append(name)
+            # we select the columns by index
+            # this prevents materializing invalid columns
+            selection.append(i)
+        i += 1
+
     # we strip the data because there is leading and trailing whitespace.
-    data = el.find("./cptcommon:values", namespaces=kwargs["namespaces"]).text.strip()
+    data = el.find(f"{prefix}/cptcommon:values", namespaces=namespaces).text.strip()
     return pl.read_csv(
         data.encode(),
+        new_columns=columns,
+        columns=selection,
         has_header=False,
         sep=delimiter,
         eol_char=new_line_char,
@@ -104,7 +123,7 @@ CPT_ATTRIBS = {
         "xpath": "./conePenetrometerSurvey/cptcommon:qualityClass",
     },
     "data": {
-        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrationTest/cptcommon:cptResult",
+        "xpath": "./conePenetrometerSurvey",
         "resolver": process_cpt_result,
     },
 }
