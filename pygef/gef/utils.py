@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
-from pygef import exceptions
+from pygef.gef import exceptions
 
 logger = logging.getLogger(__name__)
 

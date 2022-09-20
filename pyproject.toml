@@ -43,5 +43,5 @@ ignore_missing_imports = true
 
 # TODO! include these files
 [[tool.mypy.overrides]]
-module = ["pygef.plot_utils", "pygef.gef"]
+module = ["pygef.gef.plot_utils", "pygef.gef.gef"]
 ignore_errors = true

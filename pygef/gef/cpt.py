@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Union
 
-import pygef.plot_utils as plot
-from pygef.base import Base
-from pygef.gef import _GefCpt
+import pygef.gef.plot_utils as plot
+from pygef.gef.base import Base
+from pygef.gef.gef import _GefCpt
 
 logger = logging.getLogger(__name__)
 
