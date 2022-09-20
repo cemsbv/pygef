@@ -9,7 +9,7 @@ import polars as pl
 
 import pygef.gef.geo as geo
 import pygef.gef.utils as utils
-from pygef.gef import exceptions
+from pygef import exceptions
 from pygef.gef.bore import Bore
 from pygef.gef.cpt import Cpt
 from pygef.gef.gef import (

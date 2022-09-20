@@ -5,9 +5,10 @@ from enum import Enum
 
 
 class QualityClass(Enum):
-    Unknown = 0
+    Unknown = -1
     Class1 = 1
     Class2 = 2
+    Class3 = 3
 
 
 @dataclass
@@ -18,7 +19,7 @@ class Location:
 
 
 @dataclass
-class CPTXml:
+class CPTData:
     # dispatch_document cpt
     bro_id: str | None
     research_report_date: str | None

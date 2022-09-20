@@ -8,7 +8,8 @@ import numpy as np
 import polars as pl
 from polars import col, lit, when
 
-from pygef.gef import exceptions, utils
+from pygef.gef import utils
+from pygef import exceptions
 
 # Try to import the optimized Rust header parsing but if that doesn't succeed
 # use the built-in python regex methods

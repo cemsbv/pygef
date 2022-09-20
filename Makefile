@@ -14,7 +14,7 @@ clean:
 	@rm -r venv
 
 test: venv test-xml test-gef
-	$(PYTHON_BIN)/pytest pygef/tests/gef/**
+	$(PYTHON_BIN)/pytest pygef/tests/*
 
 test-gef: venv
 	$(PYTHON_BIN)/pytest pygef/tests/gef/**
