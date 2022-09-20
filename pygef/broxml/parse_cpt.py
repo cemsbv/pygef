@@ -6,9 +6,8 @@ from pathlib import Path
 from typing import Any, cast
 from warnings import warn
 import polars as pl
-import textwrap
 
-from .cpt import CPTXml, Location
+from .cpt import CPTXml, Location, QualityClass
 
 from lxml import etree
 
@@ -74,6 +73,24 @@ def parse_bool(val: str, **kwargs: dict[Any, Any]) -> bool:
     return bool(val)
 
 
+def parse_int(val: str, **kwargs: dict[Any, Any]) -> int:
+    return int(val)
+
+
+def parse_float(val: str, **kwargs: dict[Any, Any]) -> float:
+    return float(val)
+
+
+def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> QualityClass:
+    val = val.strip().lower()
+    if val == "klasse1":
+        return QualityClass.Class1
+    if val == "klasse2":
+        return QualityClass.Class2
+    warn(f"quality class '{val}' is unknown")
+    return QualityClass.Unknown
+
+
 def parse_position(pos: str) -> tuple[float, float]:
     """
     Parse a position tuple
@@ -121,10 +138,138 @@ CPT_ATTRIBS = {
     },
     "quality_class": {
         "xpath": "./conePenetrometerSurvey/cptcommon:qualityClass",
+        "resolver": parse_quality_class,
+        "el-attr": "text",
+    },
+    "predrilled_depth": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:trajectory/cptcommon:predrilledDepth",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "final_depth": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:trajectory/cptcommon:finalDepth",
+        "resolver": parse_float,
+        "el-attr": "text",
     },
     "data": {
         "xpath": "./conePenetrometerSurvey",
         "resolver": process_cpt_result,
+    },
+    "cpt_description": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:description",
+    },
+    "cpt_type": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:conePenetrometerType",
+    },
+    "cone_surface_area": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:coneSurfaceArea",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "cone_diameter": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:coneDiameter",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "cone_surface_quotient": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:coneSurfaceQuotient",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "cone_to_friction_sleeve_distance": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:coneToFrictionSleeveDistance",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "cone_to_friction_sleeve_surface_area": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:frictionSleeveSurfaceArea",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "cone_to_friction_sleeve_surface_quotient": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:frictionSleeveSurfaceQuotient",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_cone_resistance_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:coneResistanceBefore",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_cone_resistance_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:coneResistanceAfter",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_inclination_ew_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:inclinationEWBefore",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "zlm_inclination_ew_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:inclinationEWAfter",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "zlm_inclination_ns_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:inclinationNSBefore",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "zlm_inclination_ns_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:inclinationNSAfter",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "zlm_inclination_resultant_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:inclinationResultantBefore",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "zlm_inclination_resultant_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:inclinationResultantAfter",
+        "resolver": parse_int,
+        "el-attr": "text",
+    },
+    "zlm_local_friction_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:localFrictionBefore",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_local_friction_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:localFrictionAfter",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_pore_pressure_u1_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:porePressureU1Before",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_pore_pressure_u2_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:porePressureU2Before",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_pore_pressure_u3_before": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:porePressureU3Before",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_pore_pressure_u1_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:porePressureU1After",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_pore_pressure_u2_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:porePressureU2After",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "zlm_pore_pressure_u3_after": {
+        "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:porePressureU3After",
+        "resolver": parse_float,
+        "el-attr": "text",
     },
 }
 
@@ -160,6 +305,8 @@ def read_cpt(file: io.BytesIO | Path | str) -> list[CPTXml]:
                     resolved[atrib] = func(el, namespaces=namespaces)
                 else:
                     resolved[atrib] = el.text
+            else:
+                resolved[atrib] = None
         out.append(CPTXml(**resolved))
 
     return out
