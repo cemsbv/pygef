@@ -7,12 +7,12 @@ from datetime import datetime
 import numpy as np
 import polars as pl
 
-import pygef.geo as geo
-import pygef.utils as utils
-from pygef import exceptions
-from pygef.bore import Bore
-from pygef.cpt import Cpt
-from pygef.gef import (
+import pygef.gef.geo as geo
+import pygef.gef.utils as utils
+from pygef.gef import exceptions
+from pygef.gef.bore import Bore
+from pygef.gef.cpt import Cpt
+from pygef.gef.gef import (
     MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT,
     _GefBore,
     _GefCpt,
