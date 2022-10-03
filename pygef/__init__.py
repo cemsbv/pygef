@@ -3,7 +3,7 @@ from pygef.gef.bore import Bore
 from pygef.gef.cpt import Cpt
 from pygef.gef.plot_utils import plot_merged_cpt_bore
 from pygef.gef.utils import depth_to_nap, join_gef, nap_to_depth
-from pygef.broxml import CPTData, QualityClass, Location
+from pygef.broxml import CPTData, QualityClass, Location, BoreData
 from pygef.shim import read_cpt
 
 
@@ -12,6 +12,7 @@ __all__ = [
     "Bore",
     "Cpt",
     "CPTData",
+    "BoreData",
     "read_cpt",
     "QualityClass",
     "Location",
