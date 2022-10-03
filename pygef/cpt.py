@@ -1,7 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Any
+
 import polars as pl
 from enum import Enum
+import copy
+import pprint
 
 
 class QualityClass(Enum):
@@ -56,9 +60,29 @@ class CPTData:
     zlm_pore_pressure_u1_after: float | None
     zlm_pore_pressure_u2_after: float | None
     zlm_pore_pressure_u3_after: float | None
+    delivered_vertical_position_offset: float | None
+    delivered_vertical_position_datum: str
+    delivered_vertical_position_reference_point: str
 
     data: pl.DataFrame
 
     @property
     def columns(self) -> list[str]:
         return self.data.columns
+
+    def __str__(self):
+        return f"CPTData: {self.bro_id}"
+
+    def attributes(self) -> dict[str, Any]:
+        """
+        Get the attributes
+        """
+        attribs = copy.copy(self.__dict__)
+        attribs["data"] = attribs["data"].shape
+        return attribs
+
+    def display_attributes(self) -> str:
+        """
+        Get pretty formatted string representation of `CPTData.attributes``
+        """
+        return pprint.pformat(self.attributes())

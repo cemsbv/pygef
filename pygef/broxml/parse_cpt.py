@@ -80,6 +80,10 @@ def parse_float(val: str, **kwargs: dict[Any, Any]) -> float:
     return float(val)
 
 
+def lower_text(val: str, **kwargs: dict[Any, Any]) -> str:
+    return val.lower()
+
+
 def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> QualityClass:
     val = val.lower().replace(" ", "")
     if val == "klasse1" or val == "class1":
@@ -270,6 +274,21 @@ CPT_ATTRIBS = {
     "zlm_pore_pressure_u3_after": {
         "xpath": "./conePenetrometerSurvey/cptcommon:conePenetrometer/cptcommon:zeroLoadMeasurement/cptcommon:porePressureU3After",
         "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "delivered_vertical_position_offset": {
+        "xpath": "./deliveredVerticalPosition/cptcommon:offset",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "delivered_vertical_position_datum": {
+        "xpath": "./deliveredVerticalPosition/cptcommon:verticalDatum",
+        "resolver": lower_text,
+        "el-attr": "text",
+    },
+    "delivered_vertical_position_reference_point": {
+        "xpath": "./deliveredVerticalPosition/cptcommon:localVerticalReferencePoint",
+        "resolver": lower_text,
         "el-attr": "text",
     },
 }

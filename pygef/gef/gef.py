@@ -591,11 +591,15 @@ def correct_depth_with_inclination(columns):
             np.radians(col("inclination").cast(pl.Float32).fill_null(0))
         )
 
-        corrected_depth = (correction_factor * col(pt).diff()).cumsum()
+        delta_height = col(pt).diff()
+        corrected_depth = correction_factor * delta_height
+
         return (
-            pl.when(corrected_depth.is_null())
+            # this sets the first as depth
+            pl.when(pl.arange(0, corrected_depth.count()) == 0)
             .then(col(pt))
             .otherwise(corrected_depth)
+            .cumsum()
             .alias("depth")
         )
     else:

@@ -700,14 +700,16 @@ class GefTest(unittest.TestCase):
                 "fs": [0.0000e000, 4.6500e-002, 4.2750e-002, 3.9000e-002],
                 "depth": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
                 "elevation_with_respect_to_nap": [1.3, 0.28, 0.26, 0.24],
-                "friction_number": [np.nan, 6.54929577, 5.85616438, 5.65217391],
+                "friction_number": [None, 6.54929577, 5.85616438, 5.65217391],
             }
         )
 
-        # TODO: replace with frame_equal when rounding is supported
-        # assert df_calculated.frame_equal(df, null_equal=True)
         for column in df.columns:
-            assert df_calculated[column].round(6) == df[column]
+            assert (
+                df_calculated[column]
+                .round(4)
+                .series_equal(df[column].round(4), null_equal=True)
+            )
 
     def test_parse_bore(self):
         cpt = Bore(
@@ -815,10 +817,12 @@ class GefTest(unittest.TestCase):
                 "elevation_with_respect_to_nap": [-1.90, -1.919999],
             }
         )
-        # TODO: replace with frame_equal when rounding is supported
-        # assert cpt.df.frame_equal(expected, null_equal=True)
         for column in cpt.df.columns:
-            assert expected[column].round(6) == cpt.df[column]
+            assert (
+                expected[column]
+                .round(4)
+                .series_equal(cpt.df[column].round(4), null_equal=True)
+            )
 
     def test_delta_depth(self):
         df1 = pl.DataFrame({"depth": [0.0, 0.5, 1.0]})
@@ -886,7 +890,7 @@ class GefTest(unittest.TestCase):
         # TODO: replace with frame_equal when rounding is supported
         # assert df_calculated.frame_equal(df, null_equal=True)
         for column in df.columns:
-            assert v[column].round(6) == df[column]
+            assert v[column].round(6).series_equal(df[column])
 
     def test_qt(self):
         df1 = pl.DataFrame({"qc": [0.0, 1.0, 2.0], "u2": [0.0, 1.0, 1.0]})

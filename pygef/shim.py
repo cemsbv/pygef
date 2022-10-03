@@ -35,6 +35,13 @@ def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
     return broxml.read_cpt(file)[index]
 
 
+def convert_height_system_to_vertical_datum(height_system: float) -> str:
+    if height_system == 31000.0:
+        return "nap"
+    else:
+        return str(int(height_system))
+
+
 def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs: dict[str, Any] = {}
 
@@ -109,5 +116,10 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs[
         "zlm_pore_pressure_u3_after"
     ] = gef_cpt.zero_measurement_ppt_u3_after_penetration_test
+    kwargs["delivered_vertical_position_offset"] = gef_cpt.zid
+    kwargs["delivered_vertical_position_datum"] = gef_cpt.height_system
+
+    # TODO! parse measurementtext 9 in gef?
+    kwargs["delivered_vertical_position_reference_point"] = "unknown"
 
     return CPTData(**kwargs)

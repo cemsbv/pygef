@@ -41,3 +41,5 @@ def test_cpt_attributes(cpt_xml: str) -> None:
     assert cpt.zlm_pore_pressure_u1_after is None
     assert cpt.zlm_pore_pressure_u2_after is None
     assert cpt.zlm_pore_pressure_u3_after is None
+    assert cpt.delivered_vertical_position_offset == 4.41
+    assert cpt.delivered_vertical_position_datum == "nap"
