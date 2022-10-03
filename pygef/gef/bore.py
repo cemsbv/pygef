@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import Union
 
-import pygef.plot_utils as plot
-from pygef.base import Base
+import pygef.gef.plot_utils as plot
+from pygef.gef.base import Base
 from pygef.broxml import _BroXmlBore
-from pygef.gef import _GefBore
+from pygef.gef.gef import _GefBore
 
 
 class Bore(Base):

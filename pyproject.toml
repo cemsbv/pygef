@@ -7,7 +7,7 @@ build-backend = "maturin"
 name = "pygef"
 version = "0.7.3"
 dependencies = [
-    "polars[pyarrow]>= 0.14.6",
+    "polars[pyarrow]>= 0.14.16",
     "matplotlib>= 3.4.2",
     "lxml==4.9.1",
 ]
@@ -43,5 +43,5 @@ ignore_missing_imports = true
 
 # TODO! include these files
 [[tool.mypy.overrides]]
-module = ["pygef.plot_utils", "pygef.gef"]
+module = ["pygef.gef.plot_utils", "pygef.gef.gef"]
 ignore_errors = true

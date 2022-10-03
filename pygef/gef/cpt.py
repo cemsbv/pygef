@@ -1,0 +1,234 @@
+from __future__ import annotations
+
+import logging
+from typing import Union
+
+import pygef.gef.plot_utils as plot
+from pygef.gef.base import Base
+from pygef.gef.gef import _GefCpt
+
+logger = logging.getLogger(__name__)
+
+
+class Cpt(Base):
+    """
+    ** Cpt attributes:**
+        *Always present:*
+            type: str
+                Type of the gef file
+            project_id: str
+                Project id
+            x: float
+                X coordinate respect to the coordinate system
+            y: float
+                Y coordinate respect to the coordinate system
+            zid: float
+                Z coordinate respect to the height system
+            height_system: float
+                Type of coordinate system, 31000 is NAP
+            file_date: datatime.datetime
+                Start date time
+            test_id: str
+                Identifying name of gef file.
+            s: str
+                String version of gef file.
+            df: polars.DataFrame
+                DataFrame containing the same column contained in the original .gef file and
+                some additional columns [depth, elevation_with_respect_to_nap]
+
+                Tip: Use depth column instead of the penetration_length, the depth is corrected
+                with the inclination(if present).
+
+                Note that the Friction ratio is always calculated from the fs and qc values and not parsed from the file.
+
+                If this attribute is called after the classify method the columns relative to the classification
+                are also contained.
+
+        *Not always present*
+
+            default: None
+            The description is added only for the most important attributes, for the others check:
+            https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&modificationDate=1409732008000&api=v2
+
+            cpt_class: str
+                Cpt class. The format is not standard so it might be not always properly parsed.
+            column_void: str
+                It is the definition of no value for the gef file
+            nom_surface_area_cone_tip: float
+                Nom. surface area of cone tip [mm2]
+            nom_surface_area_friction_element: float
+                Nom. surface area of friction casing [mm2]
+            net_surface_area_quotient_of_the_cone_tip: float
+                Net surface area quotient of cone tip [-]
+            net_surface_area_quotient_of_the_friction_casing: float
+                Net surface area quotient of friction casing [-]
+            distance_between_cone_and_centre_of_friction_casing: float
+
+            friction_present: float
+
+            ppt_u1_present: float
+
+            ppt_u2_present: float
+
+            ppt_u3_present: float
+
+            inclination_measurement_present: float
+
+            use_of_back_flow_compensator: float
+
+            type_of_cone_penetration_test: float
+
+            pre_excavated_depth: float
+                 Pre excavate depth [m]
+            groundwater_level: float
+                Ground water level [m]
+            water_depth_offshore_activities: float
+            end_depth_of_penetration_test: float
+            stop_criteria: float
+
+            zero_measurement_cone_before_penetration_test: float
+
+            zero_measurement_cone_after_penetration_test: float
+
+            zero_measurement_friction_before_penetration_test: float
+
+            zero_measurement_friction_after_penetration_test: float
+
+            zero_measurement_ppt_u1_before_penetration_test: float
+
+            zero_measurement_ppt_u1_after_penetration_test: float
+
+            zero_measurement_ppt_u2_before_penetration_test: float
+
+            zero_measurement_ppt_u2_after_penetration_test: float
+
+            zero_measurement_ppt_u3_before_penetration_test: float
+
+            zero_measurement_ppt_u3_after_penetration_test: float
+
+            zero_measurement_inclination_before_penetration_test: float
+
+            zero_measurement_inclination_after_penetration_test: float
+
+            zero_measurement_inclination_ns_before_penetration_test: float
+
+            zero_measurement_inclination_ns_after_penetration_test: float
+
+            zero_measurement_inclination_ew_before_penetration_test: float
+
+            zero_measurement_inclination_ew_after_penetration_test : float
+
+            mileage: float
+    """
+
+    def __init__(self, path=None, content: dict | None = None):
+        """
+        Cpt class.
+
+        Parameters
+        ----------
+        path:
+            Path to the file.
+        content: dict
+            Dictionary with keys: ["string", "file_type"]
+                - string: str
+                    String version of the file.
+                - file_type: str
+                    One of [gef, xml]
+        """
+        self.net_surface_area_quotient_of_the_cone_tip = None
+        self.pre_excavated_depth = None
+
+        super().__init__()
+
+        parsed: Union[_GefCpt]
+
+        if content is not None:
+            assert (
+                content["file_type"] == "gef" or content["file_type"] == "xml"
+            ), f"file_type can be only one of [gef, xml] "
+            assert content["string"] is not None, "content['string'] must be specified"
+            if content["file_type"] == "gef":
+                parsed = _GefCpt(string=content["string"])
+            elif content["file_type"] == "xml":
+                pass
+
+        elif path is not None:
+            if path.lower().endswith("gef"):
+                parsed = _GefCpt(path)
+            elif path.lower().endswith("xml"):
+                pass
+        else:
+            raise ValueError("One of [path, (string, file_type)] should be not None.")
+
+        self.__dict__.update(parsed.__dict__)
+
+    def plot(
+        self,
+        classification=None,
+        water_level_NAP=None,
+        water_level_wrt_depth=None,
+        p_a=0.1,
+        new=True,
+        show=False,
+        figsize=(11, 8),
+        df_group=None,
+        grid_step_x=None,
+        dpi=100,
+        colors=None,
+        z_NAP=False,
+    ):
+        """
+        Plot the cpt file and return matplotlib.pyplot.figure .
+
+        Parameters
+        ----------
+        classification: str, only for cpt type
+            If classification ("robertson", "been_jefferies") is specified a subplot is added with the classification
+            for each cpt row.
+        water_level_NAP: float, only for cpt type, necessary for the classification: give this or water_level_wrt_depth
+            Water level with respect to NAP
+        water_level_wrt_depth: float, only for cpt type, necessary for the classification: give this or water_level_NAP
+            Water level with respect to the ground_level [0], it should be a negative value.
+        p_a: float, only for cpt type, optional for the classification
+            Atmospheric pressure. Default: 0.1 MPa.
+        new: bool, only for cpt type, optional for the classification default:True
+            If True and the classification is robertson, the new(2016) implementation of robertson is used.
+        show: bool
+            If True the plot is showed, else the matplotlib.pytplot.figure is returned
+        figsize: tuple
+            Figsize of the plot, default (11, 8).
+        df_group: polars.DataFrame, only for cpt type, optional for the classification
+            Use this argument to plot a defined soil layering next to the other subplots.
+            It should contain the columns:
+                - layer
+                    Name of layer, should be either BeenJefferies of Robertson soil type,
+                    if it is different then also the argument colors should be passed.
+                - z_centr_NAP
+                    Z value of the middle of the layer
+                - thickness
+                    Thickness of the layer
+        grid_step_x: float, only for cpt type, default: None
+            Grid step for qc and Fr subplots.
+        dpi: int
+            Dpi figure
+        colors: dict
+            Dictionary containing the colors associated to each soil type, if specified
+        z_NAP: bool
+            If True the Z-axis is with respect to NAP.
+        Returns
+        -------
+        matplotlib.pyplot.figure
+        """
+
+        return plot.plot_cpt(
+            self.df,
+            df_group,
+            classification,
+            show=show,
+            figsize=figsize,
+            grid_step_x=grid_step_x,
+            colors=colors,
+            dpi=dpi,
+            z_NAP=z_NAP,
+        )

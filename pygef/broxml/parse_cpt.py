@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import io
-import typing
 from pathlib import Path
 from typing import Any, cast
 from warnings import warn
 import polars as pl
 
-from .cpt import CPTXml, Location, QualityClass
+from pygef.cpt import CPTData, Location, QualityClass
 
 from lxml import etree
 
@@ -81,11 +80,17 @@ def parse_float(val: str, **kwargs: dict[Any, Any]) -> float:
     return float(val)
 
 
+def lower_text(val: str, **kwargs: dict[Any, Any]) -> str:
+    return val.lower()
+
+
 def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> QualityClass:
-    val = val.strip().lower()
-    if val == "klasse1":
+    val = val.lower().replace(" ", "")
+    if val == "klasse1" or val == "class1":
         return QualityClass.Class1
-    if val == "klasse2":
+    if val == "klasse2" or val == "class2":
+        return QualityClass.Class2
+    if val == "klasse3" or val == "class3":
         return QualityClass.Class2
     warn(f"quality class '{val}' is unknown")
     return QualityClass.Unknown
@@ -271,17 +276,32 @@ CPT_ATTRIBS = {
         "resolver": parse_float,
         "el-attr": "text",
     },
+    "delivered_vertical_position_offset": {
+        "xpath": "./deliveredVerticalPosition/cptcommon:offset",
+        "resolver": parse_float,
+        "el-attr": "text",
+    },
+    "delivered_vertical_position_datum": {
+        "xpath": "./deliveredVerticalPosition/cptcommon:verticalDatum",
+        "resolver": lower_text,
+        "el-attr": "text",
+    },
+    "delivered_vertical_position_reference_point": {
+        "xpath": "./deliveredVerticalPosition/cptcommon:localVerticalReferencePoint",
+        "resolver": lower_text,
+        "el-attr": "text",
+    },
 }
 
 
-def read_cpt(file: io.BytesIO | Path | str) -> list[CPTXml]:
+def read_cpt(file: io.BytesIO | Path | str) -> list[CPTData]:
     tree = etree.parse(file)
 
     root = tree.getroot()
     namespaces = root.nsmap
     dd = root.find("dispatchDocument", namespaces)
 
-    out: list[CPTXml] = []
+    out: list[CPTData] = []
 
     cpts = dd.findall("./*")
     for cpt in cpts:
@@ -307,6 +327,6 @@ def read_cpt(file: io.BytesIO | Path | str) -> list[CPTXml]:
                     resolved[atrib] = el.text
             else:
                 resolved[atrib] = None
-        out.append(CPTXml(**resolved))
+        out.append(CPTData(**resolved))
 
     return out

@@ -1,17 +1,17 @@
 from pygef._version import __version__
-from pygef.bore import Bore
-from pygef.cpt import Cpt
-from pygef.plot_utils import plot_merged_cpt_bore
-from pygef.utils import depth_to_nap, join_gef, nap_to_depth
-from pygef.broxml import CPTXml, read_cpt, QualityClass, Location
+from pygef.gef.bore import Bore
+from pygef.gef.cpt import Cpt
+from pygef.gef.plot_utils import plot_merged_cpt_bore
+from pygef.gef.utils import depth_to_nap, join_gef, nap_to_depth
+from pygef.broxml import CPTData, QualityClass, Location
+from pygef.shim import read_cpt
 
 
 __all__ = [
-    "cpt",
-    "bore",
+    "gef",
     "Bore",
     "Cpt",
-    "CPTXml",
+    "CPTData",
     "read_cpt",
     "QualityClass",
     "Location",
