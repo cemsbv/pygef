@@ -6,25 +6,39 @@ from typing import Any
 
 from pygef.gef.cpt import _GefCpt
 from pygef.cpt import CPTData
+from pygef.bore import BoreData
 from pygef.cpt import Location, QualityClass
 from pygef import broxml
 
+GEF_ID = "#GEFID"
 
-def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
-    # gef files start with '#GEFID' so we check the content
-    # of the file
 
-    gef_id = "#GEFID"
-
+def is_gef_file(file: io.BytesIO | Path | str) -> bool:
+    """
+    gef files start with '#GEFID' so we check the content
+    of the file
+    """
     if isinstance(file, io.BytesIO):
         pos = file.tell()
-        is_gef = file.read(6).decode().startswith(gef_id)
+        is_gef = file.read(6).decode().startswith(GEF_ID)
         file.seek(pos)
+        return is_gef
     else:
         with open(file, errors="ignore") as f:
-            is_gef = f.read(6).startswith(gef_id)
+            return f.read(6).startswith(GEF_ID)
 
-    if is_gef:
+
+def read_bore(file: io.BytesIO | Path | str, index: int = 0) -> BoreData:
+    if is_gef_file(file):
+        if isinstance(file, io.BytesIO):
+            pass
+        else:
+            pass
+    return broxml.read_bore(file)[index]
+
+
+def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
+    if is_gef_file(file):
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):

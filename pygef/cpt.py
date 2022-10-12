@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import polars as pl
+from datetime import date
 from enum import Enum
 import copy
 import pprint
@@ -26,7 +27,7 @@ class Location:
 class CPTData:
     # dispatch_document cpt
     bro_id: str | None
-    research_report_date: str | None
+    research_report_date: date
     cpt_standard: str | None
     standardized_location: Location | None
     # conepenetrometersurvey
