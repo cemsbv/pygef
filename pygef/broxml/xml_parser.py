@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import io
-from pathlib import Path
 from typing import TypeVar, cast, Any, Callable
 from lxml import etree
 
@@ -12,27 +10,25 @@ T = TypeVar("T", CPTData, BoreData)
 
 
 def read_xml(
-    file: io.BytesIO | Path | str,
+    root: etree.Element,
     constructor: Callable[..., T],
     resolver_schema: dict[str, Any],
+    payload_root: str,
 ) -> list[T]:
-    tree = etree.parse(file)
-
-    root = tree.getroot()
     namespaces = root.nsmap
-    dd = root.find("dispatchDocument", namespaces)
+    dd = root.find(payload_root, namespaces)
 
     out: list[T] = []
 
-    cpts = dd.findall("./*")
-    for cpt in cpts:
+    payloads = dd.findall("./*")
+    for payload in payloads:
 
         # kwargs of attribute: value
         resolved = dict()
 
         for (atrib, d) in resolver_schema.items():
             d = cast(dict[str, Any], d)
-            el = cpt.find(d["xpath"], cpt.nsmap)
+            el = payload.find(d["xpath"], payload.nsmap)
 
             if el is not None:
                 if "resolver" in d:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from warnings import warn
 from typing import Any
 from lxml import etree
+from datetime import date, datetime
 
 from pygef.broxml import QualityClass, Location
 import polars as pl
@@ -20,18 +21,95 @@ def parse_int(val: str, **kwargs: dict[Any, Any]) -> int:
     return int(val)
 
 
+def parse_date(val: str, **kwargs: dict[Any, Any]) -> date:
+    return datetime.strptime(val, "%Y-%m-%d").date()
+
+
 def parse_bool(val: str, **kwargs: dict[Any, Any]) -> bool:
     val = val.lower()
     if val == "ja":
         return True
-    if val == "nee":
+    if val == "nee" or val == "geen":
         return False
     return bool(val)
 
 
-def process_cpt_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFrame:
+def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFrame:
     namespaces = kwargs["namespaces"]
-    """Resolver for conePenetrometerSurvey/cptcommon:conePenetrationTest/cptcommon:cptResult."""
+    upper_boundary = []
+    lower_boundary = []
+    geotechnical_soil_name = []
+    color = []
+    dispersed_inhomogenity = []
+    organic_matter_content_class = []
+    sand_median_class = []
+    for layer in el.iterfind("bhrgtcom:layer", namespaces=namespaces):
+        upper_boundary.append(
+            float(layer.find("bhrgtcom:upperBoundary", namespaces=namespaces).text)
+        )
+        lower_boundary.append(
+            float(layer.find("bhrgtcom:lowerBoundary", namespaces=namespaces).text)
+        )
+        geotechnical_soil_name.append(
+            layer.find(
+                "bhrgtcom:soil/bhrgtcom:geotechnicalSoilName", namespaces=namespaces
+            ).text
+        )
+        color.append(
+            layer.find("bhrgtcom:soil/bhrgtcom:colour", namespaces=namespaces).text
+        )
+        dispersed_inhomogenity.append(
+            parse_bool(
+                layer.find(
+                    "bhrgtcom:soil/bhrgtcom:dispersedInhomogeneity",
+                    namespaces=namespaces,
+                ).text
+            )
+        )
+        organic_matter_content_class.append(
+            layer.find(
+                "bhrgtcom:soil/bhrgtcom:organicMatterContentClass",
+                namespaces=namespaces,
+            ).text
+        )
+        try:
+            sand_median_class.append(
+                layer.find(
+                    "bhrgtcom:soil/bhrgtcom:sandMedianClass", namespaces=namespaces
+                ).text
+            )
+        except AttributeError:
+            sand_median_class.append(None)
+
+    variables = locals()
+    return pl.DataFrame(
+        {
+            name: variables[name]
+            for name in [
+                "upper_boundary",
+                "lower_boundary",
+                "geotechnical_soil_name",
+                "color",
+                "dispersed_inhomogenity",
+                "organic_matter_content_class",
+                "sand_median_class",
+            ]
+        }
+    )
+
+
+def process_cpt_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFrame:
+    """
+    Parse the cpt data into a `DataFrame`
+
+    Parameters
+    ----------
+    el
+        conePenetrometerSurvey
+    kwargs
+        namespaces.
+    """
+    namespaces = kwargs["namespaces"]
 
     prefix = "./cptcommon:conePenetrationTest/cptcommon:cptResult"
 
@@ -73,7 +151,7 @@ def process_cpt_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFr
     )
 
 
-def parse_brocom_location(el: etree.Element, **kwargs: dict[Any, Any]) -> Location:
+def parse_gml_location(el: etree.Element, **kwargs: dict[Any, Any]) -> Location:
     """Resolver for standardizedLocation/brocom:location"""
     srs_name = el.attrib["srsName"]
     pos = next(el.iterfind("./gml:pos", namespaces=kwargs["namespaces"])).text

@@ -7,8 +7,13 @@ TEST_FILES = os.path.abspath(
 
 
 @fixture()
-def bore_xml() -> str:
+def bore_xml_v1() -> str:
     return os.path.join(TEST_FILES, "bore_xml", "bore.xml")
+
+
+@fixture()
+def bore_xml_v2() -> str:
+    return os.path.join(TEST_FILES, "bore_xml", "DP14+074_MB_KR.xml")
 
 
 @fixture()

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 from pathlib import Path
+from lxml import etree
 
 from pygef.broxml import resolvers
 from pygef.broxml.xml_parser import read_xml
@@ -15,11 +16,15 @@ from pygef.cpt import CPTData
 # el-atrr: Optional: attribute of an element taken before send to resolver
 CPT_ATTRIBS = {
     "bro_id": {"xpath": "brocom:broId"},
-    "research_report_date": {"xpath": "./researchReportDate/brocom:date"},
+    "research_report_date": {
+        "xpath": "./researchReportDate/brocom:date",
+        "resolver": resolvers.parse_date,
+        "el-attr": "text",
+    },
     "cpt_standard": {"xpath": "cptStandard"},
     "standardized_location": {
         "xpath": "./standardizedLocation/brocom:location",
-        "resolver": resolvers.parse_brocom_location,
+        "resolver": resolvers.parse_gml_location,
     },
     "dissipationtest_performed": {
         "xpath": "./conePenetrometerSurvey/cptcommon:dissipationTestPerformed",
@@ -180,4 +185,5 @@ CPT_ATTRIBS = {
 
 
 def read_cpt(file: io.BytesIO | Path | str) -> list[CPTData]:
-    return read_xml(file, CPTData, CPT_ATTRIBS)
+    tree = etree.parse(file)
+    return read_xml(tree.getroot(), CPTData, CPT_ATTRIBS, "dispatchDocument")

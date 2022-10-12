@@ -1,4 +1,5 @@
 from pygef import broxml, QualityClass, Location
+from datetime import date
 
 
 def test_cpt_attributes(cpt_xml: str) -> None:
@@ -7,7 +8,7 @@ def test_cpt_attributes(cpt_xml: str) -> None:
 
     cpt = parsed[0]
     assert cpt.bro_id == "CPT000000099543"
-    assert cpt.research_report_date == "2019-04-23"
+    assert cpt.research_report_date == date(2019, 4, 23)
     assert cpt.data.shape == (373, 9)
     assert cpt.quality_class == QualityClass.Class2
     assert cpt.cpt_standard == "ISO22476D1"
