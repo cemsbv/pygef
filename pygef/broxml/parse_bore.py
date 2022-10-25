@@ -7,7 +7,9 @@ from pathlib import Path
 from pygef.broxml import resolvers
 from pygef.broxml.xml_parser import read_xml
 from pygef.bore import BoreData
+from pygef.broxml.mapping import MAPPING_PARAMETERS
 from lxml import etree
+import polars as pl
 
 
 # maps keyword argument to:
@@ -123,7 +125,9 @@ BORE_ATTRIBS_V2 = {
 }
 
 
-def read_bore(file: io.BytesIO | Path | str) -> list[BoreData]:
+def read_bore(
+    file: io.BytesIO | Path | str, include_soil_dist: bool = True
+) -> list[BoreData]:
     root = etree.parse(file).getroot()
     match = re.compile(r"xsd/.*/(\d\.\d)")
     matched = match.search(root.nsmap["bhrgtcom"])
@@ -133,4 +137,16 @@ def read_bore(file: io.BytesIO | Path | str) -> list[BoreData]:
     else:
         if 3.0 >= float(matched.group(1)) < 2.0:
             raise ValueError("only bhrgtcom/2.x is supported ")
-        return read_xml(root, BoreData, BORE_ATTRIBS_V2, "sourceDocument")
+        all_bd = read_xml(root, BoreData, BORE_ATTRIBS_V2, "sourceDocument")
+
+    if include_soil_dist:
+        out = []
+        for bore_data in all_bd:
+            tbl = MAPPING_PARAMETERS.dist_table()
+            bore_data.data = bore_data.data.join(
+                tbl, on="geotechnical_soil_name", how="left"
+            )
+            out.append(bore_data)
+        return out
+    else:
+        return all_bd

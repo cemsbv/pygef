@@ -6,6 +6,7 @@ from datetime import datetime
 
 import numpy as np
 import polars as pl
+import polars.testing
 
 import pygef.gef.geo as geo
 import pygef.gef.utils as utils
