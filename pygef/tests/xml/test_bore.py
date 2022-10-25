@@ -2,8 +2,18 @@ import pytest
 
 from pygef import broxml
 from pygef.broxml import Location
+from pygef.broxml.mapping import MAPPING_PARAMETERS
 from datetime import date
 import polars as pl
+
+
+def test_bore_percentages() -> None:
+    # all soil distributions should be a distribution e.g.
+    # sum to 100 %
+    # be all positive
+    for dist in MAPPING_PARAMETERS.bro_to_dict().values():
+        assert dist.sum() == 1.0
+        assert (dist < 0.0).sum() == 0
 
 
 def test_bore_attributes(bore_xml_v2: str) -> None:
@@ -131,7 +141,22 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 "middelgrof200tot300um",
                 "middelgrof300tot420um",
             ],
-        }
+            "soil_dist": [
+                [0.2, 0.0, 0.8, 0.0, 0.0, 0.0],
+                [0.2, 0.0, 0.8, 0.0, 0.0, 0.0],
+                [0.0, 0.1, 0.1, 0.0, 0.8, 0.0],
+                [0.0, 0.0, 0.2, 0.0, 0.8, 0.0],
+                [0.0, 0.0, 0.2, 0.0, 0.8, 0.0],
+                [0.0, 0.0, 0.2, 0.0, 0.8, 0.0],
+                [0.0, 0.0, 0.2, 0.0, 0.8, 0.0],
+                [0.0, 0.0, 0.2, 0.0, 0.8, 0.0],
+                [0.0, 0.0, 0.7, 0.3, 0.0, 0.0],
+                [0.0, 0.0, 0.7, 0.3, 0.0, 0.0],
+                [0.0, 0.0, 0.7, 0.3, 0.0, 0.0],
+                [0.0, 0.15, 0.7, 0.15, 0.0, 0.0],
+                [0.0, 0.15, 0.7, 0.15, 0.0, 0.0],
+            ],
+        },
     )
     assert bore_data.data.frame_equal(expected, null_equal=True)
 
