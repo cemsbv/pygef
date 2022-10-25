@@ -72,7 +72,7 @@ class CPTData:
         return self.data.columns
 
     def __str__(self):
-        return f"CPTData: {self.bro_id}"
+        return f"CPTData: {self.display_attributes()}"
 
     def attributes(self) -> dict[str, Any]:
         """

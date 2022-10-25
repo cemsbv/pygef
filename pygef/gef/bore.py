@@ -3,7 +3,6 @@ from typing import Union
 
 import pygef.gef.plot_utils as plot
 from pygef.gef.base import Base
-from pygef.broxml import _BroXmlBore
 from pygef.gef.gef import _GefBore
 
 
@@ -60,8 +59,6 @@ class Bore(Base):
         """
         super().__init__()
 
-        parsed: Union[_BroXmlBore, _GefBore]
-
         self.nen_version = None
 
         if content is not None:
@@ -72,13 +69,13 @@ class Bore(Base):
             if content["file_type"] == "gef":
                 parsed = _GefBore(string=content["string"])
             elif content["file_type"] == "xml":
-                parsed = _BroXmlBore(string=content["string"])
+                raise ValueError("xml not supported by this parser")
 
         elif path is not None:
             if path.lower().endswith("gef"):
                 parsed = _GefBore(path)
             elif path.lower().endswith("xml"):
-                parsed = _BroXmlBore(path)
+                raise ValueError("xml not supported by this parser")
         else:
             raise ValueError("One of [path, (string, file_type)] should be not None.")
 
