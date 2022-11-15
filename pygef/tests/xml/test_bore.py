@@ -21,6 +21,9 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
     assert len(parsed) == 1
 
     bore_data = parsed[0]
+    print(bore_data)
+    print(bore_data.data.head())
+    assert False
     assert bore_data.research_report_date == date(2021, 10, 19)
     assert bore_data.delivered_location == Location(
         "urn:ogc:def:crs:EPSG::28992", x=158322.139, y=444864.706

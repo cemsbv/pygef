@@ -21,43 +21,113 @@ Cutting-edge version (might break):
 
 `$ pip install git+https://github.com/cemsbv/pygef.git`
 
-### Read BORE and CPT files
+## CPT files
 
 ```python
-from pygef import Cpt
-
-# Read *.gef file
-gef = Cpt("./my-gef-file.gef")
+>>> from pygef import read_cpt
+>>> # read gef and xml files
+>>> cpt_data = read_cpt("./my-cpt.xml")
+>>> cpt_data
+CPTData: {'bro_id': 'CPT000000099543',
+          'cone_diameter': 44,
+          'cone_surface_area': 1500,
+          'cone_surface_quotient': 0.67,
+          'cone_to_friction_sleeve_distance': 100,
+          'cone_to_friction_sleeve_surface_area': 22530,
+          'cone_to_friction_sleeve_surface_quotient': 1.0,
+          ...
+          'zlm_pore_pressure_u3_after': None,
+          'zlm_pore_pressure_u3_before': None}
+>>> # access the underlying polars DataFrame under the `data` attribute
+>>> cpt_data.data.head()
+shape: (5, 9)
+┌────────────┬───────┬───────────┬────────────┬─────┬────────────┬────────────┬────────────┬────────────┐
+│ penetratio ┆ depth ┆ elapsedTi ┆ coneResist ┆ ... ┆ inclinatio ┆ inclinatio ┆ localFrict ┆ frictionRa │
+│ nLength    ┆ ---   ┆ me        ┆ ance       ┆     ┆ nNS        ┆ nResultant ┆ ion        ┆ tio        │
+│ ---        ┆ f64   ┆ ---       ┆ ---        ┆     ┆ ---        ┆ ---        ┆ ---        ┆ ---        │
+│ f64        ┆       ┆ f64       ┆ f64        ┆     ┆ i64        ┆ i64        ┆ f64        ┆ f64        │
+╞════════════╪═══════╪═══════════╪════════════╪═════╪════════════╪════════════╪════════════╪════════════╡
+│ 0.0        ┆ 0.0   ┆ -9.99999e ┆ -9.99999e5 ┆ ... ┆ -999999    ┆ -999999    ┆ -9.99999e5 ┆ -9.99999e5 │
+│            ┆       ┆ 5         ┆            ┆     ┆            ┆            ┆            ┆            │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ 0.02       ┆ 0.02  ┆ 11.0      ┆ 2.708      ┆ ... ┆ 0          ┆ 0          ┆ 0.03       ┆ 0.6        │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ 0.04       ┆ 0.039 ┆ 13.0      ┆ 4.29       ┆ ... ┆ 0          ┆ 0          ┆ 0.039      ┆ 0.8        │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ 0.06       ┆ 0.059 ┆ 15.0      ┆ 5.124      ┆ ... ┆ 0          ┆ 0          ┆ 0.045      ┆ 0.9        │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ 0.08       ┆ 0.079 ┆ 17.0      ┆ 5.45       ┆ ... ┆ 0          ┆ 0          ┆ 0.049      ┆ 1.0        │
+└────────────┴───────┴───────────┴────────────┴─────┴────────────┴────────────┴────────────┴────────────┘
 ```
 
-### Polars dataframe is accessible via the `df` attribute
+## Bore files
 
 ```python
-print(gef.df)
+>>> from pygef import read_bore
+>>> # read gef and xml files
+>>> bore_data = read_bore("./my-bore.xml")
+>>> bore_data
+BoreData: {'bore_hole_completed': True,
+ 'bore_rock_reached': False,
+ 'data': (13, 8),
+ 'delivered_location': Location(srs_name='urn:ogc:def:crs:EPSG::28992', x=158322.139, y=444864.706),
+ 'delivered_vertical_position_datum': 'nap',
+ 'delivered_vertical_position_offset': 10.773,
+ 'delivered_vertical_position_reference_point': 'maaiveld',
+ 'description_procedure': 'ISO14688d1v2019c2020',
+ 'final_bore_depth': 12.0,
+ 'final_sample_depth': 12.0,
+ 'research_report_date': datetime.date(2021, 10, 19)}
+>>> # access the underlying polars DataFrame under the `data` attribute
+>>> bore_data.data.head()
+shape: (5, 8)
+┌────────────┬────────────┬────────────┬──────────┬────────────┬────────────┬────────────┬─────────┐
+│ upper_boun ┆ lower_boun ┆ geotechnic ┆ color    ┆ dispersed_ ┆ organic_ma ┆ sand_media ┆ soil_di │
+│ dary       ┆ dary       ┆ al_soil_na ┆ ---      ┆ inhomogeni ┆ tter_conte ┆ n_class    ┆ st      │
+│ ---        ┆ ---        ┆ me         ┆ str      ┆ ty         ┆ nt_class   ┆ ---        ┆ ---     │
+│ f64        ┆ f64        ┆ ---        ┆          ┆ ---        ┆ ---        ┆ str        ┆ list[f6 │
+│            ┆            ┆ str        ┆          ┆ bool       ┆ str        ┆            ┆ 4]      │
+╞════════════╪════════════╪════════════╪══════════╪════════════╪════════════╪════════════╪═════════╡
+│ 0.0        ┆ 1.0        ┆ zwakGrindi ┆ donkergr ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.2,   │
+│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420tot630u ┆ 0.0,    │
+│            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │
+│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
+│ 1.0        ┆ 1.1        ┆ zwakGrindi ┆ donkergr ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.2,   │
+│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420tot630u ┆ 0.0,    │
+│            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │
+│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
+│ 1.1        ┆ 2.0        ┆ zwakZandig ┆ standaar ┆ false      ┆ nietOrgani ┆ null       ┆ [0.0,   │
+│            ┆            ┆ eKleiMetGr ┆ dBruin   ┆            ┆ sch        ┆            ┆ 0.1,    │
+│            ┆            ┆ ind        ┆          ┆            ┆            ┆            ┆ ...     │
+│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
+│ 2.0        ┆ 3.0        ┆ zwakZandig ┆ standaar ┆ false      ┆ nietOrgani ┆ null       ┆ [0.0,   │
+│            ┆            ┆ eKlei      ┆ dGrijs   ┆            ┆ sch        ┆            ┆ 0.0,    │
+│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ ...     │
+│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │
+├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
+│ 3.0        ┆ 4.0        ┆ zwakZandig ┆ donkergr ┆ false      ┆ nietOrgani ┆ null       ┆ [0.0,   │
+│            ┆            ┆ eKlei      ┆ ijs      ┆            ┆ sch        ┆            ┆ 0.0,    │
+│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ ...     │
+│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │
+└────────────┴────────────┴────────────┴──────────┴────────────┴────────────┴────────────┴─────────┘
 
-# Pandas dataframe
-print(gef.df.to_pandas())
-
-# Save to csv
-gef.df.to_csv("my-file.csv")
 ```
 
-### A few of the GEF files attributes
-
-- zid: _height with respect to NAP_
-- type: _type of the gef file (borehole or cpt)_
-- x: _RD coordinate_
-- y: _RD coordinate_
-
-### Plotting and classifications
+## Plotting
 
 ```python
-gef.plot(classification="robertson", water_level_NAP=-1, min_thickness=0.2, show=True)
+from pygef import read_cpt, read_bore
+from pygef.plotting import plot_cpt, plot_bore
 
-# available classifications: robertson, been_jeffries
+# plot cpt file
+plot_cpt(read_cpt("myfile.xml"))
+
+# plot a bore file
+plot_bore(read_bore("myfile.xml"))
 ```
-
-![](img/gef_classified_grouped.png)
 
 ## Documentation
 
