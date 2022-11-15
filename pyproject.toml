@@ -7,7 +7,7 @@ build-backend = "maturin"
 name = "pygef"
 version = "0.7.3"
 dependencies = [
-    "polars[pyarrow]>= 0.14.16",
+    "polars[pyarrow]>= 0.14.28",
     "matplotlib>= 3.4.2",
     "lxml==4.9.1",
 ]
