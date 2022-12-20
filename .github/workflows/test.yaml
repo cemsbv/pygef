@@ -95,6 +95,12 @@ jobs:
         with:
           python-version: 3.7
 
+      - name: Create virtual environment
+        run: |
+          python -m venv venv
+          echo "$GITHUB_WORKSPACE/pygef/venv/bin" >> $GITHUB_PATH
+          source activate
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
