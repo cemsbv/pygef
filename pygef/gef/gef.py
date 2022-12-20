@@ -14,7 +14,7 @@ from pygef import exceptions
 # Try to import the optimized Rust header parsing but if that doesn't succeed
 # use the built-in python regex methods
 try:
-    import gef
+    from pygef.pygef import parse as py_parse
 
     USE_RUST_PARSED_HEADERS = False
 except ImportError:
@@ -140,7 +140,7 @@ class _Gef:
 
         if USE_RUST_PARSED_HEADERS:
             # Use the Rust optimized header parser
-            self._data, self._headers = gef.parse(string)
+            self._data, self._headers = py_parse(string)
         else:
             # Use the fallback python regex parser
             end_of_header = utils.parse_end_of_header(string)

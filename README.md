@@ -17,9 +17,9 @@ Latest stable version:
 
 `$ pip install pygef`
 
-Cutting-edge version (might break):
+Cutting-edge version (might break). Run from root of repository:
 
-`$ pip install git+https://github.com/cemsbv/pygef.git`
+`$ maturin develop --release`
 
 ## CPT files
 

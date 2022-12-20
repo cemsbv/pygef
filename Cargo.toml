@@ -1,11 +1,11 @@
 [package]
-name = "gef"
+name = "pygef-rs"
 version = "0.1.2"
 edition = "2018"
 
 [lib]
 # Name of the python module
-name = "gef"
+name = "pygef"
 crate-type = ["cdylib"]
 
 [dependencies]
@@ -13,9 +13,6 @@ itertools = "0.10.1"
 nom = "7.0.0"
 pyo3 = { version = "0.16.0", features = ["extension-module"] }
 thiserror = "1.0.29"
-
-[package.metadata.maturin]
-python-source = "pygef"
 
 # Automatically add git hooks for code conventions & tests
 [dev-dependencies.cargo-husky]

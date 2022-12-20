@@ -46,7 +46,7 @@ pub fn parse(gef: &'_ str) -> Result<(&'_ str, HeaderMap<'_>)> {
 
 /// The python module.
 #[pyo3::proc_macro::pymodule]
-fn gef(_py: Python, module: &PyModule) -> PyResult<()> {
+fn pygef(_py: Python, module: &PyModule) -> PyResult<()> {
     // Python wrapper around the parse function.
     #[pyfn(module, name = "parse")]
     fn parse_py(gef: &'_ str) -> PyResult<(&'_ str, HeaderMap<'_>)> {
