@@ -10,4 +10,5 @@ pytest==7.1.2
 lxml==4.9.1
 black==22.8.0
 mypy==0.971
+maturin==0.14.2
 .
