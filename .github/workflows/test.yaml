@@ -22,36 +22,13 @@ jobs:
         with:
           python-version: 3.7
 
-      - name: Install rust
-        uses: actions-rs/toolchain@v1.0.7
-        with:
-          profile: default
-          toolchain: stable
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt coveralls
           python setup.py install
 
-      - name: Test without rust wheel
-        run: coverage run --source=pygef -m unittest
-
-      - name: Cargo test
-        uses: actions-rs/cargo@v1.0.3
-        with:
-          command: test
-
-      - name: Build rust wheel
-        uses: messense/maturin-action@v1
-        with:
-          maturin-version: latest
-          command: build
-
-      - name: Install rust wheel
-        run: pip install gef --find-links target/wheels
-
-      - name: Test with rust wheel
+      - name: Test
         run: coverage run --source=pygef -m unittest
 
       - name: Post coverage results
@@ -84,6 +61,7 @@ jobs:
 
           LINTER_RULES_PATH: /
           PYTHON_MYPY_CONFIG_FILE: .mypy.ini
+
   test_docs:
     name: Test docs
     runs-on: ubuntu-latest

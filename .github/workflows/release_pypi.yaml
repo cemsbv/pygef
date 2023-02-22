@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'pygef-v*'
+      - "pygef-v*"
 
 jobs:
   deploy:
@@ -13,21 +13,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: messense/maturin-action@v1
-        with:
-          maturin-version: latest
-          command: build
-          args: --release -o dist/
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          python-version: "3.7"
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}

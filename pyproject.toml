@@ -1,17 +1,20 @@
 [build-system]
-requires = ["maturin>=0.13,<0.14"]
-build-backend = "maturin"
-
+requires = ["setuptools >= 42"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygef"
 version = "0.7.3"
 dependencies = [
-    "polars[pyarrow]>= 0.14.28",
-    "matplotlib>= 3.4.2",
-    "lxml==4.9.1",
+	"polars[pyarrow]>=0.14.28",
+	"matplotlib>=3.4.2",
+	"lxml==4.9.1",
+	"gef-file-to-map==0.1.0",
 ]
 requires-python = ">=3.7"
+
+[tool.setuptools]
+py-modules = []
 
 [tool.isort]
 profile = "black"
@@ -35,7 +38,6 @@ disallow_untyped_calls = true
 # warn_return_any = true
 no_implicit_reexport = true
 strict_equality = true
-
 
 [[tool.mypy.overrides]]
 module = ["matplotlib.*", "pkg_resources.*", "pandas.*", "lxml.*"]
