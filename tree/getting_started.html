@@ -140,7 +140,7 @@ columns defined in the file.</p>
 <h3>Cpt<a class="headerlink" href="#cpt" title="Permalink to this heading"></a></h3>
 <p>If we call <code class="code docutils literal notranslate"><span class="pre">cpt.df</span></code> on a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object we will get something like this:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">df</span>
-<span class="gh">Out[9]: </span><span class="go"></span>
+<span class="gh">Out[9]: </span>
 <span class="go">shape: (999, 12)</span>
 <span class="go">┌────────────┬────────┬────────────┬───────┬─────┬────────────┬────────┬────────────┬──────────────┐</span>
 <span class="go">│ penetratio ┆ qc     ┆ corrected_ ┆ fs    ┆ ... ┆ corrected_ ┆ depth  ┆ friction_n ┆ elevation_wi │</span>
@@ -150,21 +150,13 @@ columns defined in the file.</p>
 <span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆        ┆            ┆ f64          │</span>
 <span class="go">╞════════════╪════════╪════════════╪═══════╪═════╪════════════╪════════╪════════════╪══════════════╡</span>
 <span class="go">│ 0.01       ┆ 0.013  ┆ 0.013      ┆ 0.002 ┆ ... ┆ 0.01       ┆ 0.01   ┆ 15.384615  ┆ -0.1         │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 0.03       ┆ 0.103  ┆ 0.107      ┆ 0.002 ┆ ... ┆ 0.03       ┆ 0.03   ┆ 1.941748   ┆ -0.12        │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 0.05       ┆ 0.489  ┆ 0.493      ┆ 0.009 ┆ ... ┆ 0.05       ┆ 0.05   ┆ 1.840491   ┆ -0.14        │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 0.07       ┆ 0.691  ┆ 0.696      ┆ 0.012 ┆ ... ┆ 0.07       ┆ 0.07   ┆ 1.736614   ┆ -0.16        │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ ...        ┆ ...    ┆ ...        ┆ ...   ┆ ... ┆ ...        ┆ ...    ┆ ...        ┆ ...          │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 19.91      ┆ 14.912 ┆ 14.954     ┆ 0.055 ┆ ... ┆ 19.866     ┆ 19.866 ┆ 0.36883    ┆ -19.956      │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 19.93      ┆ 14.706 ┆ 14.748     ┆ 0.053 ┆ ... ┆ 19.886     ┆ 19.886 ┆ 0.360397   ┆ -19.976      │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 19.95      ┆ 14.625 ┆ 14.666     ┆ 0.05  ┆ ... ┆ 19.905     ┆ 19.905 ┆ 0.34188    ┆ -19.995      │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 19.97      ┆ 14.698 ┆ 14.74      ┆ 0.05  ┆ ... ┆ 19.925     ┆ 19.925 ┆ 0.340182   ┆ -20.015      │</span>
 <span class="go">└────────────┴────────┴────────────┴───────┴─────┴────────────┴────────┴────────────┴──────────────┘</span>
 </pre></div>
@@ -181,7 +173,7 @@ columns defined in the file.</p>
 <span class="gp">In [11]: </span><span class="n">bore</span> <span class="o">=</span> <span class="n">Bore</span><span class="p">(</span><span class="n">path_bore</span><span class="p">)</span>
 
 <span class="gp">In [12]: </span><span class="n">bore</span><span class="o">.</span><span class="n">df</span>
-<span class="gh">Out[12]: </span><span class="go"></span>
+<span class="gh">Out[12]: </span>
 <span class="go">shape: (102, 10)</span>
 <span class="go">┌─────────┬────────────┬─────────┬───────┬─────┬────────────┬────────────┬────────────┬────────────┐</span>
 <span class="go">│ depth_t ┆ depth_bott ┆ soil_co ┆ remar ┆ ... ┆ clay_compo ┆ loam_compo ┆ peat_compo ┆ silt_compo │</span>
@@ -190,9 +182,7 @@ columns defined in the file.</p>
 <span class="go">│ f64     ┆ f64        ┆ str     ┆ str   ┆     ┆ f64        ┆ f64        ┆ f64        ┆ f64        │</span>
 <span class="go">╞═════════╪════════════╪═════════╪═══════╪═════╪════════════╪════════════╪════════════╪════════════╡</span>
 <span class="go">│ 7.4     ┆ 12.5       ┆ NBE     ┆ 1) GM ┆ ... ┆ -1.0       ┆ -1.0       ┆ -1.0       ┆ -1.0       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 12.5    ┆ 26.0       ┆ NBE     ┆ 1) GM ┆ ... ┆ -1.0       ┆ -1.0       ┆ -1.0       ┆ -1.0       │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 26.0    ┆ 27.0       ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
 <span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
@@ -202,7 +192,6 @@ columns defined in the file.</p>
 <span class="go">│         ┆            ┆         ┆ g     ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ zeer  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ g...  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 27.0    ┆ 28.0       ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
 <span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
@@ -212,9 +201,7 @@ columns defined in the file.</p>
 <span class="go">│         ┆            ┆         ┆ g     ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ matig ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ ...   ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ ...     ┆ ...        ┆ ...     ┆ ...   ┆ ... ┆ ...        ┆ ...        ┆ ...        ┆ ...        │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 148.0   ┆ 149.0      ┆ Zg2     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
 <span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
@@ -224,7 +211,6 @@ columns defined in the file.</p>
 <span class="go">│         ┆            ┆         ┆ veel  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ fij.. ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ .     ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 149.0   ┆ 150.0      ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
 <span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
@@ -234,7 +220,6 @@ columns defined in the file.</p>
 <span class="go">│         ┆            ┆         ┆ st    ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ veel  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ ...   ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 150.0   ┆ 152.0      ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
 <span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
@@ -243,7 +228,6 @@ columns defined in the file.</p>
 <span class="go">│         ┆            ┆         ┆ spoor ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ matig ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ g...  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">├╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤</span>
 <span class="go">│ 152.0   ┆ 153.0      ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
 <span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
 <span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
