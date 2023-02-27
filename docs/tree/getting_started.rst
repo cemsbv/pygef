@@ -31,7 +31,7 @@ If you want to use the :code:`path` then your code should look like this:
 
     import os
 
-    path_cpt = os.path.join(os.environ.get("DOC_PATH"), "../pygef/test_files/cpt.gef")
+    path_cpt = os.path.join(os.environ.get("DOC_PATH"), "../test_files/cpt.gef")
     cpt = Cpt(path_cpt)
 
 If you want to use the :code:`content` method:
@@ -82,7 +82,7 @@ If we call :code:`bore.df` on a :code:`bore` object we will get something like t
 
 .. ipython:: python
 
-    path_bore = os.path.join(os.environ.get("DOC_PATH"), "../pygef/test_files/example_bore.gef")
+    path_bore = os.path.join(os.environ.get("DOC_PATH"), "../test_files/example_bore.gef")
     bore = Bore(path_bore)
     bore.df
 
