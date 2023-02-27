@@ -31,14 +31,14 @@ class GefTest(unittest.TestCase):
         Smoke test to see if no errors occur during creation of the Cpt object for valid
         CPTs.
         """
-        Cpt("./pygef/test_files/example.gef")
-        Cpt("./pygef/test_files/cpt.gef")
-        Cpt("./pygef/test_files/cpt2.gef")
-        Cpt("./pygef/test_files/cpt3.gef")
-        Cpt("./pygef/test_files/cpt4.gef")
+        Cpt("./test_files/example.gef")
+        Cpt("./test_files/cpt.gef")
+        Cpt("./test_files/cpt2.gef")
+        Cpt("./test_files/cpt3.gef")
+        Cpt("./test_files/cpt4.gef")
 
     def test_xy(self):
-        cpt3 = Cpt("./pygef/test_files/cpt3.gef")
+        cpt3 = Cpt("./test_files/cpt3.gef")
         self.assertEqual(cpt3.x, 110885)
         self.assertEqual(cpt3.y, 493345)
 
@@ -1147,9 +1147,9 @@ class BoreTest(unittest.TestCase):
 
 class PlotTest(unittest.TestCase):
     def test_plot_cpt(self):
-        gef = Cpt("./pygef/test_files/example.gef")
+        gef = Cpt("./test_files/example.gef")
         gef.plot(show=False)
 
     def test_plot_bore(self):
-        gef = Bore("./pygef/test_files/example_bore.gef")
+        gef = Bore("./test_files/example_bore.gef")
         gef.plot(show=False, figsize=(4, 12))

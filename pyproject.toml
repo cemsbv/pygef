@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygef"
-version = "0.8.0a2"
+version = "0.8.0a3"
 description = "Parse soil measurument data."
 dependencies = [
 	"polars[pyarrow]>=0.14.28",
@@ -20,9 +20,8 @@ keywords = ["gef"]
 [project.urls]
 repository = "https://github.com/cemsbv/pygef"
 
-[tool.setuptools]
-py-modules = []
-packages = ["pygef"]
+[tool.pytest.ini_options]
+pythonpath = ["src"]
 
 [tool.isort]
 profile = "black"

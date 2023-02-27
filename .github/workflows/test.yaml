@@ -29,7 +29,7 @@ jobs:
           python setup.py install
 
       - name: Test
-        run: coverage run --source=pygef -m unittest
+        run: coverage run -m unittest
 
       - name: Post coverage results
         env:
