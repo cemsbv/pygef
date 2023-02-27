@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; pygef 0.8.0a2 documentation</title>
+  <title>Getting started &mdash; pygef 0.8.0a3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
@@ -107,7 +107,7 @@
 <p>If you want to use the <code class="code docutils literal notranslate"><span class="pre">path</span></code> then your code should look like this:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">os</span>
 
-<span class="gp">In [3]: </span><span class="n">path_cpt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../pygef/test_files/cpt.gef&quot;</span><span class="p">)</span>
+<span class="gp">In [3]: </span><span class="n">path_cpt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../test_files/cpt.gef&quot;</span><span class="p">)</span>
 
 <span class="gp">In [4]: </span><span class="n">cpt</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">path_cpt</span><span class="p">)</span>
 </pre></div>
@@ -168,7 +168,7 @@ columns defined in the file.</p>
 <section id="borehole">
 <h3>Borehole<a class="headerlink" href="#borehole" title="Permalink to this heading"></a></h3>
 <p>If we call <code class="code docutils literal notranslate"><span class="pre">bore.df</span></code> on a <code class="code docutils literal notranslate"><span class="pre">bore</span></code> object we will get something like this:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="n">path_bore</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../pygef/test_files/example_bore.gef&quot;</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="n">path_bore</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../test_files/example_bore.gef&quot;</span><span class="p">)</span>
 
 <span class="gp">In [11]: </span><span class="n">bore</span> <span class="o">=</span> <span class="n">Bore</span><span class="p">(</span><span class="n">path_bore</span><span class="p">)</span>
 
