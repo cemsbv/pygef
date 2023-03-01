@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import logging
 import re
 from datetime import date
@@ -7,6 +8,7 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 
 from pygef import exceptions
+from pygef.gef.mapping import MAPPING_PARAMETERS
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ def cast_string(f, s):
     """
     try:
         return f(s)
-    except ValueError as e:
+    except ValueError:
         return None
 
 
@@ -63,16 +65,6 @@ def parse_regex_cast(regex_string, s, f, group_number):
         return None
 
 
-def parse_end_of_header(s):
-    """
-    Function that parses the end of the header.
-
-    :param s:(str) String to search for regex pattern.
-    :return:(str) End of the header.
-    """
-    return parse_regex_cast(r"(#EOH[=\s+]+)", s, str, 1)
-
-
 def parse_column_void(headers: Union[dict, str]) -> Dict[int, float]:
     """
     Function that parses the column void headers and returns a dictionary that maps
@@ -84,12 +76,12 @@ def parse_column_void(headers: Union[dict, str]) -> Dict[int, float]:
     :param headers:(Union[Dict,str]) Gef headers
     :return: (Dict[int, float]) Mapping of column-numbers to their void value.
     """
+    voids_info: List[Tuple[int, float]] = []
     if isinstance(headers, dict):
         # Return a list of all the second float values of all COLUMN_VOID lines
         if "COLUMNVOID" in headers:
-
             try:
-                voids_info: List[Tuple[int, float]] = list(
+                voids_info = list(
                     map(
                         lambda values: (int(values[0]), float(values[1])),
                         headers["COLUMNVOID"],
@@ -101,10 +93,7 @@ def parse_column_void(headers: Union[dict, str]) -> Dict[int, float]:
                 )
 
     else:
-        voids_info = []
-
         for void_line in re.finditer(r"#COLUMNVOID\s*=\s*(.*)", headers):
-
             voids = re.search(r"^(\d+)\s*,\s*([-+]?\d+\.?\d*)", void_line.group(1))
 
             if not voids:
@@ -314,7 +303,7 @@ def parse_gef_type(headers):
 
     if "cpt" in proc_code or "dis" in proc_code:
         return "cpt"
-    elif "bore" in proc_code and not "borehole" in proc_code:
+    elif "bore" in proc_code and "borehole" not in proc_code:
         return "bore"
     elif "borehole" in proc_code:
         return "borehole-report"
@@ -449,7 +438,7 @@ def get_record_separator(headers: Union[dict, str]) -> str:
     return parse_record_separator(headers) or "\n"
 
 
-def parse_soil_code(s):
+def parse_soil_code(s: str) -> str:
     """
     Function to parse the soil code.
 
@@ -459,116 +448,16 @@ def parse_soil_code(s):
     return s.replace("'", "")
 
 
-def create_soil_type(s: str) -> str:
+def parse_soil_name(s: str) -> str:
     """
-    Function to create the description of the soil type.
+    Function to parse the soil name.
 
-    :param s: (str) Soil code.
-    :return: (str) Description of the soil code.
+    NOTE: interpretation of the soil code to NEN-EN-ISO 14688-1:2019+NEN 8990:2020
+
+    :param s: (str) String with the soil code.
+    :return: Soil name.
     """
-    string_noquote = s.replace("'", "")
-    split_letters = list(string_noquote)
-
-    # split_soil_string = list(soil_string)
-    dict_name = {"G": "gravel", "K": "clay", "L": "loam", "V": "peat", "Z": "sand"}
-    dict_addition = {
-        "z": "sand",
-        "s": "silt",
-        "m": "mineral",
-        "k": "clay",
-        "g": "gravel",
-        "h": "humeus",
-    }
-    dict_intensity = {"1": 5, "2": 10, "3": 15, "4": 20}
-    dict_exceptions = {
-        "GM": "layer information missing",
-        "NBE": "soil cannot be classified properly",
-        "W": "water",
-    }
-    soil_name = ""
-    try:
-        if string_noquote != "":
-            if string_noquote in dict_exceptions:
-                soil_name = soil_name + dict_exceptions[string_noquote]
-            else:
-                sum_addition = 0
-                percentage_main_component = 100
-                main_component = dict_name[split_letters[0]]
-                soil_additions = ""
-                for i in range(1, len(split_letters)):
-                    if split_letters[i] in dict_addition:
-                        soil_additions = (
-                            soil_additions + " with " + dict_addition[split_letters[i]]
-                        )
-                    elif split_letters[i] in dict_intensity:
-                        soil_additions = (
-                            soil_additions
-                            + " "
-                            + str(dict_intensity[split_letters[i]])
-                            + "%"
-                        )
-                        sum_addition = sum_addition + dict_intensity[split_letters[i]]
-                if sum_addition > 0:
-                    percentage_main_component = percentage_main_component - sum_addition
-                soil_name = (
-                    main_component
-                    + " "
-                    + str(percentage_main_component)
-                    + "%"
-                    + soil_additions
-                )
-        else:
-            soil_name = "soil_not_defined"
-    except KeyError:
-        soil_name = "soil_not_according_with_NEN_classification"
-    return soil_name
-
-
-INDICES = {"g": 0, "z": 1, "k": 2, "s": 5, "m": 1, "h": 4, "l": 3, "v": 4, "p": 4}
-
-INTENSITY = {"1": 0.05, "2": 0.10, "3": 0.15, "4": 0.20}
-
-NO_CLASSIFY = {
-    "gm": "layer information missing",
-    "nbe": "soil cannot be classified properly",
-    "w": "water",
-}
-
-
-def soil_quantification(s):
-    """
-    Function to create the quantification of the soil type.
-
-    :param s:(str) Soil code.
-    :return: Quantification of the soil code.
-    """
-    #   0    1    2    3    4     5
-    # ['G', 'S', 'C', 'L', 'P', 'SI']
-    dist = np.zeros(6)
-
-    s = s.replace("'", "").split(" ")[0].lower()
-
-    if s in NO_CLASSIFY or len(s) == 0:
-        return np.ones(6) * -1
-
-    tokens = list(enumerate(s))
-    numerics = dict(filter(lambda t: t[1].isnumeric(), tokens))
-    alphabetics = dict(
-        filter(lambda t: not t[1].isnumeric(), tokens[1:])
-    )  # skip the first one.
-
-    for i, token in alphabetics.items():
-        idx = INDICES[token]
-        if (i + 1) in numerics:
-            v = INTENSITY[numerics[i + 1]]
-        else:
-            v = 0.05
-        dist[idx] = v
-
-    # Sometimes the same soil type has multiple tokens ?? e.g. Kkgh2.
-    dist[INDICES[s[0]]] = 0
-    dist[INDICES[s[0]]] = 1 - dist.sum()
-    return dist
+    return MAPPING_PARAMETERS.dino_to_bro(s)
 
 
 def parse_add_info(headers):
@@ -578,201 +467,7 @@ def parse_add_info(headers):
     :param headers:(Union[Dict,str]) Dictionary or string of headers.
     :return: (str) Additional informations.
     """
-    dict_add_info = {
-        "DO": "dark ",
-        "LI": "light ",
-        "TBL": "blue-",
-        "TBR": "brown-",
-        "TGE": "yellow-",
-        "TGN": "green-",
-        "TGR": "gray-",
-        "TOL": "olive-",
-        "TOR": "orange-",
-        "TPA": "violet-",
-        "TRO": "red-",
-        "TWI": "white-",
-        "TRZ": "pink-",
-        "TZW": "black-",
-        "BL": "blue ",
-        "BR": "brown ",
-        "GE": "yellow ",
-        "GN": "green ",
-        "GR": "gray ",
-        "OL": "olive ",
-        "OR": "orange ",
-        "PA": "violet ",
-        "RO": "red ",
-        "WI": "white ",
-        "RZ": "pink ",
-        "ZW": "black ",
-        "ZUF": "uiterst fijn ",
-        "ZZF": "zeer fijn ",
-        "ZMF": "matig fijn ",
-        "ZMG": "matig grof ",
-        "ZZG": "zeer grof ",
-        "ZUG": "uiterst grof ",
-        "SZK": "zeer kleine spreiding ",
-        "SMK": "matig kleine spreiding|",
-        "SMG": "matig grote spreiding ",
-        "SZG": "zeer grote spreiding ",
-        "STW": "tweetoppige spreiding ",
-        "ZZH": "sterk hoekig ",
-        "ZHK": "hoekig ",
-        "ZMH": "matig hoekig ",
-        "ZMA": "afgerond ",
-        "ZSA": "sterk afgerond ",
-        "GFN": "fijn grind ",
-        "GMG": "matig grof grind ",
-        "GZG": "zeer grof grind ",
-        "FN1": "spoor fijn grind (<1%) ",
-        "FN2": "weinig fijn grind (1-25%) ",
-        "FN3": "veel fijn grind (25-50%) ",
-        "FN4": "zeer veel fijn grind (50-75%) ",
-        "FN5": "uiterst veel fijn grind (>75%) ",
-        "MG1": "spoor matig grof grind (<1%) ",
-        "MG2": "weinig matig grof grind (1-25%) ",
-        "MG3": "veel matig grof grind (25-50%) ",
-        "MG4": "zeer veel matig grof grind (50-75%) ",
-        "MG5": "uiterst veel matig grof grind(>75%) ",
-        "GG1": "spoor zeer grof grind (<1%) ",
-        "GG2": "weinig zeer grof grind (1-25%) ",
-        "GG3": "veel zeer grof grind (25-50%) ",
-        "GG4": "zeer veel zeer grof grind (50-75%) ",
-        "GG5": "uiterst veel zeer grof grind (>75%) ",
-        "AV1": "zwak amorf ",
-        "AV2": "matig amorf ",
-        "AV3": "sterk amorf ",
-        "BSV": "bosveen ",
-        "HEV": "heideveen ",
-        "MOV": "mosveen ",
-        "RIV": "rietveen ",
-        "SZV": "Scheuchzeriaveen ",
-        "VMV": "veenmosveen ",
-        "WOV": "wollegrasveen ",
-        "ZEV": "zeggeveen ",
-        "KZSL": "klei zeer slap ",
-        "KSLA": "klei slap ",
-        "KMSL": "klei matig slap ",
-        "KMST": "klei stevig ",
-        "KZST": "klei zeer stevig ",
-        "KHRD": "klei hard ",
-        "KZHR": "klei zeer hard ",
-        "LZSL": "leem zeer slap ",
-        "LSLA": "leem slap ",
-        "LMSL": "leem matig slap ",
-        "LMST": "leem matig stevig ",
-        "LSTV": "leem stevig ",
-        "LZST": "leem zeer stevig ",
-        "LHRD": "leem hard ",
-        "LZHR": "leem zeer hard ",
-        "VZSL": "veen zeer slap ",
-        "VSLA": "veen slap ",
-        "VMSL": "veen matig slap ",
-        "VMST": "veen matig stevig ",
-        "VSTV": "stevig ",
-        "LOS": "los gepakt ",
-        "NOR": "normaal gepakt ",
-        "VAS": "vast gepakt ",
-        "VGZZ": "zeer zacht ",
-        "VGZA": "zacht ",
-        "VGMZ": "matig zacht ",
-        "VGMH": "matig hard ",
-        "VGHA": "hard ",
-        "VGZH": "zeer hard ",
-        "VGEH": "extreem hard ",
-        "SCH0": "geen schelpmateriaal 0% ",
-        "SCH1": "spoor schelpmateriaal <1% ",
-        "SCH2": "weinig schelpmateriaal (1-10%) ",
-        "SCH3": "veel schelpmateriaal (10-30%) ",
-        "CA1": "kalkloos ",
-        "CA2": "kalkarm ",
-        "CA3": "kalkrijk ",
-        "GC0": "geen glauconiet 0% ",
-        "GC1": "spoor glauconiet <1% ",
-        "GC2": "weinig glauconiet (1-10%) ",
-        "GC3": "veel glauconiet (10-30%) ",
-        "GC4": "zeer veel glauconiet(30-50%) ",
-        "GC5": "uiterst veel glauconiet (>50%) ",
-        "BST1": "spoor baksteen ",
-        "BST2": "weinig baksteen ",
-        "BST3": "veel baksteen ",
-        "PUR1": "spoor puinresten ",
-        "PUR2": "weinig puinresten ",
-        "PUR3": "veel puinresten ",
-        "SIN1": "spoor sintels ",
-        "SIN2": "weinig sintels ",
-        "SIN3": "veel sintels ",
-        "STO1": "spoor stortsteen ",
-        "STO2": "weinig stortsteen ",
-        "STO3": "veel stortsteen ",
-        "VUI1": "spoor vuilnis ",
-        "VUI2": "weinig vuilnis ",
-        "VUI3": "veel vuilnis ",
-        "AF": "afval ",
-        "AS": "asfalt ",
-        "BE": "beton ",
-        "BI": "bitumen ",
-        "BT": "ballast ",
-        "BST": "baksteen ",
-        "GI": "gips ",
-        "GA": "glas ",
-        "HK": "houtskool ",
-        "HU": "huisvuil ",
-        "KA": "kalk ",
-        "KG": "kolengruis ",
-        "KO": "kolen ",
-        "KT": "krijt ",
-        "ME": "metaal ",
-        "MI": "mijnsteen ",
-        "OE": "oer ",
-        "PL": "planten ",
-        "PU": "puin ",
-        "SI": "sintels ",
-        "SL": "slakken ",
-        "WO": "wortels ",
-        "YZ": "ijzer ",
-        "GL": "gley ",
-        "RT": "roest ",
-        "SE": "silex ",
-        "BIO": "bioturbatie ",
-        "DWO": "doorworteling ",
-        "GCM": "cm-gelaagdheid ",
-        "GDM": "dm-gelaagdheid ",
-        "GDU": "dubbeltjes-gelaagdheid ",
-        "GMM": "mm-gelaagdheid ",
-        "GRG": "graafgangen ",
-        "GSC": "scheve gelaagdheid ",
-        "GSP": "spekkoek-gelaagdheid ",
-        "HOM": "homogeen ",
-        "GE1": "zwak gelaagd ",
-        "GE2": "weinig gelaagd ",
-        "GE3": "sterk gelaagd ",
-        "GEX": "gelaagd ",
-        "STGL": "met grindlagen ",
-        "STKL": "met kleilagen ",
-        "STLL": "met leemlagen ",
-        "STSL": "met stenenlagen ",
-        "STVL": "met veenlagen ",
-        "STZL": "met zandlagen ",
-        "STBR": "met bruinkoollagen ",
-        "STDE": "met detrituslagen ",
-        "STGY": "met gyttjalagen ",
-        "STSC": "met schelpenlagen ",
-        "ANT": "Antropogeen ",
-        "BOO": "Boomse klei ",
-        "DEZ": "dekzand ",
-        "KEL": "keileem ",
-        "LSS": "loess ",
-        "POK": "potklei ",
-        "WAR": "warven ",
-        "DR": "Formatie van Drente ",
-        "EC": "Formatie van Echteld ",
-        "KR": "Formatie van Kreftenheye ",
-        "NA": "Formatie van Naaldwijk ",
-        "NI": "Formatie van Nieuwkoop ",
-        "TW": "Formatie van Twente ",
-        "WA": "Formatie van Waalre ",
-    }
+    dict_add_info = MAPPING_PARAMETERS.code_to_text()
 
     if isinstance(headers, dict):
         raise Exception("todo")
@@ -791,53 +486,3 @@ def parse_add_info(headers):
                     ]
                 )
         return add_info
-
-
-def assign_multiple_columns(df, columns, partial_df):
-    return df.drop(columns).hstack(partial_df[columns])
-
-
-def kpa_to_mpa(df, columns):
-    return assign_multiple_columns(df, columns, df[columns] * 10**-3)
-
-
-def none_to_zero(df):
-    return df.fill_null(0.0)
-
-
-def nap_to_depth(zid, nap):
-    return -(nap - zid)
-
-
-def depth_to_nap(depth, zid):
-    return zid - depth
-
-
-def join_gef(bore, cpt):
-    """
-    Join a cpt and bore file in one Dataframe based on depth.
-
-    :param bore: (ParseBORE)
-    :param cpt: (ParseCPT)
-    :return: (pl.DataFrame)
-    """
-    df_cpt = cpt.df.assign(join_idx=0)
-    df_bore = bore.df.loc[
-        bore.df[["G", "S", "C", "L", "P", "SI"]].sum(1) == 1
-    ].reset_index(drop=True)
-
-    df_cpt = df_cpt[df_cpt["depth"] > df_bore["depth_top"].min()].reset_index(drop=True)
-    idx = np.searchsorted(df_cpt["depth"].values, df_bore["depth_top"].values)
-
-    a = np.zeros(df_cpt.shape[0])
-    for i in range(len(idx) - 1):
-        a[idx[i] : idx[i + 1]] = i
-
-    a[idx[i + 1] :] = i + 1
-    df_cpt["join_idx"] = a
-
-    return df_cpt.merge(
-        df_bore[["soil_code", "G", "S", "C", "L", "P", "SI"]].reset_index(-1),
-        left_on="join_idx",
-        right_on="index",
-    ).drop(["index", "join_idx"], axis=1)

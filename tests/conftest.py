@@ -1,9 +1,8 @@
-from pytest import fixture
 import os
 
-TEST_FILES = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "test_files")
-)
+from pytest import fixture
+
+TEST_FILES = os.path.abspath(os.path.join(os.path.dirname(__file__), "test_files"))
 
 
 @fixture()

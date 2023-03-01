@@ -1,16 +1,16 @@
 [build-system]
-requires = ["setuptools >= 42"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygef"
-version = "0.8.0a3"
+version = "0.8.0a4"
 description = "Parse soil measurument data."
 dependencies = [
-	"polars[pyarrow]>=0.14.28",
-	"matplotlib>=3.4.2",
-	"lxml==4.9.1",
-	"gef-file-to-map==0.1.0",
+    "polars[pyarrow]>=0.14.28",
+    "matplotlib>=3.4.2",
+    "lxml==4.9.1",
+    "gef-file-to-map==0.1.0",
 ]
 requires-python = ">=3.7"
 license = { file = "LICENSE.txt" }
@@ -20,14 +20,35 @@ keywords = ["gef"]
 [project.urls]
 repository = "https://github.com/cemsbv/pygef"
 
+[project.optional-dependencies]
+test = ["coveralls"]
+docs = [
+    "Sphinx==5.1.1",
+    "sphinx-autodoc-typehints==1.19.1",
+    "ipython==7.34.0",
+    "asteroid-sphinx-theme==0.0.3",
+    "sphinx_rtd_theme==1.0.0"
+]
+lint = [
+    "black",
+    "isort",
+]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
 [tool.isort]
 profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
 
 [tool.mypy]
 files = ["pygef"]
+mypy_path = 'src'
 namespace_packages = true
 show_error_codes = true
 warn_redundant_casts = true
@@ -35,22 +56,24 @@ warn_unused_ignores = true
 warn_unused_configs = true
 disallow_subclassing_any = true
 no_implicit_optional = true
+#disallow_untyped_defs = true
+#strict_concatenate = true
+#disallow_any_generics = true
+#disallow_untyped_calls = true
+#warn_return_any = true
+#no_implicit_reexport = true
+#strict_equality = true
 
 [[tool.mypy.overrides]]
-module = "pygef.broxml.*"
-disallow_untyped_defs = true
-strict_concatenate = true
-disallow_any_generics = true
-disallow_untyped_calls = true
-# warn_return_any = true
-no_implicit_reexport = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = ["matplotlib.*", "pkg_resources.*", "pandas.*", "lxml.*"]
+module = [
+    "matplotlib.*",
+    "pkg_resources.*",
+    "pandas.*",
+    "lxml.*",
+    "polars.*",
+    "numpy.*",
+    "gef_file_to_map.*",
+    "pytest.*",
+    "setuptools.*"
+]
 ignore_missing_imports = true
-
-# TODO! include these files
-[[tool.mypy.overrides]]
-module = ["pygef.gef.plot_utils", "pygef.gef.gef"]
-ignore_errors = true

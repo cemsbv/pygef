@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from warnings import warn
-from typing import Any
-from lxml import etree
+import re
 from datetime import date, datetime
+from typing import Any, List
+from warnings import warn
 
-from pygef.broxml import QualityClass, Location
 import polars as pl
+from lxml import etree
+
+from pygef.common import Location
+from pygef.cpt import QualityClass
 
 
 def lower_text(val: str, **kwargs: dict[Any, Any]) -> str:
@@ -23,6 +26,10 @@ def parse_int(val: str, **kwargs: dict[Any, Any]) -> int:
 
 def parse_date(val: str, **kwargs: dict[Any, Any]) -> date:
     return datetime.strptime(val, "%Y-%m-%d").date()
+
+
+def clean_string(val: str, **kwargs: dict[Any, Any]) -> str:
+    return re.sub(r"\W+", "", val)
 
 
 def parse_bool(val: str, **kwargs: dict[Any, Any]) -> bool:
@@ -42,7 +49,7 @@ def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataF
     color = []
     dispersed_inhomogenity = []
     organic_matter_content_class = []
-    sand_median_class = []
+    sand_median_class: List[str | None] = []
     for layer in el.iterfind("bhrgtcom:layer", namespaces=namespaces):
         upper_boundary.append(
             float(layer.find("bhrgtcom:upperBoundary", namespaces=namespaces).text)
@@ -51,12 +58,16 @@ def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataF
             float(layer.find("bhrgtcom:lowerBoundary", namespaces=namespaces).text)
         )
         geotechnical_soil_name.append(
-            layer.find(
-                "bhrgtcom:soil/bhrgtcom:geotechnicalSoilName", namespaces=namespaces
-            ).text
+            clean_string(
+                layer.find(
+                    "bhrgtcom:soil/bhrgtcom:geotechnicalSoilName", namespaces=namespaces
+                ).text
+            )
         )
         color.append(
-            layer.find("bhrgtcom:soil/bhrgtcom:colour", namespaces=namespaces).text
+            clean_string(
+                layer.find("bhrgtcom:soil/bhrgtcom:colour", namespaces=namespaces).text
+            )
         )
         dispersed_inhomogenity.append(
             parse_bool(
@@ -67,16 +78,20 @@ def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataF
             )
         )
         organic_matter_content_class.append(
-            layer.find(
-                "bhrgtcom:soil/bhrgtcom:organicMatterContentClass",
-                namespaces=namespaces,
-            ).text
+            clean_string(
+                layer.find(
+                    "bhrgtcom:soil/bhrgtcom:organicMatterContentClass",
+                    namespaces=namespaces,
+                ).text
+            )
         )
         try:
             sand_median_class.append(
-                layer.find(
-                    "bhrgtcom:soil/bhrgtcom:sandMedianClass", namespaces=namespaces
-                ).text
+                clean_string(
+                    layer.find(
+                        "bhrgtcom:soil/bhrgtcom:sandMedianClass", namespaces=namespaces
+                    ).text
+                )
             )
         except AttributeError:
             sand_median_class.append(None)

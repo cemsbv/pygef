@@ -24,10 +24,10 @@ Cutting-edge version (might break):
 ## CPT files
 
 ```python
->>> from pygef import read_cpt
->>> # read gef and xml files
->>> cpt_data = read_cpt("./my-cpt.xml")
->>> cpt_data
+>> > from pygef import read_cpt
+>> >  # read gef and xml files
+>> > cpt_data = read_cpt("./my-cpt.xml")
+>> > cpt_data
 CPTData: {'bro_id': 'CPT000000099543',
           'cone_diameter': 44,
           'cone_surface_area': 1500,
@@ -36,10 +36,10 @@ CPTData: {'bro_id': 'CPT000000099543',
           'cone_to_friction_sleeve_surface_area': 22530,
           'cone_to_friction_sleeve_surface_quotient': 1.0,
           ...
-          'zlm_pore_pressure_u3_after': None,
-          'zlm_pore_pressure_u3_before': None}
->>> # access the underlying polars DataFrame under the `data` attribute
->>> cpt_data.data.head()
+              'zlm_pore_pressure_u3_after': None,
+'zlm_pore_pressure_u3_before': None}
+>> >  # access the underlying polars DataFrame under the `data` attribute
+>> > cpt_data.data.head()
 shape: (5, 9)
 ┌────────────┬───────┬───────────┬────────────┬─────┬────────────┬────────────┬────────────┬────────────┐
 │ penetratio ┆ depth ┆ elapsedTi ┆ coneResist ┆ ... ┆ inclinatio ┆ inclinatio ┆ localFrict ┆ frictionRa │
@@ -47,7 +47,8 @@ shape: (5, 9)
 │ ---        ┆ f64   ┆ ---       ┆ ---        ┆     ┆ ---        ┆ ---        ┆ ---        ┆ ---        │
 │ f64        ┆       ┆ f64       ┆ f64        ┆     ┆ i64        ┆ i64        ┆ f64        ┆ f64        │
 ╞════════════╪═══════╪═══════════╪════════════╪═════╪════════════╪════════════╪════════════╪════════════╡
-│ 0.0        ┆ 0.0   ┆ -9.99999e ┆ -9.99999e5 ┆ ... ┆ -999999    ┆ -999999    ┆ -9.99999e5 ┆ -9.99999e5 │
+│ 0.0        ┆ 0.0   ┆ -9.99999
+e ┆ -9.99999e5 ┆ ... ┆ -999999    ┆ -999999    ┆ -9.99999e5 ┆ -9.99999e5 │
 │            ┆       ┆ 5         ┆            ┆     ┆            ┆            ┆            ┆            │
 ├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
 │ 0.02       ┆ 0.02  ┆ 11.0      ┆ 2.708      ┆ ... ┆ 0          ┆ 0          ┆ 0.03       ┆ 0.6        │
@@ -63,23 +64,23 @@ shape: (5, 9)
 ## Bore files
 
 ```python
->>> from pygef import read_bore
->>> # read gef and xml files
->>> bore_data = read_bore("./my-bore.xml")
->>> bore_data
+>> > from pygef import read_bore
+>> >  # read gef and xml files
+>> > bore_data = read_bore("./my-bore.xml")
+>> > bore_data
 BoreData: {'bore_hole_completed': True,
- 'bore_rock_reached': False,
- 'data': (13, 8),
- 'delivered_location': Location(srs_name='urn:ogc:def:crs:EPSG::28992', x=158322.139, y=444864.706),
- 'delivered_vertical_position_datum': 'nap',
- 'delivered_vertical_position_offset': 10.773,
- 'delivered_vertical_position_reference_point': 'maaiveld',
- 'description_procedure': 'ISO14688d1v2019c2020',
- 'final_bore_depth': 12.0,
- 'final_sample_depth': 12.0,
- 'research_report_date': datetime.date(2021, 10, 19)}
->>> # access the underlying polars DataFrame under the `data` attribute
->>> bore_data.data.head()
+           'bore_rock_reached': False,
+           'data': (13, 8),
+           'delivered_location': Location(srs_name='urn:ogc:def:crs:EPSG::28992', x=158322.139, y=444864.706),
+           'delivered_vertical_position_datum': 'nap',
+           'delivered_vertical_position_offset': 10.773,
+           'delivered_vertical_position_reference_point': 'maaiveld',
+           'description_procedure': 'ISO14688d1v2019c2020',
+           'final_bore_depth': 12.0,
+           'final_sample_depth': 12.0,
+           'research_report_date': datetime.date(2021, 10, 19)}
+>> >  # access the underlying polars DataFrame under the `data` attribute
+>> > bore_data.data.head()
 shape: (5, 8)
 ┌────────────┬────────────┬────────────┬──────────┬────────────┬────────────┬────────────┬─────────┐
 │ upper_boun ┆ lower_boun ┆ geotechnic ┆ color    ┆ dispersed_ ┆ organic_ma ┆ sand_media ┆ soil_di │
@@ -89,12 +90,14 @@ shape: (5, 8)
 │            ┆            ┆ str        ┆          ┆ bool       ┆ str        ┆            ┆ 4]      │
 ╞════════════╪════════════╪════════════╪══════════╪════════════╪════════════╪════════════╪═════════╡
 │ 0.0        ┆ 1.0        ┆ zwakGrindi ┆ donkergr ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.2,   │
-│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420tot630u ┆ 0.0,    │
+│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420
+tot630u ┆ 0.0,    │
 │            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │
 │            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │
 ├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
 │ 1.0        ┆ 1.1        ┆ zwakGrindi ┆ donkergr ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.2,   │
-│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420tot630u ┆ 0.0,    │
+│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420
+tot630u ┆ 0.0,    │
 │            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │
 │            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │
 ├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┤
@@ -131,10 +134,62 @@ plot_bore(read_bore("myfile.xml"))
 
 ## Documentation
 
-Install the requirements:
-
-`pip install -r requirements_docs.txt`
-
 Build the docs:
 
-`sphinx-build -b html docs public`
+```bash
+python setup.py install
+sphinx-build -b html docs public
+```
+
+## Format
+
+We format our code with black and isort.
+
+```bash
+black --config "pyproject.toml" .
+isort --settings-path "pyproject.toml" .
+```
+
+## Lint
+
+To maintain code quality we use the Gitlab super-linter.
+
+To run the linters locally, run the following bash script from the root directory:
+
+```bash
+docker run \
+--env RUN_LOCAL=true \
+--env VALIDATE_JSCPD=false \
+--env VALIDATE_CSS=false \
+--env VALIDATE_BASH=false \
+--env VALIDATE_YAML=false \
+--env VALIDATE_PYTHON_PYLINT=false \
+--env VALIDATE_NATURAL_LANGUAGE=false \
+--env VALIDATE_MARKDOWN=false \
+--env LINTER_RULES_PATH=/ \
+--env PYTHON_BLACK_CONFIG_FILE=pyproject.toml \
+--env PYTHON_ISORT_CONFIG_FILE=pyproject.toml \
+--env PYTHON_MYPY_CONFIG_FILE=pyproject.toml \
+--env PYTHON_FLAKE8_CONFIG_FILE=.flake8 \
+-v $(pwd):/tmp/lint github/super-linter:v4
+```
+
+## UnitTest
+
+Test the software with th use of coverage:
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python setup.py install
+
+coverage run --source=pygef -m unittest
+```
+
+## Requirements
+
+Requirements are autogenerated by `pip-compile` with python 3.9
+
+```bash
+pip-compile --extra=test --extra=docs --extra=lint --output-file=requirements.txt pyproject.toml
+```

@@ -17,7 +17,7 @@ from typing import List
 sys.path.insert(0, os.path.abspath("../src"))
 os.environ["DOC_PATH"] = os.path.dirname(__file__)
 
-import pygef
+import pygef  # noqa: E402
 
 project = "pygef"
 copyright = "2020, CEMS BV"

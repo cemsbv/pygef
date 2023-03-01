@@ -4,13 +4,12 @@ import io
 import re
 from pathlib import Path
 
-from pygef.broxml import resolvers
-from pygef.broxml.xml_parser import read_xml
-from pygef.bore import BoreData
-from pygef.broxml.mapping import MAPPING_PARAMETERS
 from lxml import etree
-import polars as pl
 
+from pygef.bore import BoreData
+from pygef.broxml import resolvers
+from pygef.broxml.mapping import MAPPING_PARAMETERS
+from pygef.broxml.xml_parser import read_xml
 
 # maps keyword argument to:
 # xpath: query passed to elementree.find
@@ -137,7 +136,7 @@ def read_bore(
     else:
         if 3.0 >= float(matched.group(1)) < 2.0:
             raise ValueError("only bhrgtcom/2.x is supported ")
-        all_bd = read_xml(root, BoreData, BORE_ATTRIBS_V2, "sourceDocument")
+        all_bd = read_xml(root, BoreData, BORE_ATTRIBS_V2, "dispatchDocument")
 
     if include_soil_dist:
         out = []
