@@ -137,7 +137,10 @@ plot_bore(read_bore("myfile.xml"))
 Build the docs:
 
 ```bash
-python setup.py install
+python -m pip install --upgrade pip setuptools
+pip install -r requirements.txt
+pip install .
+
 sphinx-build -b html docs public
 ```
 
@@ -179,11 +182,11 @@ docker run \
 Test the software with th use of coverage:
 
 ```bash
-python -m pip install --upgrade pip
+python -m pip install --upgrade pip setuptools
 pip install -r requirements.txt
-python setup.py install
+pip install .
 
-coverage run --source=pygef -m unittest
+coverage run -m unittest
 ```
 
 ## Requirements
