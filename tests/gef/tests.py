@@ -902,12 +902,6 @@ class GefTest(unittest.TestCase):
         )
         assert v.frame_equal(df, null_equal=True)
 
-    def test_nan_to_zero(self):
-        df1 = pl.DataFrame({"type_index": [None, 1.0, 2.0]})
-        v = common.none_to_zero(df1)
-        df = pl.DataFrame({"type_index": [0.0, 1.0, 2.0]})
-        assert v.frame_equal(df, null_equal=True)
-
     def test_bug_depth(self):
         cpt = """#GEFID= 1, 1, 0
 #FILEDATE= 2011, 5, 13

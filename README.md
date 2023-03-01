@@ -6,7 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/ritchie46/pygef/badge.svg?branch=master)](https://coveralls.io/github/ritchie46/pygef?branch=code-coverage)
 
 Simple parser for \*.gef files. These are ASCII based files used for soil properties measurements.
-Compatible with Python 3.7.
+Compatible with Python 3.9.
 
 Recently added the parsing of xml boreholes file, the xml parsing is still in a preliminary phase,
 not all the files are supported. If you find a file that doesn't work with pygef, please make an issue about it or PR :)
@@ -155,7 +155,7 @@ isort --settings-path "pyproject.toml" .
 
 ## Lint
 
-To maintain code quality we use the Gitlab super-linter.
+To maintain code quality we use the GitHub super-linter.
 
 To run the linters locally, run the following bash script from the root directory:
 
@@ -179,7 +179,7 @@ docker run \
 
 ## UnitTest
 
-Test the software with th use of coverage:
+Test the software with the use of coverage:
 
 ```bash
 python -m pip install --upgrade pip setuptools

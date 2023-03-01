@@ -12,7 +12,7 @@ dependencies = [
     "lxml==4.9.1",
     "gef-file-to-map==0.1.0",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 license = { file = "LICENSE.txt" }
 readme = "README.md"
 keywords = ["gef"]
