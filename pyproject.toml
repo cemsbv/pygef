@@ -21,7 +21,10 @@ keywords = ["gef"]
 repository = "https://github.com/cemsbv/pygef"
 
 [project.optional-dependencies]
-test = ["coveralls"]
+test = [
+    "coveralls",
+    "pytest"
+]
 docs = [
     "Sphinx==5.1.1",
     "sphinx-autodoc-typehints==1.19.1",

@@ -8,6 +8,8 @@ alabaster==0.7.13
     # via sphinx
 asteroid-sphinx-theme==0.0.3
     # via pygef (pyproject.toml)
+attrs==22.2.0
+    # via pytest
 babel==2.12.0
     # via sphinx
 backcall==0.2.0
@@ -34,6 +36,8 @@ docutils==0.17.1
     # via
     #   sphinx
     #   sphinx-rtd-theme
+exceptiongroup==1.1.0
+    # via pytest
 fonttools==4.38.0
     # via matplotlib
 gef-file-to-map==0.1.0
@@ -44,6 +48,8 @@ imagesize==1.4.1
     # via sphinx
 importlib-metadata==6.0.0
     # via sphinx
+iniconfig==2.0.0
+    # via pytest
 ipython==7.34.0
     # via pygef (pyproject.toml)
 isort==5.12.0
@@ -72,6 +78,7 @@ packaging==23.0
     # via
     #   black
     #   matplotlib
+    #   pytest
     #   sphinx
 parso==0.8.3
     # via jedi
@@ -85,6 +92,8 @@ pillow==9.4.0
     # via matplotlib
 platformdirs==3.0.0
     # via black
+pluggy==1.0.0
+    # via pytest
 polars[pyarrow]==0.16.9
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.38
@@ -99,6 +108,8 @@ pygments==2.14.0
     #   sphinx
 pyparsing==3.0.9
     # via matplotlib
+pytest==7.2.1
+    # via pygef (pyproject.toml)
 python-dateutil==2.8.2
     # via matplotlib
 requests==2.28.2
@@ -132,7 +143,9 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 tomli==2.0.1
-    # via black
+    # via
+    #   black
+    #   pytest
 traitlets==5.9.0
     # via
     #   ipython
