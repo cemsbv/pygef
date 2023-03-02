@@ -28,7 +28,7 @@ test = [
 docs = [
     "Sphinx==5.1.1",
     "sphinx-autodoc-typehints==1.19.1",
-    "ipython==8.11.0",
+    "ipython==7.34.0",
     "asteroid-sphinx-theme==0.0.3",
     "sphinx_rtd_theme==1.0.0"
 ]
