@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reference &mdash; pygef 0.8.0a4 documentation</title>
@@ -13,11 +13,10 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -29,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> pygef
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pygef
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -43,8 +46,28 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#cpt">Cpt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#bore">Bore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cpt">Cpt</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pygef.shim.read_cpt"><code class="docutils literal notranslate"><span class="pre">read_cpt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pygef.cpt.CPTData"><code class="docutils literal notranslate"><span class="pre">CPTData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pygef.cpt.CPTData.__init__"><code class="docutils literal notranslate"><span class="pre">CPTData.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pygef.cpt.CPTData.attributes"><code class="docutils literal notranslate"><span class="pre">CPTData.attributes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pygef.cpt.CPTData.display_attributes"><code class="docutils literal notranslate"><span class="pre">CPTData.display_attributes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pygef.plotting.plot_cpt"><code class="docutils literal notranslate"><span class="pre">plot_cpt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#bore">Bore</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pygef.shim.read_bore"><code class="docutils literal notranslate"><span class="pre">read_bore()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pygef.bore.BoreData"><code class="docutils literal notranslate"><span class="pre">BoreData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pygef.bore.BoreData.__init__"><code class="docutils literal notranslate"><span class="pre">BoreData.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pygef.bore.BoreData.attributes"><code class="docutils literal notranslate"><span class="pre">BoreData.attributes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pygef.bore.BoreData.display_attributes"><code class="docutils literal notranslate"><span class="pre">BoreData.display_attributes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pygef.plotting.plot_bore"><code class="docutils literal notranslate"><span class="pre">plot_bore()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -62,8 +85,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Reference</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Reference</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tree/reference.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -82,13 +105,13 @@
 <span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_cpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_cpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_cpt" title="Permalink to this definition"></a></dt>
 <dd><p>Parse the cpt file. Can either be BytesIO, Path or str</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>io.BytesIO</em><em> | </em><em>Path</em><em> | </em><em>str</em>) – bore file</p></li>
 <li><p><strong>index</strong> (<em>int</em>) – only valid for xml files</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#pygef.cpt.CPTData" title="pygef.cpt.CPTData">CPTData</a></p>
 </dd>
 </dl>
@@ -107,7 +130,7 @@
 <span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/cpt.html#CPTData.attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.cpt.CPTData.attributes" title="Permalink to this definition"></a></dt>
 <dd><p>Get the attributes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 </dd>
 </dl>
@@ -118,7 +141,7 @@
 <span class="sig-name descname"><span class="pre">display_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/cpt.html#CPTData.display_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.cpt.CPTData.display_attributes" title="Permalink to this definition"></a></dt>
 <dd><p>Get pretty formatted string representation of <cite>CPTData.attributes`</cite></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
@@ -138,17 +161,17 @@
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="#pygef.cpt.CPTData" title="pygef.cpt.CPTData"><em>CPTData</em></a>) – (BoreData) Bore data object</p></li>
 <li><p><strong>fig</strong> (<em>plt.Figure</em><em> | </em><em>None</em>) – (Figure, optional) Figure object used to add axes</p></li>
 <li><p><strong>dpi</strong> (<em>int</em>) – (int, optional)  Default is 100 Resolution of the figure.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Tuple[plt.Figure, Tuple[plt.Axes, plt.Axes, plt.Axes]]</p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Figure, Axes</p>
 </dd>
 </dl>
@@ -162,13 +185,13 @@
 <span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_bore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_bore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_bore" title="Permalink to this definition"></a></dt>
 <dd><p>Parse the bore file. Can either be BytesIO, Path or str</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>io.BytesIO</em><em> | </em><em>Path</em><em> | </em><em>str</em>) – bore file</p></li>
 <li><p><strong>index</strong> (<em>int</em>) – only valid for xml files</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#pygef.bore.BoreData" title="pygef.bore.BoreData">BoreData</a></p>
 </dd>
 </dl>
@@ -187,7 +210,7 @@
 <span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/bore.html#BoreData.attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.bore.BoreData.attributes" title="Permalink to this definition"></a></dt>
 <dd><p>Get the attributes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 </dd>
 </dl>
@@ -198,7 +221,7 @@
 <span class="sig-name descname"><span class="pre">display_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/bore.html#BoreData.display_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.bore.BoreData.display_attributes" title="Permalink to this definition"></a></dt>
 <dd><p>Get pretty formatted string representation of <cite>CPTData.attributes`</cite></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
@@ -216,14 +239,14 @@
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="#pygef.bore.BoreData" title="pygef.bore.BoreData"><em>BoreData</em></a>) – Bore data object</p></li>
 <li><p><strong>fig</strong> (<em>plt.Figure</em><em> | </em><em>None</em>) – Figure object used to add axes</p></li>
 <li><p><strong>dpi</strong> (<em>int</em>) – Default is 100 Resolution of the figure.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Tuple[plt.Figure, plt.Axes]</p>
 </dd>
 </dl>
