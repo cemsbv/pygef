@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pygef.shim &mdash; pygef 0.8.0a4 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/index.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pygef
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/reference.html">Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pygef</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>pygef.shim</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pygef.shim</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">broxml</span>
+<span class="kn">from</span> <span class="nn">pygef.bore</span> <span class="kn">import</span> <span class="n">BoreData</span>
+<span class="kn">from</span> <span class="nn">pygef.common</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">pygef.cpt</span> <span class="kn">import</span> <span class="n">CPTData</span><span class="p">,</span> <span class="n">QualityClass</span>
+<span class="kn">from</span> <span class="nn">pygef.gef.gef</span> <span class="kn">import</span> <span class="n">_GefBore</span><span class="p">,</span> <span class="n">_GefCpt</span>
+
+<span class="n">GEF_ID</span> <span class="o">=</span> <span class="s2">&quot;#GEFID&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    gef files start with &#39;#GEFID&#39; so we check the content</span>
+<span class="sd">    of the file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">is_gef</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">GEF_ID</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">is_gef</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">GEF_ID</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not find the GEF file.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read_bore"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_bore">[docs]</a><span class="k">def</span> <span class="nf">read_bore</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoreData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the bore file. Can either be BytesIO, Path or str</span>
+
+<span class="sd">    :param file: bore file</span>
+<span class="sd">    :param index: only valid for xml files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;an index &gt; 0 not supported for GEF files&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">_GefBore</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">_GefBore</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">broxml</span><span class="o">.</span><span class="n">read_bore</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="read_cpt"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_cpt">[docs]</a><span class="k">def</span> <span class="nf">read_cpt</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the cpt file. Can either be BytesIO, Path or str</span>
+
+<span class="sd">    :param file: bore file</span>
+<span class="sd">    :param index: only valid for xml files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;an index &gt; 0 not supported for GEF files&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">broxml</span><span class="o">.</span><span class="n">read_cpt</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">convert_height_system_to_vertical_datum</span><span class="p">(</span><span class="n">height_system</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">height_system</span> <span class="o">==</span> <span class="mf">31000.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;nap&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">height_system</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">gef_cpt</span><span class="p">:</span> <span class="n">_GefCpt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;standardized_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span>
+        <span class="c1"># all gef files are RD new</span>
+        <span class="n">srs_name</span><span class="o">=</span><span class="s2">&quot;urn:ogc:def:crs:EPSG::28992&quot;</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bro_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">project_id</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">df</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;research_report_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cpt_standard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dissipationtest_performed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;quality_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QualityClass</span><span class="p">(</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">cpt_class</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;predrilled_depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">pre_excavated_depth</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;final_depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">end_depth_of_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cpt_description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cpt_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">type_of_cone_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_surface_area&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">nom_surface_area_cone_tip</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_diameter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_surface_quotient&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">net_surface_area_quotient_of_the_cone_tip</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;cone_to_friction_sleeve_distance&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">distance_between_cone_and_centre_of_friction_casing</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_to_friction_sleeve_surface_area&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;cone_to_friction_sleeve_surface_quotient&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">net_surface_area_quotient_of_the_friction_casing</span>
+
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_cone_resistance_before&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_cone_before_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_cone_resistance_after&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_cone_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_inclination_ew_before&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ew_before_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_inclination_ew_after&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ew_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_inclination_ns_before&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ns_before_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_inclination_ns_after&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ns_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_resultant_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_resultant_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_local_friction_before&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_friction_before_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_local_friction_after&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_friction_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_pore_pressure_u1_before&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u1_before_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_pore_pressure_u2_before&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u2_before_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_pore_pressure_u3_before&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u3_before_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_pore_pressure_u1_after&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u1_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_pore_pressure_u2_after&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u2_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span>
+        <span class="s2">&quot;zlm_pore_pressure_u3_after&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u3_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_offset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zid</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_datum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">height_system</span>
+
+    <span class="c1"># TODO! parse measurementtext 9 in gef?</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_reference_point&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+
+    <span class="k">return</span> <span class="n">CPTData</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">gef_bore</span><span class="p">:</span> <span class="n">_GefBore</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoreData</span><span class="p">:</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span>
+        <span class="c1"># all gef files are RD new</span>
+        <span class="n">srs_name</span><span class="o">=</span><span class="s2">&quot;urn:ogc:def:crs:EPSG::28992&quot;</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">gef_bore</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">gef_bore</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;research_report_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;description_procedure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_offset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_bore</span><span class="o">.</span><span class="n">zid</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_datum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_reference_point&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bore_rock_reached&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;final_bore_depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;final_sample_depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bore_hole_completed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_bore</span><span class="o">.</span><span class="n">df</span>
+    <span class="k">return</span> <span class="n">BoreData</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, CEMS BV.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

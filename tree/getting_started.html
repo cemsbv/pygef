@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; pygef 0.8.0a3 documentation</title>
+  <title>Getting started &mdash; pygef 0.8.0a4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
@@ -45,13 +45,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#load-a-cpt-bore-file">Load a Cpt/Bore file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#access-the-attributes">Access the attributes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#cpt">Cpt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cpt">CPT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#borehole">Borehole</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#plot-a-gef-file">Plot a gef file</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">cpt</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">borehole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">CPT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Borehole</a></li>
 </ul>
 </li>
 </ul>
@@ -86,38 +86,26 @@
   <section id="getting-started">
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
 <p>Getting started with pygef is easy done by importing the <code class="code docutils literal notranslate"><span class="pre">pygef</span></code> library:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">Cpt</span><span class="p">,</span> <span class="n">Bore</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">read_cpt</span><span class="p">,</span> <span class="n">read_bore</span>
 </pre></div>
 </div>
 <p>or any equivalent <code class="code docutils literal notranslate"><span class="pre">import</span></code> statement.</p>
 <section id="load-a-cpt-bore-file">
 <h2>Load a Cpt/Bore file<a class="headerlink" href="#load-a-cpt-bore-file" title="Permalink to this heading"></a></h2>
-<p>The classes <code class="code docutils literal notranslate"><span class="pre">Cpt</span></code> and <code class="code docutils literal notranslate"><span class="pre">Bore</span></code> accept two possible inputs:</p>
-<ul>
+<p>The classes <code class="code docutils literal notranslate"><span class="pre">read_cpt</span></code> and <code class="code docutils literal notranslate"><span class="pre">read_bore</span></code> accept two possible inputs:</p>
+<ul class="simple">
 <li><p>the <code class="code docutils literal notranslate"><span class="pre">path</span></code> of the file</p></li>
-<li><p>the <code class="code docutils literal notranslate"><span class="pre">content</span></code>, a dictionary containing the keys: [“string”, “file_type”]</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>string: String version of the file.</p></li>
-<li><p>file_type: One of [“gef”, “xml”]</p></li>
-</ul>
-</div></blockquote>
-</li>
+<li><p>the <code class="code docutils literal notranslate"><span class="pre">BytesIO</span></code> of the file</p></li>
 </ul>
 <p>If you want to use the <code class="code docutils literal notranslate"><span class="pre">path</span></code> then your code should look like this:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">os</span>
 
-<span class="gp">In [3]: </span><span class="n">path_cpt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../test_files/cpt.gef&quot;</span><span class="p">)</span>
-
-<span class="gp">In [4]: </span><span class="n">cpt</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">path_cpt</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>If you want to use the <code class="code docutils literal notranslate"><span class="pre">content</span></code> method:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [5]: </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_cpt</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<span class="gp">   ...: </span>    <span class="n">s</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="gp">In [3]: </span><span class="n">path_cpt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<span class="gp">   ...: </span>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../tests/test_files/cpt_xml/example.xml&quot;</span>
+<span class="gp">   ...: </span><span class="p">)</span>
 <span class="gp">   ...: </span>
 
-<span class="gp">In [6]: </span><span class="n">gef</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;gef&quot;</span><span class="p">))</span>
+<span class="gp">In [4]: </span><span class="n">cpt</span> <span class="o">=</span> <span class="n">read_cpt</span><span class="p">(</span><span class="n">path_cpt</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -125,40 +113,45 @@
 <h2>Access the attributes<a class="headerlink" href="#access-the-attributes" title="Permalink to this heading"></a></h2>
 <p>Accessing the attributes of a pygef object is quite easy.
 If for example we want to know the (x, y, z) coordinates of the gef we can simply do:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">coordinates</span> <span class="o">=</span> <span class="p">(</span><span class="n">gef</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">gef</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">gef</span><span class="o">.</span><span class="n">zid</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [5]: </span><span class="n">coordinates</span> <span class="o">=</span> <span class="p">(</span>
+<span class="gp">   ...: </span>    <span class="n">cpt</span><span class="o">.</span><span class="n">standardized_location</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+<span class="gp">   ...: </span>    <span class="n">cpt</span><span class="o">.</span><span class="n">standardized_location</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+<span class="gp">   ...: </span>    <span class="n">cpt</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span>
+<span class="gp">   ...: </span><span class="p">)</span>
+<span class="gp">   ...: </span>
 
-<span class="gp">In [8]: </span><span class="nb">print</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
-<span class="go">(79578.38, 424838.97, -0.09)</span>
+<span class="gp">In [6]: </span><span class="nb">print</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<span class="go">(52.36533659, 5.60907955, 4.41)</span>
 </pre></div>
 </div>
-<p>Check all the available attributes in the reference. Everything(or almost) that is contained in the files it is now
+<p>Check all the available attributes in the reference. Everything (or almost) that is contained in the files it is now
 accessible as attribute of the <code class="code docutils literal notranslate"><span class="pre">gef</span></code> object.</p>
-<p>The classes <code class="code docutils literal notranslate"><span class="pre">Cpt</span></code> and <code class="code docutils literal notranslate"><span class="pre">Bore</span></code> have different attributes, check the reference to learn more about it.</p>
-<p>A common and very useful attribute is <code class="code docutils literal notranslate"><span class="pre">gef.df</span></code>, this is a <code class="code docutils literal notranslate"><span class="pre">polars.DataFrame</span></code> that contains all the rows and
+<p>The classes <a class="reference internal" href="reference.html#pygef.cpt.CPTData" title="pygef.cpt.CPTData"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pygef.cpt.CPTData()</span></code></a> and <a class="reference internal" href="reference.html#pygef.bore.BoreData" title="pygef.bore.BoreData"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pygef.bore.BoreData()</span></code></a> have different attributes, check the reference to learn more about it.</p>
+<p>A common and very useful attribute is <code class="code docutils literal notranslate"><span class="pre">CPTData.data</span></code>, this is a <code class="code docutils literal notranslate"><span class="pre">polars.DataFrame</span></code> that contains all the rows and
 columns defined in the file.</p>
 <section id="cpt">
-<h3>Cpt<a class="headerlink" href="#cpt" title="Permalink to this heading"></a></h3>
-<p>If we call <code class="code docutils literal notranslate"><span class="pre">cpt.df</span></code> on a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object we will get something like this:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">df</span>
-<span class="gh">Out[9]: </span>
-<span class="go">shape: (999, 12)</span>
-<span class="go">┌────────────┬────────┬────────────┬───────┬─────┬────────────┬────────┬────────────┬──────────────┐</span>
-<span class="go">│ penetratio ┆ qc     ┆ corrected_ ┆ fs    ┆ ... ┆ corrected_ ┆ depth  ┆ friction_n ┆ elevation_wi │</span>
-<span class="go">│ n_length   ┆ ---    ┆ qc         ┆ ---   ┆     ┆ depth      ┆ ---    ┆ umber      ┆ th_respect_t │</span>
-<span class="go">│ ---        ┆ f64    ┆ ---        ┆ f64   ┆     ┆ ---        ┆ f64    ┆ ---        ┆ o_nap        │</span>
-<span class="go">│ f64        ┆        ┆ f64        ┆       ┆     ┆ f64        ┆        ┆ f64        ┆ ---          │</span>
-<span class="go">│            ┆        ┆            ┆       ┆     ┆            ┆        ┆            ┆ f64          │</span>
-<span class="go">╞════════════╪════════╪════════════╪═══════╪═════╪════════════╪════════╪════════════╪══════════════╡</span>
-<span class="go">│ 0.01       ┆ 0.013  ┆ 0.013      ┆ 0.002 ┆ ... ┆ 0.01       ┆ 0.01   ┆ 15.384615  ┆ -0.1         │</span>
-<span class="go">│ 0.03       ┆ 0.103  ┆ 0.107      ┆ 0.002 ┆ ... ┆ 0.03       ┆ 0.03   ┆ 1.941748   ┆ -0.12        │</span>
-<span class="go">│ 0.05       ┆ 0.489  ┆ 0.493      ┆ 0.009 ┆ ... ┆ 0.05       ┆ 0.05   ┆ 1.840491   ┆ -0.14        │</span>
-<span class="go">│ 0.07       ┆ 0.691  ┆ 0.696      ┆ 0.012 ┆ ... ┆ 0.07       ┆ 0.07   ┆ 1.736614   ┆ -0.16        │</span>
-<span class="go">│ ...        ┆ ...    ┆ ...        ┆ ...   ┆ ... ┆ ...        ┆ ...    ┆ ...        ┆ ...          │</span>
-<span class="go">│ 19.91      ┆ 14.912 ┆ 14.954     ┆ 0.055 ┆ ... ┆ 19.866     ┆ 19.866 ┆ 0.36883    ┆ -19.956      │</span>
-<span class="go">│ 19.93      ┆ 14.706 ┆ 14.748     ┆ 0.053 ┆ ... ┆ 19.886     ┆ 19.886 ┆ 0.360397   ┆ -19.976      │</span>
-<span class="go">│ 19.95      ┆ 14.625 ┆ 14.666     ┆ 0.05  ┆ ... ┆ 19.905     ┆ 19.905 ┆ 0.34188    ┆ -19.995      │</span>
-<span class="go">│ 19.97      ┆ 14.698 ┆ 14.74      ┆ 0.05  ┆ ... ┆ 19.925     ┆ 19.925 ┆ 0.340182   ┆ -20.015      │</span>
-<span class="go">└────────────┴────────┴────────────┴───────┴─────┴────────────┴────────┴────────────┴──────────────┘</span>
+<h3>CPT<a class="headerlink" href="#cpt" title="Permalink to this heading"></a></h3>
+<p>If we call <code class="code docutils literal notranslate"><span class="pre">CPTData.data</span></code> on a <code class="code docutils literal notranslate"><span class="pre">CPTData</span></code> object we will get something like this:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">data</span>
+<span class="gh">Out[7]: </span>
+<span class="go">shape: (373, 9)</span>
+<span class="go">┌────────────┬───────┬───────────┬────────────┬─────┬────────────┬────────────┬────────────┬────────────┐</span>
+<span class="go">│ penetratio ┆ depth ┆ elapsedTi ┆ coneResist ┆ ... ┆ inclinatio ┆ inclinatio ┆ localFrict ┆ frictionRa │</span>
+<span class="go">│ nLength    ┆ ---   ┆ me        ┆ ance       ┆     ┆ nNS        ┆ nResultant ┆ ion        ┆ tio        │</span>
+<span class="go">│ ---        ┆ f64   ┆ ---       ┆ ---        ┆     ┆ ---        ┆ ---        ┆ ---        ┆ ---        │</span>
+<span class="go">│ f64        ┆       ┆ f64       ┆ f64        ┆     ┆ i64        ┆ i64        ┆ f64        ┆ f64        │</span>
+<span class="go">╞════════════╪═══════╪═══════════╪════════════╪═════╪════════════╪════════════╪════════════╪════════════╡</span>
+<span class="go">│ 0.0        ┆ 0.0   ┆ -9.99999e ┆ -9.99999e5 ┆ ... ┆ -999999    ┆ -999999    ┆ -9.99999e5 ┆ -9.99999e5 │</span>
+<span class="go">│            ┆       ┆ 5         ┆            ┆     ┆            ┆            ┆            ┆            │</span>
+<span class="go">│ 0.02       ┆ 0.02  ┆ 11.0      ┆ 2.708      ┆ ... ┆ 0          ┆ 0          ┆ 0.03       ┆ 0.6        │</span>
+<span class="go">│ 0.04       ┆ 0.039 ┆ 13.0      ┆ 4.29       ┆ ... ┆ 0          ┆ 0          ┆ 0.039      ┆ 0.8        │</span>
+<span class="go">│ 0.06       ┆ 0.059 ┆ 15.0      ┆ 5.124      ┆ ... ┆ 0          ┆ 0          ┆ 0.045      ┆ 0.9        │</span>
+<span class="go">│ ...        ┆ ...   ┆ ...       ┆ ...        ┆ ... ┆ ...        ┆ ...        ┆ ...        ┆ ...        │</span>
+<span class="go">│ 7.38       ┆ 7.379 ┆ 520.0     ┆ 10.576     ┆ ... ┆ 0          ┆ 1          ┆ -9.99999e5 ┆ 0.0        │</span>
+<span class="go">│ 7.4        ┆ 7.399 ┆ 521.0     ┆ 10.235     ┆ ... ┆ 0          ┆ 1          ┆ -9.99999e5 ┆ 0.0        │</span>
+<span class="go">│ 7.42       ┆ 7.419 ┆ 522.0     ┆ 9.714      ┆ ... ┆ 0          ┆ 1          ┆ -9.99999e5 ┆ 0.0        │</span>
+<span class="go">│ 7.44       ┆ 7.439 ┆ 523.0     ┆ 9.11       ┆ ... ┆ 0          ┆ 1          ┆ -9.99999e5 ┆ 0.0        │</span>
+<span class="go">└────────────┴───────┴───────────┴────────────┴─────┴────────────┴────────────┴────────────┴────────────┘</span>
 </pre></div>
 </div>
 <p>The number and type of columns depends on the columns originally present in the cpt.</p>
@@ -167,98 +160,89 @@ columns defined in the file.</p>
 </section>
 <section id="borehole">
 <h3>Borehole<a class="headerlink" href="#borehole" title="Permalink to this heading"></a></h3>
-<p>If we call <code class="code docutils literal notranslate"><span class="pre">bore.df</span></code> on a <code class="code docutils literal notranslate"><span class="pre">bore</span></code> object we will get something like this:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="n">path_bore</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../test_files/example_bore.gef&quot;</span><span class="p">)</span>
+<p>If we call <code class="code docutils literal notranslate"><span class="pre">BoreData.data</span></code> on a <code class="code docutils literal notranslate"><span class="pre">BoreData</span></code> object we will get something like this:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [8]: </span><span class="n">path_bore</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<span class="gp">   ...: </span>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../tests/test_files/bore_xml/DP14+074_MB_KR.xml&quot;</span>
+<span class="gp">   ...: </span><span class="p">)</span>
+<span class="gp">   ...: </span>
 
-<span class="gp">In [11]: </span><span class="n">bore</span> <span class="o">=</span> <span class="n">Bore</span><span class="p">(</span><span class="n">path_bore</span><span class="p">)</span>
+<span class="gp">In [9]: </span><span class="n">bore</span> <span class="o">=</span> <span class="n">read_bore</span><span class="p">(</span><span class="n">path_bore</span><span class="p">)</span>
 
-<span class="gp">In [12]: </span><span class="n">bore</span><span class="o">.</span><span class="n">df</span>
-<span class="gh">Out[12]: </span>
-<span class="go">shape: (102, 10)</span>
-<span class="go">┌─────────┬────────────┬─────────┬───────┬─────┬────────────┬────────────┬────────────┬────────────┐</span>
-<span class="go">│ depth_t ┆ depth_bott ┆ soil_co ┆ remar ┆ ... ┆ clay_compo ┆ loam_compo ┆ peat_compo ┆ silt_compo │</span>
-<span class="go">│ op      ┆ om         ┆ de      ┆ ks    ┆     ┆ nent       ┆ nent       ┆ nent       ┆ nent       │</span>
-<span class="go">│ ---     ┆ ---        ┆ ---     ┆ ---   ┆     ┆ ---        ┆ ---        ┆ ---        ┆ ---        │</span>
-<span class="go">│ f64     ┆ f64        ┆ str     ┆ str   ┆     ┆ f64        ┆ f64        ┆ f64        ┆ f64        │</span>
-<span class="go">╞═════════╪════════════╪═════════╪═══════╪═════╪════════════╪════════════╪════════════╪════════════╡</span>
-<span class="go">│ 7.4     ┆ 12.5       ┆ NBE     ┆ 1) GM ┆ ... ┆ -1.0       ┆ -1.0       ┆ -1.0       ┆ -1.0       │</span>
-<span class="go">│ 12.5    ┆ 26.0       ┆ NBE     ┆ 1) GM ┆ ... ┆ -1.0       ┆ -1.0       ┆ -1.0       ┆ -1.0       │</span>
-<span class="go">│ 26.0    ┆ 27.0       ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
-<span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ZMGO  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 3)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ weini ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ g     ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ zeer  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ g...  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│ 27.0    ┆ 28.0       ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
-<span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ZMGO  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 3)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ weini ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ g     ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ matig ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ...   ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│ ...     ┆ ...        ┆ ...     ┆ ...   ┆ ... ┆ ...        ┆ ...        ┆ ...        ┆ ...        │</span>
-<span class="go">│ 148.0   ┆ 149.0      ┆ Zg2     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
-<span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ZZGO  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 3)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ zeer  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ veel  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ fij.. ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ .     ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│ 149.0   ┆ 150.0      ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
-<span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ZMGO  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 3)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ uiter ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ st    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ veel  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ...   ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│ 150.0   ┆ 152.0      ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
-<span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ZMGO  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 3)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ spoor ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ matig ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ g...  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│ 152.0   ┆ 153.0      ┆ Zg1     ┆ 1)    ┆ ... ┆ 0.0        ┆ 0.0        ┆ 0.0        ┆ 0.0        │</span>
-<span class="go">│         ┆            ┆         ┆ gray  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 2)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ZMGO  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ 3)    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ uiter ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ st    ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ veel  ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">│         ┆            ┆         ┆ ...   ┆     ┆            ┆            ┆            ┆            │</span>
-<span class="go">└─────────┴────────────┴─────────┴───────┴─────┴────────────┴────────────┴────────────┴────────────┘</span>
+<span class="gp">In [10]: </span><span class="n">bore</span><span class="o">.</span><span class="n">data</span>
+<span class="gh">Out[10]: </span>
+<span class="go">shape: (13, 8)</span>
+<span class="go">┌────────────┬────────────┬────────────┬──────────┬────────────┬────────────┬────────────┬─────────┐</span>
+<span class="go">│ upper_boun ┆ lower_boun ┆ geotechnic ┆ color    ┆ dispersed_ ┆ organic_ma ┆ sand_media ┆ soil_di │</span>
+<span class="go">│ dary       ┆ dary       ┆ al_soil_na ┆ ---      ┆ inhomogeni ┆ tter_conte ┆ n_class    ┆ st      │</span>
+<span class="go">│ ---        ┆ ---        ┆ me         ┆ str      ┆ ty         ┆ nt_class   ┆ ---        ┆ ---     │</span>
+<span class="go">│ f64        ┆ f64        ┆ ---        ┆          ┆ ---        ┆ ---        ┆ str        ┆ list[f6 │</span>
+<span class="go">│            ┆            ┆ str        ┆          ┆ bool       ┆ str        ┆            ┆ 4]      │</span>
+<span class="go">╞════════════╪════════════╪════════════╪══════════╪════════════╪════════════╪════════════╪═════════╡</span>
+<span class="go">│ 0.0        ┆ 1.0        ┆ zwakGrindi ┆ donkergr ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.2,   │</span>
+<span class="go">│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420tot630u ┆ 0.0,    │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">│ 1.0        ┆ 1.1        ┆ zwakGrindi ┆ donkergr ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.2,   │</span>
+<span class="go">│            ┆            ┆ gZand      ┆ ijs      ┆            ┆ sch        ┆ 420tot630u ┆ 0.0,    │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">│ 1.1        ┆ 2.0        ┆ zwakZandig ┆ standaar ┆ false      ┆ nietOrgani ┆ null       ┆ [0.0,   │</span>
+<span class="go">│            ┆            ┆ eKleiMetGr ┆ dBruin   ┆            ┆ sch        ┆            ┆ 0.1,    │</span>
+<span class="go">│            ┆            ┆ ind        ┆          ┆            ┆            ┆            ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">│ 2.0        ┆ 3.0        ┆ zwakZandig ┆ standaar ┆ false      ┆ nietOrgani ┆ null       ┆ [0.0,   │</span>
+<span class="go">│            ┆            ┆ eKlei      ┆ dGrijs   ┆            ┆ sch        ┆            ┆ 0.0,    │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">│ ...        ┆ ...        ┆ ...        ┆ ...      ┆ ...        ┆ ...        ┆ ...        ┆ ...     │</span>
+<span class="go">│ 8.0        ┆ 9.0        ┆ siltigZand ┆ standaar ┆ false      ┆ nietOrgani ┆ fijn150tot ┆ [0.0,   │</span>
+<span class="go">│            ┆            ┆            ┆ dGrijs   ┆            ┆ sch        ┆ 200um      ┆ 0.0,    │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">│ 9.0        ┆ 10.0       ┆ siltigZand ┆ standaar ┆ false      ┆ nietOrgani ┆ fijn150tot ┆ [0.0,   │</span>
+<span class="go">│            ┆            ┆            ┆ dGrijs   ┆            ┆ sch        ┆ 200um      ┆ 0.0,    │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">│ 10.0       ┆ 11.0       ┆ siltigZand ┆ standaar ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.0,   │</span>
+<span class="go">│            ┆            ┆ MetGrind   ┆ dGrijs   ┆            ┆ sch        ┆ 200tot300u ┆ 0.15,   │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">│ 11.0       ┆ 12.0       ┆ siltigZand ┆ standaar ┆ false      ┆ nietOrgani ┆ middelgrof ┆ [0.0,   │</span>
+<span class="go">│            ┆            ┆ MetGrind   ┆ dGrijs   ┆            ┆ sch        ┆ 300tot420u ┆ 0.15,   │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆ m          ┆ ...     │</span>
+<span class="go">│            ┆            ┆            ┆          ┆            ┆            ┆            ┆ 0.0]    │</span>
+<span class="go">└────────────┴────────────┴────────────┴──────────┴────────────┴────────────┴────────────┴─────────┘</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="plot-a-gef-file">
 <h2>Plot a gef file<a class="headerlink" href="#plot-a-gef-file" title="Permalink to this heading"></a></h2>
-<p>We can plot a .gef file using the method <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code>, check the reference to know which are the arguments of the method.</p>
+<p>We can plot a gef file using the method <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code>, check the reference to know which are the arguments of the method.</p>
 <section id="id1">
-<h3>cpt<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<h3>CPT<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
 <p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object we get:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [13]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
-<span class="gh">Out[13]: </span><span class="go">&lt;Figure size 600x800 with 2 Axes&gt;</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [11]: </span><span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">plot_cpt</span>
+
+<span class="gp">In [12]: </span><span class="n">plot_cpt</span><span class="p">(</span><span class="n">cpt</span><span class="p">)</span>
+<span class="gh">Out[12]: </span>
+<span class="go">(&lt;Figure size 800x1200 with 3 Axes&gt;,</span>
+<span class="go"> (&lt;AxesSubplot:xlabel=&#39;$q_c$ [MPa]&#39;, ylabel=&#39;Depth [m]&#39;&gt;,</span>
+<span class="go">  &lt;AxesSubplot:xlabel=&#39;fs [MPa]&#39;&gt;,</span>
+<span class="go">  &lt;AxesSubplot:xlabel=&#39;rf [%]&#39;&gt;))</span>
 </pre></div>
 </div>
 <img alt="../_images/cpt_plot.png" src="../_images/cpt_plot.png" />
 </section>
 <section id="id2">
-<h3>borehole<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
-<p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">bore</span></code> object we get:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [14]: </span><span class="n">bore</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<span class="gh">Out[14]: </span><span class="go">&lt;Figure size 1100x800 with 1 Axes&gt;</span>
+<h3>Borehole<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">BoreData</span></code> object we get:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [13]: </span><span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">plot_bore</span>
+
+<span class="gp">In [14]: </span><span class="n">plot_bore</span><span class="p">(</span><span class="n">bore</span><span class="p">)</span>
+<span class="gh">Out[14]: </span>
+<span class="go">(&lt;Figure size 800x1200 with 1 Axes&gt;,</span>
+<span class="go"> &lt;AxesSubplot:xlabel=&#39;cumulative soil fraction&#39;, ylabel=&#39;depth [m]&#39;&gt;)</span>
 </pre></div>
 </div>
 <img alt="../_images/bore_plot.png" src="../_images/bore_plot.png" />

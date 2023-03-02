@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reference &mdash; pygef 0.8.0a3 documentation</title>
+  <title>Reference &mdash; pygef 0.8.0a4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
@@ -77,265 +77,156 @@
 <h1>Reference<a class="headerlink" href="#reference" title="Permalink to this heading"></a></h1>
 <section id="cpt">
 <h2>Cpt<a class="headerlink" href="#cpt" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pygef.Cpt">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygef.</span></span><span class="sig-name descname"><span class="pre">Cpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/gef/cpt.html#Cpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.Cpt" title="Permalink to this definition"></a></dt>
-<dd><dl>
-<dt>** Cpt attributes:**</dt><dd><dl>
-<dt><em>Always present:</em></dt><dd><dl>
-<dt>type: str</dt><dd><p>Type of the gef file</p>
-</dd>
-<dt>project_id: str</dt><dd><p>Project id</p>
-</dd>
-<dt>x: float</dt><dd><p>X coordinate respect to the coordinate system</p>
-</dd>
-<dt>y: float</dt><dd><p>Y coordinate respect to the coordinate system</p>
-</dd>
-<dt>zid: float</dt><dd><p>Z coordinate respect to the height system</p>
-</dd>
-<dt>height_system: float</dt><dd><p>Type of coordinate system, 31000 is NAP</p>
-</dd>
-<dt>file_date: datatime.datetime</dt><dd><p>Start date time</p>
-</dd>
-<dt>test_id: str</dt><dd><p>Identifying name of gef file.</p>
-</dd>
-<dt>s: str</dt><dd><p>String version of gef file.</p>
-</dd>
-<dt>df: polars.DataFrame</dt><dd><p>DataFrame containing the same column contained in the original .gef file and
-some additional columns [depth, elevation_with_respect_to_nap]</p>
-<p>Tip: Use depth column instead of the penetration_length, the depth is corrected
-with the inclination(if present).</p>
-<p>Note that the Friction ratio is always calculated from the fs and qc values and not parsed from the file.</p>
-<p>If this attribute is called after the classify method the columns relative to the classification
-are also contained.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p><em>Not always present</em></p>
-<blockquote>
-<div><p>default: None
-The description is added only for the most important attributes, for the others check:
-<a class="reference external" href="https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&amp;modificationDate=1409732008000&amp;api=v2">https://publicwiki.deltares.nl/download/attachments/102204318/GEF-CPT.pdf?version=1&amp;modificationDate=1409732008000&amp;api=v2</a></p>
-<dl class="simple">
-<dt>cpt_class: str</dt><dd><p>Cpt class. The format is not standard so it might be not always properly parsed.</p>
-</dd>
-<dt>column_void: str</dt><dd><p>It is the definition of no value for the gef file</p>
-</dd>
-<dt>nom_surface_area_cone_tip: float</dt><dd><p>Nom. surface area of cone tip [mm2]</p>
-</dd>
-<dt>nom_surface_area_friction_element: float</dt><dd><p>Nom. surface area of friction casing [mm2]</p>
-</dd>
-<dt>net_surface_area_quotient_of_the_cone_tip: float</dt><dd><p>Net surface area quotient of cone tip [-]</p>
-</dd>
-<dt>net_surface_area_quotient_of_the_friction_casing: float</dt><dd><p>Net surface area quotient of friction casing [-]</p>
-</dd>
-</dl>
-<p>distance_between_cone_and_centre_of_friction_casing: float</p>
-<p>friction_present: float</p>
-<p>ppt_u1_present: float</p>
-<p>ppt_u2_present: float</p>
-<p>ppt_u3_present: float</p>
-<p>inclination_measurement_present: float</p>
-<p>use_of_back_flow_compensator: float</p>
-<p>type_of_cone_penetration_test: float</p>
-<dl class="simple">
-<dt>pre_excavated_depth: float</dt><dd><p>Pre excavate depth [m]</p>
-</dd>
-<dt>groundwater_level: float</dt><dd><p>Ground water level [m]</p>
-</dd>
-</dl>
-<p>water_depth_offshore_activities: float
-end_depth_of_penetration_test: float
-stop_criteria: float</p>
-<p>zero_measurement_cone_before_penetration_test: float</p>
-<p>zero_measurement_cone_after_penetration_test: float</p>
-<p>zero_measurement_friction_before_penetration_test: float</p>
-<p>zero_measurement_friction_after_penetration_test: float</p>
-<p>zero_measurement_ppt_u1_before_penetration_test: float</p>
-<p>zero_measurement_ppt_u1_after_penetration_test: float</p>
-<p>zero_measurement_ppt_u2_before_penetration_test: float</p>
-<p>zero_measurement_ppt_u2_after_penetration_test: float</p>
-<p>zero_measurement_ppt_u3_before_penetration_test: float</p>
-<p>zero_measurement_ppt_u3_after_penetration_test: float</p>
-<p>zero_measurement_inclination_before_penetration_test: float</p>
-<p>zero_measurement_inclination_after_penetration_test: float</p>
-<p>zero_measurement_inclination_ns_before_penetration_test: float</p>
-<p>zero_measurement_inclination_ns_after_penetration_test: float</p>
-<p>zero_measurement_inclination_ew_before_penetration_test: float</p>
-<p>zero_measurement_inclination_ew_after_penetration_test : float</p>
-<p>mileage: float</p>
-</div></blockquote>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pygef.Cpt.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/gef/cpt.html#Cpt.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.Cpt.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>Cpt class.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pygef.shim.read_cpt">
+<span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_cpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_cpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_cpt" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the cpt file. Can either be BytesIO, Path or str</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – Path to the file.</p></li>
-<li><p><strong>content</strong> (<em>dict</em>) – <dl class="simple">
-<dt>Dictionary with keys: [“string”, “file_type”]</dt><dd><ul>
-<li><dl class="simple">
-<dt>string: str</dt><dd><p>String version of the file.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>file_type: str</dt><dd><p>One of [gef, xml]</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pygef.Cpt.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_level_NAP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_level_wrt_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(11,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_step_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_NAP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/gef/cpt.html#Cpt.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.Cpt.plot" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the cpt file and return matplotlib.pyplot.figure .</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>classification</strong> (<em>str</em><em>, </em><em>only for cpt type</em>) – If classification (“robertson”, “been_jefferies”) is specified a subplot is added with the classification
-for each cpt row.</p></li>
-<li><p><strong>water_level_NAP</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>necessary for the classification: give this</em><em> or </em><em>water_level_wrt_depth</em>) – Water level with respect to NAP</p></li>
-<li><p><strong>water_level_wrt_depth</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>necessary for the classification: give this</em><em> or </em><em>water_level_NAP</em>) – Water level with respect to the ground_level [0], it should be a negative value.</p></li>
-<li><p><strong>p_a</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification</em>) – Atmospheric pressure. Default: 0.1 MPa.</p></li>
-<li><p><strong>new</strong> (<em>bool</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification default:True</em>) – If True and the classification is robertson, the new(2016) implementation of robertson is used.</p></li>
-<li><p><strong>show</strong> (<em>bool</em>) – If True the plot is showed, else the matplotlib.pytplot.figure is returned</p></li>
-<li><p><strong>figsize</strong> (<em>tuple</em>) – Figsize of the plot, default (11, 8).</p></li>
-<li><p><strong>df_group</strong> (<em>polars.DataFrame</em><em>, </em><em>only for cpt type</em><em>, </em><em>optional for the classification</em>) – <p>Use this argument to plot a defined soil layering next to the other subplots.
-It should contain the columns:</p>
-<blockquote>
-<div><ul>
-<li><dl class="simple">
-<dt>layer</dt><dd><p>Name of layer, should be either BeenJefferies of Robertson soil type,
-if it is different then also the argument colors should be passed.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>z_centr_NAP</dt><dd><p>Z value of the middle of the layer</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>thickness</dt><dd><p>Thickness of the layer</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-</p></li>
-<li><p><strong>grid_step_x</strong> (<em>float</em><em>, </em><em>only for cpt type</em><em>, </em><em>default: None</em>) – Grid step for qc and Fr subplots.</p></li>
-<li><p><strong>dpi</strong> (<em>int</em>) – Dpi figure</p></li>
-<li><p><strong>colors</strong> (<em>dict</em>) – Dictionary containing the colors associated to each soil type, if specified</p></li>
-<li><p><strong>z_NAP</strong> (<em>bool</em>) – If True the Z-axis is with respect to NAP.</p></li>
+<li><p><strong>file</strong> (<em>io.BytesIO</em><em> | </em><em>Path</em><em> | </em><em>str</em>) – bore file</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – only valid for xml files</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>matplotlib.pyplot.figure</p>
+<dd class="field-even"><p><a class="reference internal" href="#pygef.cpt.CPTData" title="pygef.cpt.CPTData">CPTData</a></p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="pygef.cpt.CPTData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygef.cpt.</span></span><span class="sig-name descname"><span class="pre">CPTData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bro_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">research_report_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpt_standard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardized_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissipationtest_performed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predrilled_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpt_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpt_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_surface_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_diameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_surface_quotient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_to_friction_sleeve_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_to_friction_sleeve_surface_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_to_friction_sleeve_surface_quotient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_cone_resistance_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_cone_resistance_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ew_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ew_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ns_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ns_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_resultant_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_resultant_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_local_friction_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_local_friction_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u1_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u2_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u3_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u1_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u2_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u3_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_datum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_reference_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/cpt.html#CPTData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.cpt.CPTData" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pygef.cpt.CPTData.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bro_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">research_report_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpt_standard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardized_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissipationtest_performed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predrilled_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpt_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpt_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_surface_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_diameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_surface_quotient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_to_friction_sleeve_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_to_friction_sleeve_surface_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_to_friction_sleeve_surface_quotient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_cone_resistance_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_cone_resistance_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ew_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ew_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ns_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_ns_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_resultant_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_inclination_resultant_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_local_friction_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_local_friction_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u1_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u2_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u3_before</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u1_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u2_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlm_pore_pressure_u3_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_datum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_reference_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pygef.cpt.CPTData.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pygef.cpt.CPTData.attributes">
+<span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/cpt.html#CPTData.attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.cpt.CPTData.attributes" title="Permalink to this definition"></a></dt>
+<dd><p>Get the attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pygef.cpt.CPTData.display_attributes">
+<span class="sig-name descname"><span class="pre">display_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/cpt.html#CPTData.display_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.cpt.CPTData.display_attributes" title="Permalink to this definition"></a></dt>
+<dd><p>Get pretty formatted string representation of <cite>CPTData.attributes`</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygef.plotting.plot_cpt">
+<span class="sig-prename descclassname"><span class="pre">pygef.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_cpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/plotting.html#plot_cpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.plotting.plot_cpt" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Create a plot with three axes.</dt><dd><ul class="simple">
+<li><p>cone_resistance [Mpa]</p></li>
+<li><p>friction_ratio [%] (twiny)</p></li>
+<li><p>friction [MPa] (twiny)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="#pygef.cpt.CPTData" title="pygef.cpt.CPTData"><em>CPTData</em></a>) – (BoreData) Bore data object</p></li>
+<li><p><strong>fig</strong> (<em>plt.Figure</em><em> | </em><em>None</em>) – (Figure, optional) Figure object used to add axes</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>) – (int, optional)  Default is 100 Resolution of the figure.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Tuple[plt.Figure, Tuple[plt.Axes, plt.Axes, plt.Axes]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Figure, Axes</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
 <section id="bore">
 <h2>Bore<a class="headerlink" href="#bore" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pygef.Bore">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygef.</span></span><span class="sig-name descname"><span class="pre">Bore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/gef/bore.html#Bore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.Bore" title="Permalink to this definition"></a></dt>
-<dd><dl>
-<dt>** Bore attributes:**</dt><dd><dl>
-<dt>type: str</dt><dd><p>Type of the gef file</p>
-</dd>
-<dt>project_id: str</dt><dd><p>Project id</p>
-</dd>
-<dt>x: float</dt><dd><p>X coordinate respect to the coordinate system</p>
-</dd>
-<dt>y: float</dt><dd><p>Y coordinate respect to the coordinate system</p>
-</dd>
-<dt>zid: float</dt><dd><p>Z coordinate respect to the height system</p>
-</dd>
-<dt>height_system: float</dt><dd><p>Type of coordinate system, 31000 is NAP</p>
-</dd>
-<dt>file_date: datatime.datetime</dt><dd><p>Start date time</p>
-</dd>
-<dt>test_id: str</dt><dd><p>Identifying name of gef file.</p>
-</dd>
-<dt>s: str</dt><dd><p>String version of gef file.</p>
-</dd>
-<dt>df: polars.DataFrame</dt><dd><dl>
-<dt>DataFrame containing the columns: [</dt><dd><blockquote>
-<div><p>“depth_top”,
-“depth_bottom”,
-“soil_code”,
-“gravel_component”,
-“sand_component”,
-“clay_component”,
-“loam_component”,
-“peat_component”,
-“silt_component”,
-“remarks”,</p>
-</div></blockquote>
-<p>]</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pygef.Bore.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/gef/bore.html#Bore.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.Bore.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>Bore class.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pygef.shim.read_bore">
+<span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_bore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_bore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_bore" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the bore file. Can either be BytesIO, Path or str</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – Path to the file.</p></li>
-<li><p><strong>content</strong> (<em>dict</em>) – <dl class="simple">
-<dt>Dictionary with keys: [“string”, “file_type”]</dt><dd><dl class="simple">
-<dt>-string: str</dt><dd><p>String version of the file.</p>
-</dd>
-<dt>-file_type:</dt><dd><p>One of [gef, xml]</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pygef.Bore.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(11,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/gef/bore.html#Bore.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.Bore.plot" title="Permalink to this definition"></a></dt>
-<dd><p>Plot plot of soil components over the depth.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>show</strong> (<em>bool</em>) – If True the plot is showed, else the matplotlib.pytplot.figure is returned</p></li>
-<li><p><strong>figsize</strong> (<em>tuple</em>) – Figsize of the plot, default (11, 8).</p></li>
-<li><p><strong>dpi</strong> (<em>int</em>) – Dpi figure</p></li>
+<li><p><strong>file</strong> (<em>io.BytesIO</em><em> | </em><em>Path</em><em> | </em><em>str</em>) – bore file</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – only valid for xml files</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>matplotlib.pyplot.figure</p>
+<dd class="field-even"><p><a class="reference internal" href="#pygef.bore.BoreData" title="pygef.bore.BoreData">BoreData</a></p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="pygef.bore.BoreData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygef.bore.</span></span><span class="sig-name descname"><span class="pre">BoreData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">research_report_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_procedure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_datum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_reference_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bore_rock_reached</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_bore_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_sample_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bore_hole_completed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/bore.html#BoreData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.bore.BoreData" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pygef.bore.BoreData.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">research_report_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_procedure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_datum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delivered_vertical_position_reference_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bore_rock_reached</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_bore_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_sample_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bore_hole_completed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pygef.bore.BoreData.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pygef.bore.BoreData.attributes">
+<span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/bore.html#BoreData.attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.bore.BoreData.attributes" title="Permalink to this definition"></a></dt>
+<dd><p>Get the attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pygef.bore.BoreData.display_attributes">
+<span class="sig-name descname"><span class="pre">display_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/bore.html#BoreData.display_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.bore.BoreData.display_attributes" title="Permalink to this definition"></a></dt>
+<dd><p>Get pretty formatted string representation of <cite>CPTData.attributes`</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygef.plotting.plot_bore">
+<span class="sig-prename descclassname"><span class="pre">pygef.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_bore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/plotting.html#plot_bore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.plotting.plot_bore" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Create a plot with one axes.</dt><dd><ul class="simple">
+<li><p>soil distribution</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="#pygef.bore.BoreData" title="pygef.bore.BoreData"><em>BoreData</em></a>) – Bore data object</p></li>
+<li><p><strong>fig</strong> (<em>plt.Figure</em><em> | </em><em>None</em>) – Figure object used to add axes</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>) – Default is 100 Resolution of the figure.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Tuple[plt.Figure, plt.Axes]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

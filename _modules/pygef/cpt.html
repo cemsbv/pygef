@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pygef.cpt &mdash; pygef 0.8.0a4 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/index.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pygef
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/reference.html">Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pygef</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>pygef.cpt</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pygef.cpt</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+
+<span class="kn">from</span> <span class="nn">pygef.common</span> <span class="kn">import</span> <span class="n">Location</span>
+
+
+<span class="k">class</span> <span class="nc">QualityClass</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">Unknown</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">Class1</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Class2</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">Class3</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="CPTData"><a class="viewcode-back" href="../../tree/reference.html#pygef.cpt.CPTData">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">CPTData</span><span class="p">:</span>
+    <span class="c1"># dispatch_document cpt</span>
+    <span class="n">bro_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">research_report_date</span><span class="p">:</span> <span class="n">date</span>
+    <span class="n">cpt_standard</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">standardized_location</span><span class="p">:</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="c1"># conepenetrometersurvey</span>
+    <span class="n">dissipationtest_performed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">quality_class</span><span class="p">:</span> <span class="n">QualityClass</span>
+    <span class="n">predrilled_depth</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">final_depth</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="c1"># conepenetrometer</span>
+    <span class="n">cpt_description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">cpt_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">cone_surface_area</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">cone_diameter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">cone_surface_quotient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">cone_to_friction_sleeve_distance</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">cone_to_friction_sleeve_surface_area</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">cone_to_friction_sleeve_surface_quotient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="c1"># zero-load-measurement</span>
+    <span class="n">zlm_cone_resistance_before</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">zlm_cone_resistance_after</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">zlm_inclination_ew_before</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_inclination_ew_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_inclination_ns_before</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_inclination_ns_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_inclination_resultant_before</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_inclination_resultant_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_local_friction_before</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_local_friction_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_pore_pressure_u1_before</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_pore_pressure_u2_before</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_pore_pressure_u3_before</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_pore_pressure_u1_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_pore_pressure_u2_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">zlm_pore_pressure_u3_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">delivered_vertical_position_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">delivered_vertical_position_datum</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">delivered_vertical_position_reference_point</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;CPTData: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display_attributes</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="CPTData.attributes"><a class="viewcode-back" href="../../tree/reference.html#pygef.cpt.CPTData.attributes">[docs]</a>    <span class="k">def</span> <span class="nf">attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the attributes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attribs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="n">attribs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attribs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">return</span> <span class="n">attribs</span></div>
+
+<div class="viewcode-block" id="CPTData.display_attributes"><a class="viewcode-back" href="../../tree/reference.html#pygef.cpt.CPTData.display_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">display_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get pretty formatted string representation of `CPTData.attributes``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">())</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, CEMS BV.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
