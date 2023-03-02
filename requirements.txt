@@ -126,7 +126,7 @@ sphinx==5.1.1
     #   pygef (pyproject.toml)
     #   sphinx-autodoc-typehints
     #   sphinx-rtd-theme
-sphinx-autodoc-typehints==1.19.1
+sphinx-autodoc-typehints==1.22
     # via pygef (pyproject.toml)
 sphinx-rtd-theme==1.0.0
     # via pygef (pyproject.toml)
