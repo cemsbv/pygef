@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TypeVar, cast, Any, Callable
+from typing import Any, Callable, TypeVar, cast
+
 from lxml import etree
 
-from pygef.cpt import CPTData
 from pygef.bore import BoreData
+from pygef.cpt import CPTData
 
 T = TypeVar("T", CPTData, BoreData)
 
@@ -22,11 +23,10 @@ def read_xml(
 
     payloads = dd.findall("./*")
     for payload in payloads:
-
         # kwargs of attribute: value
         resolved = dict()
 
-        for (atrib, d) in resolver_schema.items():
+        for atrib, d in resolver_schema.items():
             d = cast(dict[str, Any], d)
             el = payload.find(d["xpath"], payload.nsmap)
 

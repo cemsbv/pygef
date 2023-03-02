@@ -14,3 +14,7 @@ public/
 .vscode/
 venv/
 data/
+/.mypy_cache/
+/docs/savefig/
+/.pytest_cache/
+*/super-linter.log

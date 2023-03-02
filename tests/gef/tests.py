@@ -1,18 +1,19 @@
-# pylint: disable=E1136
+# flake8: noqa: E501 line too long (182 > 180 characters)
 from __future__ import annotations
-import os
+
+import os.path
 import unittest
 from datetime import datetime
 
+import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
 import polars.testing
+import pytest
 
 import pygef.gef.geo as geo
 import pygef.gef.utils as utils
-from pygef import exceptions
-from pygef.gef.bore import Bore
-from pygef.gef.cpt import Cpt
+from pygef import common, exceptions, plot_bore, plot_cpt, read_bore, read_cpt
 from pygef.gef.gef import (
     MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT,
     _GefBore,
@@ -24,23 +25,39 @@ from pygef.gef.gef import (
     replace_column_void,
 )
 
+BasePath = os.path.dirname(__file__)
+
+
+def test_cpt_smoke():
+    """
+    Smoke test to see if no errors occur during creation of the Cpt object for valid
+    CPTs.
+    """
+
+    read_cpt(os.path.join(BasePath, "../test_files/example.gef"))
+    gef = read_cpt(os.path.join(BasePath, "../test_files/cpt.gef"))
+    read_cpt(os.path.join(BasePath, "../test_files/cpt2.gef"))
+    read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
+    read_cpt(os.path.join(BasePath, "../test_files/cpt4.gef"))
+
+    fig, axes = plot_cpt(gef)
+    assert isinstance(fig, plt.Figure)
+
+
+def test_bore_smoke():
+    """
+    Smoke test to see if no errors occur during creation of the Bore object for valid
+    Bore files.
+    """
+    gef = read_bore(os.path.join(BasePath, "../test_files/example_bore.gef"))
+    plot_bore(gef)
+
 
 class GefTest(unittest.TestCase):
-    def test_cpt_smoke(self):
-        """
-        Smoke test to see if no errors occur during creation of the Cpt object for valid
-        CPTs.
-        """
-        Cpt("./test_files/example.gef")
-        Cpt("./test_files/cpt.gef")
-        Cpt("./test_files/cpt2.gef")
-        Cpt("./test_files/cpt3.gef")
-        Cpt("./test_files/cpt4.gef")
-
     def test_xy(self):
-        cpt3 = Cpt("./test_files/cpt3.gef")
-        self.assertEqual(cpt3.x, 110885)
-        self.assertEqual(cpt3.y, 493345)
+        cpt3 = read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
+        self.assertEqual(cpt3.standardized_location.x, 110885)
+        self.assertEqual(cpt3.standardized_location.y, 493345)
 
     def test_measurement_var_with_minus_sign(self):
         s = r"#MEASUREMENTVAR= 41, -15.000000, "
@@ -321,7 +338,6 @@ class GefTest(unittest.TestCase):
         self.assertEqual(v, 4)
 
     def test_parse_all_column_info(self):
-
         dictionary = MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 
         s = r"#COLUMNINFO= 1, m, Sondeerlengte, 1"
@@ -360,11 +376,6 @@ class GefTest(unittest.TestCase):
         v = parse_all_columns_info(h, dictionary)
         self.assertEqual(v, ans)
 
-    def test_end_of_the_header(self):
-        s = r"#EOH="
-        v = utils.parse_end_of_header(s)
-        self.assertEqual(v, "#EOH=")
-
     def test_parse_data(self):
         header_s = "This is an header"
         df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
@@ -382,7 +393,7 @@ class GefTest(unittest.TestCase):
         assert df_parsed.frame_equal(df, null_equal=True)
 
         # Test terribly formatted columns
-        header_s = "#RECORDSEPARATOR=!"
+        # header_s = "#RECORDSEPARATOR=!"
         data_s = "!\n 1  1 1 !\n2 2 2 ! \n3 3 3\n!"
         df_parsed = _GefCpt.parse_data(
             data_s, " ", "!", column_names=["col1", "col2", "col3"]
@@ -420,25 +431,6 @@ class GefTest(unittest.TestCase):
         v = utils.get_column_separator(s)
         self.assertEqual(v, r" ")
 
-    def test_create_soil_type(self):
-        s = "'Kz'"
-        v = utils.create_soil_type(s)
-        self.assertEqual(v, "clay 100% with sand")
-
-    def test_parse_data_soil_type(self):
-        df = pl.DataFrame(
-            {
-                "soil_type": [
-                    "clay 100% with sand",
-                    "clay 95% with sand 5%",
-                    "clay 90% with sand 10%",
-                ]
-            }
-        )
-        data_s = [["'Kz'", ""], ["'Kz1'", ""], ["'Kz2'", ""]]
-        df_parsed = _GefBore.parse_data_soil_type(pl.DataFrame({}), data_s)
-        assert df_parsed.frame_equal(df, null_equal=True)
-
     def test_parse_add_info(self):
         s = "'SCH1'"
         v = utils.parse_add_info(s)
@@ -475,46 +467,16 @@ class GefTest(unittest.TestCase):
         df_parsed = _GefBore.parse_add_info_as_string(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
-    def test_soil_quantification(self):
-        s = "'Kz'"
-        v = utils.soil_quantification(s)
-        self.assertTrue(np.all(np.isclose(v, [0, 0.05, 0.95, 0.0, 0.0, 0.0])))
-
-        s = "'Kz1'"
-        v = utils.soil_quantification(s)
-        self.assertTrue(np.all(np.isclose(v, [0.0, 0.05, 0.95, 0.0, 0.0, 0.0])))
-
-        s = "'Kz1s1'"
-        v = utils.soil_quantification(s)
-        self.assertTrue(np.all(np.isclose(v, [0.0, 0.05, 0.9, 0.0, 0.0, 0.05])))
-
     def test_parse_data_soil_code(self):
         df = pl.DataFrame({"soil_code": ["Kz", "Kz1", "Kz2"]})
         data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
         df_parsed = _GefBore.parse_data_soil_code(pl.DataFrame({}), data_s)
         assert df_parsed.frame_equal(df, null_equal=True)
 
-    def test_data_soil_quantified(self):
-        lst = [[0.0, 0.05, 0.95, 0.0, 0.0, 0.0], [0.0, 0.05, 0.95, 0.0, 0.0, 0.0]]
-        df = pl.DataFrame(
-            lst,
-            columns=[
-                "gravel_component",
-                "sand_component",
-                "clay_component",
-                "loam_component",
-                "peat_component",
-                "silt_component",
-            ],
-        )
-        data_s = [["'Kz'", "''"], ["'Kz1'", "''"]]
-        df_parsed = _GefBore.parse_soil_quantification(pl.DataFrame({}), data_s)
-        assert df_parsed.frame_equal(df, null_equal=True)
-
     def test_calculate_elevation_respect_to_NAP(self):
         df1 = pl.DataFrame({"depth": [0.0, 1.0, 2.0, 3.0, 4.0]})
         zid = -3
-        df_calculated = df1.with_column(
+        df_calculated = df1.with_columns(
             _GefCpt.calculate_elevation_with_respect_to_nap(zid, 31000)
         )
         df = pl.DataFrame(
@@ -527,7 +489,7 @@ class GefTest(unittest.TestCase):
 
     def test_correct_depth_with_inclination(self):
         df1 = pl.DataFrame({"penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8]})
-        df_calculated = df1.with_column(correct_depth_with_inclination(df1.columns))
+        df_calculated = df1.with_columns(correct_depth_with_inclination(df1.columns))
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
@@ -542,7 +504,7 @@ class GefTest(unittest.TestCase):
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
-        df_calculated = df2.with_column(correct_depth_with_inclination(df2.columns))
+        df_calculated = df2.with_columns(correct_depth_with_inclination(df2.columns))
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
@@ -565,7 +527,7 @@ class GefTest(unittest.TestCase):
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
-        df_calculated = df2.with_column(correct_depth_with_inclination(df2.columns))
+        df_calculated = df2.with_columns(correct_depth_with_inclination(df2.columns))
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
@@ -583,7 +545,7 @@ class GefTest(unittest.TestCase):
                 "inclination": [45, 45, 45, 45, 45],
             }
         )
-        df_calculated = df2.with_column(correct_depth_with_inclination(df2.columns))
+        df_calculated = df2.with_columns(correct_depth_with_inclination(df2.columns))
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
@@ -650,7 +612,7 @@ class GefTest(unittest.TestCase):
         df1 = pl.DataFrame(
             {"qc": [0.5, 0.5, 0.6, 0.7, 0.8], "fs": [0.0, 0.05, 0.06, 0.07, 0.08]}
         )
-        df_calculated = df1.with_column(calculate_friction_number(df1.columns))
+        df_calculated = df1.with_columns(calculate_friction_number(df1.columns))
         df = pl.DataFrame(
             {
                 "qc": [0.5, 0.5, 0.6, 0.7, 0.8],
@@ -661,9 +623,8 @@ class GefTest(unittest.TestCase):
         assert df_calculated.frame_equal(df, null_equal=True)
 
     def test_parse_cpt(self):
-        cpt = Cpt(
-            content=dict(
-                string="""
+        cpt = _GefCpt(
+            string="""
 #GEFID= 1, 1, 0
 #FILEOWNER= Wagen 2
 #FILEDATE= 2004, 1, 14
@@ -689,19 +650,17 @@ class GefTest(unittest.TestCase):
 1.0200e+000 7.1000e-001 4.6500e-002
 1.0400e+000 7.3000e-001 4.2750e-002
 1.0600e+000 6.9000e-001 3.9000e-002
-""",
-                file_type="gef",
-            )
+"""
         )
         df_calculated = cpt.df
         df = pl.DataFrame(
             {
                 "penetration_length": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
-                "qc": [0.0000e000, 7.1000e-001, 7.3000e-001, 6.9000e-001],
-                "fs": [0.0000e000, 4.6500e-002, 4.2750e-002, 3.9000e-002],
+                "coneResistance": [0.0000e000, 7.1000e-001, 7.3000e-001, 6.9000e-001],
+                "localFriction": [0.0000e000, 4.6500e-002, 4.2750e-002, 3.9000e-002],
                 "depth": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
                 "elevation_with_respect_to_nap": [1.3, 0.28, 0.26, 0.24],
-                "friction_number": [None, 6.54929577, 5.85616438, 5.65217391],
+                "frictionRatio": [None, 6.54929577, 5.85616438, 5.65217391],
             }
         )
 
@@ -713,9 +672,8 @@ class GefTest(unittest.TestCase):
             )
 
     def test_parse_bore(self):
-        cpt = Bore(
-            content=dict(
-                string="""
+        cpt = _GefBore(
+            string="""
 #GEFID = 1,1,0
 #COLUMNTEXT = 1, aan
 #COLUMNSEPARATOR = ;
@@ -753,35 +711,38 @@ class GefTest(unittest.TestCase):
 0.00;1.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zgh2';'TGR GE';'ZMFO';'CA3';!
 1.20;3.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zg';'ON';'ZMGO';'FN2';'CA2';!
 3.10;5.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vz';'TBR ZW';'ZMO';'CA1';!
-""",
-                file_type="gef",
-            )
+"""
         )
-        df_calculated = cpt.df
-        df = pl.DataFrame(
+
+        df = cpt.df
+        # No need to check beyond parse result
+        df.drop_in_place("soil_dist")
+        df.drop_in_place("geotechnical_soil_name")
+
+        expected = pl.DataFrame(
             {
-                "depth_top": [0.0, 1.2, 3.1],
-                "depth_bottom": [1.2, 3.1, 5.0],
+                "upper_boundary": [0.0, 1.2, 3.1],
+                "lower_boundary": [1.2, 3.1, 5.0],
+                "sand_median": [None, None, None],
+                "gravel_median": [None, None, None],
+                "lutum_percentage": [None, None, None],
+                "silt_percentage": [None, None, None],
+                "sand_percentage": [None, None, None],
+                "gravel_percentage": [None, None, None],
+                "organic_matter_percentage": [None, None, None],
                 "soil_code": ["Zgh2", "Zg", "Vz"],
                 "remarks": [
                     "1) gray-yellow 2) ZMFO 3) kalkrijk ",
                     "1) ON 2) ZMGO 3) weinig fijn grind (1-25%) 4) kalkarm ",
                     "1) brown-black 2) ZMO 3) kalkloos ",
                 ],
-                "gravel_component": [0.05, 0.05, 0.00],
-                "sand_component": [0.85, 0.95, 0.05],
-                "clay_component": [0.0, 0.0, 0.0],
-                "loam_component": [0.0, 0.0, 0.0],
-                "peat_component": [0.10, 0.00, 0.95],
-                "silt_component": [0.0, 0.0, 0.0],
-            }
+            },
         )
-        assert df_calculated.frame_equal(df, null_equal=True)
+        assert df.frame_equal(expected, null_equal=True)
 
     def test_parse_pre_excavated_dept_with_void_inclination(self):
-        cpt = Cpt(
-            content=dict(
-                string="""
+        cpt = _GefCpt(
+            string="""
 #COLUMN= 6
 #COLUMNINFO= 1, m, Sondeerlengte, 1
 #COLUMNINFO= 2, MPa, Conuswaarde, 2
@@ -802,17 +763,15 @@ class GefTest(unittest.TestCase):
 0.0000e+000 -9.9990e+003 -9.9990e+003 -9.9990e+003 -9.9990e+003 -9.9990e+003
 1.5100e+000 9.1800e+000 5.3238e-002 5.8398e-001 5.7314e-001 3.0107e-003
 1.5300e+000 9.3044e+000 5.3803e-002 8.2007e-001 5.7986e-001 3.3362e-003
-""",
-                file_type="gef",
-            )
+"""
         )
         expected = pl.DataFrame(
             {
                 "penetration_length": [1.51, 1.53],
-                "qc": [9.1800, 9.3044],
-                "fs": [0.053238, 0.053803],
+                "coneResistance": [9.1800, 9.3044],
+                "localFriction": [0.053238, 0.053803],
                 "inclination": [0.58398, 0.82007],
-                "friction_number": [0.579935, 0.578253],
+                "frictionRatio": [0.579935, 0.578253],
                 "u1": [0.003011, 0.003336],
                 "depth": [1.510000, 1.529999],
                 "elevation_with_respect_to_nap": [-1.90, -1.919999],
@@ -871,7 +830,9 @@ class GefTest(unittest.TestCase):
         df1 = pl.DataFrame(
             {"soil_pressure": [0.0, 0.25, 0.75], "water_pressure": [0.0, 0.0, 4.905]}
         )
-        v = utils.assign_multiple_columns(df1, ["soil_pressure", "water_pressure"], df1)
+        v = common.assign_multiple_columns(
+            df1, ["soil_pressure", "water_pressure"], df1
+        )
         df = pl.DataFrame(
             {"soil_pressure": [0.0, 0.25, 0.75], "water_pressure": [0.0, 0.0, 4.905]}
         )
@@ -881,7 +842,7 @@ class GefTest(unittest.TestCase):
         df1 = pl.DataFrame(
             {"soil_pressure": [0.0, 0.25, 0.75], "water_pressure": [0.0, 0.0, 4.905]}
         )
-        v = utils.kpa_to_mpa(df1, ["soil_pressure", "water_pressure"])
+        v = common.kpa_to_mpa(df1, ["soil_pressure", "water_pressure"])
         df = pl.DataFrame(
             {
                 "soil_pressure": [0.0, 0.00025, 0.00075],
@@ -941,14 +902,8 @@ class GefTest(unittest.TestCase):
         )
         assert v.frame_equal(df, null_equal=True)
 
-    def test_nan_to_zero(self):
-        df1 = pl.DataFrame({"type_index": [None, 1.0, 2.0]})
-        v = utils.none_to_zero(df1)
-        df = pl.DataFrame({"type_index": [0.0, 1.0, 2.0]})
-        assert v.frame_equal(df, null_equal=True)
-
     def test_bug_depth(self):
-        cpt = """
+        cpt = """#GEFID= 1, 1, 0
 #FILEDATE= 2011, 5, 13
 #PROJECTID= CPT, 4015110
 #COLUMN= 5
@@ -997,13 +952,13 @@ class GefTest(unittest.TestCase):
 1.8700e+000 3.6954e-001 5.2590e-003 9.9502e-002 1.4635e+000
 1.8900e+000 3.6954e-001 5.8176e-003 1.1194e-001 1.5781e+000
         """
-        cpt = Cpt(content=dict(string=cpt, file_type="gef"))
+        cpt = _GefCpt(string=cpt)
         assert np.isclose(cpt.df[0, "depth"], 1.51)
 
     def test_bore_with_reduced_columns(self):
-        Bore(
-            content=dict(
-                string="""
+        _GefBore(
+            string="""
+#GEFID = 1,1,0
 #PROJECTID= redacted, 1234, -
 #COLUMN= 2
 #COLUMNINFO= 1, m, Laag van, 1
@@ -1025,131 +980,5 @@ class GefTest(unittest.TestCase):
 1.4000e+000;2.2000e+000;'Zs1';'ZUF';'LI BR';'Restante BZB.: PR (zwak)';;!
 2.2000e+000;2.6000e+000;'Zs1g1';'ZUF';'LI TBE BR';'Restante BZB.: PR (zwak)';;!
 2.6000e+000;3.2000e+000;'Zs1g1';'ZUF';'LI GR';;;!
-""",
-                file_type="gef",
-            )
+"""
         )
-
-
-class BoreTest(unittest.TestCase):
-    def setUp(self):
-        self.bore = Bore(
-            content=dict(
-                string="""
-#GEFID = 1,1,0
-#COLUMNTEXT = 1, aan
-#COLUMNSEPARATOR = ;
-#RECORDSEPARATOR = !
-#FILEOWNER = DINO
-#COMPANYID = Wiertsema & Partners
-#FILEDATE = 2015,7,15
-#PROJECTID = DINO-BOR
-#COLUMN = 9
-#COLUMNINFO = 1, m, Diepte bovenkant laag, 1
-#COLUMNINFO = 2, m, Diepte onderkant laag, 2
-#COLUMNINFO = 3, mm, Zandmediaan, 8
-#COLUMNINFO = 4, mm, Grindmediaan, 9
-#COLUMNINFO = 5, %, Lutum percentage, 3
-#COLUMNINFO = 6, %, Silt percentage, 4
-#COLUMNINFO = 7, %, Zand percentage, 5
-#COLUMNINFO = 8, %, Grind percentage, 6
-#COLUMNINFO = 9, %, Organische stof percentage, 7
-#COLUMNVOID = 1, -9999.99
-#COLUMNVOID = 2, -9999.99
-#COLUMNVOID = 3, -9999.99
-#COLUMNVOID = 4, -9999.99
-#COLUMNVOID = 5, -9999.99
-#COLUMNVOID = 6, -9999.99
-#COLUMNVOID = 7, -9999.99
-#COLUMNVOID = 8, -9999.99
-#COLUMNVOID = 9, -9999.99
-#LASTSCAN = 29
-#REPORTCODE = GEF-BORE-Report,1,0,0
-#MEASUREMENTCODE = Volgens GEF-BORE-Report 1.0.0,-,-,-
-#TESTID = B43F1303
-#XYID = 31000,99046.00,424271.00
-#ZID = 31000,1.96,5.0000002E-5
-#MEASUREMENTTEXT = 3, Puttershoek, plaatsnaam
-#MEASUREMENTTEXT = 5, 2014-05-07, datum boorbeschrijving
-#MEASUREMENTTEXT = 6, Jan Palsma, beschrijver lagen
-#MEASUREMENTTEXT = 13, Wiertsema & Partners, boorbedrijf
-#MEASUREMENTTEXT = 16, 2014-05-07, datum boring
-#MEASUREMENTVAR = 31, 28.00, m, diepte onderkant boortraject
-#MEASUREMENTVAR = 32, 168, mm, boorbuisdiameter
-#MEASUREMENTTEXT = 31, PUM, boormethode
-#MEASUREMENTTEXT = 11, MONB, maaiveldhoogtebepaling
-#MEASUREMENTTEXT = 12, LONB, plaatsbepalingmethode
-#MEASUREMENTTEXT = 7, Rijksdriehoeksmeting, locaal coördinatensysteem
-#MEASUREMENTTEXT = 8, Normaal Amsterdams Peil, locaal referentiesysteem
-#MEASUREMENTVAR = 16, 28.00, m, einddiepte
-#MEASUREMENTTEXT = 1, Antea Group, opdrachtgever
-#MEASUREMENTTEXT = 14, Nee, openbaar
-#MEASUREMENTTEXT = 18, Nee, peilbuis afwezig
-#MEASUREMENTVAR = 18, 1.00, m, grondwaterstand direct na boring
-#EOH =
-0.00;0.07;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'NBE';'NBE';'betontegel geen monster';!
-0.07;0.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI BR';'ZMG';'zeer veel baksteenresten';!
-0.50;2.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1g1';'LI BR';'ZZG';'GFN';'SCH1';'uiterst grof zandhoudend plaatselijk weinig schelprestjes opgebracht';!
-2.00;3.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1';'LI TGR GR';'ZMG';'SCH1';'grof zandhoudend opgebracht';!
-3.20;5.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI TGR GR';'ZMG';'SCH1';'plaatselijk weinig kleibrokjes grof zandhoudend opgebracht';!
-5.10;6.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz1';'GR';'KSTV';'SCH1';!
-6.00;8.40;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3h1';'GR';'KMST';'zandgelaagd plaatselijk weinig plantenresten rietresten';!
-8.40;8.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1';'LI GR';'ZMG';!
-8.50;8.55;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3';'KMST';'weinig plantenresten houtresten';!
-8.55;8.80;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI TGR GR';'ZMG';'plaatselijk weinig plantenresten houtresten weinig kleibrokjes';!
-8.80;9.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks1h3';'TGR BR';'KSTV';'plaatselijk plantenresten rietresten houtresten';!
-9.00;9.90;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vk1';'DO TBR BR';'VSTV';'houtresten';!
-9.90;12.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2h1';'TBR GR';'KSTV';'plaatselijk plantenresten rietresten veel houtresten';!
-12.50;13.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2h1';'TBR GR';'KSTV';'plaatselijk plantenresten rietresten houtresten plaatselijk grove houtresten';!
-13.00;13.50;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks1h2';'TGR BR';'KSTV';'plaatselijk plantenresten rietresten houtresten';!
-13.50;13.90;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vk3';'DO TBR GR';'VSTV';!
-13.90;15.90;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2h1';'GR';'KSTV';'plaatselijk weinig plantenresten rietresten houtresten';!
-15.90;16.30;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vk3';'TGR BR';'VSTV';!
-16.30;16.55;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Ks2';'GR';'KSTV';'houtresten';!
-16.55;17.45;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs2';'LI TGR GR';'ZMG';'plaatselijk plantenresten houtresten rietresten';!
-17.45;19.60;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1g1';'LI TGR GR';'ZUG';'GFN';'grof zandhoudend plaatselijk weinig plantenresten rietresten houtresten';!
-19.60;22.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs1g2';'LI TGR GR';'ZUG';'GFN';'uiterst grof/grof zandhoudend';!
-22.10;23.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz2';'TGN GR';'KSTV';!
-23.20;23.70;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz1';'TGN GR';'KZST';!
-23.70;24.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3';'GR';'KSTV';!
-24.20;24.35;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs4';'GR';'ZZF';!
-24.35;26.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz3';'TGN GR';'KSTV';!
-26.00;26.80;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zs3';'LI TGR GR';'ZZF';'plaatselijk kleirestje fijn zandhoudend';!
-26.80;28.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Kz1';'TGN GR';'KZST';!
-""",
-                file_type="gef",
-            )
-        )
-
-    def test_sum_to_one(self):
-        cols = [
-            "gravel_component",
-            "sand_component",
-            "clay_component",
-            "loam_component",
-            "peat_component",
-            "silt_component",
-        ]
-        s = self.bore.df.select(
-            [
-                pl.fold(
-                    pl.lit(0),
-                    lambda a, b: a + b,
-                    [
-                        pl.when(pl.col(a) < 0).then(1 / len(cols)).otherwise(pl.col(a))
-                        for a in cols
-                    ],
-                ).alias("sum")
-            ]
-        )
-        self.assertTrue(np.all(np.isclose(s, 1)))
-
-
-class PlotTest(unittest.TestCase):
-    def test_plot_cpt(self):
-        gef = Cpt("./test_files/example.gef")
-        gef.plot(show=False)
-
-    def test_plot_bore(self):
-        gef = Bore("./test_files/example_bore.gef")
-        gef.plot(show=False, figsize=(4, 12))

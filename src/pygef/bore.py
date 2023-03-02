@@ -1,12 +1,14 @@
 from __future__ import annotations
+
+import copy
+import pprint
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
-import copy
-import pprint
 
-from pygef.broxml import Location
 import polars as pl
+
+from pygef.common import Location
 
 
 @dataclass

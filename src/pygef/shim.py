@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import io
+import os
 from pathlib import Path
 from typing import Any
 
-from pygef.gef.cpt import _GefCpt
-from pygef.cpt import CPTData
-from pygef.bore import BoreData
-from pygef.cpt import Location, QualityClass
 from pygef import broxml
+from pygef.bore import BoreData
+from pygef.common import Location
+from pygef.cpt import CPTData, QualityClass
+from pygef.gef.gef import _GefBore, _GefCpt
 
 GEF_ID = "#GEFID"
 
@@ -23,21 +24,36 @@ def is_gef_file(file: io.BytesIO | Path | str) -> bool:
         is_gef = file.read(6).decode().startswith(GEF_ID)
         file.seek(pos)
         return is_gef
-    else:
+    if os.path.exists(file):
         with open(file, errors="ignore") as f:
             return f.read(6).startswith(GEF_ID)
+    raise FileNotFoundError("Could not find the GEF file.")
 
 
 def read_bore(file: io.BytesIO | Path | str, index: int = 0) -> BoreData:
+    """
+    Parse the bore file. Can either be BytesIO, Path or str
+
+    :param file: bore file
+    :param index: only valid for xml files
+    """
     if is_gef_file(file):
+        if index > 0:
+            raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):
-            pass
+            return gef_bore_to_bore_data(_GefBore(string=file.read().decode()))
         else:
-            pass
+            return gef_bore_to_bore_data(_GefBore(path=file))
     return broxml.read_bore(file)[index]
 
 
 def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
+    """
+    Parse the cpt file. Can either be BytesIO, Path or str
+
+    :param file: bore file
+    :param index: only valid for xml files
+    """
     if is_gef_file(file):
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
@@ -137,3 +153,25 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs["delivered_vertical_position_reference_point"] = "unknown"
 
     return CPTData(**kwargs)
+
+
+def gef_bore_to_bore_data(gef_bore: _GefBore) -> BoreData:
+    kwargs: dict[str, Any] = {}
+
+    kwargs["delivered_location"] = Location(
+        # all gef files are RD new
+        srs_name="urn:ogc:def:crs:EPSG::28992",
+        x=gef_bore.x,
+        y=gef_bore.y,
+    )
+    kwargs["research_report_date"] = None
+    kwargs["description_procedure"] = "unknown"
+    kwargs["delivered_vertical_position_offset"] = gef_bore.zid
+    kwargs["delivered_vertical_position_datum"] = "unknown"
+    kwargs["delivered_vertical_position_reference_point"] = "unknown"
+    kwargs["bore_rock_reached"] = None
+    kwargs["final_bore_depth"] = None
+    kwargs["final_sample_depth"] = None
+    kwargs["bore_hole_completed"] = None
+    kwargs["data"] = gef_bore.df
+    return BoreData(**kwargs)

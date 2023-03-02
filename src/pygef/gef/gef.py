@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import logging
 import re
 from dataclasses import dataclass
@@ -6,22 +7,14 @@ from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import polars as pl
-from polars import col, lit, when
+from gef_file_to_map import gef_to_map
+from polars import lit, when
 
-from pygef.gef import utils
 from pygef import exceptions
-
-# Try to import the optimized Rust header parsing but if that doesn't succeed
-# use the built-in python regex methods
-try:
-    from gef_file_to_map import gef_to_map
-
-    USE_RUST_PARSED_HEADERS = False
-except ImportError:
-    USE_RUST_PARSED_HEADERS = False
+from pygef.broxml.mapping import MAPPING_PARAMETERS
+from pygef.gef import utils
 
 logger = logging.getLogger(__name__)
-
 
 MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {
     1: "penetration_length",
@@ -88,24 +81,6 @@ COLUMN_NAMES_BORE_CHILD = [
 ]  # 16
 MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE_CHILD = dict(enumerate(COLUMN_NAMES_BORE_CHILD, 1))
 
-dict_soil_type_rob = {
-    "Peat": 1,
-    "Clays - silty clay to clay": 2,
-    "Silt mixtures - clayey silt to silty clay": 3,
-    "Sand mixtures - silty sand to sandy silt": 4,
-    "Sands - clean sand to silty sand": 5,
-    "Gravelly sand to dense sand": 6,
-}
-
-dict_soil_type_been = {
-    "Peat": 1,
-    "Clays": 2,
-    "Clayey silt to silty clay": 3,
-    "Silty sand to sandy silt": 4,
-    "Sands: clean sand to silty": 5,
-    "Gravelly sands": 6,
-}
-
 
 class _Gef:
     """
@@ -138,13 +113,8 @@ class _Gef:
 
         self.s = string
 
-        if USE_RUST_PARSED_HEADERS:
-            # Use the Rust optimized header parser
-            self._data, self._headers = gef_to_map(string)
-        else:
-            # Use the fallback python regex parser
-            end_of_header = utils.parse_end_of_header(string)
-            self._headers, self._data = string.split(end_of_header)
+        # Use the Rust optimized header parser
+        self._data, self._headers = gef_to_map(string)
 
         self.zid = utils.parse_zid_as_float(self._headers)
         self.height_system = utils.parse_height_system(self._headers)
@@ -171,7 +141,6 @@ class _Gef:
         default_void: float = float(-9999)
 
         def __post_init__(self):
-
             self.columns_number = len(self.column_numbers)
             self.column_voids = self.fill_default_column_voids()
 
@@ -233,7 +202,7 @@ class _Gef:
 
         # Remove all horizontal whitespace characters around the column separator
         new_data = re.sub(
-            f"[^\S\r\n]*{re.escape(col_separator)}[^\S\r\n]*",
+            rf"[^\S\r\n]*{re.escape(col_separator)}[^\S\r\n]*",
             col_separator,
             data_s,
         )
@@ -241,7 +210,7 @@ class _Gef:
         # Split string by record separator into lines
         # Remove all whitespaces and column separators at the beginning and end of lines
         # Also remove the last trailing line
-        regex = f"[\s{re.escape(col_separator)}]+"
+        regex = rf"[\s{re.escape(col_separator)}]+"
         new_data = "\n".join(
             re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line))
             for line in new_data.split(rec_separator)
@@ -276,7 +245,9 @@ class _GefCpt(_Gef):
             )
         self.project_id = utils.parse_project_type(self._headers, "cpt")
         self.cone_id = utils.parse_cone_id(self._headers)
-        self.cpt_class = utils.parse_cpt_class(self._headers)
+
+        cpt_class = utils.parse_cpt_class(self._headers)
+        self.cpt_class = -1 if cpt_class is None else cpt_class
 
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(
             self._headers, 1
@@ -386,14 +357,16 @@ class _GefCpt(_Gef):
             # Remove the rows with null values
             .drop_nulls()
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
-            .with_column(correct_depth_with_inclination(self.columns_info.descriptions))
+            .with_columns(
+                correct_depth_with_inclination(self.columns_info.descriptions)
+            )
             .select(
                 # Remove None values since they throw an error
                 [
                     expr
                     for expr in [
                         pl.all().exclude(["depth", "friction_number"]),
-                        col("depth").abs(),
+                        pl.col("depth").abs(),
                         calculate_friction_number(self.columns_info.descriptions),
                         self.calculate_elevation_with_respect_to_nap(
                             self.zid, self.height_system
@@ -405,6 +378,16 @@ class _GefCpt(_Gef):
             .collect()
         )
 
+        _mapping = {
+            "qc": "coneResistance",
+            "friction_number": "frictionRatio",
+            "fs": "localFriction",
+        }
+        for key in _mapping.keys():
+            if key not in self.df.columns:
+                _mapping.pop(key)
+        self.df = self.df.rename(_mapping)
+
     @staticmethod
     def calculate_elevation_with_respect_to_nap(zid, height_system):
         if zid is not None and height_system == 31000.0:
@@ -414,7 +397,7 @@ class _GefCpt(_Gef):
 
 
 class _GefBore(_Gef):
-    def __init__(self, path=None, string=None):
+    def __init__(self, path=None, string=None, include_soil_dist: bool = True):
         """
         Parser of the borehole file.
 
@@ -424,6 +407,8 @@ class _GefBore(_Gef):
             Path to the *.gef file.
         string: str
             String version of the *.gef file.
+        include_soil_dist: bool
+            Map the soil distribution to the dataframe
         """
         super().__init__(path=path, string=string)
         if self.type == "bore":
@@ -465,25 +450,18 @@ class _GefBore(_Gef):
             )
             .pipe(replace_column_void, self.data_info.description_to_void_mapping)
             .pipe(self.parse_data_soil_code, data_rows_soil)
-            .pipe(self.parse_data_soil_type, data_rows_soil)
             .pipe(self.parse_add_info_as_string, data_rows_soil)
-            .pipe(self.parse_soil_quantification, data_rows_soil)
+            .pipe(self.map_soil_code_to_soil_name, data_rows_soil)
+            .rename(
+                {
+                    "depth_top": "upper_boundary",
+                    "depth_bottom": "lower_boundary",
+                }
+            )
         )
-
-        # Drop the columns if they exist, do nothing if they don't
-        for column in [
-            "sand_median",
-            "gravel_median",
-            "lutum_percentage",
-            "silt_percentage",
-            "sand_percentage",
-            "gravel_percentage",
-            "organic_matter_percentage",
-            "soil_type",
-        ]:
-            if column in self.df.columns:
-                self.df.drop_in_place(column)
-
+        if include_soil_dist:
+            tbl = MAPPING_PARAMETERS.dist_table()
+            self.df = self.df.join(tbl, on="geotechnical_soil_name", how="left")
         # Remove the rows with null values
         self.df.drop_nulls()
 
@@ -491,7 +469,7 @@ class _GefBore(_Gef):
     def parse_add_info_as_string(
         df: pl.DataFrame, data_rows_soil: list[list[str]]
     ) -> pl.DataFrame:
-        return df.with_column(
+        return df.with_columns(
             pl.Series(
                 "remarks",
                 [utils.parse_add_info("".join(row[1::])) for row in data_rows_soil],
@@ -507,21 +485,9 @@ class _GefBore(_Gef):
         )
 
     @staticmethod
-    def parse_data_soil_type(df: pl.DataFrame, data_rows_soil: list[str]):
-        # return df.with_column(pl.Series("soil_type", data_rows_soil).apply(utils.create_soil_type))
-
-        # todo1 remove me
-        return df.with_column(
-            pl.Series(
-                "soil_type",
-                (list(map(lambda x: utils.create_soil_type(x[0]), data_rows_soil))),
-            )
-        )
-
-    @staticmethod
     def parse_data_soil_code(df: pl.DataFrame, data_rows_soil: list[str]):
-        # return df.with_column(pl.Series("soil_code", data_rows_soil).apply(utils.parse_soil_code))
-        return df.with_column(
+        # return df.with_columns(pl.Series("soil_code", data_rows_soil).apply(utils.parse_soil_code))
+        return df.with_columns(
             pl.Series(
                 "soil_code",
                 list(map(lambda x: utils.parse_soil_code(x[0]), data_rows_soil)),
@@ -529,32 +495,24 @@ class _GefBore(_Gef):
         )
 
     @staticmethod
-    def parse_soil_quantification(
-        df: pl.DataFrame, data_rows_soil: list[list[str]]
-    ) -> pl.DataFrame:
-        data = np.array([utils.soil_quantification(x[0]) for x in data_rows_soil])
-
+    def map_soil_code_to_soil_name(df: pl.DataFrame, data_rows_soil: list[str]):
+        # return df.with_columns(pl.Series("soil_code", data_rows_soil).apply(utils.parse_soil_code))
         return df.with_columns(
-            [
-                pl.Series(name, data[:, i])
-                for i, name in enumerate(
-                    [
-                        "gravel_component",
-                        "sand_component",
-                        "clay_component",
-                        "loam_component",
-                        "peat_component",
-                        "silt_component",
-                    ]
-                )
-            ]
+            pl.Series(
+                "geotechnical_soil_name",
+                list(
+                    map(
+                        lambda x: utils.parse_soil_name(utils.parse_soil_code(x[0])),
+                        data_rows_soil,
+                    )
+                ),
+            )
         )
 
 
 def replace_column_void(
     lf: pl.LazyFrame, col_name_to_void_mapping: Dict[str, float]
 ) -> pl.LazyFrame:
-
     return (
         # Get all values matching column_void and change them to null
         # Interpolate all null values
@@ -573,37 +531,37 @@ def replace_column_void(
 
 def correct_pre_excavated_depth(lf: pl.LazyFrame, pre_excavated_depth) -> pl.LazyFrame:
     if pre_excavated_depth is not None and pre_excavated_depth > 0:
-        return lf.filter(col("penetration_length") >= pre_excavated_depth)
+        return lf.filter(pl.col("penetration_length") >= pre_excavated_depth)
     return lf
 
 
-def correct_depth_with_inclination(columns):
+def correct_depth_with_inclination(columns: List[str]):
     """
     Return the expression needed to correct depth
     """
     if "corrected_depth" in columns:
-        return col("corrected_depth").abs().alias("depth")
+        return pl.col("corrected_depth").abs().alias("depth")
     elif "inclination" in columns:
         pt = "penetration_length"
 
         # every different in depth needs to be corrected with the angle
         correction_factor = np.cos(
-            np.radians(col("inclination").cast(pl.Float32).fill_null(0))
+            np.radians(pl.col("inclination").cast(pl.Float32).fill_null(0))
         )
 
-        delta_height = col(pt).diff()
+        delta_height = pl.col(pt).diff()
         corrected_depth = correction_factor * delta_height
 
         return (
             # this sets the first as depth
             pl.when(pl.arange(0, corrected_depth.count()) == 0)
-            .then(col(pt))
+            .then(pl.col(pt))
             .otherwise(corrected_depth)
             .cumsum()
             .alias("depth")
         )
     else:
-        return col("penetration_length").alias("depth")
+        return pl.col("penetration_length").alias("depth")
 
 
 def parse_all_columns_info_from_dict(
@@ -622,7 +580,6 @@ def parse_all_columns_info_from_dict(
     if "COLUMNINFO" in headers:
         # Loop over all headers to find the right number
         for values in headers["COLUMNINFO"]:
-
             try:
                 col_number = int(values[0])
                 quantity = int(values[3])
@@ -667,7 +624,6 @@ def parse_all_columns_info_from_str(
         )
 
         if column_number is not None and column_quantity is not None:
-
             columns_info.append(
                 (
                     column_number,
@@ -716,7 +672,9 @@ def parse_all_columns_info(
 def calculate_friction_number(column_names: List[str]) -> "pl.Expr":
     if "fs" in column_names and "qc" in column_names:
         return (
-            col("fs") / when(col("qc") == 0.0).then(None).otherwise(col("qc")) * 100.0
+            pl.col("fs")
+            / when(pl.col("qc") == 0.0).then(None).otherwise(pl.col("qc"))
+            * 100.0
         ).alias("friction_number")
     else:
         return lit(0.0).alias("friction_number")

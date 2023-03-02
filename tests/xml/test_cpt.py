@@ -1,9 +1,12 @@
-from pygef import broxml, QualityClass, Location
 from datetime import date
+
+from pygef.broxml import read_cpt
+from pygef.common import Location
+from pygef.cpt import QualityClass
 
 
 def test_cpt_attributes(cpt_xml: str) -> None:
-    parsed = broxml.read_cpt(cpt_xml)
+    parsed = read_cpt(cpt_xml)
     assert len(parsed) == 1
 
     cpt = parsed[0]

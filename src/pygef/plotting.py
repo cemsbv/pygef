@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from typing import Tuple
 
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from pygef import CPTData, BoreData
-import polars as pl
+import matplotlib.pyplot as plt
 import numpy as np
+import polars as pl
+
+from pygef.bore import BoreData
+from pygef.cpt import CPTData
 
 
 def init_fig(
@@ -20,60 +22,89 @@ def init_fig(
 
 
 def plot_cpt(
-    data: CPTData, fig: plt.Figure | None, dpi: int = 100
-) -> plt.Figure | None:
+    data: CPTData, fig: plt.Figure | None = None, dpi: int = 100
+) -> Tuple[plt.Figure, Tuple[plt.Axes, plt.Axes, plt.Axes]]:
+    """
+    Create a plot with three axes.
+        - cone_resistance [Mpa]
+        - friction_ratio [%] (twiny)
+        - friction [MPa] (twiny)
+
+    :param data: (BoreData) Bore data object
+    :param fig: (Figure, optional) Figure object used to add axes
+    :param dpi: (int, optional)  Default is 100 Resolution of the figure.
+    :return: Figure, Axes
+    """
     df = data.data.select(
         pl.when(pl.all().abs() > 1e4).then(None).otherwise(pl.all()).keep_name()
     )
 
     fig, figure_given = init_fig(fig, dpi, figsize=(8, 12))
+    ax1 = fig.subplots(1, 1)
+    ax2 = ax1.twiny()
+    ax3 = ax1.twiny()
 
-    axs = fig.subplots(1, 3, gridspec_kw={"width_ratios": [2, 1, 1]})
-    (ax1, ax2, ax3) = axs
+    ax1.set_xbound(0, 40)
+    ax1.set_ylabel("Depth [m]")
+    ax1.set_xlabel("$q_c$ [MPa]")
+    ax1.xaxis.label.set_color("tab:blue")
+    ax1.invert_yaxis()
+    ax1.grid()
 
-    # only set left axes y label
-    # it is clear that this label is used for all y axes
-    ax1.set_ylabel("depth")
+    ax2.spines["bottom"].set_position(("outward", 0))
+    ax2.set_xlabel("fs [MPa]")
+    ax1.set_xbound(0, 10)
+    ax2.xaxis.label.set_color("tab:orange")
+    ax2.invert_yaxis()
 
-    titles = ["cone_resistance [Mpa]", "friction_ratio [%]", "friction [MPa]"]
-    for (ax, title) in zip(axs, titles):
-        ax.invert_yaxis()
-        ax.set_title(title)
+    ax3.spines["top"].set_position(("outward", 40))
+    ax3.set_xlabel("rf [%]")
+    ax3.invert_xaxis()
+    ax3.invert_yaxis()
+    ax3.set_xbound(0, 10)
+    ax3.xaxis.label.set_color("tab:gray")
 
-    depth = df["depth"]
-
-    ax1.plot(df["coneResistance"], depth)
+    # add data to figure
+    if "coneResistance" in df.columns:
+        ax1.plot(df["coneResistance"], df["depth"], color="tab:blue", label="$q_c$")
 
     if "frictionRatio" in df.columns:
-        ax2.plot(df["frictionRatio"], depth, label="measured Rf")
-    ax2.plot(
-        df["localFriction"] / df["coneResistance"] * 100,
-        depth,
-        label="computed Rf",
-        ls="dashed",
-    )
-    ax2.set_xbound(0, 10)
-    ax3.plot(
-        df["localFriction"],
-        depth,
-    )
-    ax2.legend()
+        ax3.plot(
+            df["frictionRatio"], df["depth"], label="rf measured", color="tab:gray"
+        )
 
-    if figure_given:
-        return fig
-    else:
-        plt.show()
-        return None
+    if "localFriction" in df.columns and "coneResistance" in df.columns:
+        ax3.plot(
+            df["localFriction"] / df["coneResistance"] * 100,
+            df["depth"],
+            label="rf computed",
+            ls="dashed",
+            color="tab:gray",
+        )
+
+    if "localFriction" in df.columns:
+        ax3.plot(df["localFriction"], df["depth"], color="tab:orange", label="fs")
+
+    plt.legend(loc="upper left")
+    return fig, (ax1, ax2, ax3)
 
 
 def plot_bore(
-    data: BoreData, fig: plt.Figure | None, dpi: int = 100
-) -> plt.Figure | None:
-    fig, figure_given = init_fig(fig, dpi, figsize=(4, 12))
+    data: BoreData, fig: plt.Figure | None = None, dpi: int = 100
+) -> Tuple[plt.Figure, plt.Axes]:
+    """
+    Create a plot with one axes.
+        - soil distribution
+
+    :param data: Bore data object
+    :param fig: Figure object used to add axes
+    :param dpi: Default is 100 Resolution of the figure.
+    """
+    fig, figure_given = init_fig(fig, dpi, figsize=(8, 12))
     ax = fig.subplots(1, 1)
 
     df = data.data
-    soil_dist = np.stack(df["soil_dist"].to_numpy())  # type: ignore[call-overload]
+    soil_dist = np.stack(df["soil_dist"].to_numpy())
     cum_soil_dist = soil_dist.cumsum(axis=1)
 
     # peat, clay, silt, sand, gravel, rocks
@@ -85,17 +116,19 @@ def plot_bore(
 
     for i in range(5):
         ax.fill_betweenx(
-            np.repeat(df["upper_boundary"], 2),
+            np.array(list(zip(df["upper_boundary"], df["lower_boundary"]))).flatten(),
             np.zeros(df.shape[0] * 2),
-            np.roll(np.repeat(cum_soil_dist[:, -(i + 1)], 2), 1),
+            np.repeat(cum_soil_dist[:, -(i + 1)], 2),
             color=c[i],
         )
 
-    patches = [mpatches.Patch(color=color, label=key) for key, color in zip(legend, c)]
-    plt.legend(handles=patches, bbox_to_anchor=(1, 1), loc="upper left")
+    # add the name of the soil to the plot
+    for row in df.rows(named=True):
+        y = (row["lower_boundary"] - row["upper_boundary"]) / 2 + row["upper_boundary"]
+        ax.annotate(text=row["geotechnical_soil_name"], xy=(0.25, y))
 
-    if figure_given:
-        return fig
-    else:
-        plt.show()
-        return None
+    # add legend
+    patches = [mpatches.Patch(color=color, label=key) for key, color in zip(legend, c)]
+    plt.legend(handles=patches, bbox_to_anchor=(1, 1), loc="best")
+
+    return fig, ax

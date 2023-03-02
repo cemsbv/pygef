@@ -1,12 +1,15 @@
 from __future__ import annotations
+
+import copy
+import pprint
 from dataclasses import dataclass
+from datetime import date
+from enum import Enum
 from typing import Any
 
 import polars as pl
-from datetime import date
-from enum import Enum
-import copy
-import pprint
+
+from pygef.common import Location
 
 
 class QualityClass(Enum):
@@ -14,13 +17,6 @@ class QualityClass(Enum):
     Class1 = 1
     Class2 = 2
     Class3 = 3
-
-
-@dataclass
-class Location:
-    srs_name: str
-    x: float
-    y: float
 
 
 @dataclass

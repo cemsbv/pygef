@@ -10,20 +10,17 @@ Getting started with pygef is easy done by importing the :code:`pygef` library:
 
 .. ipython:: python
 
-    from pygef import Cpt, Bore
+    from pygef import read_cpt, read_bore
 
 or any equivalent :code:`import` statement.
 
 Load a Cpt/Bore file
 ---------------------
 
-The classes :code:`Cpt` and :code:`Bore` accept two possible inputs:
+The classes :code:`read_cpt` and :code:`read_bore` accept two possible inputs:
 
 - the :code:`path` of the file
-- the :code:`content`, a dictionary containing the keys: ["string", "file_type"]
-
-    - string: String version of the file.
-    - file_type: One of ["gef", "xml"]
+- the :code:`BytesIO` of the file
 
 If you want to use the :code:`path` then your code should look like this:
 
@@ -31,16 +28,10 @@ If you want to use the :code:`path` then your code should look like this:
 
     import os
 
-    path_cpt = os.path.join(os.environ.get("DOC_PATH"), "../test_files/cpt.gef")
-    cpt = Cpt(path_cpt)
-
-If you want to use the :code:`content` method:
-
-.. ipython:: python
-
-    with open(path_cpt, encoding="utf-8", errors="ignore") as f:
-        s = f.read()
-    gef = Cpt(content=dict(string=s, file_type="gef"))
+    path_cpt = os.path.join(
+        os.environ.get("DOC_PATH"), "../tests/test_files/cpt_xml/example.xml"
+    )
+    cpt = read_cpt(path_cpt)
 
 Access the attributes
 ---------------------
@@ -50,24 +41,28 @@ If for example we want to know the (x, y, z) coordinates of the gef we can simpl
 
 .. ipython:: python
 
-    coordinates = (gef.x, gef.y, gef.zid)
+    coordinates = (
+        cpt.standardized_location.x,
+        cpt.standardized_location.y,
+        cpt.delivered_vertical_position_offset
+    )
     print(coordinates)
 
-Check all the available attributes in the reference. Everything(or almost) that is contained in the files it is now
+Check all the available attributes in the reference. Everything (or almost) that is contained in the files it is now
 accessible as attribute of the :code:`gef` object.
 
-The classes :code:`Cpt` and :code:`Bore` have different attributes, check the reference to learn more about it.
+The classes :meth:`pygef.cpt.CPTData` and :meth:`pygef.bore.BoreData` have different attributes, check the reference to learn more about it.
 
-A common and very useful attribute is :code:`gef.df`, this is a :code:`polars.DataFrame` that contains all the rows and
+A common and very useful attribute is :code:`CPTData.data`, this is a :code:`polars.DataFrame` that contains all the rows and
 columns defined in the file.
 
-Cpt
+CPT
 ...
-If we call :code:`cpt.df` on a :code:`cpt` object we will get something like this:
+If we call :code:`CPTData.data` on a :code:`CPTData` object we will get something like this:
 
 .. ipython:: python
 
-    cpt.df
+    cpt.data
 
 
 The number and type of columns depends on the columns originally present in the cpt.
@@ -78,37 +73,43 @@ Suggestion: Instead of using the column :code:`penetration_length` use the colum
 
 Borehole
 .........
-If we call :code:`bore.df` on a :code:`bore` object we will get something like this:
+If we call :code:`BoreData.data` on a :code:`BoreData` object we will get something like this:
 
 .. ipython:: python
 
-    path_bore = os.path.join(os.environ.get("DOC_PATH"), "../test_files/example_bore.gef")
-    bore = Bore(path_bore)
-    bore.df
+    path_bore = os.path.join(
+        os.environ.get("DOC_PATH"), "../tests/test_files/bore_xml/DP14+074_MB_KR.xml"
+    )
+    bore = read_bore(path_bore)
+    bore.data
 
 
 Plot a gef file
 ---------------
 
-We can plot a .gef file using the method :code:`.plot()`, check the reference to know which are the arguments of the method.
+We can plot a gef file using the method :code:`.plot()`, check the reference to know which are the arguments of the method.
 
-cpt
+CPT
 ...
 If we use the method without arguments on a :code:`cpt` object we get:
 
 .. ipython:: python
     :okwarning:
 
+    from pygef import plot_cpt
+
     @savefig cpt_plot.png
-    cpt.plot(figsize=(6, 8))
+    plot_cpt(cpt)
 
 
-borehole
+Borehole
 .........
-If we use the method without arguments on a :code:`bore` object we get:
+If we use the method without arguments on a :code:`BoreData` object we get:
 
 .. ipython:: python
     :okwarning:
 
+    from pygef import plot_bore
+
     @savefig bore_plot.png
-    bore.plot()
+    plot_bore(bore)

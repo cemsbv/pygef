@@ -5,7 +5,7 @@
    <brocom:deliveryAccountableParty>30276831</brocom:deliveryAccountableParty>
    <brocom:qualityRegime>IMBRO</brocom:qualityRegime>
    <brocom:underPrivilege>ja</brocom:underPrivilege>
-   <isbhrgt:sourceDocument>
+   <isbhrgt:dispatchDocument>
       <isbhrgt:BHR_GT_CompleteReport_V1 gml:id="_e8b71a69-9654-1953-d787-14a181a339ff">
          <isbhrgt:boreholeSampleDescription>
             <bhrgtcom:descriptionReportDate>
@@ -268,5 +268,5 @@
             <brocom:date>2021-10-07</brocom:date>
          </isbhrgt:researchReportDate>
       </isbhrgt:BHR_GT_CompleteReport_V1>
-   </isbhrgt:sourceDocument>
+   </isbhrgt:dispatchDocument>
 </isbhrgt:registrationRequest>

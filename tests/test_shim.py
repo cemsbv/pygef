@@ -1,4 +1,6 @@
-from pygef import read_cpt, QualityClass, Location
+from pygef import read_cpt
+from pygef.common import Location
+from pygef.cpt import QualityClass
 
 
 def test_gef_to_cpt_data(cpt_gef_1: str) -> None:

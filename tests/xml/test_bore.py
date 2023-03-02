@@ -1,10 +1,12 @@
+from datetime import date
+
+import matplotlib.pyplot as plt
+import polars as pl
 import pytest
 
-from pygef import broxml
-from pygef.broxml import Location
+from pygef import broxml, plot_bore
 from pygef.broxml.mapping import MAPPING_PARAMETERS
-from datetime import date
-import polars as pl
+from pygef.common import Location
 
 
 def test_bore_percentages() -> None:
@@ -23,7 +25,6 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
     bore_data = parsed[0]
     print(bore_data)
     print(bore_data.data.head())
-    assert False
     assert bore_data.research_report_date == date(2021, 10, 19)
     assert bore_data.delivered_location == Location(
         "urn:ogc:def:crs:EPSG::28992", x=158322.139, y=444864.706
@@ -167,3 +168,9 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
 def test_bore_version(bore_xml_v1) -> None:
     with pytest.raises(ValueError, match="only bhrgtcom/2.x is supported"):
         broxml.read_bore(bore_xml_v1)
+
+
+def test_plot(bore_xml_v2) -> None:
+    parsed = broxml.read_bore(bore_xml_v2)
+    fig, axes = plot_bore(parsed[0])
+    assert isinstance(fig, plt.Figure)

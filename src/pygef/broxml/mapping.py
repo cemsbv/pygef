@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+
 import polars as pl
 
 
@@ -63,6 +64,7 @@ class _MappingParameters:
             "zwakZandigeKleiMetGrind": [0.0, 0.1, 0.1, 0.0, 0.8, 0.0],
             "sterkZandigeKlei": [0.0, 0.0, 0.4, 0.0, 0.6, 0.0],
             "sterkZandigeKleiMetGrind": [0.0, 0.2, 0.2, 0.0, 0.6, 0.0],
+            "organischKlei": [0.0, 0.0, 0.0, 0.0, 0.6, 0.4],
             "detritus": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
             "zwakZandigeDetritus": [0.0, 0.0, 0.2, 0.0, 0.0, 0.8],
             "sterkZandigeDetritus": [0.0, 0.0, 0.4, 0.0, 0.0, 0.6],
@@ -80,6 +82,7 @@ class _MappingParameters:
             "kleiigVeen": [0.0, 0.0, 0.0, 0.2, 0.0, 0.8],
             "gyttja": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
             "bruinkool": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+            "niet gedefinieerd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         }
         return {k: pl.Series(v) for k, v in BRO_TO_DIST.items()}
 
