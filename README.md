@@ -161,6 +161,7 @@ To run the linters locally, run the following bash script from the root director
 
 ```bash
 docker run \
+--env VALIDATE_ALL_CODEBASE=false \
 --env RUN_LOCAL=true \
 --env VALIDATE_JSCPD=false \
 --env VALIDATE_CSS=false \
@@ -186,7 +187,7 @@ python -m pip install --upgrade pip setuptools
 pip install -r requirements.txt
 pip install .
 
-coverage run -m unittest
+coverage run -m pytest
 ```
 
 ## Requirements

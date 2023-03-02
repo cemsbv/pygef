@@ -27,6 +27,29 @@ def cast_string(f, s):
         return None
 
 
+def measurement_header_value(headers, name, index=0, cast=None, key=0):
+    """
+    Based on the key en index of the measurement in
+    the GEF return the value
+
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :param name:(str) Header name.
+    :param key:(int) Index of the variable.
+    :param index:(int) Index of the value.
+    :param cast: (function) Cast to the specified type.
+    :return: (str) The header value.
+    """
+    if name in headers:
+        mapping = {int(value[0]): value for value in headers[name]}
+
+        if key in mapping:
+            result = mapping[key][index]
+            if cast:
+                return cast(result)
+            else:
+                return result
+
+
 def first_header_value(headers, name, index=0, cast=None):
     """
     Get the first matching line with a header.
@@ -154,7 +177,7 @@ def parse_cone_id(headers):
     :return: cone id.
     """
     if isinstance(headers, dict):
-        return first_header_value(headers, "MEASUREMENTTEXT", index=1)
+        return measurement_header_value(headers, "MEASUREMENTTEXT", index=1, key=4)
     else:
         try:
             return parse_regex_cast(
@@ -173,15 +196,16 @@ def parse_cpt_class(headers):
     :return: Cpt class.
     """
     if isinstance(headers, dict):
-        all_definition = first_header_value(headers, "MEASUREMENTTEXT", index=1)
+        all_definition = measurement_header_value(
+            headers, "MEASUREMENTTEXT", key=6, index=1
+        )
     else:
         all_definition = parse_regex_cast(
             r"#MEASUREMENTTEXT[=\s+]+6[, ](.*)", headers, str, 1
         )
-
     if all_definition is not None:
         return parse_regex_cast(
-            r"^.*?(klasse|class).*?(\d{1})", all_definition.lower(), int, 2
+            r"^.*?(klasse|class|kl.).*?(\d{1})", all_definition.lower(), int, 2
         )
 
 

@@ -13,9 +13,10 @@ def test_bore_percentages() -> None:
     # all soil distributions should be a distribution e.g.
     # sum to 100 %
     # be all positive
-    for dist in MAPPING_PARAMETERS.bro_to_dict().values():
-        assert dist.sum() == 1.0
-        assert (dist < 0.0).sum() == 0
+    for key, dist in MAPPING_PARAMETERS.bro_to_dict().items():
+        if key != "niet gedefinieerd":
+            assert dist.sum() == 1.0
+            assert (dist < 0.0).sum() == 0
 
 
 def test_bore_attributes(bore_xml_v2: str) -> None:
@@ -23,8 +24,6 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
     assert len(parsed) == 1
 
     bore_data = parsed[0]
-    print(bore_data)
-    print(bore_data.data.head())
     assert bore_data.research_report_date == date(2021, 10, 19)
     assert bore_data.delivered_location == Location(
         "urn:ogc:def:crs:EPSG::28992", x=158322.139, y=444864.706

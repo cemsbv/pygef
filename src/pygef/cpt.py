@@ -17,6 +17,7 @@ class QualityClass(Enum):
     Class1 = 1
     Class2 = 2
     Class3 = 3
+    Class4 = 4
 
 
 @dataclass
