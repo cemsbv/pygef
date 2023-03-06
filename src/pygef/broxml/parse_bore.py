@@ -69,6 +69,7 @@ BORE_ATTRIBS_V1 = {
 }
 
 BORE_ATTRIBS_V2 = {
+    "bro_id": {"xpath": "brocom:broId"},
     "research_report_date": {
         "xpath": "./researchReportDate/brocom:date",
         "resolver": resolvers.parse_date,
@@ -80,6 +81,10 @@ BORE_ATTRIBS_V2 = {
     },
     "delivered_location": {
         "xpath": "./deliveredLocation/bhrgtcom:location/gml:Point",
+        "resolver": resolvers.parse_gml_location,
+    },
+    "standardized_location": {
+        "xpath": "./standardizedLocation/brocom:location",
         "resolver": resolvers.parse_gml_location,
     },
     "delivered_vertical_position_offset": {
@@ -113,7 +118,7 @@ BORE_ATTRIBS_V2 = {
         "el-attr": "text",
     },
     "bore_hole_completed": {
-        "xpath": "./boring",
+        "xpath": "./boring/bhrgtcom:boreholeCompleted",
         "resolver": resolvers.parse_bool,
         "el-attr": "text",
     },

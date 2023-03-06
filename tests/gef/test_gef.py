@@ -12,7 +12,7 @@ import pytest
 
 import pygef.gef.geo as geo
 import pygef.gef.utils as utils
-from pygef import common, exceptions, plot_bore, plot_cpt, read_bore, read_cpt
+from pygef import common, exceptions, plotting, read_bore, read_cpt
 from pygef.gef.gef import (
     MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT,
     _GefBore,
@@ -39,8 +39,8 @@ def test_cpt_smoke():
     read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
     read_cpt(os.path.join(BasePath, "../test_files/cpt4.gef"))
 
-    fig, axes = plot_cpt(gef)
-    assert isinstance(fig, plt.Figure)
+    axes = plotting.plot_cpt(gef)
+    assert isinstance(axes[0], plt.Axes)
 
 
 def test_bore_smoke():
@@ -49,13 +49,25 @@ def test_bore_smoke():
     Bore files.
     """
     gef = read_bore(os.path.join(BasePath, "../test_files/example_bore.gef"))
-    plot_bore(gef)
+    axes = plotting.plot_bore(gef)
+    assert isinstance(axes, plt.Axes)
+
+
+def test_bore_cpt_smoke():
+    """
+    Smoke test to see if no errors occur during creation of the Bore object for valid
+    Bore files.
+    """
+    gef1 = read_bore(os.path.join(BasePath, "../test_files/example_bore.gef"))
+    gef2 = read_cpt(os.path.join(BasePath, "../test_files/cpt.gef"))
+    fig, axes = plotting.plot_merge(gef1, gef2)
+    assert isinstance(axes[0], plt.Axes)
 
 
 def test_xy():
     cpt3 = read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
-    np.testing.assert_almost_equal(cpt3.standardized_location.x, 110885)
-    np.testing.assert_almost_equal(cpt3.standardized_location.y, 493345)
+    np.testing.assert_almost_equal(cpt3.delivered_location.x, 110885)
+    np.testing.assert_almost_equal(cpt3.delivered_location.y, 493345)
 
 
 def test_measurement_var_with_minus_sign():

@@ -13,9 +13,12 @@ from pygef.common import Location
 
 @dataclass
 class BoreData:
+    # dispatch_document bhrgt
+    bro_id: str | None
     research_report_date: date
     description_procedure: str
     delivered_location: Location
+    standardized_location: Location | None
     delivered_vertical_position_offset: float | None
     delivered_vertical_position_datum: str
     delivered_vertical_position_reference_point: str

@@ -22,6 +22,10 @@ CPT_ATTRIBS = {
         "el-attr": "text",
     },
     "cpt_standard": {"xpath": "cptStandard"},
+    "delivered_location": {
+        "xpath": "./deliveredLocation/cptcommon:location",
+        "resolver": resolvers.parse_gml_location,
+    },
     "standardized_location": {
         "xpath": "./standardizedLocation/brocom:location",
         "resolver": resolvers.parse_gml_location,

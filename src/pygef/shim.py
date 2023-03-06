@@ -75,12 +75,13 @@ def convert_height_system_to_vertical_datum(height_system: float) -> str:
 def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs: dict[str, Any] = {}
 
-    kwargs["standardized_location"] = Location(
+    kwargs["delivered_location"] = Location(
         # all gef files are RD new
         srs_name="urn:ogc:def:crs:EPSG::28992",
         x=gef_cpt.x,
         y=gef_cpt.y,
     )
+    kwargs["standardized_location"] = None
     kwargs["bro_id"] = gef_cpt.project_id
     kwargs["data"] = gef_cpt.df
     kwargs["research_report_date"] = None
@@ -164,6 +165,8 @@ def gef_bore_to_bore_data(gef_bore: _GefBore) -> BoreData:
         x=gef_bore.x,
         y=gef_bore.y,
     )
+    kwargs["standardized_location"] = None
+    kwargs["bro_id"] = gef_bore.project_id
     kwargs["research_report_date"] = None
     kwargs["description_procedure"] = "unknown"
     kwargs["delivered_vertical_position_offset"] = gef_bore.zid

@@ -26,7 +26,8 @@ def test_gef_to_cpt_data(cpt_gef_1: str) -> None:
         "predrilled_depth": 0.0,
         "quality_class": QualityClass(2),
         "research_report_date": None,
-        "standardized_location": Location(
+        "standardized_location": None,
+        "delivered_location": Location(
             srs_name="urn:ogc:def:crs:EPSG::28992", x=79578.38, y=424838.97
         ),
         "zlm_cone_resistance_after": -0.245,
