@@ -87,6 +87,22 @@
 
 <div class="viewcode-block" id="BoreData"><a class="viewcode-back" href="../../tree/reference.html#pygef.bore.BoreData">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">BoreData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Bore dataclass holds the information from the BHRgt object.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        bro_id (str | None): BRO ID of the BHRgt.</span>
+<span class="sd">        research_report_date (date): research report date</span>
+<span class="sd">        delivered_location (Location): delivered location in EPSG:28992 - RD new</span>
+<span class="sd">        standardized_location (Location | None): standardized location in EPSG:4326 - WGS 84</span>
+<span class="sd">        delivered_vertical_position_offset (float | None): delivered vertical position offset</span>
+<span class="sd">        delivered_vertical_position_datum (str): research delivered vertical position datum</span>
+<span class="sd">        delivered_vertical_position_reference_point (str): delivered vertical position reference point</span>
+<span class="sd">        bore_rock_reached (bool): bore rock reached</span>
+<span class="sd">        final_bore_depth (float): final bore depth</span>
+<span class="sd">        data (pl.DataFrame): DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># dispatch_document bhrgt</span>
     <span class="n">bro_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="n">research_report_date</span><span class="p">:</span> <span class="n">date</span>
