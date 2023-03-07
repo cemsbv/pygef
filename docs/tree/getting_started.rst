@@ -3,14 +3,26 @@
 
     import polars
 
-Getting started
-===============
+Installing pygef
+==================
+To install :code:`pygef`, we strongly recommend using Python Package Index (PyPI).
+You can install :code:`pygef` with:
+
+.. code-block:: bash
+
+    pip install pygef[map]
+
+We installed the `map` variant of :code:`pygef` which include additional dependencies,
+and thereby enable additional functionality.
+
+How to import pygef
+===================
 
 Getting started with pygef is easy done by importing the :code:`pygef` library:
 
 .. ipython:: python
 
-    from pygef import read_cpt, read_bore
+    import pygef
 
 or any equivalent :code:`import` statement.
 
@@ -31,7 +43,7 @@ If you want to use the :code:`path` then your code should look like this:
     path_cpt = os.path.join(
         os.environ.get("DOC_PATH"), "../tests/test_files/cpt_xml/example.xml"
     )
-    cpt = read_cpt(path_cpt)
+    cpt = pygef.read_cpt(path_cpt)
 
 Access the attributes
 ---------------------
@@ -80,7 +92,7 @@ If we call :code:`BoreData.data` on a :code:`BoreData` object we will get someth
     path_bore = os.path.join(
         os.environ.get("DOC_PATH"), "../tests/test_files/bore_xml/DP14+074_MB_KR.xml"
     )
-    bore = read_bore(path_bore)
+    bore = pygef.read_bore(path_bore)
     bore.data
 
 
@@ -96,10 +108,8 @@ If we use the method without arguments on a :code:`cpt` object we get:
 .. ipython:: python
     :okwarning:
 
-    from pygef import plot_cpt
-
     @savefig cpt_plot.png
-    plot_cpt(cpt)
+    pygef.plotting.plot_cpt(cpt)
 
 
 Borehole
@@ -109,7 +119,27 @@ If we use the method without arguments on a :code:`BoreData` object we get:
 .. ipython:: python
     :okwarning:
 
-    from pygef import plot_bore
-
     @savefig bore_plot.png
-    plot_bore(bore)
+    pygef.plotting.plot_bore(bore)
+
+
+Combine Borehole an CPT
+........................
+
+.. ipython:: python
+    :okwarning:
+
+    # parse BRO bhrgt XML
+    path_bore = os.path.join(
+        os.environ.get("DOC_PATH"), "../tests/test_files/bore_xml/BHR000000336600.xml"
+    )
+    bore = pygef.read_bore(path_bore)
+
+    # parse BRO CPT XML
+    path_cpt = os.path.join(
+        os.environ.get("DOC_PATH"), "../tests/test_files/cpt_xml/CPT000000155283.xml"
+    )
+    cpt = pygef.read_cpt(path_cpt)
+
+    @savefig bore_cpt_plot.png
+    pygef.plotting.plot_merge(bore, cpt)

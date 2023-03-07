@@ -26,6 +26,7 @@ class CPTData:
     bro_id: str | None
     research_report_date: date
     cpt_standard: str | None
+    delivered_location: Location
     standardized_location: Location | None
     # conepenetrometersurvey
     dissipationtest_performed: bool | None

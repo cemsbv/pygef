@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import os
 from pathlib import Path
 
 from lxml import etree
@@ -22,6 +23,10 @@ CPT_ATTRIBS = {
         "el-attr": "text",
     },
     "cpt_standard": {"xpath": "cptStandard"},
+    "delivered_location": {
+        "xpath": "./deliveredLocation/cptcommon:location",
+        "resolver": resolvers.parse_gml_location,
+    },
     "standardized_location": {
         "xpath": "./standardizedLocation/brocom:location",
         "resolver": resolvers.parse_gml_location,
@@ -185,5 +190,8 @@ CPT_ATTRIBS = {
 
 
 def read_cpt(file: io.BytesIO | Path | str) -> list[CPTData]:
-    tree = etree.parse(file)
-    return read_xml(tree.getroot(), CPTData, CPT_ATTRIBS, "dispatchDocument")
+    if isinstance(file, str) and not os.path.exists(file):
+        root = etree.fromstring(file).getroot()
+    else:
+        root = etree.parse(file).getroot()
+    return read_xml(root, CPTData, CPT_ATTRIBS, "dispatchDocument")

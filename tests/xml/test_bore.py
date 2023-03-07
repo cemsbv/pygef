@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import polars as pl
 import pytest
 
-from pygef import broxml, plot_bore
+from pygef import broxml, plotting
 from pygef.broxml.mapping import MAPPING_PARAMETERS
 from pygef.common import Location
 
@@ -14,8 +14,8 @@ def test_bore_percentages() -> None:
     # sum to 100 %
     # be all positive
     for key, dist in MAPPING_PARAMETERS.bro_to_dict().items():
-        if key != "niet gedefinieerd":
-            assert dist.sum() == 1.0
+        if key not in ["niet gedefinieerd", "unknown"]:
+            assert dist.sum() == 1.0, key
             assert (dist < 0.0).sum() == 0
 
 
@@ -171,5 +171,5 @@ def test_bore_version(bore_xml_v1) -> None:
 
 def test_plot(bore_xml_v2) -> None:
     parsed = broxml.read_bore(bore_xml_v2)
-    fig, axes = plot_bore(parsed[0])
-    assert isinstance(fig, plt.Figure)
+    axes = plotting.plot_bore(parsed[0])
+    assert isinstance(axes, plt.Axes)

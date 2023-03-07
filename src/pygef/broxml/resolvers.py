@@ -16,12 +16,16 @@ def lower_text(val: str, **kwargs: dict[Any, Any]) -> str:
     return val.lower()
 
 
-def parse_float(val: str, **kwargs: dict[Any, Any]) -> float:
-    return float(val)
+def parse_float(val: str | None, **kwargs: dict[Any, Any]) -> float | None:
+    if isinstance(val, (str, int, float)):
+        return float(val)
+    return None
 
 
-def parse_int(val: str, **kwargs: dict[Any, Any]) -> int:
-    return int(val)
+def parse_int(val: str | None, **kwargs: dict[Any, Any]) -> int | None:
+    if isinstance(val, (str, int, float)):
+        return int(val)
+    return None
 
 
 def parse_date(val: str, **kwargs: dict[Any, Any]) -> date:
@@ -29,7 +33,9 @@ def parse_date(val: str, **kwargs: dict[Any, Any]) -> date:
 
 
 def clean_string(val: str, **kwargs: dict[Any, Any]) -> str:
-    return re.sub(r"\W+", "", val)
+    if isinstance(val, str):
+        return re.sub(r"\W+", "", val)
+    return "unknown"
 
 
 def parse_bool(val: str, **kwargs: dict[Any, Any]) -> bool:
@@ -45,10 +51,11 @@ def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataF
     namespaces = kwargs["namespaces"]
     upper_boundary = []
     lower_boundary = []
-    geotechnical_soil_name = []
-    color = []
-    dispersed_inhomogenity = []
-    organic_matter_content_class = []
+    geotechnical_soil_name_iso: List[str] = []
+    geotechnical_soil_name_nen: List[str] = []
+    color: List[str] = []
+    dispersed_inhomogenity: List[bool | None] = []
+    organic_matter_content_class: List[str | None] = []
     sand_median_class: List[str | None] = []
     for layer in el.iterfind("bhrgtcom:layer", namespaces=namespaces):
         upper_boundary.append(
@@ -57,34 +64,61 @@ def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataF
         lower_boundary.append(
             float(layer.find("bhrgtcom:lowerBoundary", namespaces=namespaces).text)
         )
-        geotechnical_soil_name.append(
-            clean_string(
-                layer.find(
-                    "bhrgtcom:soil/bhrgtcom:geotechnicalSoilName", namespaces=namespaces
-                ).text
+        try:
+            geotechnical_soil_name_iso.append(
+                clean_string(
+                    layer.find(
+                        "bhrgtcom:soil/bhrgtcom:geotechnicalSoilName",
+                        namespaces=namespaces,
+                    ).text
+                )
             )
-        )
-        color.append(
-            clean_string(
-                layer.find("bhrgtcom:soil/bhrgtcom:colour", namespaces=namespaces).text
+        except AttributeError:
+            geotechnical_soil_name_iso.append("niet gedefinieerd")
+        try:
+            geotechnical_soil_name_nen.append(
+                clean_string(
+                    layer.find(
+                        "bhrgtcom:soil/bhrgtcom:soilNameNEN5104",
+                        namespaces=namespaces,
+                    ).text
+                )
             )
-        )
-        dispersed_inhomogenity.append(
-            parse_bool(
-                layer.find(
-                    "bhrgtcom:soil/bhrgtcom:dispersedInhomogeneity",
-                    namespaces=namespaces,
-                ).text
+        except AttributeError:
+            geotechnical_soil_name_nen.append("niet gedefinieerd")
+        try:
+            color.append(
+                clean_string(
+                    layer.find(
+                        "bhrgtcom:soil/bhrgtcom:colour", namespaces=namespaces
+                    ).text
+                )
             )
-        )
-        organic_matter_content_class.append(
-            clean_string(
-                layer.find(
-                    "bhrgtcom:soil/bhrgtcom:organicMatterContentClass",
-                    namespaces=namespaces,
-                ).text
+        except AttributeError:
+            color.append("onbekend")
+
+        try:
+            dispersed_inhomogenity.append(
+                parse_bool(
+                    layer.find(
+                        "bhrgtcom:soil/bhrgtcom:dispersedInhomogeneity",
+                        namespaces=namespaces,
+                    ).text
+                )
             )
-        )
+        except AttributeError:
+            dispersed_inhomogenity.append(None)
+        try:
+            organic_matter_content_class.append(
+                clean_string(
+                    layer.find(
+                        "bhrgtcom:soil/bhrgtcom:organicMatterContentClass",
+                        namespaces=namespaces,
+                    ).text
+                )
+            )
+        except AttributeError:
+            organic_matter_content_class.append(None)
         try:
             sand_median_class.append(
                 clean_string(
@@ -96,6 +130,11 @@ def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataF
         except AttributeError:
             sand_median_class.append(None)
 
+    # merge NEN and ISO names
+    geotechnical_soil_name = [
+        word if word != "unknown" else geotechnical_soil_name_nen[i]
+        for i, word in enumerate(geotechnical_soil_name_iso)
+    ]
     variables = locals()
     return pl.DataFrame(
         {
@@ -181,7 +220,11 @@ def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> QualityClass:
     if val == "klasse2" or val == "class2":
         return QualityClass.Class2
     if val == "klasse3" or val == "class3":
-        return QualityClass.Class2
+        return QualityClass.Class3
+    if val == "klasse4" or val == "class4":
+        return QualityClass.Class4
+    if val == "onbekend" or val == "unknown":
+        return QualityClass.Unknown
     warn(f"quality class '{val}' is unknown")
     return QualityClass.Unknown
 

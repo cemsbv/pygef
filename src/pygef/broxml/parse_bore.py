@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import os
 import re
 from pathlib import Path
 
@@ -69,6 +70,7 @@ BORE_ATTRIBS_V1 = {
 }
 
 BORE_ATTRIBS_V2 = {
+    "bro_id": {"xpath": "brocom:broId"},
     "research_report_date": {
         "xpath": "./researchReportDate/brocom:date",
         "resolver": resolvers.parse_date,
@@ -80,6 +82,10 @@ BORE_ATTRIBS_V2 = {
     },
     "delivered_location": {
         "xpath": "./deliveredLocation/bhrgtcom:location/gml:Point",
+        "resolver": resolvers.parse_gml_location,
+    },
+    "standardized_location": {
+        "xpath": "./standardizedLocation/brocom:location",
         "resolver": resolvers.parse_gml_location,
     },
     "delivered_vertical_position_offset": {
@@ -113,7 +119,7 @@ BORE_ATTRIBS_V2 = {
         "el-attr": "text",
     },
     "bore_hole_completed": {
-        "xpath": "./boring",
+        "xpath": "./boring/bhrgtcom:boreholeCompleted",
         "resolver": resolvers.parse_bool,
         "el-attr": "text",
     },
@@ -127,7 +133,10 @@ BORE_ATTRIBS_V2 = {
 def read_bore(
     file: io.BytesIO | Path | str, include_soil_dist: bool = True
 ) -> list[BoreData]:
-    root = etree.parse(file).getroot()
+    if isinstance(file, str) and not os.path.exists(file):
+        root = etree.fromstring(file).getroot()
+    else:
+        root = etree.parse(file).getroot()
     match = re.compile(r"xsd/.*/(\d\.\d)")
     matched = match.search(root.nsmap["bhrgtcom"])
 
