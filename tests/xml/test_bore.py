@@ -15,7 +15,7 @@ def test_bore_percentages() -> None:
     # be all positive
     for key, dist in MAPPING_PARAMETERS.bro_to_dict().items():
         if key not in ["niet gedefinieerd", "unknown"]:
-            assert dist.sum() == 1.0, print(key)
+            assert dist.sum() == 1.0, key
             assert (dist < 0.0).sum() == 0
 
 
