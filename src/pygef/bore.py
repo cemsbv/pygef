@@ -13,6 +13,22 @@ from pygef.common import Location
 
 @dataclass
 class BoreData:
+    """
+    The Bore dataclass holds the information from the BHRgt object.
+
+    Attributes:
+        bro_id (str | None): BRO ID of the BHRgt.
+        research_report_date (date): research report date
+        delivered_location (Location): delivered location in EPSG:28992 - RD new
+        standardized_location (Location | None): standardized location in EPSG:4326 - WGS 84
+        delivered_vertical_position_offset (float | None): delivered vertical position offset
+        delivered_vertical_position_datum (str): research delivered vertical position datum
+        delivered_vertical_position_reference_point (str): delivered vertical position reference point
+        bore_rock_reached (bool): bore rock reached
+        final_bore_depth (float): final bore depth
+        data (pl.DataFrame): DataFrame
+    """
+
     # dispatch_document bhrgt
     bro_id: str | None
     research_report_date: date
