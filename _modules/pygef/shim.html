@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pygef.shim &mdash; pygef 0.8.0a4 documentation</title>
+  <title>pygef.shim &mdash; pygef 0.8.0a5 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
@@ -42,7 +42,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../tree/getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/getting_started.html">Installing pygef</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tree/getting_started.html#how-to-import-pygef">How to import pygef</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tree/reference.html">Reference</a></li>
 </ul>
 
@@ -100,6 +101,8 @@
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">GEF_ID</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">file</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">GEF_ID</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not find the GEF file.&quot;</span><span class="p">)</span>
 
 
@@ -115,8 +118,10 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;an index &gt; 0 not supported for GEF files&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">_GefBore</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()))</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">_GefBore</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">_GefBore</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">broxml</span><span class="o">.</span><span class="n">read_bore</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
 
 
@@ -132,8 +137,10 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;an index &gt; 0 not supported for GEF files&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()))</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">broxml</span><span class="o">.</span><span class="n">read_cpt</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
 
@@ -148,12 +155,13 @@
 <span class="k">def</span> <span class="nf">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">gef_cpt</span><span class="p">:</span> <span class="n">_GefCpt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
     <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;standardized_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span>
         <span class="c1"># all gef files are RD new</span>
         <span class="n">srs_name</span><span class="o">=</span><span class="s2">&quot;urn:ogc:def:crs:EPSG::28992&quot;</span><span class="p">,</span>
         <span class="n">x</span><span class="o">=</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
         <span class="n">y</span><span class="o">=</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;standardized_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bro_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">project_id</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">df</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;research_report_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -237,6 +245,8 @@
         <span class="n">x</span><span class="o">=</span><span class="n">gef_bore</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
         <span class="n">y</span><span class="o">=</span><span class="n">gef_bore</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;standardized_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bro_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_bore</span><span class="o">.</span><span class="n">project_id</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;research_report_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;description_procedure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_offset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_bore</span><span class="o">.</span><span class="n">zid</span>
