@@ -27,6 +27,8 @@ def is_gef_file(file: io.BytesIO | Path | str) -> bool:
     if os.path.exists(file):
         with open(file, errors="ignore") as f:
             return f.read(6).startswith(GEF_ID)
+    if isinstance(file, str):
+        return file[:6].startswith(GEF_ID)
     raise FileNotFoundError("Could not find the GEF file.")
 
 
@@ -42,8 +44,10 @@ def read_bore(file: io.BytesIO | Path | str, index: int = 0) -> BoreData:
             raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):
             return gef_bore_to_bore_data(_GefBore(string=file.read().decode()))
-        else:
+        if os.path.exists(file):
             return gef_bore_to_bore_data(_GefBore(path=file))
+        else:
+            return gef_bore_to_bore_data(_GefBore(string=file))
     return broxml.read_bore(file)[index]
 
 
@@ -59,8 +63,10 @@ def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
             raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):
             return gef_cpt_to_cpt_data(_GefCpt(string=file.read().decode()))
-        else:
+        if os.path.exists(file):
             return gef_cpt_to_cpt_data(_GefCpt(path=file))
+        else:
+            return gef_cpt_to_cpt_data(_GefCpt(string=file))
 
     return broxml.read_cpt(file)[index]
 

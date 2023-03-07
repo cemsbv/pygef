@@ -1,4 +1,5 @@
 import os
+from io import BytesIO
 
 from pytest import fixture
 
@@ -23,6 +24,20 @@ def cpt_xml() -> str:
 @fixture()
 def cpt_gef_1() -> str:
     return os.path.join(TEST_FILES, "cpt.gef")
+
+
+@fixture()
+def cpt_gef_1_bytes(cpt_gef_1) -> BytesIO:
+    with open(cpt_gef_1, encoding="utf-8", errors="ignore") as f:
+        data = BytesIO(f.read().encode("utf-8"))
+    return data
+
+
+@fixture()
+def cpt_gef_1_string(cpt_gef_1) -> str:
+    with open(cpt_gef_1, encoding="utf-8", errors="ignore") as f:
+        string = f.read()
+    return string
 
 
 @fixture()

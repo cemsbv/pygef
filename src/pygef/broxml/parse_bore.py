@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import os
 import re
 from pathlib import Path
 
@@ -132,7 +133,10 @@ BORE_ATTRIBS_V2 = {
 def read_bore(
     file: io.BytesIO | Path | str, include_soil_dist: bool = True
 ) -> list[BoreData]:
-    root = etree.parse(file).getroot()
+    if isinstance(file, str) and not os.path.exists(file):
+        root = etree.fromstring(file).getroot()
+    else:
+        root = etree.parse(file).getroot()
     match = re.compile(r"xsd/.*/(\d\.\d)")
     matched = match.search(root.nsmap["bhrgtcom"])
 

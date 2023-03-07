@@ -287,7 +287,7 @@ def plot_merge(
     plt.gcf().text(
         0,
         0,
-        "created by CRUX Engineering Microservices BV (CEMS)",
+        "created by pyGEF supported by CRUX Engineering Microservices BV (CEMS)",
         fontsize=10,
         color="gray",
         alpha=0.5,

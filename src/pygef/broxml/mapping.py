@@ -18,8 +18,10 @@ class _MappingParameters:
 
     @lru_cache(1)
     def bro_to_dict(self) -> dict[str, pl.Series]:
-        # SoilNameISO > https://publiek.broservices.nl/bro/refcodes/v1/codes?domain=urn%3Abro%3Abhrgt%3AGeotechnicalSoilName&version=latest
-        # SoilNameNEN5104 > https://publiek.broservices.nl/bro/refcodes/v1/codes?domain=urn%3Abro%3Abhrgt%3ASoilNameNEN5104&version=latest
+        # SoilNameISO14688
+        # > https://publiek.broservices.nl/bro/refcodes/v1/codes?domain=urn%3Abro%3Abhrgt%3AGeotechnicalSoilName&version=latest
+        # SoilNameNEN5104
+        # > https://publiek.broservices.nl/bro/refcodes/v1/codes?domain=urn%3Abro%3Abhrgt%3ASoilNameNEN5104&version=latest
         # ["rocks", "gravel", "sand", "silt, "clay", "peat"]
         BRO_TO_DIST = {
             "blokken": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],  # SoilNameNEN5104
