@@ -41,6 +41,11 @@ CPT_ATTRIBS = {
         "resolver": resolvers.parse_quality_class,
         "el-attr": "text",
     },
+    "groundwater_level": {
+        "xpath": "./additionalInvestigation/cptcommon:groundwaterLevel",
+        "resolver": resolvers.parse_float,
+        "el-attr": "text",
+    },
     "predrilled_depth": {
         "xpath": "./conePenetrometerSurvey/cptcommon:trajectory/cptcommon:predrilledDepth",
         "resolver": resolvers.parse_float,

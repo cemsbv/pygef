@@ -38,6 +38,7 @@ class CPTData:
         quality_class (QualityClass): quality class
         predrilled_depth (float): predrilled depth
         final_depth (float): final depth
+        groundwater_level (float | None): groundwater level
         cpt_description (str): cpt description
         cpt_type (str): cpt type
         cone_surface_area (int): cone_surface_area
@@ -76,6 +77,7 @@ class CPTData:
     quality_class: QualityClass
     predrilled_depth: float
     final_depth: float
+    groundwater_level: float | None
     # conepenetrometer
     cpt_description: str
     cpt_type: str
