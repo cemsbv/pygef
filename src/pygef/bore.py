@@ -20,6 +20,7 @@ class BoreData:
         bro_id (str | None): BRO ID of the BHRgt.
         research_report_date (date): research report date
         delivered_location (Location): delivered location in EPSG:28992 - RD new
+        groundwater_level (float | None): groundwater level
         standardized_location (Location | None): standardized location in EPSG:4326 - WGS 84
         delivered_vertical_position_offset (float | None): delivered vertical position offset
         delivered_vertical_position_datum (str): research delivered vertical position datum
@@ -34,6 +35,7 @@ class BoreData:
     research_report_date: date
     description_procedure: str
     delivered_location: Location
+    groundwater_level: float | None
     standardized_location: Location | None
     delivered_vertical_position_offset: float | None
     delivered_vertical_position_datum: str

@@ -76,6 +76,11 @@ BORE_ATTRIBS_V2 = {
         "resolver": resolvers.parse_date,
         "el-attr": "text",
     },
+    "groundwater_level": {
+        "xpath": "./boring/bhrgtcom:groundwaterLevel",
+        "resolver": resolvers.parse_float,
+        "el-attr": "text",
+    },
     "description_procedure": {
         "xpath": "./boreholeSampleDescription/bhrgtcom:descriptionProcedure",
         "el-attr": "text",
