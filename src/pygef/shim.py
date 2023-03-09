@@ -92,6 +92,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs["data"] = gef_cpt.df
     kwargs["research_report_date"] = None
     kwargs["cpt_standard"] = None
+    kwargs["groundwater_level"] = gef_cpt.groundwater_level
     kwargs["dissipationtest_performed"] = None
     kwargs["quality_class"] = QualityClass(gef_cpt.cpt_class)
     kwargs["predrilled_depth"] = gef_cpt.pre_excavated_depth
@@ -173,6 +174,7 @@ def gef_bore_to_bore_data(gef_bore: _GefBore) -> BoreData:
     )
     kwargs["standardized_location"] = None
     kwargs["bro_id"] = gef_bore.project_id
+    kwargs["groundwater_level"] = None
     kwargs["research_report_date"] = None
     kwargs["description_procedure"] = "unknown"
     kwargs["delivered_vertical_position_offset"] = gef_bore.zid
