@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 import polars as pl
-from polars import Expr
 
 from pygef.gef import utils
 from pygef.gef.gef import _Gef, parse_all_columns_info, replace_column_void

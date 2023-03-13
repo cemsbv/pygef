@@ -148,6 +148,7 @@ class CPTData:
 
 
 def calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyFrame:
+    """post-process function for CPT data, creates a new column with the computed frictionRatio"""
     if "localFriction" in columns and "coneResistance" in columns:
         return lf.with_columns(
             (
@@ -164,6 +165,7 @@ def calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyFr
 def calculate_elevation_with_respect_to_offset(
     lf: pl.LazyFrame, zid: float, columns: List[str]
 ) -> pl.LazyFrame:
+    """post-process function for CPT data creates a new column with the elevation with respect to offset"""
     yname = "depth" if "depth" in columns else "penetrationLength"
     return lf.with_columns(
         (zid - pl.col(yname)).alias("elevation_with_respect_to_offset")
