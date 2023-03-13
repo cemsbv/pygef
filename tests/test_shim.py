@@ -16,7 +16,8 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
     cpt_data = read_cpt(_format[_type])
 
     assert cpt_data.attributes() == {
-        "bro_id": "1801726",
+        "bro_id": None,
+        "alias": "CPTU17.8 + 83BITE",
         "cone_diameter": None,
         "cone_surface_area": 1000.0,
         "cone_surface_quotient": 0.8,

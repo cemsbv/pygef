@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import pprint
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
@@ -18,6 +18,7 @@ class BoreData:
 
     Attributes:
         bro_id (str | None): BRO ID of the BHRgt.
+        alias  (str | None): Alias of the CPT.
         research_report_date (date): research report date
         delivered_location (Location): delivered location in EPSG:28992 - RD new
         groundwater_level (float | None): groundwater level
@@ -62,6 +63,8 @@ class BoreData:
     final_sample_depth: float | None
     bore_hole_completed: bool
     data: pl.DataFrame
+
+    alias: str | None = field(default=None)
 
     @property
     def columns(self) -> list[str]:

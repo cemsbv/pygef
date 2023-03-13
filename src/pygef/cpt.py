@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import pprint
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
 from typing import Any, List
@@ -27,6 +27,7 @@ class CPTData:
 
     Attributes:
         bro_id (str | None): BRO ID of the CPT.
+        alias  (str | None): Alias of the CPT.
         research_report_date (date): research report date
         delivered_location (Location): delivered location in `EPSG:28992 - RD new`
         standardized_location (Location | None): standardized location in `EPSG:4326 - WGS 84`
@@ -143,8 +144,9 @@ class CPTData:
     delivered_vertical_position_offset: float | None
     delivered_vertical_position_datum: VerticalDatumClass
     delivered_vertical_position_reference_point: str
-
     data: pl.DataFrame
+
+    alias: str | None = field(default=None)
 
     def __post_init__(self):
         # post-processing of the data

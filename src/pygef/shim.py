@@ -89,7 +89,8 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
         y=gef_cpt.y,
     )
     kwargs["standardized_location"] = None
-    kwargs["bro_id"] = gef_cpt.project_id
+    kwargs["bro_id"] = None
+    kwargs["alias"] = gef_cpt.test_id
     kwargs["data"] = gef_cpt.df
     kwargs["research_report_date"] = None
     kwargs["cpt_standard"] = None
@@ -176,7 +177,8 @@ def gef_bore_to_bore_data(gef_bore: _GefBore) -> BoreData:
         y=gef_bore.y,
     )
     kwargs["standardized_location"] = None
-    kwargs["bro_id"] = gef_bore.project_id
+    kwargs["bro_id"] = None
+    kwargs["alias"] = gef_bore.test_id
     kwargs["groundwater_level"] = None
     kwargs["research_report_date"] = None
     kwargs["description_procedure"] = "unknown"

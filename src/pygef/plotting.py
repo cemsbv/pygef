@@ -140,7 +140,7 @@ def plot_cpt(
     # add legend
     ax.legend(
         loc="upper center",
-        title=f"CPT: {data.bro_id}",
+        title=f"CPT: {data.alias if data.bro_id is None else data.bro_id}",
         handles=[i for i in [p1, p2, p3, p4, p11, p12] if i is not None],
     )
     return axes
@@ -197,7 +197,7 @@ def plot_bore(
             handles=patches,
             bbox_to_anchor=(1, 1),
             loc="upper left",
-            title=f"BHRgt: {data.bro_id}",
+            title=f"BHRgt: {data.alias if data.bro_id is None else data.bro_id}",
         )
 
     return ax
