@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import functools
 import pprint
 from dataclasses import dataclass
 from datetime import date
@@ -64,7 +63,43 @@ class CPTData:
         zlm_pore_pressure_u1_after (float | None): zlm_pore_pressure_u1_after
         zlm_pore_pressure_u2_after (float | None): zlm_pore_pressure_u2_after
         zlm_pore_pressure_u3_after (float | None): zlm_pore_pressure_u3_after
-        _data (pl.DataFrame): DataFrame
+        data (pl.DataFrame): DataFrame
+            columns:
+
+                - penetrationLength [m]
+                - depth [m]
+                    penetrationLength corrected for inclination
+                - elevation_with_respect_to_offset [m wrt offset]
+                    see delivered_vertical_position_datum for offset
+                - coneResistance [MPa]
+                - correctedConeResistance [MPa]
+                - netConeResistance [MPa]
+                - coneResistanceRatio
+                - localFriction [MPa]
+                - frictionRatioComputed [%]
+                - frictionRatio [%]
+                - porePressureU1 [MPa]
+                - porePressureU2 [MPa]
+                - porePressureU3 [MPa]
+                - inclinationResultant [degrees]
+                - inclinationNS [degrees]
+                - inclinationEW [degrees]
+                - elapsedTime [seconds]
+                - poreRatio [MPa]
+                - soilDensity
+                - porePressure
+                - verticalPorePressureTotal
+                - verticalPorePressureEffective
+                - temperature [degrees celsius]
+                - inclinationX [degrees]
+                - inclinationY [degrees]
+                - electricalConductivity [S/m]
+                - magneticFieldStrengthX [nT]
+                - magneticFieldStrengthY [nT]
+                - magneticFieldStrengthZ [nT]
+                - magneticFieldStrengthTotal [nT]
+                - magneticInclination [degrees]
+                - magneticDeclination [degrees]
     """
 
     # dispatch_document cpt
@@ -109,23 +144,24 @@ class CPTData:
     delivered_vertical_position_datum: VerticalDatumClass
     delivered_vertical_position_reference_point: str
 
-    _data: pl.DataFrame
+    data: pl.DataFrame
 
-    @functools.cached_property
-    def data(self) -> pl.DataFrame:
-        return (
-            self._data.lazy()
+    def __post_init__(self):
+        # post-processing of the data
+        self.data = (
+            self.data.lazy()
             .pipe(
                 calculate_elevation_with_respect_to_offset,
                 self.delivered_vertical_position_offset,
-                self._data.columns,
+                self.data.columns,
             )
-            .pipe(calculate_friction_number, self._data.columns)
+            .pipe(calculate_friction_number, self.data.columns)
             .collect()
         )
 
     @property
     def columns(self) -> list[str]:
+        """Columns names for the DataFrame"""
         return self.data.columns
 
     def __str__(self):
@@ -136,8 +172,7 @@ class CPTData:
         Get the attributes
         """
         attribs = copy.copy(self.__dict__)
-        attribs["data"] = attribs["_data"].shape
-        attribs.pop("_data")
+        attribs["data"] = attribs["data"].shape
         return attribs
 
     def display_attributes(self) -> str:

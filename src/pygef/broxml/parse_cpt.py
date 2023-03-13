@@ -56,7 +56,7 @@ CPT_ATTRIBS = {
         "resolver": resolvers.parse_float,
         "el-attr": "text",
     },
-    "_data": {
+    "data": {
         "xpath": "./conePenetrometerSurvey",
         "resolver": resolvers.process_cpt_result,
     },

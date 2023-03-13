@@ -24,7 +24,7 @@ def plot_cpt(
 ) -> Tuple[plt.Axes, plt.Axes, plt.Axes]:
     """
     Create a plot with three axes.
-        - cone_resistance [Mpa]
+        - cone_resistance [MPa]
         - friction_ratio [%] (twiny)
         - friction [MPa] (twiny)
 

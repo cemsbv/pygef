@@ -28,6 +28,23 @@ class BoreData:
         bore_rock_reached (bool): bore rock reached
         final_bore_depth (float): final bore depth
         data (pl.DataFrame): DataFrame
+            columns:
+
+                - upper_boundary [m]
+                - lower_boundary [m]
+                - lutum_percentage [%]
+                - silt_percentage [%]
+                - sand_percentage [%]
+                - gravel_percentage [%]
+                - organic_matter_percentage [%]
+                - sand_median
+                - gravel_median
+                - geotechnical_soil_name
+                - color
+                - dispersed_inhomogenity
+                - organic_matter_content_class
+                - sand_median_class
+                - soil_dist
     """
 
     # dispatch_document bhrgt
@@ -48,6 +65,7 @@ class BoreData:
 
     @property
     def columns(self) -> list[str]:
+        """Columns names for the DataFrame"""
         return self.data.columns
 
     def __str__(self):

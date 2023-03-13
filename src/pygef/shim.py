@@ -90,7 +90,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     )
     kwargs["standardized_location"] = None
     kwargs["bro_id"] = gef_cpt.project_id
-    kwargs["_data"] = gef_cpt.df
+    kwargs["data"] = gef_cpt.df
     kwargs["research_report_date"] = None
     kwargs["cpt_standard"] = None
     kwargs["groundwater_level"] = gef_cpt.groundwater_level
