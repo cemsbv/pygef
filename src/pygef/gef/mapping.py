@@ -286,3 +286,46 @@ class _MappingParameters:
 
 
 MAPPING_PARAMETERS = _MappingParameters()
+COLUMN_NAMES_BORE = [
+    "upper_boundary",  # 1
+    "lower_boundary",  # 2
+    "lutum_percentage",  # 3
+    "silt_percentage",  # 4
+    "sand_percentage",  # 5
+    "gravel_percentage",  # 6
+    "organic_matter_percentage",  # 7
+    "sand_median",  # 8
+    "gravel_median",  # 9
+]
+MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE = dict(enumerate(COLUMN_NAMES_BORE, 1))
+MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {
+    1: "penetrationLength",
+    2: "coneResistance",
+    3: "localFriction",
+    4: "frictionRatio",
+    5: "porePressureU1",
+    6: "porePressureU2",
+    7: "porePressureU3",
+    8: "inclinationResultant",
+    9: "inclinationNS",
+    10: "inclinationEW",
+    11: "depth",
+    12: "elapsedTime",
+    13: "correctedConeResistance",
+    14: "netConeResistance",
+    15: "poreRatio",
+    16: "coneResistanceRatio",
+    17: "soilDensity",
+    18: "porePressure",
+    19: "verticalPorePressureTotal",
+    20: "verticalPorePressureEffective",
+    21: "inclinationX",
+    22: "inclinationY",
+    23: "electricalConductivity",
+    31: "magneticFieldStrengthX",
+    32: "magneticFieldStrengthY",
+    33: "magneticFieldStrengthZ",
+    34: "magneticFieldStrengthTotal",
+    35: "magneticInclination",
+    36: "magneticDeclination",
+}
