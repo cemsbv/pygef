@@ -43,6 +43,8 @@ def plot_cpt(
         ax = fig.subplots(1, 1)
 
     p1 = None
+    p11 = None
+    p12 = None
     ax2 = ax.twiny()
     p2 = None
     ax3 = ax.twiny()
@@ -111,20 +113,35 @@ def plot_cpt(
         )
 
     # plot computed frictionRatio
-    if "localFriction" in df.columns and "coneResistance" in df.columns:
+    if "frictionRatioComputed" in df.columns:
         (p4,) = ax3.plot(
-            df["localFriction"] / df["coneResistance"] * 100,
+            df["frictionRatioComputed"],
             df[yname],
             label="frictionRatio computed",
             ls="dashed",
             color="tab:gray",
+        )
+    # add hlines
+    if data.groundwater_level is not None:
+        p11 = ax.axhline(
+            data.groundwater_level,
+            label=f"groundwater level: {data.groundwater_level:.2f}",
+            color="tab:blue",
+            ls="dashed",
+        )
+    if data.predrilled_depth is not None:
+        p12 = ax.axhline(
+            data.predrilled_depth,
+            label=f"predrilled depth: {data.predrilled_depth:.2f}",
+            color="tab:brown",
+            ls="dashed",
         )
 
     # add legend
     ax.legend(
         loc="upper center",
         title=f"CPT: {data.bro_id}",
-        handles=[i for i in [p1, p2, p3, p4] if i is not None],
+        handles=[i for i in [p1, p2, p3, p4, p11, p12] if i is not None],
     )
     return axes
 
@@ -227,6 +244,20 @@ def plot_merge(
             "upper_boundary"
         ),
     )
+    if (
+        cpt_data.groundwater_level is not None
+        and cpt_data.delivered_vertical_position_offset is not None
+    ):
+        cpt_data.groundwater_level = (
+            cpt_data.delivered_vertical_position_offset - cpt_data.groundwater_level
+        )
+    if (
+        cpt_data.predrilled_depth is not None
+        and cpt_data.delivered_vertical_position_offset is not None
+    ):
+        cpt_data.predrilled_depth = (
+            cpt_data.delivered_vertical_position_offset - cpt_data.predrilled_depth
+        )
 
     # fill axes and update ylabels
     _ = plot_cpt(cpt_data, ax1)
