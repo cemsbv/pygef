@@ -202,7 +202,8 @@ def process_cpt_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFr
         sep=delimiter,
         eol_char=new_line_char,
         ignore_errors=True,
-    )
+        null_values="-999999",
+    ).drop_nulls("coneResistance")
 
 
 def parse_gml_location(el: etree.Element, **kwargs: dict[Any, Any]) -> Location:

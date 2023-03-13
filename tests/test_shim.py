@@ -27,7 +27,7 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
         "cpt_standard": None,
         "groundwater_level": None,
         "cpt_type": 4.0,
-        "data": (999, 10),
+        "data": (999, 12),
         "delivered_vertical_position_datum": VerticalDatumClass("31000"),
         "delivered_vertical_position_offset": -0.09,
         "delivered_vertical_position_reference_point": "unknown",
