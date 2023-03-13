@@ -12,7 +12,7 @@ def test_cpt_attributes(cpt_xml: str) -> None:
     cpt = parsed[0]
     assert cpt.bro_id == "CPT000000099543"
     assert cpt.research_report_date == date(2019, 4, 23)
-    assert cpt.data.shape == (373, 9)
+    assert cpt.data.shape == (373, 11)
     assert cpt.quality_class == QualityClass.Class2
     assert cpt.cpt_standard == "ISO22476D1"
     assert cpt.standardized_location == Location(
@@ -46,4 +46,4 @@ def test_cpt_attributes(cpt_xml: str) -> None:
     assert cpt.zlm_pore_pressure_u2_after is None
     assert cpt.zlm_pore_pressure_u3_after is None
     assert cpt.delivered_vertical_position_offset == 4.41
-    assert cpt.delivered_vertical_position_datum == "nap"
+    assert cpt.delivered_vertical_position_datum.name == "NAP"

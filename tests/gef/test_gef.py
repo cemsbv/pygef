@@ -586,8 +586,6 @@ def test_parse_cpt():
     )
     df_calculated = cpt.data
 
-    a = df_calculated.to_pandas()
-
     df = pl.DataFrame(
         {
             "penetrationLength": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
@@ -712,7 +710,6 @@ def test_parse_pre_excavated_dept_with_void_inclination():
             "depth": [1.510000, 1.529999],
         }
     )
-    a = cpt.df.to_pandas()
 
     for column in cpt.df.columns:
         assert (
