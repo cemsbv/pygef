@@ -8,7 +8,7 @@ from warnings import warn
 import polars as pl
 from lxml import etree
 
-from pygef.common import Location
+from pygef.common import Location, VerticalDatumClass
 from pygef.cpt import QualityClass
 
 
@@ -227,6 +227,20 @@ def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> QualityClass:
         return QualityClass.Unknown
     warn(f"quality class '{val}' is unknown")
     return QualityClass.Unknown
+
+
+def parse_local_vertical_reference_point_class(
+    val: str, **kwargs: dict[Any, Any]
+) -> VerticalDatumClass:
+    val = val.lower().replace(" ", "")
+    if val == "nap":
+        return VerticalDatumClass.NAP
+    if val == "msl":
+        return VerticalDatumClass.MSL
+    if val == "lat":
+        return VerticalDatumClass.LAT
+    warn(f"vertical datum class '{val}' is unknown")
+    return VerticalDatumClass.Unknown
 
 
 def parse_position(pos: str) -> tuple[float, float]:

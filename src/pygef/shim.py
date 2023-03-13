@@ -7,9 +7,10 @@ from typing import Any
 
 from pygef import broxml
 from pygef.bore import BoreData
-from pygef.common import Location
+from pygef.common import Location, VerticalDatumClass
 from pygef.cpt import CPTData, QualityClass
-from pygef.gef.gef import _GefBore, _GefCpt
+from pygef.gef.parse_bore import _GefBore
+from pygef.gef.parse_cpt import _GefCpt
 
 GEF_ID = "#GEFID"
 
@@ -89,7 +90,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     )
     kwargs["standardized_location"] = None
     kwargs["bro_id"] = gef_cpt.project_id
-    kwargs["data"] = gef_cpt.df
+    kwargs["_data"] = gef_cpt.df
     kwargs["research_report_date"] = None
     kwargs["cpt_standard"] = None
     kwargs["groundwater_level"] = gef_cpt.groundwater_level
@@ -155,7 +156,9 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
         "zlm_pore_pressure_u3_after"
     ] = gef_cpt.zero_measurement_ppt_u3_after_penetration_test
     kwargs["delivered_vertical_position_offset"] = gef_cpt.zid
-    kwargs["delivered_vertical_position_datum"] = gef_cpt.height_system
+    kwargs["delivered_vertical_position_datum"] = VerticalDatumClass(
+        str(int(gef_cpt.height_system))
+    )
 
     # TODO! parse measurementtext 9 in gef?
     kwargs["delivered_vertical_position_reference_point"] = "unknown"

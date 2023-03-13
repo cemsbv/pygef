@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import List
 
 import polars as pl
@@ -13,6 +14,17 @@ class Location:
     srs_name: str
     x: float
     y: float
+
+
+class VerticalDatumClass(Enum):
+    """DataClass that holds the standardized vertical reference information"""
+
+    Unknown = "-1"
+    NAP = "31000"  # Normaal Amsterdams Peil
+    BOP = "32000"  # Ostend Level (GEF)
+    MSL = "49000"  # Mean Sea Level
+    LAT = "00001"  # Lowest Astronomical Tide
+    TAW = "32001"  # (GEF)
 
 
 def assign_multiple_columns(

@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import copy
+import functools
 import pprint
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
-from typing import Any
+from typing import Any, List
 
 import polars as pl
 
-from pygef.common import Location
+from pygef.common import Location, VerticalDatumClass
 
 
 class QualityClass(Enum):
@@ -63,7 +64,7 @@ class CPTData:
         zlm_pore_pressure_u1_after (float | None): zlm_pore_pressure_u1_after
         zlm_pore_pressure_u2_after (float | None): zlm_pore_pressure_u2_after
         zlm_pore_pressure_u3_after (float | None): zlm_pore_pressure_u3_after
-        data (pl.DataFrame): DataFrame
+        _data (pl.DataFrame): DataFrame
     """
 
     # dispatch_document cpt
@@ -105,10 +106,23 @@ class CPTData:
     zlm_pore_pressure_u2_after: float | None
     zlm_pore_pressure_u3_after: float | None
     delivered_vertical_position_offset: float | None
-    delivered_vertical_position_datum: str
+    delivered_vertical_position_datum: VerticalDatumClass
     delivered_vertical_position_reference_point: str
 
-    data: pl.DataFrame
+    _data: pl.DataFrame
+
+    @functools.cached_property
+    def data(self) -> pl.DataFrame:
+        return (
+            self._data.lazy()
+            .pipe(
+                calculate_elevation_with_respect_to_offset,
+                self.delivered_vertical_position_offset,
+                self._data.columns,
+            )
+            .pipe(calculate_friction_number, self._data.columns)
+            .collect()
+        )
 
     @property
     def columns(self) -> list[str]:
@@ -122,7 +136,8 @@ class CPTData:
         Get the attributes
         """
         attribs = copy.copy(self.__dict__)
-        attribs["data"] = attribs["data"].shape
+        attribs["data"] = attribs["_data"].shape
+        attribs.pop("_data")
         return attribs
 
     def display_attributes(self) -> str:
@@ -130,3 +145,26 @@ class CPTData:
         Get pretty formatted string representation of `CPTData.attributes``
         """
         return pprint.pformat(self.attributes())
+
+
+def calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyFrame:
+    if "localFriction" in columns and "coneResistance" in columns:
+        return lf.with_columns(
+            (
+                pl.col("localFriction")
+                / pl.when(pl.col("coneResistance") == 0.0)
+                .then(None)
+                .otherwise(pl.col("coneResistance"))
+                * 100.0
+            ).alias("frictionRatioComputed")
+        )
+    return lf
+
+
+def calculate_elevation_with_respect_to_offset(
+    lf: pl.LazyFrame, zid: float, columns: List[str]
+) -> pl.LazyFrame:
+    yname = "depth" if "depth" in columns else "penetrationLength"
+    return lf.with_columns(
+        (zid - pl.col(yname)).alias("elevation_with_respect_to_offset")
+    )
