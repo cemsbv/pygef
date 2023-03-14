@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+from typing_extensions import Literal
+
 from pygef.bore import BoreData
 from pygef.broxml.parse_bore import read_bore as read_bore_xml
 from pygef.broxml.parse_cpt import read_cpt as read_cpt_xml
@@ -34,14 +36,20 @@ def is_gef_file(file: io.BytesIO | Path | str) -> bool:
     raise FileNotFoundError("Could not find the GEF file.")
 
 
-def read_bore(file: io.BytesIO | Path | str, index: int = 0) -> BoreData:
+def read_bore(
+    file: io.BytesIO | Path | str,
+    index: int = 0,
+    engine: Literal["auto", "gef", "xml"] = "auto",
+) -> BoreData:
     """
     Parse the bore file. Can either be BytesIO, Path or str
 
     :param file: bore file
     :param index: only valid for xml files
+    :param engine: default is "auto". parsing engine.
+        Please note that auto engine checks if the files starts with `#GEFID`.
     """
-    if is_gef_file(file):
+    if engine == "gef" or is_gef_file(file) and engine == "auto":
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):
@@ -53,14 +61,21 @@ def read_bore(file: io.BytesIO | Path | str, index: int = 0) -> BoreData:
     return read_bore_xml(file)[index]
 
 
-def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
+def read_cpt(
+    file: io.BytesIO | Path | str,
+    index: int = 0,
+    engine: Literal["auto", "gef", "xml"] = "auto",
+) -> CPTData:
     """
     Parse the cpt file. Can either be BytesIO, Path or str
 
     :param file: bore file
     :param index: only valid for xml files
+    :param engine: default is "auto". parsing engine.
+        Please note that auto engine checks if the files starts with `#GEFID`.
     """
-    if is_gef_file(file):
+
+    if engine == "gef" or is_gef_file(file) and engine == "auto":
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):
@@ -69,7 +84,6 @@ def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
             return gef_cpt_to_cpt_data(_GefCpt(path=file))
         else:
             return gef_cpt_to_cpt_data(_GefCpt(string=file))
-
     return read_cpt_xml(file)[index]
 
 
