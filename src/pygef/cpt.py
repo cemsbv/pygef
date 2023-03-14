@@ -225,7 +225,7 @@ def _calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyF
 def _calculate_depth_with_respect_to_offset(
     lf: pl.LazyFrame, offset: float | None, columns: List[str]
 ) -> pl.LazyFrame:
-    """post-process function for CPT data creates a new column with the elevation with respect to offset"""
+    """Post-process function for CPT data creates a new column with the elevation with respect to offset"""
     if offset is None:
         return lf
     yname = "depth" if "depth" in columns else "penetrationLength"
