@@ -68,11 +68,14 @@ class CPTData:
             columns:
 
                 - penetrationLength [m]
-                - depth [m]
-                    penetrationLength corrected for inclination
+                - coneResistance [MPa]
+
+            optional columns:
+
                 - depthOffset [m wrt offset]
                     see delivered_vertical_position_datum for offset
-                - coneResistance [MPa]
+                - depth [m]
+                    penetrationLength corrected for inclination
                 - correctedConeResistance [MPa]
                 - netConeResistance [MPa]
                 - coneResistanceRatio

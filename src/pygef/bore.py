@@ -34,6 +34,11 @@ class BoreData:
 
                 - upperBoundary [m]
                 - lowerBoundary [m]
+                - geotechnicalSoilName
+                - soilDistribution
+
+            optional columns:
+
                 - upperBoundaryOffset [m wrt offset]
                     see delivered_vertical_position_datum for offset
                 - lowerBoundaryOffset [m wrt offset]
@@ -45,13 +50,11 @@ class BoreData:
                 - organicMatterPercentage [%]
                 - sandMedianClass
                 - gravelMedianClass
-                - geotechnicalSoilName
                 - geotechnicalSoilCode
                 - color
                 - remarks
                 - dispersedInhomogeneity
                 - organicMatterContentClass
-                - soilDistribution
     """
 
     # dispatch_document bhrgt
