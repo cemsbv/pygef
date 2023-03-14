@@ -162,13 +162,15 @@
 <h2>Cpt<a class="headerlink" href="#cpt" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pygef.shim.read_cpt">
-<span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_cpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_cpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_cpt" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_cpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_cpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_cpt" title="Permalink to this definition"></a></dt>
 <dd><p>Parse the cpt file. Can either be BytesIO, Path or str</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>io.BytesIO</em><em> | </em><em>Path</em><em> | </em><em>str</em>) – bore file</p></li>
 <li><p><strong>index</strong> (<em>int</em>) – only valid for xml files</p></li>
+<li><p><strong>engine</strong> (<em>Literal</em><em>[</em><em>'auto'</em><em>, </em><em>'gef'</em><em>, </em><em>'xml'</em><em>]</em>) – default is “auto”. parsing engine.
+Please note that auto engine checks if the files starts with <cite>#GEFID</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -744,13 +746,15 @@ columns:</p>
 <h2>Bore<a class="headerlink" href="#bore" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pygef.shim.read_bore">
-<span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_bore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_bore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_bore" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pygef.shim.</span></span><span class="sig-name descname"><span class="pre">read_bore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygef/shim.html#read_bore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygef.shim.read_bore" title="Permalink to this definition"></a></dt>
 <dd><p>Parse the bore file. Can either be BytesIO, Path or str</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>io.BytesIO</em><em> | </em><em>Path</em><em> | </em><em>str</em>) – bore file</p></li>
 <li><p><strong>index</strong> (<em>int</em>) – only valid for xml files</p></li>
+<li><p><strong>engine</strong> (<em>Literal</em><em>[</em><em>'auto'</em><em>, </em><em>'gef'</em><em>, </em><em>'xml'</em><em>]</em>) – default is “auto”. parsing engine.
+Please note that auto engine checks if the files starts with <cite>#GEFID</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

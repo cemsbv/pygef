@@ -79,6 +79,8 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+
 <span class="kn">from</span> <span class="nn">pygef.bore</span> <span class="kn">import</span> <span class="n">BoreData</span>
 <span class="kn">from</span> <span class="nn">pygef.broxml.parse_bore</span> <span class="kn">import</span> <span class="n">read_bore</span> <span class="k">as</span> <span class="n">read_bore_xml</span>
 <span class="kn">from</span> <span class="nn">pygef.broxml.parse_cpt</span> <span class="kn">import</span> <span class="n">read_cpt</span> <span class="k">as</span> <span class="n">read_cpt_xml</span>
@@ -108,14 +110,20 @@
     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not find the GEF file.&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="read_bore"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_bore">[docs]</a><span class="k">def</span> <span class="nf">read_bore</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoreData</span><span class="p">:</span>
+<div class="viewcode-block" id="read_bore"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_bore">[docs]</a><span class="k">def</span> <span class="nf">read_bore</span><span class="p">(</span>
+    <span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">engine</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;gef&quot;</span><span class="p">,</span> <span class="s2">&quot;xml&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoreData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse the bore file. Can either be BytesIO, Path or str</span>
 
 <span class="sd">    :param file: bore file</span>
 <span class="sd">    :param index: only valid for xml files</span>
+<span class="sd">    :param engine: default is &quot;auto&quot;. parsing engine.</span>
+<span class="sd">        Please note that auto engine checks if the files starts with `#GEFID`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;gef&quot;</span> <span class="ow">or</span> <span class="n">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="ow">and</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;an index &gt; 0 not supported for GEF files&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
@@ -127,14 +135,21 @@
     <span class="k">return</span> <span class="n">read_bore_xml</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="read_cpt"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_cpt">[docs]</a><span class="k">def</span> <span class="nf">read_cpt</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
+<div class="viewcode-block" id="read_cpt"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_cpt">[docs]</a><span class="k">def</span> <span class="nf">read_cpt</span><span class="p">(</span>
+    <span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">engine</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;gef&quot;</span><span class="p">,</span> <span class="s2">&quot;xml&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse the cpt file. Can either be BytesIO, Path or str</span>
 
 <span class="sd">    :param file: bore file</span>
 <span class="sd">    :param index: only valid for xml files</span>
+<span class="sd">    :param engine: default is &quot;auto&quot;. parsing engine.</span>
+<span class="sd">        Please note that auto engine checks if the files starts with `#GEFID`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;gef&quot;</span> <span class="ow">or</span> <span class="n">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="ow">and</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;an index &gt; 0 not supported for GEF files&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
@@ -143,7 +158,6 @@
             <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
-
     <span class="k">return</span> <span class="n">read_cpt_xml</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
 
 
