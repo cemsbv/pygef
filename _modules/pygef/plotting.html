@@ -79,7 +79,6 @@
 <span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="kn">from</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">import</span> <span class="n">GridSpec</span>
 
 <span class="kn">from</span> <span class="nn">pygef.bore</span> <span class="kn">import</span> <span class="n">BoreData</span>
@@ -94,29 +93,32 @@
 
 
 <div class="viewcode-block" id="plot_cpt"><a class="viewcode-back" href="../../tree/reference.html#pygef.plotting.plot_cpt">[docs]</a><span class="k">def</span> <span class="nf">plot_cpt</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="n">CPTData</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">CPTData</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">use_offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a plot with three axes.</span>
-<span class="sd">        - cone_resistance [Mpa]</span>
+<span class="sd">        - cone_resistance [MPa]</span>
 <span class="sd">        - friction_ratio [%] (twiny)</span>
 <span class="sd">        - friction [MPa] (twiny)</span>
 
 <span class="sd">    :param data: (BoreData) Bore data object</span>
 <span class="sd">    :param ax: (Axes, optional) Axes object used to add axes</span>
 <span class="sd">    :param dpi: (int, optional)  Default is 100 Resolution of the figure.</span>
+<span class="sd">    :param use_offset: (bool, optional)  Default is False Plot depth with respect to offset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
-        <span class="n">pl</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1e4</span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">otherwise</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">all</span><span class="p">())</span><span class="o">.</span><span class="n">keep_name</span><span class="p">()</span>
-    <span class="p">)</span>
-    <span class="n">yname</span> <span class="o">=</span> <span class="s2">&quot;depth&quot;</span> <span class="k">if</span> <span class="s2">&quot;depth&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="s2">&quot;penetrationLength&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">if</span> <span class="n">use_offset</span><span class="p">:</span>
+        <span class="n">yname</span> <span class="o">=</span> <span class="s2">&quot;depthOffset&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">yname</span> <span class="o">=</span> <span class="s2">&quot;depth&quot;</span> <span class="k">if</span> <span class="s2">&quot;depth&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="s2">&quot;penetrationLength&quot;</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FigureSize</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="n">p1</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">p11</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">p12</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
     <span class="n">p2</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ax3</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
@@ -165,7 +167,7 @@
 
     <span class="c1"># add data to figure</span>
     <span class="c1"># plot coneResistance</span>
-    <span class="k">if</span> <span class="s2">&quot;coneResistance&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;coneResistance&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="p">(</span><span class="n">p1</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
             <span class="n">df</span><span class="p">[</span><span class="s2">&quot;coneResistance&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">yname</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#2d2e87&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;coneResistance&quot;</span>
         <span class="p">)</span>
@@ -185,26 +187,47 @@
         <span class="p">)</span>
 
     <span class="c1"># plot computed frictionRatio</span>
-    <span class="k">if</span> <span class="s2">&quot;localFriction&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="s2">&quot;coneResistance&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;frictionRatioComputed&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="p">(</span><span class="n">p4</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;localFriction&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;coneResistance&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;frictionRatioComputed&quot;</span><span class="p">],</span>
             <span class="n">df</span><span class="p">[</span><span class="n">yname</span><span class="p">],</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;frictionRatio computed&quot;</span><span class="p">,</span>
             <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span>
             <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tab:gray&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+    <span class="c1"># add hlines</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">groundwater_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groundwater_level_offset</span> <span class="k">if</span> <span class="n">use_offset</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">groundwater_level</span>
+        <span class="n">p11</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;groundwater level: </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span>
+            <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">predrilled_depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">predrilled_depth_offset</span> <span class="k">if</span> <span class="n">use_offset</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">predrilled_depth</span>
+        <span class="n">p12</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;predrilled depth: </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tab:brown&quot;</span><span class="p">,</span>
+            <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># add legend</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
         <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper center&quot;</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;CPT: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">bro_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p4</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;CPT: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">alias</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">data</span><span class="o">.</span><span class="n">bro_id</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">data</span><span class="o">.</span><span class="n">bro_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p4</span><span class="p">,</span> <span class="n">p11</span><span class="p">,</span> <span class="n">p12</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">axes</span></div>
 
 
 <div class="viewcode-block" id="plot_bore"><a class="viewcode-back" href="../../tree/reference.html#pygef.plotting.plot_bore">[docs]</a><span class="k">def</span> <span class="nf">plot_bore</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="n">BoreData</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">BoreData</span><span class="p">,</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a plot with one axes.</span>
@@ -214,14 +237,21 @@
 <span class="sd">    :param ax: Axes object</span>
 <span class="sd">    :param dpi: Default is 100 Resolution of the figure.</span>
 <span class="sd">    :param legend: Default is True Add legend to the figure.</span>
+<span class="sd">    :param use_offset: (bool, optional)  Default is False Plot depth with respect to offset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">use_offset</span><span class="p">:</span>
+        <span class="n">yupper</span> <span class="o">=</span> <span class="s2">&quot;upperBoundaryOffset&quot;</span>
+        <span class="n">ylower</span> <span class="o">=</span> <span class="s2">&quot;lowerBoundaryOffset&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">yupper</span> <span class="o">=</span> <span class="s2">&quot;upperBoundary&quot;</span>
+        <span class="n">ylower</span> <span class="o">=</span> <span class="s2">&quot;lowerBoundary&quot;</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FigureSize</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span>
-    <span class="n">soil_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;soil_dist&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+    <span class="n">soil_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;soilDistribution&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
     <span class="n">cum_soil_dist</span> <span class="o">=</span> <span class="n">soil_dist</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># peat, clay, silt, sand, gravel, rocks</span>
@@ -233,7 +263,7 @@
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;upper_boundary&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lower_boundary&quot;</span><span class="p">])))</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">yupper</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">ylower</span><span class="p">])))</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">cum_soil_dist</span><span class="p">[:,</span> <span class="o">-</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span> <span class="mi">2</span><span class="p">),</span>
             <span class="n">color</span><span class="o">=</span><span class="n">legend_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
@@ -241,8 +271,8 @@
 
     <span class="c1"># add the name of the soil to the plot</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;lower_boundary&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;upper_boundary&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;upper_boundary&quot;</span><span class="p">]</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;geotechnical_soil_name&quot;</span><span class="p">],</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">ylower</span><span class="p">]</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="n">yupper</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">row</span><span class="p">[</span><span class="n">yupper</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;geotechnicalSoilName&quot;</span><span class="p">],</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
 
     <span class="c1"># add legend</span>
     <span class="k">if</span> <span class="n">legend</span><span class="p">:</span>
@@ -254,7 +284,7 @@
             <span class="n">handles</span><span class="o">=</span><span class="n">patches</span><span class="p">,</span>
             <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">,</span>
-            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;BHRgt: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">bro_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;BHRgt: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">alias</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">data</span><span class="o">.</span><span class="n">bro_id</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">data</span><span class="o">.</span><span class="n">bro_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ax</span></div>
@@ -290,21 +320,10 @@
     <span class="c1"># update depth to depth with respect to offset</span>
     <span class="c1"># in the Netherlands this is usually NAP</span>
     <span class="n">yname</span> <span class="o">=</span> <span class="s2">&quot;depth&quot;</span> <span class="k">if</span> <span class="s2">&quot;depth&quot;</span> <span class="ow">in</span> <span class="n">cpt_data</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="s2">&quot;penetrationLength&quot;</span>
-    <span class="n">cpt_data</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">cpt_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">cpt_data</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span> <span class="o">-</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">yname</span><span class="p">))</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="n">yname</span><span class="p">)</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">yname</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">bore_data</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">bore_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">bore_data</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span> <span class="o">-</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;lower_boundary&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span>
-            <span class="s2">&quot;lower_boundary&quot;</span>
-        <span class="p">),</span>
-        <span class="p">(</span><span class="n">bore_data</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span> <span class="o">-</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;upper_boundary&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span>
-            <span class="s2">&quot;upper_boundary&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
 
     <span class="c1"># fill axes and update ylabels</span>
-    <span class="n">_</span> <span class="o">=</span> <span class="n">plot_cpt</span><span class="p">(</span><span class="n">cpt_data</span><span class="p">,</span> <span class="n">ax1</span><span class="p">)</span>
-    <span class="n">_</span> <span class="o">=</span> <span class="n">plot_bore</span><span class="p">(</span><span class="n">bore_data</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plot_cpt</span><span class="p">(</span><span class="n">cpt_data</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">use_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plot_bore</span><span class="p">(</span><span class="n">bore_data</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">yname</span><span class="si">}</span><span class="s2"> [m w.r.t. vertical position offset]&quot;</span><span class="p">)</span>
     <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 

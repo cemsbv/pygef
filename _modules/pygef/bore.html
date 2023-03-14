@@ -76,22 +76,24 @@
 
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
 
-<span class="kn">from</span> <span class="nn">pygef.common</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">pygef.broxml.mapping</span> <span class="kn">import</span> <span class="n">MAPPING_PARAMETERS</span>
+<span class="kn">from</span> <span class="nn">pygef.common</span> <span class="kn">import</span> <span class="n">Location</span><span class="p">,</span> <span class="n">depth_to_offset</span>
 
 
-<div class="viewcode-block" id="BoreData"><a class="viewcode-back" href="../../tree/reference.html#pygef.bore.BoreData">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="BoreData"><a class="viewcode-back" href="../../tree/reference.html#pygef.bore.BoreData">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">BoreData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The Bore dataclass holds the information from the BHRgt object.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        bro_id (str | None): BRO ID of the BHRgt.</span>
+<span class="sd">        alias  (str | None): Alias of the CPT.</span>
 <span class="sd">        research_report_date (date): research report date</span>
 <span class="sd">        delivered_location (Location): delivered location in EPSG:28992 - RD new</span>
 <span class="sd">        groundwater_level (float | None): groundwater level</span>
@@ -102,6 +104,31 @@
 <span class="sd">        bore_rock_reached (bool): bore rock reached</span>
 <span class="sd">        final_bore_depth (float): final bore depth</span>
 <span class="sd">        data (pl.DataFrame): DataFrame</span>
+<span class="sd">            columns:</span>
+
+<span class="sd">                - upperBoundary [m]</span>
+<span class="sd">                - lowerBoundary [m]</span>
+<span class="sd">                - geotechnicalSoilName</span>
+<span class="sd">                - soilDistribution</span>
+
+<span class="sd">            optional columns:</span>
+
+<span class="sd">                - upperBoundaryOffset [m wrt offset]</span>
+<span class="sd">                    see delivered_vertical_position_datum for offset</span>
+<span class="sd">                - lowerBoundaryOffset [m wrt offset]</span>
+<span class="sd">                    see delivered_vertical_position_datum for offset</span>
+<span class="sd">                - lutumPercentage [%]</span>
+<span class="sd">                - siltPercentage [%]</span>
+<span class="sd">                - sandPercentage [%]</span>
+<span class="sd">                - gravelPercentage [%]</span>
+<span class="sd">                - organicMatterPercentage [%]</span>
+<span class="sd">                - sandMedianClass</span>
+<span class="sd">                - gravelMedianClass</span>
+<span class="sd">                - geotechnicalSoilCode</span>
+<span class="sd">                - color</span>
+<span class="sd">                - remarks</span>
+<span class="sd">                - dispersedInhomogeneity</span>
+<span class="sd">                - organicMatterContentClass</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># dispatch_document bhrgt</span>
@@ -120,9 +147,48 @@
     <span class="n">bore_hole_completed</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
 
+    <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># post-processing of the data</span>
+        <span class="n">tbl</span> <span class="o">=</span> <span class="n">MAPPING_PARAMETERS</span><span class="o">.</span><span class="n">dist_table</span><span class="p">()</span><span class="o">.</span><span class="n">lazy</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">lazy</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">pipe</span><span class="p">(</span>
+                <span class="n">_calculate_depth_with_respect_to_offset</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;geotechnicalSoilName&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="c1"># bypass FrozenInstanceError</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Columns names for the DataFrame&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">groundwater_level_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;groundwater level wrt offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">depth_to_offset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groundwater_level</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">final_sample_depth_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;final sample depth wrt offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">depth_to_offset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_sample_depth</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">final_depth_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;final depth wrt offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">depth_to_offset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_depth_offset</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;BoreData: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">display_attributes</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -140,6 +206,19 @@
 <span class="sd">        Get pretty formatted string representation of `CPTData.attributes``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">())</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_calculate_depth_with_respect_to_offset</span><span class="p">(</span>
+    <span class="n">lf</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">LazyFrame</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">LazyFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;post-process function for CPT data creates a new column with the elevation with respect to offset&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lf</span>
+
+    <span class="k">return</span> <span class="n">lf</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">offset</span> <span class="o">-</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;upperBoundary&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;upperBoundaryOffset&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">offset</span> <span class="o">-</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;lowerBoundary&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;lowerBoundaryOffset&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
 </pre></div>
 
            </div>

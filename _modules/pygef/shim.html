@@ -79,11 +79,13 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
-<span class="kn">from</span> <span class="nn">pygef</span> <span class="kn">import</span> <span class="n">broxml</span>
 <span class="kn">from</span> <span class="nn">pygef.bore</span> <span class="kn">import</span> <span class="n">BoreData</span>
-<span class="kn">from</span> <span class="nn">pygef.common</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">pygef.broxml.parse_bore</span> <span class="kn">import</span> <span class="n">read_bore</span> <span class="k">as</span> <span class="n">read_bore_xml</span>
+<span class="kn">from</span> <span class="nn">pygef.broxml.parse_cpt</span> <span class="kn">import</span> <span class="n">read_cpt</span> <span class="k">as</span> <span class="n">read_cpt_xml</span>
+<span class="kn">from</span> <span class="nn">pygef.common</span> <span class="kn">import</span> <span class="n">Location</span><span class="p">,</span> <span class="n">VerticalDatumClass</span>
 <span class="kn">from</span> <span class="nn">pygef.cpt</span> <span class="kn">import</span> <span class="n">CPTData</span><span class="p">,</span> <span class="n">QualityClass</span>
-<span class="kn">from</span> <span class="nn">pygef.gef.gef</span> <span class="kn">import</span> <span class="n">_GefBore</span><span class="p">,</span> <span class="n">_GefCpt</span>
+<span class="kn">from</span> <span class="nn">pygef.gef.parse_bore</span> <span class="kn">import</span> <span class="n">_GefBore</span>
+<span class="kn">from</span> <span class="nn">pygef.gef.parse_cpt</span> <span class="kn">import</span> <span class="n">_GefCpt</span>
 
 <span class="n">GEF_ID</span> <span class="o">=</span> <span class="s2">&quot;#GEFID&quot;</span>
 
@@ -122,7 +124,7 @@
             <span class="k">return</span> <span class="n">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">_GefBore</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">_GefBore</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">broxml</span><span class="o">.</span><span class="n">read_bore</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">read_bore_xml</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="read_cpt"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_cpt">[docs]</a><span class="k">def</span> <span class="nf">read_cpt</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
@@ -142,7 +144,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">broxml</span><span class="o">.</span><span class="n">read_cpt</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">read_cpt_xml</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
 
 
 <span class="k">def</span> <span class="nf">convert_height_system_to_vertical_datum</span><span class="p">(</span><span class="n">height_system</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -162,7 +164,8 @@
         <span class="n">y</span><span class="o">=</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;standardized_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bro_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">project_id</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bro_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;alias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">test_id</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">df</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;research_report_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cpt_standard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -229,7 +232,9 @@
         <span class="s2">&quot;zlm_pore_pressure_u3_after&quot;</span>
     <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u3_after_penetration_test</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_offset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zid</span>
-    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_datum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">height_system</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_datum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">VerticalDatumClass</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">height_system</span><span class="p">))</span>
+    <span class="p">)</span>
 
     <span class="c1"># TODO! parse measurementtext 9 in gef?</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_reference_point&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
@@ -247,7 +252,8 @@
         <span class="n">y</span><span class="o">=</span><span class="n">gef_bore</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;standardized_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bro_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_bore</span><span class="o">.</span><span class="n">project_id</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bro_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;alias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_bore</span><span class="o">.</span><span class="n">test_id</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;groundwater_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;research_report_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;description_procedure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
