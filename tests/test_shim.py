@@ -1,8 +1,21 @@
 import pytest
+from lxml.etree import XMLSyntaxError
 
 from pygef import read_cpt
 from pygef.common import Location, VerticalDatumClass
-from pygef.cpt import QualityClass
+from pygef.cpt import CPTData, QualityClass
+
+
+def test_engine(cpt_gef_1) -> None:
+    # read test with force incorrect engine
+    with pytest.raises(XMLSyntaxError):
+        read_cpt(cpt_gef_1, engine="xml")
+    # read test with force engine
+    gef = read_cpt(cpt_gef_1, engine="gef")
+    isinstance(gef, CPTData)
+    # read test with auto engine
+    gef = read_cpt(cpt_gef_1, engine="auto")
+    isinstance(gef, CPTData)
 
 
 @pytest.mark.parametrize("_type", ["string", "path", "byte"])
