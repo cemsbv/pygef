@@ -57,11 +57,11 @@ docutils==0.18.1
     # via
     #   sphinx
     #   sphinx-rtd-theme
-exceptiongroup==1.1.0
+exceptiongroup==1.1.1
     # via pytest
 executing==1.2.0
     # via stack-data
-fonttools==4.38.0
+fonttools==4.39.0
     # via matplotlib
 gef-file-to-map==0.1.0
     # via pygef (pyproject.toml)
@@ -130,11 +130,11 @@ pillow==9.4.0
     # via
     #   contextily
     #   matplotlib
-platformdirs==3.1.0
+platformdirs==3.1.1
     # via black
 pluggy==1.0.0
     # via pytest
-polars[pyarrow]==0.16.11
+polars[pyarrow]==0.16.13
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.38
     # via ipython
@@ -209,7 +209,7 @@ typing-extensions==4.5.0
     # via
     #   black
     #   polars
-urllib3==1.26.14
+urllib3==1.26.15
     # via requests
 wcwidth==0.2.6
     # via prompt-toolkit
