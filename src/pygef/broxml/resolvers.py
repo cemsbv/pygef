@@ -135,19 +135,15 @@ def process_bore_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataF
         word if word != "unknown" else geotechnical_soil_name_nen[i]
         for i, word in enumerate(geotechnical_soil_name_iso)
     ]
-    variables = locals()
     return pl.DataFrame(
         {
-            name: variables[name]
-            for name in [
-                "upper_boundary",
-                "lower_boundary",
-                "geotechnical_soil_name",
-                "color",
-                "dispersed_inhomogenity",
-                "organic_matter_content_class",
-                "sand_median_class",
-            ]
+            "upperBoundary": upper_boundary,
+            "lowerBoundary": lower_boundary,
+            "geotechnicalSoilName": geotechnical_soil_name,
+            "color": color,
+            "dispersedInhomogeneity": dispersed_inhomogenity,
+            "organicMatterContentClass": organic_matter_content_class,
+            "sandMedianClass": sand_median_class,
         }
     )
 

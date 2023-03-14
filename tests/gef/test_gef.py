@@ -491,7 +491,7 @@ def test_parse_add_info_as_string():
 
 
 def test_parse_data_soil_code():
-    df = pl.DataFrame({"soil_code": ["Kz", "Kz1", "Kz2"]})
+    df = pl.DataFrame({"geotechnicalSoilCode": ["Kz", "Kz1", "Kz2"]})
     data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
     df_parsed = _GefBore.parse_data_soil_code(pl.DataFrame({}), data_s)
     assert df_parsed.frame_equal(df, null_equal=True)
@@ -591,7 +591,7 @@ def test_parse_cpt():
             "penetrationLength": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
             "coneResistance": [0.0000e000, 7.1000e-001, 7.3000e-001, 6.9000e-001],
             "localFriction": [0.0000e000, 4.6500e-002, 4.2750e-002, 3.9000e-002],
-            "elevation_with_respect_to_offset": [1.3, 0.28, 0.26, 0.24],
+            "depthOffset": [1.3, 0.28, 0.26, 0.24],
             "frictionRatioComputed": [None, 6.54929577, 5.85616438, 5.65217391],
         }
     )
@@ -649,21 +649,20 @@ def test_parse_bore():
 
     df = cpt.df
     # No need to check beyond parse result
-    df.drop_in_place("soil_dist")
-    df.drop_in_place("geotechnical_soil_name")
+    df.drop_in_place("geotechnicalSoilName")
 
     expected = pl.DataFrame(
         {
-            "upper_boundary": [0.0, 1.2, 3.1],
-            "lower_boundary": [1.2, 3.1, 5.0],
-            "sand_median": [None, None, None],
-            "gravel_median": [None, None, None],
-            "lutum_percentage": [None, None, None],
-            "silt_percentage": [None, None, None],
-            "sand_percentage": [None, None, None],
-            "gravel_percentage": [None, None, None],
-            "organic_matter_percentage": [None, None, None],
-            "soil_code": ["Zgh2", "Zg", "Vz"],
+            "upperBoundary": [0.0, 1.2, 3.1],
+            "lowerBoundary": [1.2, 3.1, 5.0],
+            "sandMedianClass": [None, None, None],
+            "gravelMedianClass": [None, None, None],
+            "lutumPercentage": [None, None, None],
+            "siltPercentage": [None, None, None],
+            "sandPercentage": [None, None, None],
+            "gravelPercentage": [None, None, None],
+            "organicMatterPercentage": [None, None, None],
+            "geotechnicalSoilCode": ["Zgh2", "Zg", "Vz"],
             "remarks": [
                 "1) gray-yellow 2) ZMFO 3) kalkrijk ",
                 "1) ON 2) ZMGO 3) weinig fijn grind (1-25%) 4) kalkarm ",

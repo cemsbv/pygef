@@ -9,7 +9,7 @@ from typing import Any, List
 
 import polars as pl
 
-from pygef.common import Location, VerticalDatumClass
+from pygef.common import Location, VerticalDatumClass, depth_to_offset
 
 
 class QualityClass(Enum):
@@ -20,7 +20,7 @@ class QualityClass(Enum):
     Class4 = 4
 
 
-@dataclass
+@dataclass(frozen=True)
 class CPTData:
     """
     The CPT dataclass holds the information from the CPT object.
@@ -70,7 +70,7 @@ class CPTData:
                 - penetrationLength [m]
                 - depth [m]
                     penetrationLength corrected for inclination
-                - elevation_with_respect_to_offset [m wrt offset]
+                - depthOffset [m wrt offset]
                     see delivered_vertical_position_datum for offset
                 - coneResistance [MPa]
                 - correctedConeResistance [MPa]
@@ -150,21 +150,44 @@ class CPTData:
 
     def __post_init__(self):
         # post-processing of the data
-        self.data = (
+        df = (
             self.data.lazy()
             .pipe(
-                calculate_elevation_with_respect_to_offset,
+                _calculate_depth_with_respect_to_offset,
                 self.delivered_vertical_position_offset,
                 self.data.columns,
             )
-            .pipe(calculate_friction_number, self.data.columns)
+            .pipe(_calculate_friction_number, self.data.columns)
             .collect()
         )
+        # bypass FrozenInstanceError
+        object.__setattr__(self, "data", df)
 
     @property
     def columns(self) -> list[str]:
         """Columns names for the DataFrame"""
         return self.data.columns
+
+    @property
+    def groundwater_level_offset(self) -> float | None:
+        """groundwater level wrt offset"""
+        return depth_to_offset(
+            self.groundwater_level, offset=self.delivered_vertical_position_offset
+        )
+
+    @property
+    def predrilled_depth_offset(self) -> float | None:
+        """predrilled depth wrt offset"""
+        return depth_to_offset(
+            self.predrilled_depth, offset=self.delivered_vertical_position_offset
+        )
+
+    @property
+    def final_depth_offset(self) -> float | None:
+        """final depth wrt offset"""
+        return depth_to_offset(
+            self.final_depth_offset, offset=self.delivered_vertical_position_offset
+        )
 
     def __str__(self):
         return f"CPTData: {self.display_attributes()}"
@@ -184,7 +207,7 @@ class CPTData:
         return pprint.pformat(self.attributes())
 
 
-def calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyFrame:
+def _calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyFrame:
     """post-process function for CPT data, creates a new column with the computed frictionRatio"""
     if "localFriction" in columns and "coneResistance" in columns:
         return lf.with_columns(
@@ -199,11 +222,11 @@ def calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyFr
     return lf
 
 
-def calculate_elevation_with_respect_to_offset(
-    lf: pl.LazyFrame, zid: float, columns: List[str]
+def _calculate_depth_with_respect_to_offset(
+    lf: pl.LazyFrame, offset: float | None, columns: List[str]
 ) -> pl.LazyFrame:
     """post-process function for CPT data creates a new column with the elevation with respect to offset"""
+    if offset is None:
+        return lf
     yname = "depth" if "depth" in columns else "penetrationLength"
-    return lf.with_columns(
-        (zid - pl.col(yname)).alias("elevation_with_respect_to_offset")
-    )
+    return lf.with_columns((offset - pl.col(yname)).alias("depthOffset"))

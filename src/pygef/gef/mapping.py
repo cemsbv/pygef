@@ -287,15 +287,15 @@ class _MappingParameters:
 
 MAPPING_PARAMETERS = _MappingParameters()
 COLUMN_NAMES_BORE = [
-    "upper_boundary",  # 1
-    "lower_boundary",  # 2
-    "lutum_percentage",  # 3
-    "silt_percentage",  # 4
-    "sand_percentage",  # 5
-    "gravel_percentage",  # 6
-    "organic_matter_percentage",  # 7
-    "sand_median",  # 8
-    "gravel_median",  # 9
+    "upperBoundary",  # 1
+    "lowerBoundary",  # 2
+    "lutumPercentage",  # 3
+    "siltPercentage",  # 4
+    "sandPercentage",  # 5
+    "gravelPercentage",  # 6
+    "organicMatterPercentage",  # 7
+    "sandMedianClass",  # 8
+    "gravelMedianClass",  # 9
 ]
 MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE = dict(enumerate(COLUMN_NAMES_BORE, 1))
 MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT = {

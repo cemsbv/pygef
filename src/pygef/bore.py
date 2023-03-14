@@ -8,10 +8,11 @@ from typing import Any
 
 import polars as pl
 
-from pygef.common import Location
+from pygef.broxml.mapping import MAPPING_PARAMETERS
+from pygef.common import Location, depth_to_offset
 
 
-@dataclass
+@dataclass(frozen=True)
 class BoreData:
     """
     The Bore dataclass holds the information from the BHRgt object.
@@ -31,21 +32,26 @@ class BoreData:
         data (pl.DataFrame): DataFrame
             columns:
 
-                - upper_boundary [m]
-                - lower_boundary [m]
-                - lutum_percentage [%]
-                - silt_percentage [%]
-                - sand_percentage [%]
-                - gravel_percentage [%]
-                - organic_matter_percentage [%]
-                - sand_median
-                - gravel_median
-                - geotechnical_soil_name
+                - upperBoundary [m]
+                - lowerBoundary [m]
+                - upperBoundaryOffset [m wrt offset]
+                    see delivered_vertical_position_datum for offset
+                - lowerBoundaryOffset [m wrt offset]
+                    see delivered_vertical_position_datum for offset
+                - lutumPercentage [%]
+                - siltPercentage [%]
+                - sandPercentage [%]
+                - gravelPercentage [%]
+                - organicMatterPercentage [%]
+                - sandMedianClass
+                - gravelMedianClass
+                - geotechnicalSoilName
+                - geotechnicalSoilCode
                 - color
-                - dispersed_inhomogenity
-                - organic_matter_content_class
-                - sand_median_class
-                - soil_dist
+                - remarks
+                - dispersedInhomogeneity
+                - organicMatterContentClass
+                - soilDistribution
     """
 
     # dispatch_document bhrgt
@@ -66,10 +72,46 @@ class BoreData:
 
     alias: str | None = field(default=None)
 
+    def __post_init__(self):
+        # post-processing of the data
+        tbl = MAPPING_PARAMETERS.dist_table().lazy()
+        df = (
+            self.data.lazy()
+            .pipe(
+                _calculate_depth_with_respect_to_offset,
+                self.delivered_vertical_position_offset,
+            )
+            .join(tbl, on="geotechnicalSoilName", how="left")
+            .collect()
+        )
+        # bypass FrozenInstanceError
+        object.__setattr__(self, "data", df)
+
     @property
     def columns(self) -> list[str]:
         """Columns names for the DataFrame"""
         return self.data.columns
+
+    @property
+    def groundwater_level_offset(self) -> float | None:
+        """groundwater level wrt offset"""
+        return depth_to_offset(
+            self.groundwater_level, offset=self.delivered_vertical_position_offset
+        )
+
+    @property
+    def final_sample_depth_offset(self) -> float | None:
+        """final sample depth wrt offset"""
+        return depth_to_offset(
+            self.final_sample_depth, offset=self.delivered_vertical_position_offset
+        )
+
+    @property
+    def final_depth_offset(self) -> float | None:
+        """final depth wrt offset"""
+        return depth_to_offset(
+            self.final_depth_offset, offset=self.delivered_vertical_position_offset
+        )
 
     def __str__(self):
         return f"BoreData: {self.display_attributes()}"
@@ -87,3 +129,16 @@ class BoreData:
         Get pretty formatted string representation of `CPTData.attributes``
         """
         return pprint.pformat(self.attributes())
+
+
+def _calculate_depth_with_respect_to_offset(
+    lf: pl.LazyFrame, offset: float | None
+) -> pl.LazyFrame:
+    """post-process function for CPT data creates a new column with the elevation with respect to offset"""
+    if offset is None:
+        return lf
+
+    return lf.with_columns(
+        (offset - pl.col("upperBoundary")).alias("upperBoundaryOffset"),
+        (offset - pl.col("lowerBoundary")).alias("lowerBoundaryOffset"),
+    )

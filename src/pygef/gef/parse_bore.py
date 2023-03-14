@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import polars as pl
 
-from pygef.broxml.mapping import MAPPING_PARAMETERS
 from pygef.gef import utils
 from pygef.gef.gef import _Gef, parse_all_columns_info, replace_column_void
 from pygef.gef.mapping import MAP_QUANTITY_NUMBER_COLUMN_NAME_BORE
 
 
 class _GefBore(_Gef):
-    def __init__(self, path=None, string=None, include_soil_dist: bool = True):
+    def __init__(self, path=None, string=None):
         """
         Parser of the borehole file.
 
@@ -19,8 +18,6 @@ class _GefBore(_Gef):
             Path to the *.gef file.
         string: str
             String version of the *.gef file.
-        include_soil_dist: bool
-            Map the soil distribution to the dataframe
         """
         super().__init__(path=path, string=string)
         if self.type == "bore":
@@ -66,9 +63,6 @@ class _GefBore(_Gef):
             .pipe(self.map_soil_code_to_soil_name, data_rows_soil)
         )
 
-        if include_soil_dist:
-            tbl = MAPPING_PARAMETERS.dist_table()
-            self.df = self.df.join(tbl, on="geotechnical_soil_name", how="left")
         # Remove the rows with null values
         self.df.drop_nulls()
 
@@ -96,7 +90,7 @@ class _GefBore(_Gef):
         # return df.with_columns(pl.Series("soil_code", data_rows_soil).apply(utils.parse_soil_code))
         return df.with_columns(
             pl.Series(
-                "soil_code",
+                "geotechnicalSoilCode",
                 list(map(lambda x: utils.parse_soil_code(x[0]), data_rows_soil)),
             )
         )
@@ -106,7 +100,7 @@ class _GefBore(_Gef):
         # return df.with_columns(pl.Series("soil_code", data_rows_soil).apply(utils.parse_soil_code))
         return df.with_columns(
             pl.Series(
-                "geotechnical_soil_name",
+                "geotechnicalSoilName",
                 list(
                     map(
                         lambda x: utils.parse_soil_name(utils.parse_soil_code(x[0])),

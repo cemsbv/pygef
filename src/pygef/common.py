@@ -52,23 +52,27 @@ def kpa_to_mpa(df: pl.DataFrame, columns: List[str]) -> pl.DataFrame:
     return assign_multiple_columns(df, columns, df[columns] * 10**-3)
 
 
-def nap_to_depth(zid: float, ref: float) -> float:
+def offset_to_depth(ref: float | None, offset: float | None) -> float | None:
     """
     Transform depth with respect to reference level to depth
 
-    :param zid: surface reference level
+    :param offset: surface reference level
     :param ref: z
     :return: depth
     """
-    return -(ref - zid)
+    if offset is None or ref is None:
+        return None
+    return -(ref - offset)
 
 
-def depth_to_nap(zid: float, depth: float) -> float:
+def depth_to_offset(depth: float | None, offset: float | None) -> float | None:
     """
     Transform depth to depth with respect to reference level
 
-    :param zid: surface reference level
+    :param offset: surface reference level
     :param depth: z
     :return: depth with respect to reference level
     """
-    return zid - depth
+    if offset is None or depth is None:
+        return None
+    return offset - depth

@@ -5,8 +5,9 @@ import os
 from pathlib import Path
 from typing import Any
 
-from pygef import broxml
 from pygef.bore import BoreData
+from pygef.broxml.parse_bore import read_bore as read_bore_xml
+from pygef.broxml.parse_cpt import read_cpt as read_cpt_xml
 from pygef.common import Location, VerticalDatumClass
 from pygef.cpt import CPTData, QualityClass
 from pygef.gef.parse_bore import _GefBore
@@ -49,7 +50,7 @@ def read_bore(file: io.BytesIO | Path | str, index: int = 0) -> BoreData:
             return gef_bore_to_bore_data(_GefBore(path=file))
         else:
             return gef_bore_to_bore_data(_GefBore(string=file))
-    return broxml.read_bore(file)[index]
+    return read_bore_xml(file)[index]
 
 
 def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
@@ -69,7 +70,7 @@ def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
         else:
             return gef_cpt_to_cpt_data(_GefCpt(string=file))
 
-    return broxml.read_cpt(file)[index]
+    return read_cpt_xml(file)[index]
 
 
 def convert_height_system_to_vertical_datum(height_system: float) -> str:

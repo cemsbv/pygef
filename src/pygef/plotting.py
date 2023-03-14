@@ -5,7 +5,6 @@ from typing import List, Tuple
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
-import polars as pl
 from matplotlib.gridspec import GridSpec
 
 from pygef.bore import BoreData
@@ -20,7 +19,7 @@ FigureSize = (8, 12)
 
 
 def plot_cpt(
-    data: CPTData, ax: plt.Axes | None = None, dpi: int = 100
+    data: CPTData, ax: plt.Axes | None = None, dpi: int = 100, use_offset: bool = False
 ) -> Tuple[plt.Axes, plt.Axes, plt.Axes]:
     """
     Create a plot with three axes.
@@ -31,12 +30,13 @@ def plot_cpt(
     :param data: (BoreData) Bore data object
     :param ax: (Axes, optional) Axes object used to add axes
     :param dpi: (int, optional)  Default is 100 Resolution of the figure.
+    :param use_offset: (bool, optional)  Default is False Plot depth with respect to offset.
     """
-
-    df = data.data.select(
-        pl.when(pl.all().abs() > 1e4).then(None).otherwise(pl.all()).keep_name()
-    )
-    yname = "depth" if "depth" in df.columns else "penetrationLength"
+    df = data.data
+    if use_offset:
+        yname = "depthOffset"
+    else:
+        yname = "depth" if "depth" in data.columns else "penetrationLength"
 
     if ax is None:
         fig = plt.figure(figsize=FigureSize, dpi=dpi, layout="tight")
@@ -93,7 +93,7 @@ def plot_cpt(
 
     # add data to figure
     # plot coneResistance
-    if "coneResistance" in df.columns:
+    if "coneResistance" in data.columns:
         (p1,) = ax.plot(
             df["coneResistance"], df[yname], color="#2d2e87", label="coneResistance"
         )
@@ -123,16 +123,18 @@ def plot_cpt(
         )
     # add hlines
     if data.groundwater_level is not None:
+        value = data.groundwater_level_offset if use_offset else data.groundwater_level
         p11 = ax.axhline(
-            data.groundwater_level,
-            label=f"groundwater level: {data.groundwater_level:.2f}",
+            value,
+            label=f"groundwater level: {value:.2f}",
             color="tab:blue",
             ls="dashed",
         )
     if data.predrilled_depth is not None:
+        value = data.predrilled_depth_offset if use_offset else data.predrilled_depth
         p12 = ax.axhline(
-            data.predrilled_depth,
-            label=f"predrilled depth: {data.predrilled_depth:.2f}",
+            value,
+            label=f"predrilled depth: {value:.2f}",
             color="tab:brown",
             ls="dashed",
         )
@@ -147,7 +149,11 @@ def plot_cpt(
 
 
 def plot_bore(
-    data: BoreData, ax: plt.Axes | None = None, dpi: int = 100, legend: bool = True
+    data: BoreData,
+    ax: plt.Axes | None = None,
+    dpi: int = 100,
+    legend: bool = True,
+    use_offset: bool = False,
 ) -> plt.Axes:
     """
     Create a plot with one axes.
@@ -157,14 +163,21 @@ def plot_bore(
     :param ax: Axes object
     :param dpi: Default is 100 Resolution of the figure.
     :param legend: Default is True Add legend to the figure.
+    :param use_offset: (bool, optional)  Default is False Plot depth with respect to offset.
     """
+    if use_offset:
+        yupper = "upperBoundaryOffset"
+        ylower = "lowerBoundaryOffset"
+    else:
+        yupper = "upperBoundary"
+        ylower = "lowerBoundary"
 
     if ax is None:
         fig = plt.figure(figsize=FigureSize, dpi=dpi, layout="tight")
         ax = fig.subplots(1, 1)
 
     df = data.data
-    soil_dist = np.stack(df["soil_dist"].to_numpy())
+    soil_dist = np.stack(df["soilDistribution"].to_numpy())
     cum_soil_dist = soil_dist.cumsum(axis=1)
 
     # peat, clay, silt, sand, gravel, rocks
@@ -176,7 +189,7 @@ def plot_bore(
 
     for i in range(5):
         ax.fill_betweenx(
-            np.array(list(zip(df["upper_boundary"], df["lower_boundary"]))).flatten(),
+            np.array(list(zip(df[yupper], df[ylower]))).flatten(),
             np.zeros(df.shape[0] * 2),
             np.repeat(cum_soil_dist[:, -(i + 1)], 2),
             color=legend_colors[i],
@@ -184,8 +197,8 @@ def plot_bore(
 
     # add the name of the soil to the plot
     for row in df.rows(named=True):
-        y = (row["lower_boundary"] - row["upper_boundary"]) / 2 + row["upper_boundary"]
-        ax.annotate(text=row["geotechnical_soil_name"], xy=(0.25, y))
+        y = (row[ylower] - row[yupper]) / 2 + row[yupper]
+        ax.annotate(text=row["geotechnicalSoilName"], xy=(0.25, y))
 
     # add legend
     if legend:
@@ -233,35 +246,10 @@ def plot_merge(
     # update depth to depth with respect to offset
     # in the Netherlands this is usually NAP
     yname = "depth" if "depth" in cpt_data.columns else "penetrationLength"
-    cpt_data.data = cpt_data.data.with_columns(
-        (cpt_data.delivered_vertical_position_offset - pl.col(yname)).alias(yname)
-    ).sort(yname, descending=True)
-    bore_data.data = bore_data.data.with_columns(
-        (bore_data.delivered_vertical_position_offset - pl.col("lower_boundary")).alias(
-            "lower_boundary"
-        ),
-        (bore_data.delivered_vertical_position_offset - pl.col("upper_boundary")).alias(
-            "upper_boundary"
-        ),
-    )
-    if (
-        cpt_data.groundwater_level is not None
-        and cpt_data.delivered_vertical_position_offset is not None
-    ):
-        cpt_data.groundwater_level = (
-            cpt_data.delivered_vertical_position_offset - cpt_data.groundwater_level
-        )
-    if (
-        cpt_data.predrilled_depth is not None
-        and cpt_data.delivered_vertical_position_offset is not None
-    ):
-        cpt_data.predrilled_depth = (
-            cpt_data.delivered_vertical_position_offset - cpt_data.predrilled_depth
-        )
 
     # fill axes and update ylabels
-    _ = plot_cpt(cpt_data, ax1)
-    _ = plot_bore(bore_data, ax2, legend=False)
+    _ = plot_cpt(cpt_data, ax1, use_offset=True)
+    _ = plot_bore(bore_data, ax2, legend=False, use_offset=True)
     ax1.set_ylabel(f"{yname} [m w.r.t. vertical position offset]")
     ax2.set_ylabel("")
 
