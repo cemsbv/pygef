@@ -7,22 +7,14 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
-import polars.testing
 import pytest
 
-import pygef.gef.geo as geo
 import pygef.gef.utils as utils
 from pygef import common, exceptions, plotting, read_bore, read_cpt
-from pygef.gef.gef import (
-    MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT,
-    _GefBore,
-    _GefCpt,
-    calculate_friction_number,
-    correct_depth_with_inclination,
-    correct_pre_excavated_depth,
-    parse_all_columns_info,
-    replace_column_void,
-)
+from pygef.gef.gef import parse_all_columns_info, replace_column_void
+from pygef.gef.mapping import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
+from pygef.gef.parse_bore import _GefBore
+from pygef.gef.parse_cpt import _GefCpt, correct_pre_excavated_depth
 
 BasePath = os.path.dirname(__file__)
 
@@ -188,7 +180,7 @@ def test_parse_cpt_class():
             ]
         ]
     }
-    v = utils.parse_cpt_class(s)
+    v = utils.parse_cpt_class(h)
     np.testing.assert_almost_equal(v, 2.0)
 
 
@@ -365,7 +357,7 @@ def test_parse_all_column_info():
     dictionary = MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 
     s = r"#COLUMNINFO= 1, m, Sondeerlengte, 1"
-    ans = ([1], ["m"], ["penetration_length"], [1])
+    ans = ([1], ["m"], ["penetrationLength"], [1])
     v = parse_all_columns_info(s, dictionary)
     assert v == ans
 
@@ -374,7 +366,7 @@ def test_parse_all_column_info():
     assert v == ans
 
     s = r"#COLUMNINFO= 7, m, Gecorrigeerde diepte, 11"
-    ans = ([7], ["m"], ["corrected_depth"], [11])
+    ans = ([7], ["m"], ["depth"], [11])
     v = parse_all_columns_info(s, dictionary)
     assert v == ans
 
@@ -383,7 +375,7 @@ def test_parse_all_column_info():
     assert v == ans
 
     s = r"#COLUMNINFO= 4, %, Wrijvingsgetal Rf, 4"
-    ans = ([4], ["%"], ["friction_number"], [4])
+    ans = ([4], ["%"], ["frictionRatio"], [4])
     v = parse_all_columns_info(s, dictionary)
     assert v == ans
 
@@ -392,7 +384,7 @@ def test_parse_all_column_info():
     assert v == ans
 
     s = r"#COLUMNINFO= 4, Graden(deg), Helling, 8"
-    ans = ([4], ["Graden(deg)"], ["inclination"], [8])
+    ans = ([4], ["Graden(deg)"], ["inclinationResultant"], [8])
     v = parse_all_columns_info(s, dictionary)
     assert v == ans
 
@@ -499,95 +491,10 @@ def test_parse_add_info_as_string():
 
 
 def test_parse_data_soil_code():
-    df = pl.DataFrame({"soil_code": ["Kz", "Kz1", "Kz2"]})
+    df = pl.DataFrame({"geotechnicalSoilCode": ["Kz", "Kz1", "Kz2"]})
     data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
     df_parsed = _GefBore.parse_data_soil_code(pl.DataFrame({}), data_s)
     assert df_parsed.frame_equal(df, null_equal=True)
-
-
-def test_calculate_elevation_respect_to_NAP():
-    df1 = pl.DataFrame({"depth": [0.0, 1.0, 2.0, 3.0, 4.0]})
-    zid = -3
-    df_calculated = df1.with_columns(
-        _GefCpt.calculate_elevation_with_respect_to_nap(zid, 31000)
-    )
-    df = pl.DataFrame(
-        {
-            "depth": [0.0, 1.0, 2.0, 3.0, 4.0],
-            "elevation_with_respect_to_nap": [-3.0, -4.0, -5.0, -6.0, -7.0],
-        }
-    )
-    assert df_calculated.frame_equal(df, null_equal=True)
-
-
-def test_correct_depth_with_inclination():
-    df1 = pl.DataFrame({"penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8]})
-    df_calculated = df1.with_columns(correct_depth_with_inclination(df1.columns))
-    df = pl.DataFrame(
-        {
-            "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
-            "depth": [0.0, 0.2, 0.4, 0.6, 0.8],
-        }
-    )
-    assert df_calculated.frame_equal(df, null_equal=True)
-
-    df2 = pl.DataFrame(
-        {
-            "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
-            "inclination": [45, 45, 45, 45, 45],
-        }
-    )
-    df_calculated = df2.with_columns(correct_depth_with_inclination(df2.columns))
-    df = pl.DataFrame(
-        {
-            "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
-            "inclination": [45, 45, 45, 45, 45],
-            "depth": [
-                0.0,
-                0.14142135623730953,
-                0.28284271247461906,
-                0.42426406871192857,
-                0.5656854249492381,
-            ],
-        }
-    )
-    assert np.isclose(df_calculated["depth"], df["depth"]).all()
-
-    df2 = pl.DataFrame(
-        {
-            "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
-            "corrected_depth": [0.0, 0.10, 0.25, 0.40, 0.60],
-            "inclination": [45, 45, 45, 45, 45],
-        }
-    )
-    df_calculated = df2.with_columns(correct_depth_with_inclination(df2.columns))
-    df = pl.DataFrame(
-        {
-            "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
-            "depth": [0.0, 0.10, 0.25, 0.40, 0.60],
-            "inclination": [45, 45, 45, 45, 45],
-        }
-    )
-    assert np.isclose(df_calculated["depth"], df["depth"]).all()
-
-
-def test_negative_corrected_depth():
-    df2 = pl.DataFrame(
-        {
-            "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
-            "corrected_depth": [-0.0, -0.10, -0.25, -0.40, -0.60],
-            "inclination": [45, 45, 45, 45, 45],
-        }
-    )
-    df_calculated = df2.with_columns(correct_depth_with_inclination(df2.columns))
-    df = pl.DataFrame(
-        {
-            "penetration_length": [0.0, 0.2, 0.4, 0.6, 0.8],
-            "depth": [0.0, 0.10, 0.25, 0.40, 0.60],
-            "inclination": [45, 45, 45, 45, 45],
-        }
-    )
-    assert np.isclose(df_calculated["depth"], df["depth"]).all()
 
 
 def test_parse_column_void():
@@ -607,64 +514,50 @@ def test_parse_column_void():
 def test_pre_excavated_depth():
     df1 = pl.DataFrame(
         {
-            "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
-            "qc": [0.5, 0.5, 0.6, 0.7, 0.8],
+            "penetrationLength": [0.0, 1.0, 2.0, 3.0, 4.0],
+            "coneResistance": [0.5, 0.5, 0.6, 0.7, 0.8],
         }
     )
     pre_excavated_depth = 2
     df_calculated = correct_pre_excavated_depth(df1, pre_excavated_depth)
-    df = pl.DataFrame({"penetration_length": [2.0, 3.0, 4.0], "qc": [0.6, 0.7, 0.8]})
+    df = pl.DataFrame(
+        {"penetrationLength": [2.0, 3.0, 4.0], "coneResistance": [0.6, 0.7, 0.8]}
+    )
     assert df_calculated.frame_equal(df, null_equal=True)
 
 
 def test_replace_column_void():
     void_value = 999.0
-    column_void = {"penetration_length": void_value, "qc": void_value}
+    column_void = {"penetrationLength": void_value, "coneResistance": void_value}
     df1 = pl.DataFrame(
         {
-            "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
-            "qc": [void_value, 0.5, 0.6, 0.7, 0.8],
+            "penetrationLength": [0.0, 1.0, 2.0, 3.0, 4.0],
+            "coneResistance": [void_value, 0.5, 0.6, 0.7, 0.8],
         }
     )
     df_calculated = replace_column_void(df1, column_void)
     df = pl.DataFrame(
         {
-            "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
-            "qc": [None, 0.5, 0.6, 0.7, 0.8],
+            "penetrationLength": [0.0, 1.0, 2.0, 3.0, 4.0],
+            "coneResistance": [None, 0.5, 0.6, 0.7, 0.8],
         }
     )
     assert df_calculated.frame_equal(df, null_equal=True)
 
     df1 = pl.DataFrame(
         {
-            "penetration_length": [0.0, 1.0, 2.0, 3.0, 4.0],
-            "qc": [None, 0.5, 0.6, None, 0.8],
+            "penetrationLength": [0.0, 1.0, 2.0, 3.0, 4.0],
+            "coneResistance": [None, 0.5, 0.6, None, 0.8],
         }
     )
 
     df_calculated = replace_column_void(df1, column_void)
-    assert df_calculated.frame_equal(df, null_equal=True)
-
-
-def test_calculate_friction_number():
-    df1 = pl.DataFrame(
-        {"qc": [0.5, 0.5, 0.6, 0.7, 0.8], "fs": [0.0, 0.05, 0.06, 0.07, 0.08]}
-    )
-    df_calculated = df1.with_columns(calculate_friction_number(df1.columns))
-    df = pl.DataFrame(
-        {
-            "qc": [0.5, 0.5, 0.6, 0.7, 0.8],
-            "fs": [0.0, 0.05, 0.06, 0.07, 0.08],
-            "friction_number": [0.0, 10.0, 10.0, 10.000000000000002, 10.0],
-        }
-    )
     assert df_calculated.frame_equal(df, null_equal=True)
 
 
 def test_parse_cpt():
-    cpt = _GefCpt(
-        string="""
-#GEFID= 1, 1, 0
+    cpt = read_cpt(
+        """#GEFID= 1, 1, 0
 #FILEOWNER= Wagen 2
 #FILEDATE= 2004, 1, 14
 #PROJECTID= CPT, 146203
@@ -691,15 +584,15 @@ def test_parse_cpt():
 1.0600e+000 6.9000e-001 3.9000e-002
 """
     )
-    df_calculated = cpt.df
+    df_calculated = cpt.data
+
     df = pl.DataFrame(
         {
-            "penetration_length": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
+            "penetrationLength": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
             "coneResistance": [0.0000e000, 7.1000e-001, 7.3000e-001, 6.9000e-001],
             "localFriction": [0.0000e000, 4.6500e-002, 4.2750e-002, 3.9000e-002],
-            "depth": [0.0000e000, 1.0200e000, 1.0400e000, 1.0600e000],
-            "elevation_with_respect_to_nap": [1.3, 0.28, 0.26, 0.24],
-            "frictionRatio": [None, 6.54929577, 5.85616438, 5.65217391],
+            "depthOffset": [1.3, 0.28, 0.26, 0.24],
+            "frictionRatioComputed": [None, 6.54929577, 5.85616438, 5.65217391],
         }
     )
 
@@ -756,21 +649,20 @@ def test_parse_bore():
 
     df = cpt.df
     # No need to check beyond parse result
-    df.drop_in_place("soil_dist")
-    df.drop_in_place("geotechnical_soil_name")
+    df.drop_in_place("geotechnicalSoilName")
 
     expected = pl.DataFrame(
         {
-            "upper_boundary": [0.0, 1.2, 3.1],
-            "lower_boundary": [1.2, 3.1, 5.0],
-            "sand_median": [None, None, None],
-            "gravel_median": [None, None, None],
-            "lutum_percentage": [None, None, None],
-            "silt_percentage": [None, None, None],
-            "sand_percentage": [None, None, None],
-            "gravel_percentage": [None, None, None],
-            "organic_matter_percentage": [None, None, None],
-            "soil_code": ["Zgh2", "Zg", "Vz"],
+            "upperBoundary": [0.0, 1.2, 3.1],
+            "lowerBoundary": [1.2, 3.1, 5.0],
+            "sandMedianClass": [None, None, None],
+            "gravelMedianClass": [None, None, None],
+            "lutumPercentage": [None, None, None],
+            "siltPercentage": [None, None, None],
+            "sandPercentage": [None, None, None],
+            "gravelPercentage": [None, None, None],
+            "organicMatterPercentage": [None, None, None],
+            "geotechnicalSoilCode": ["Zgh2", "Zg", "Vz"],
             "remarks": [
                 "1) gray-yellow 2) ZMFO 3) kalkrijk ",
                 "1) ON 2) ZMGO 3) weinig fijn grind (1-25%) 4) kalkarm ",
@@ -808,66 +700,22 @@ def test_parse_pre_excavated_dept_with_void_inclination():
     )
     expected = pl.DataFrame(
         {
-            "penetration_length": [1.51, 1.53],
+            "penetrationLength": [1.51, 1.53],
             "coneResistance": [9.1800, 9.3044],
             "localFriction": [0.053238, 0.053803],
-            "inclination": [0.58398, 0.82007],
-            "frictionRatio": [0.579935, 0.578253],
-            "u1": [0.003011, 0.003336],
+            "inclinationResultant": [0.58398, 0.82007],
+            "frictionRatio": [0.57314, 0.57986],
+            "porePressureU1": [0.003011, 0.003336],
             "depth": [1.510000, 1.529999],
-            "elevation_with_respect_to_nap": [-1.90, -1.919999],
         }
     )
+
     for column in cpt.df.columns:
         assert (
             expected[column]
             .round(4)
             .series_equal(cpt.df[column].round(4), null_equal=True)
         )
-
-
-def test_delta_depth():
-    df1 = pl.DataFrame({"depth": [0.0, 0.5, 1.0]})
-    v = geo.delta_depth(df1)
-    df = pl.DataFrame({"depth": [0.0, 0.5, 1.0], "delta_depth": [0.0, 0.5, 0.5]})
-    assert v.frame_equal(df, null_equal=True)
-
-
-def test_soil_pressure():
-    v = pl.DataFrame({"gamma": [0.0, 0.5, 1.0], "delta_depth": [0.0, 0.5, 0.5]})
-    v = geo.soil_pressure(v)
-    df = pl.DataFrame(
-        {
-            "gamma": [0.0, 0.5, 1.0],
-            "delta_depth": [0.0, 0.5, 0.5],
-            "soil_pressure": [0.0, 0.25, 0.75],
-        }
-    )
-    assert v.frame_equal(df, null_equal=True)
-
-
-def test_water_pressure():
-    water_level = 0.5
-    v = pl.DataFrame({"depth": [0.0, 0.5, 1.0]})
-    v = geo.water_pressure(v, water_level)
-    df = pl.DataFrame({"depth": [0.0, 0.5, 1.0], "water_pressure": [0.0, 0.0, 4.905]})
-
-    assert v.frame_equal(df, null_equal=True)
-
-
-def test_effective_soil_pressure():
-    df1 = pl.DataFrame(
-        {"soil_pressure": [0.0, 0.25, 0.75], "water_pressure": [0.0, 0.0, 4.905]}
-    )
-    v = geo.effective_soil_pressure(df1)
-    df = pl.DataFrame(
-        {
-            "soil_pressure": [0.0, 0.25, 0.75],
-            "water_pressure": [0.0, 0.0, 4.905],
-            "effective_soil_pressure": [0.0, 0.25, -4.155],
-        }
-    )
-    assert v.frame_equal(df, null_equal=True)
 
 
 def test_assign_multiple_columns():
@@ -896,57 +744,6 @@ def test_kpa_to_mpa():
     # assert df_calculated.frame_equal(df, null_equal=True)
     for column in df.columns:
         assert v[column].round(6).series_equal(df[column])
-
-
-def test_qt():
-    df1 = pl.DataFrame({"qc": [0.0, 1.0, 2.0], "u2": [0.0, 1.0, 1.0]})
-    v = geo.qt(df1, area_quotient_cone_tip=0.5)
-    df = pl.DataFrame(
-        {"qc": [0.0, 1.0, 2.0], "u2": [0.0, 1.0, 1.0], "qt": [0.0, 1.5, 2.5]}
-    )
-    assert v.frame_equal(df, null_equal=True)
-
-
-def test_normalized_cone_resistance():
-    df1 = pl.DataFrame(
-        {
-            "qt": [0.0, 1.5, 2.5],
-            "soil_pressure": [0.0, 0.25, 0.75],
-            "effective_soil_pressure": [0.0, 0.25, -4.155],
-        }
-    )
-    v = geo.normalized_cone_resistance(df1)
-    df = pl.DataFrame(
-        {
-            "qt": [0.0, 1.5, 2.5],
-            "soil_pressure": [0.0, 0.25, 0.75],
-            "effective_soil_pressure": [0.0, 0.25, -4.155],
-            "normalized_cone_resistance": [float("nan"), 5.0, 0.0],
-        }
-    )
-    pl.testing.assert_frame_equal(v, df)
-
-
-def test_normalized_friction_ratio():
-    df1 = pl.DataFrame(
-        {
-            "qt": [0.0, 1.5, 2.5],
-            "fs": [0.5, 0.5, 0.5],
-            "soil_pressure": [0.0, 0.25, 0.75],
-            "effective_soil_pressure": [0.0, 0.25, -4.155],
-        }
-    )
-    v = geo.normalized_friction_ratio(df1)
-    df = pl.DataFrame(
-        {
-            "qt": [0.0, 1.5, 2.5],
-            "fs": [0.5, 0.5, 0.5],
-            "soil_pressure": [0.0, 0.25, 0.75],
-            "effective_soil_pressure": [0.0, 0.25, -4.155],
-            "normalized_friction_ratio": [np.inf, 40.0, 28.57142857142857],
-        }
-    )
-    assert v.frame_equal(df, null_equal=True)
 
 
 def test_bug_depth():

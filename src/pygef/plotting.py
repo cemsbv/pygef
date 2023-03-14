@@ -5,7 +5,6 @@ from typing import List, Tuple
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
-import polars as pl
 from matplotlib.gridspec import GridSpec
 
 from pygef.bore import BoreData
@@ -20,29 +19,32 @@ FigureSize = (8, 12)
 
 
 def plot_cpt(
-    data: CPTData, ax: plt.Axes | None = None, dpi: int = 100
+    data: CPTData, ax: plt.Axes | None = None, dpi: int = 100, use_offset: bool = False
 ) -> Tuple[plt.Axes, plt.Axes, plt.Axes]:
     """
     Create a plot with three axes.
-        - cone_resistance [Mpa]
+        - cone_resistance [MPa]
         - friction_ratio [%] (twiny)
         - friction [MPa] (twiny)
 
     :param data: (BoreData) Bore data object
     :param ax: (Axes, optional) Axes object used to add axes
     :param dpi: (int, optional)  Default is 100 Resolution of the figure.
+    :param use_offset: (bool, optional)  Default is False Plot depth with respect to offset.
     """
-
-    df = data.data.select(
-        pl.when(pl.all().abs() > 1e4).then(None).otherwise(pl.all()).keep_name()
-    )
-    yname = "depth" if "depth" in df.columns else "penetrationLength"
+    df = data.data
+    if use_offset:
+        yname = "depthOffset"
+    else:
+        yname = "depth" if "depth" in data.columns else "penetrationLength"
 
     if ax is None:
         fig = plt.figure(figsize=FigureSize, dpi=dpi, layout="tight")
         ax = fig.subplots(1, 1)
 
     p1 = None
+    p11 = None
+    p12 = None
     ax2 = ax.twiny()
     p2 = None
     ax3 = ax.twiny()
@@ -91,7 +93,7 @@ def plot_cpt(
 
     # add data to figure
     # plot coneResistance
-    if "coneResistance" in df.columns:
+    if "coneResistance" in data.columns:
         (p1,) = ax.plot(
             df["coneResistance"], df[yname], color="#2d2e87", label="coneResistance"
         )
@@ -111,26 +113,47 @@ def plot_cpt(
         )
 
     # plot computed frictionRatio
-    if "localFriction" in df.columns and "coneResistance" in df.columns:
+    if "frictionRatioComputed" in df.columns:
         (p4,) = ax3.plot(
-            df["localFriction"] / df["coneResistance"] * 100,
+            df["frictionRatioComputed"],
             df[yname],
             label="frictionRatio computed",
             ls="dashed",
             color="tab:gray",
         )
+    # add hlines
+    if data.groundwater_level is not None:
+        value = data.groundwater_level_offset if use_offset else data.groundwater_level
+        p11 = ax.axhline(
+            value,
+            label=f"groundwater level: {value:.2f}",
+            color="tab:blue",
+            ls="dashed",
+        )
+    if data.predrilled_depth is not None:
+        value = data.predrilled_depth_offset if use_offset else data.predrilled_depth
+        p12 = ax.axhline(
+            value,
+            label=f"predrilled depth: {value:.2f}",
+            color="tab:brown",
+            ls="dashed",
+        )
 
     # add legend
     ax.legend(
         loc="upper center",
-        title=f"CPT: {data.bro_id}",
-        handles=[i for i in [p1, p2, p3, p4] if i is not None],
+        title=f"CPT: {data.alias if data.bro_id is None else data.bro_id}",
+        handles=[i for i in [p1, p2, p3, p4, p11, p12] if i is not None],
     )
     return axes
 
 
 def plot_bore(
-    data: BoreData, ax: plt.Axes | None = None, dpi: int = 100, legend: bool = True
+    data: BoreData,
+    ax: plt.Axes | None = None,
+    dpi: int = 100,
+    legend: bool = True,
+    use_offset: bool = False,
 ) -> plt.Axes:
     """
     Create a plot with one axes.
@@ -140,14 +163,21 @@ def plot_bore(
     :param ax: Axes object
     :param dpi: Default is 100 Resolution of the figure.
     :param legend: Default is True Add legend to the figure.
+    :param use_offset: (bool, optional)  Default is False Plot depth with respect to offset.
     """
+    if use_offset:
+        yupper = "upperBoundaryOffset"
+        ylower = "lowerBoundaryOffset"
+    else:
+        yupper = "upperBoundary"
+        ylower = "lowerBoundary"
 
     if ax is None:
         fig = plt.figure(figsize=FigureSize, dpi=dpi, layout="tight")
         ax = fig.subplots(1, 1)
 
     df = data.data
-    soil_dist = np.stack(df["soil_dist"].to_numpy())
+    soil_dist = np.stack(df["soilDistribution"].to_numpy())
     cum_soil_dist = soil_dist.cumsum(axis=1)
 
     # peat, clay, silt, sand, gravel, rocks
@@ -159,7 +189,7 @@ def plot_bore(
 
     for i in range(5):
         ax.fill_betweenx(
-            np.array(list(zip(df["upper_boundary"], df["lower_boundary"]))).flatten(),
+            np.array(list(zip(df[yupper], df[ylower]))).flatten(),
             np.zeros(df.shape[0] * 2),
             np.repeat(cum_soil_dist[:, -(i + 1)], 2),
             color=legend_colors[i],
@@ -167,8 +197,8 @@ def plot_bore(
 
     # add the name of the soil to the plot
     for row in df.rows(named=True):
-        y = (row["lower_boundary"] - row["upper_boundary"]) / 2 + row["upper_boundary"]
-        ax.annotate(text=row["geotechnical_soil_name"], xy=(0.25, y))
+        y = (row[ylower] - row[yupper]) / 2 + row[yupper]
+        ax.annotate(text=row["geotechnicalSoilName"], xy=(0.25, y))
 
     # add legend
     if legend:
@@ -180,7 +210,7 @@ def plot_bore(
             handles=patches,
             bbox_to_anchor=(1, 1),
             loc="upper left",
-            title=f"BHRgt: {data.bro_id}",
+            title=f"BHRgt: {data.alias if data.bro_id is None else data.bro_id}",
         )
 
     return ax
@@ -216,21 +246,10 @@ def plot_merge(
     # update depth to depth with respect to offset
     # in the Netherlands this is usually NAP
     yname = "depth" if "depth" in cpt_data.columns else "penetrationLength"
-    cpt_data.data = cpt_data.data.with_columns(
-        (cpt_data.delivered_vertical_position_offset - pl.col(yname)).alias(yname)
-    ).sort(yname, descending=True)
-    bore_data.data = bore_data.data.with_columns(
-        (bore_data.delivered_vertical_position_offset - pl.col("lower_boundary")).alias(
-            "lower_boundary"
-        ),
-        (bore_data.delivered_vertical_position_offset - pl.col("upper_boundary")).alias(
-            "upper_boundary"
-        ),
-    )
 
     # fill axes and update ylabels
-    _ = plot_cpt(cpt_data, ax1)
-    _ = plot_bore(bore_data, ax2, legend=False)
+    _ = plot_cpt(cpt_data, ax1, use_offset=True)
+    _ = plot_bore(bore_data, ax2, legend=False, use_offset=True)
     ax1.set_ylabel(f"{yname} [m w.r.t. vertical position offset]")
     ax2.set_ylabel("")
 

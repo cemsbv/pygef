@@ -1,7 +1,7 @@
 import pytest
 
 from pygef import read_cpt
-from pygef.common import Location
+from pygef.common import Location, VerticalDatumClass
 from pygef.cpt import QualityClass
 
 
@@ -16,7 +16,8 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
     cpt_data = read_cpt(_format[_type])
 
     assert cpt_data.attributes() == {
-        "bro_id": "1801726",
+        "bro_id": None,
+        "alias": "CPTU17.8 + 83BITE",
         "cone_diameter": None,
         "cone_surface_area": 1000.0,
         "cone_surface_quotient": 0.8,
@@ -28,7 +29,7 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
         "groundwater_level": None,
         "cpt_type": 4.0,
         "data": (999, 12),
-        "delivered_vertical_position_datum": 31000.0,
+        "delivered_vertical_position_datum": VerticalDatumClass("31000"),
         "delivered_vertical_position_offset": -0.09,
         "delivered_vertical_position_reference_point": "unknown",
         "dissipationtest_performed": None,

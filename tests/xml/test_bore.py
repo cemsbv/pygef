@@ -3,9 +3,11 @@ from datetime import date
 import matplotlib.pyplot as plt
 import polars as pl
 import pytest
+from polars.testing import assert_frame_equal
 
-from pygef import broxml, plotting
+from pygef import plotting
 from pygef.broxml.mapping import MAPPING_PARAMETERS
+from pygef.broxml.parse_bore import read_bore as read_bore_xml
 from pygef.common import Location
 
 
@@ -20,7 +22,7 @@ def test_bore_percentages() -> None:
 
 
 def test_bore_attributes(bore_xml_v2: str) -> None:
-    parsed = broxml.read_bore(bore_xml_v2)
+    parsed = read_bore_xml(bore_xml_v2)
     assert len(parsed) == 1
 
     bore_data = parsed[0]
@@ -39,7 +41,7 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
 
     expected = pl.DataFrame(
         {
-            "upper_boundary": [
+            "upperBoundary": [
                 0.0,
                 1.0,
                 1.1,
@@ -54,7 +56,7 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 10.0,
                 11.0,
             ],
-            "lower_boundary": [
+            "lowerBoundary": [
                 1.0,
                 1.1,
                 2.0,
@@ -69,7 +71,7 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 11.0,
                 12.0,
             ],
-            "geotechnical_soil_name": [
+            "geotechnicalSoilName": [
                 "zwakGrindigZand",
                 "zwakGrindigZand",
                 "zwakZandigeKleiMetGrind",
@@ -99,7 +101,7 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 "standaardGrijs",
                 "standaardGrijs",
             ],
-            "dispersed_inhomogenity": [
+            "dispersedInhomogeneity": [
                 False,
                 False,
                 False,
@@ -114,7 +116,7 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 False,
                 False,
             ],
-            "organic_matter_content_class": [
+            "organicMatterContentClass": [
                 "nietOrganisch",
                 "nietOrganisch",
                 "nietOrganisch",
@@ -129,7 +131,7 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 "nietOrganisch",
                 "nietOrganisch",
             ],
-            "sand_median_class": [
+            "sandMedianClass": [
                 "middelgrof420tot630um",
                 "middelgrof420tot630um",
                 None,
@@ -144,7 +146,37 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 "middelgrof200tot300um",
                 "middelgrof300tot420um",
             ],
-            "soil_dist": [
+            "upperBoundaryOffset": [
+                10.773,
+                9.773,
+                9.673,
+                8.773,
+                7.773,
+                6.773,
+                5.773,
+                4.773,
+                3.773,
+                2.773,
+                1.773,
+                0.773,
+                -0.227,
+            ],
+            "lowerBoundaryOffset": [
+                9.773,
+                9.673,
+                8.773,
+                7.773,
+                6.773,
+                5.773,
+                4.773,
+                3.773,
+                2.773,
+                1.773,
+                0.773,
+                -0.227,
+                -1.227,
+            ],
+            "soilDistribution": [
                 [0.2, 0.0, 0.8, 0.0, 0.0, 0.0],
                 [0.2, 0.0, 0.8, 0.0, 0.0, 0.0],
                 [0.0, 0.1, 0.1, 0.0, 0.8, 0.0],
@@ -159,17 +191,18 @@ def test_bore_attributes(bore_xml_v2: str) -> None:
                 [0.0, 0.15, 0.7, 0.15, 0.0, 0.0],
                 [0.0, 0.15, 0.7, 0.15, 0.0, 0.0],
             ],
-        },
+        }
     )
-    assert bore_data.data.frame_equal(expected, null_equal=True)
+
+    assert_frame_equal(bore_data.data, expected)
 
 
 def test_bore_version(bore_xml_v1) -> None:
     with pytest.raises(ValueError, match="only bhrgtcom/2.x is supported"):
-        broxml.read_bore(bore_xml_v1)
+        read_bore_xml(bore_xml_v1)
 
 
 def test_plot(bore_xml_v2) -> None:
-    parsed = broxml.read_bore(bore_xml_v2)
+    parsed = read_bore_xml(bore_xml_v2)
     axes = plotting.plot_bore(parsed[0])
     assert isinstance(axes, plt.Axes)

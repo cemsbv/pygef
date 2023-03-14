@@ -5,11 +5,13 @@ import os
 from pathlib import Path
 from typing import Any
 
-from pygef import broxml
 from pygef.bore import BoreData
-from pygef.common import Location
+from pygef.broxml.parse_bore import read_bore as read_bore_xml
+from pygef.broxml.parse_cpt import read_cpt as read_cpt_xml
+from pygef.common import Location, VerticalDatumClass
 from pygef.cpt import CPTData, QualityClass
-from pygef.gef.gef import _GefBore, _GefCpt
+from pygef.gef.parse_bore import _GefBore
+from pygef.gef.parse_cpt import _GefCpt
 
 GEF_ID = "#GEFID"
 
@@ -48,7 +50,7 @@ def read_bore(file: io.BytesIO | Path | str, index: int = 0) -> BoreData:
             return gef_bore_to_bore_data(_GefBore(path=file))
         else:
             return gef_bore_to_bore_data(_GefBore(string=file))
-    return broxml.read_bore(file)[index]
+    return read_bore_xml(file)[index]
 
 
 def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
@@ -68,7 +70,7 @@ def read_cpt(file: io.BytesIO | Path | str, index: int = 0) -> CPTData:
         else:
             return gef_cpt_to_cpt_data(_GefCpt(string=file))
 
-    return broxml.read_cpt(file)[index]
+    return read_cpt_xml(file)[index]
 
 
 def convert_height_system_to_vertical_datum(height_system: float) -> str:
@@ -88,7 +90,8 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
         y=gef_cpt.y,
     )
     kwargs["standardized_location"] = None
-    kwargs["bro_id"] = gef_cpt.project_id
+    kwargs["bro_id"] = None
+    kwargs["alias"] = gef_cpt.test_id
     kwargs["data"] = gef_cpt.df
     kwargs["research_report_date"] = None
     kwargs["cpt_standard"] = None
@@ -155,7 +158,9 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
         "zlm_pore_pressure_u3_after"
     ] = gef_cpt.zero_measurement_ppt_u3_after_penetration_test
     kwargs["delivered_vertical_position_offset"] = gef_cpt.zid
-    kwargs["delivered_vertical_position_datum"] = gef_cpt.height_system
+    kwargs["delivered_vertical_position_datum"] = VerticalDatumClass(
+        str(int(gef_cpt.height_system))
+    )
 
     # TODO! parse measurementtext 9 in gef?
     kwargs["delivered_vertical_position_reference_point"] = "unknown"
@@ -173,7 +178,8 @@ def gef_bore_to_bore_data(gef_bore: _GefBore) -> BoreData:
         y=gef_bore.y,
     )
     kwargs["standardized_location"] = None
-    kwargs["bro_id"] = gef_bore.project_id
+    kwargs["bro_id"] = None
+    kwargs["alias"] = gef_bore.test_id
     kwargs["groundwater_level"] = None
     kwargs["research_report_date"] = None
     kwargs["description_procedure"] = "unknown"

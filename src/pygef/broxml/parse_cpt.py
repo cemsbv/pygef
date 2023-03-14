@@ -183,7 +183,7 @@ CPT_ATTRIBS = {
     },
     "delivered_vertical_position_datum": {
         "xpath": "./deliveredVerticalPosition/cptcommon:verticalDatum",
-        "resolver": resolvers.lower_text,
+        "resolver": resolvers.parse_local_vertical_reference_point_class,
         "el-attr": "text",
     },
     "delivered_vertical_position_reference_point": {

@@ -11,10 +11,10 @@ class _MappingParameters:
         mapping = self.bro_to_dict()
         return pl.DataFrame(
             {
-                "geotechnical_soil_name": list(mapping.keys()),
-                "soil_dist": list(mapping.values()),
+                "geotechnicalSoilName": list(mapping.keys()),
+                "soilDistribution": list(mapping.values()),
             }
-        ).sort("geotechnical_soil_name")
+        ).sort("geotechnicalSoilName")
 
     @lru_cache(1)
     def bro_to_dict(self) -> dict[str, pl.Series]:
