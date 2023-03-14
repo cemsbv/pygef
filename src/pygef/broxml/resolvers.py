@@ -229,7 +229,7 @@ def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> QualityClass:
 def parse_local_vertical_reference_point_class(
     val: str, **kwargs: dict[Any, Any]
 ) -> VerticalDatumClass:
-    val = val.lower().replace(" ", "")
+    val = val.lower().strip()
     if val == "nap":
         return VerticalDatumClass.NAP
     if val == "msl":
