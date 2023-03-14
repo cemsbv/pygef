@@ -208,7 +208,7 @@ class CPTData:
 
 
 def _calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyFrame:
-    """post-process function for CPT data, creates a new column with the computed frictionRatio"""
+    """Post-process function for CPT data, creates a new column with the computed frictionRatio"""
     if "localFriction" in columns and "coneResistance" in columns:
         return lf.with_columns(
             (
