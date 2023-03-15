@@ -63,11 +63,11 @@ class _MappingParameters:
             "zand": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
             "zandMetKeien": [0.3, 0.0, 0.7, 0.0, 0.0, 0.0],
             "zandMetKeitjes": [0.3, 0.0, 0.7, 0.0, 0.0, 0.0],
-            "zwakGrindigZand": [0.2, 0.0, 0.8, 0.0, 0.0, 0.0],
-            "sterkGrindigZand": [0.4, 0.0, 0.6, 0.0, 0.0, 0.0],
+            "zwakGrindigZand": [0.0, 0.2, 0.8, 0.0, 0.0, 0.0],
+            "sterkGrindigZand": [0.0, 0.4, 0.6, 0.0, 0.0, 0.0],
             "siltigZand": [0.0, 0.0, 0.7, 0.3, 0.0, 0.0],
             "zwakSiltigZand": [0.0, 0.0, 0.8, 0.2, 0.0, 0.0],  # SoilNameNEN5104
-            "matigSiltigZand": [0.0, 0.0, 0.8, 0.2, 0.0, 0.0],  # SoilNameNEN5104
+            "matigSiltigZand": [0.0, 0.0, 0.7, 0.3, 0.0, 0.0],  # SoilNameNEN5104
             "sterkSiltigZand": [0.0, 0.0, 0.6, 0.4, 0.0, 0.0],  # SoilNameNEN5104
             "uiterstSiltigZand": [0.0, 0.0, 0.5, 0.5, 0.0, 0.0],  # SoilNameNEN5104
             "siltigZandMetGrind": [0.0, 0.15, 0.7, 0.15, 0.0, 0.0],
@@ -88,13 +88,13 @@ class _MappingParameters:
             "zwakGrindigeKlei": [0.0, 0.2, 0.0, 0.0, 0.8, 0.0],
             "sterkGrindigeKlei": [0.0, 0.4, 0.0, 0.0, 0.6, 0.0],
             "zwakZandigeKlei": [0.0, 0.0, 0.2, 0.0, 0.8, 0.0],
-            "matigZandigeKlei": [0.0, 0.0, 0.2, 0.0, 0.8, 0.0],  # SoilNameNEN5104
+            "matigZandigeKlei": [0.0, 0.0, 0.3, 0.0, 0.7, 0.0],  # SoilNameNEN5104
             "zwakZandigeKleiMetGrind": [0.0, 0.1, 0.1, 0.0, 0.8, 0.0],
             "sterkZandigeKlei": [0.0, 0.0, 0.4, 0.0, 0.6, 0.0],
             "sterkZandigeKleiMetGrind": [0.0, 0.2, 0.2, 0.0, 0.6, 0.0],
             "organischKlei": [0.0, 0.0, 0.0, 0.0, 0.6, 0.4],
             "matigSiltigeKlei": [0.0, 0.0, 0.0, 0.2, 0.8, 0.0],  # SoilNameNEN5104
-            "uiterstSiltigeKlei": [0.0, 0.0, 0.0, 0.4, 0.6, 0.0],  # SoilNameNEN5104
+            "uiterstSiltigeKlei": [0.0, 0.0, 0.0, 0.5, 0.5, 0.0],  # SoilNameNEN5104
             "sterkSiltigeKlei": [0.0, 0.0, 0.0, 0.3, 0.7, 0.0],  # SoilNameNEN5104
             "zwakSiltigeKlei": [0.0, 0.0, 0.0, 0.1, 0.9, 0.0],  # SoilNameNEN5104
             "sterkZandigeLeem": [0.1, 0.25, 0.1, 0.45, 0.05, 0.05],  # SoilNameNEN5104
