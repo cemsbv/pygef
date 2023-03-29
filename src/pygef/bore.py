@@ -85,6 +85,7 @@ class BoreData:
                 self.delivered_vertical_position_offset,
             )
             .join(tbl, on="geotechnicalSoilName", how="left")
+            .sort("upperBoundary", descending=False, nulls_last=False)
             .collect()
         )
         # bypass FrozenInstanceError
