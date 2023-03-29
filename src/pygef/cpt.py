@@ -161,6 +161,7 @@ class CPTData:
                 self.data.columns,
             )
             .pipe(_calculate_friction_number, self.data.columns)
+            .sort("penetrationLength", descending=False, nulls_last=False)
             .collect()
         )
         # bypass FrozenInstanceError
