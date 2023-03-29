@@ -35,8 +35,10 @@ def plot_cpt(
     df = data.data
     if use_offset:
         yname = "depthOffset"
+        label_name = "depth" if "depth" in data.columns else "penetrationLength"
     else:
         yname = "depth" if "depth" in data.columns else "penetrationLength"
+        label_name = yname
 
     if ax is None:
         fig = plt.figure(figsize=FigureSize, dpi=dpi, layout="tight")
@@ -58,10 +60,16 @@ def plot_cpt(
     ax.xaxis.set_label_position("top")
     ax.spines["top"].set_position(("axes", 1))
     ax.set_xlim(0, 40)
-    ax.set_ylabel(f"{yname} [m]")
     ax.set_xlabel("$q_c$ [MPa]")
     ax.xaxis.label.set_color("#2d2e87")
-    ax.invert_yaxis()
+    if not use_offset:
+        ax.invert_yaxis()
+
+    # set axis label
+    if use_offset:
+        ax.set_ylabel(f"{label_name} [m w.r.t. vertical position offset]")
+    else:
+        ax.set_ylabel(f"{label_name} [m]")
 
     # create grid
     major_ticks = np.arange(0, 41, 5)
@@ -79,7 +87,6 @@ def plot_cpt(
     ax2.set_xlabel("$f_s$ [MPa]")
     ax2.set_xlim(0, 0.8)
     ax2.xaxis.label.set_color("#e04913")
-    ax2.invert_yaxis()
 
     # set the properties on the frictionRatio axes
     ax3.xaxis.set_ticks_position("top")
@@ -88,7 +95,6 @@ def plot_cpt(
     ax3.set_xlabel("$R_f$ [%]")
     ax3.set_xlim(0, 16)
     ax3.invert_xaxis()
-    ax3.invert_yaxis()
     ax3.xaxis.label.set_color("tab:gray")
 
     # add data to figure
@@ -183,8 +189,13 @@ def plot_bore(
     # peat, clay, silt, sand, gravel, rocks
     legend_colors = ["#a76b29", "#578E57", "#0078C1", "#DBAD4B", "#708090", "#59626b"]
     legend_names = ["peat", "clay", "silt", "sand", "gravel", "rocks"]
-    ax.invert_yaxis()
-    ax.set_ylabel("depth [m]")
+    if not use_offset:
+        ax.invert_yaxis()
+    # set axis label
+    if use_offset:
+        ax.set_ylabel("depth [m w.r.t. vertical position offset]")
+    else:
+        ax.set_ylabel("depth [m]")
     ax.set_xlabel("cumulative soil fraction [-]")
 
     for i in range(5):
@@ -243,14 +254,9 @@ def plot_merge(
     ax3 = fig.add_subplot(gs[2:])
     axes = [ax1, ax2, ax3]
 
-    # update depth to depth with respect to offset
-    # in the Netherlands this is usually NAP
-    yname = "depth" if "depth" in cpt_data.columns else "penetrationLength"
-
     # fill axes and update ylabels
     _ = plot_cpt(cpt_data, ax1, use_offset=True)
     _ = plot_bore(bore_data, ax2, legend=False, use_offset=True)
-    ax1.set_ylabel(f"{yname} [m w.r.t. vertical position offset]")
     ax2.set_ylabel("")
 
     # plot BHRgt location
