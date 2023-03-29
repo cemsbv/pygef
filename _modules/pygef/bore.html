@@ -158,6 +158,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">delivered_vertical_position_offset</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tbl</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;geotechnicalSoilName&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;upperBoundary&quot;</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nulls_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="o">.</span><span class="n">collect</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="c1"># bypass FrozenInstanceError</span>

@@ -234,6 +234,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">_calculate_friction_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;penetrationLength&quot;</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nulls_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="o">.</span><span class="n">collect</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="c1"># bypass FrozenInstanceError</span>
