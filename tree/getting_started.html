@@ -316,9 +316,9 @@ columns defined in the file.</p>
 <section id="id1">
 <h3>CPT<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
 <p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object we get:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [11]: </span><span class="n">pygef</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">plot_cpt</span><span class="p">(</span><span class="n">cpt</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [11]: </span><span class="n">pygef</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">plot_cpt</span><span class="p">(</span><span class="n">cpt</span><span class="p">,</span> <span class="n">use_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gh">Out[11]: </span>
-<span class="go">(&lt;Axes: xlabel=&#39;$q_c$ [MPa]&#39;, ylabel=&#39;depth [m]&#39;&gt;,</span>
+<span class="go">(&lt;Axes: xlabel=&#39;$q_c$ [MPa]&#39;, ylabel=&#39;depth [m w.r.t. vertical position offset]&#39;&gt;,</span>
 <span class="go"> &lt;Axes: xlabel=&#39;$f_s$ [MPa]&#39;&gt;,</span>
 <span class="go"> &lt;Axes: xlabel=&#39;$R_f$ [%]&#39;&gt;)</span>
 </pre></div>
