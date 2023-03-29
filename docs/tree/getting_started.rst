@@ -109,7 +109,7 @@ If we use the method without arguments on a :code:`cpt` object we get:
     :okwarning:
 
     @savefig cpt_plot.png
-    pygef.plotting.plot_cpt(cpt)
+    pygef.plotting.plot_cpt(cpt, use_offset=True)
 
 
 Borehole
