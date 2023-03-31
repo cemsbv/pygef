@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import matplotlib.ticker as plticker
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
@@ -16,6 +17,7 @@ except ImportError:
     ctx = None
 
 FigureSize = (8, 12)
+TickLoc = plticker.MultipleLocator(base=0.5)
 
 
 def plot_cpt(
@@ -79,6 +81,7 @@ def plot_cpt(
     ax.grid(which="both")
     ax.grid(which="minor", alpha=0.2)
     ax.grid(which="major", alpha=0.5)
+    ax.yaxis.set_major_locator(TickLoc)
 
     # set the properties on the localFriction axes
     ax2.xaxis.set_ticks_position("top")
@@ -197,6 +200,7 @@ def plot_bore(
     else:
         ax.set_ylabel("depth [m]")
     ax.set_xlabel("cumulative soil fraction [-]")
+    ax.yaxis.set_major_locator(TickLoc)
 
     for i in range(5):
         ax.fill_betweenx(
