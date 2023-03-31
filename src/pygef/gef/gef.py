@@ -150,7 +150,7 @@ class _Gef:
 
         return pl.read_csv(
             new_data.encode(),
-            sep=col_separator,
+            separator=col_separator,
             new_columns=column_names,
             has_header=False,
             columns=list(range(0, len(column_names))),
