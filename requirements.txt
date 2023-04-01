@@ -61,7 +61,7 @@ exceptiongroup==1.1.1
     # via pytest
 executing==1.2.0
     # via stack-data
-fonttools==4.39.2
+fonttools==4.39.3
     # via matplotlib
 gef-file-to-map==0.1.0
     # via pygef (pyproject.toml)
