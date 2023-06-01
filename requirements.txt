@@ -53,7 +53,7 @@ decorator==5.1.1
     # via ipython
 docopt==0.6.2
     # via coveralls
-docutils==0.18.1
+docutils==0.20.1
     # via
     #   sphinx
     #   sphinx-rtd-theme
