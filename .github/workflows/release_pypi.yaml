@@ -7,6 +7,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pygef
+
+    # Mandatory permission for trusted publishing to PyPi
+    permissions:
+      id-token: write
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -18,10 +27,9 @@ jobs:
         run: |
           pip install setuptools twine
 
-      - name: Build & Release
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Build
         run: |
           python setup.py sdist
-          twine upload --skip-existing dist/*
+
+      - name: Publish to PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
