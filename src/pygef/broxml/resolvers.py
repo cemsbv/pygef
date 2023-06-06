@@ -195,6 +195,7 @@ def process_cpt_result(el: etree.Element, **kwargs: dict[Any, Any]) -> pl.DataFr
         new_columns=columns,
         columns=selection,
         has_header=False,
+        dtypes=[pl.Float64] * len(columns),
         separator=delimiter,
         eol_char=new_line_char,
         ignore_errors=True,
