@@ -3,9 +3,7 @@ from __future__ import annotations
 import io
 import os
 from pathlib import Path
-from typing import Any
-
-from typing_extensions import Literal
+from typing import Any, Literal
 
 from pygef.bore import BoreData
 from pygef.broxml.parse_bore import read_bore as read_bore_xml
