@@ -3,7 +3,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPi Version](https://img.shields.io/pypi/v/pygef.svg)](https://pypi.org/project/pygef)
 [![GitHub stars](https://img.shields.io/github/stars/ritchie46/pygef.svg?logo=github&label=Stars&logoColor=white)](https://github.com/ritchie46/pygef)
-[![Coverage Status](https://coveralls.io/repos/github/ritchie46/pygef/badge.svg?branch=master)](https://coveralls.io/github/ritchie46/pygef?branch=code-coverage)
+[![Coverage Status](https://coveralls.io/repos/github/cemsbv/pygef/badge.svg?branch=master)](https://coveralls.io/github/cemsbv/pygef?branch=master)
 
 Simple parser for \*.gef files. These are ASCII based files used for soil properties measurements.
 Compatible with Python 3.9.
