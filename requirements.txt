@@ -134,7 +134,7 @@ platformdirs==3.5.1
     # via black
 pluggy==1.0.0
     # via pytest
-polars[pyarrow]==0.18.0
+polars[pyarrow]==0.18.1
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.38
     # via ipython
@@ -207,9 +207,7 @@ traitlets==5.9.0
     #   ipython
     #   matplotlib-inline
 typing-extensions==4.5.0
-    # via
-    #   black
-    #   polars
+    # via black
 urllib3==1.26.15
     # via requests
 wcwidth==0.2.6
