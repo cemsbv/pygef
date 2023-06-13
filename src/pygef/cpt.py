@@ -2,12 +2,25 @@ from __future__ import annotations
 
 import copy
 import pprint
-from dataclasses import dataclass, field
+from dataclasses import field
 from datetime import date
 from enum import Enum
 from typing import Any, List
 
 import polars as pl
+
+# check if pydantic is installed
+try:
+    from pydantic.dataclasses import dataclass as pydantic_dataclass
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    dataclass = pydantic_dataclass(frozen=True, config=Config)
+
+except ImportError:
+    from dataclasses import dataclass
+    dataclass = dataclass(frozen=True)
 
 from pygef.common import Location, VerticalDatumClass, depth_to_offset
 
@@ -20,7 +33,7 @@ class QualityClass(Enum):
     Class4 = 4
 
 
-@dataclass(frozen=True)
+@dataclass
 class CPTData:
     """
     The CPT dataclass holds the information from the CPT object.
