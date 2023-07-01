@@ -134,7 +134,7 @@ platformdirs==3.5.1
     # via black
 pluggy==1.0.0
     # via pytest
-polars[pyarrow]==0.18.1
+polars[pyarrow]==0.18.4
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.38
     # via ipython
