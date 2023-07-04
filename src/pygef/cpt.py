@@ -2,25 +2,12 @@ from __future__ import annotations
 
 import copy
 import pprint
-from dataclasses import field
 from datetime import date
 from enum import Enum
 from typing import Any, List
 
 import polars as pl
-
-# check if pydantic is installed
-try:
-    from pydantic.dataclasses import dataclass as pydantic_dataclass
-
-    class Config:
-        arbitrary_types_allowed = True
-
-    dataclass = pydantic_dataclass(frozen=True, config=Config)
-
-except ImportError:
-    from dataclasses import dataclass
-    dataclass = dataclass(frozen=True)
+from pydantic import BaseModel, Field, computed_field
 
 from pygef.common import Location, VerticalDatumClass, depth_to_offset
 
@@ -33,8 +20,7 @@ class QualityClass(Enum):
     Class4 = 4
 
 
-@dataclass
-class CPTData:
+class CPTData(BaseModel):
     """
     The CPT dataclass holds the information from the CPT object.
 
@@ -162,7 +148,7 @@ class CPTData:
     delivered_vertical_position_reference_point: str
     data: pl.DataFrame
 
-    alias: str | None = field(default=None)
+    alias: str | None = Field(default=None)
 
     def __post_init__(self):
         # post-processing of the data
@@ -180,11 +166,19 @@ class CPTData:
         # bypass FrozenInstanceError
         object.__setattr__(self, "data", df)
 
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {
+            pl.DataFrame: lambda df: df.to_dict(orient="records"),
+        }
+
+    @computed_field
     @property
     def columns(self) -> list[str]:
         """Columns names for the DataFrame"""
         return self.data.columns
 
+    @computed_field
     @property
     def groundwater_level_offset(self) -> float | None:
         """groundwater level wrt offset"""
@@ -192,6 +186,7 @@ class CPTData:
             self.groundwater_level, offset=self.delivered_vertical_position_offset
         )
 
+    @computed_field
     @property
     def predrilled_depth_offset(self) -> float | None:
         """predrilled depth wrt offset"""
@@ -199,6 +194,7 @@ class CPTData:
             self.predrilled_depth, offset=self.delivered_vertical_position_offset
         )
 
+    @computed_field
     @property
     def final_depth_offset(self) -> float | None:
         """final depth wrt offset"""
@@ -229,18 +225,18 @@ def _calculate_friction_number(lf: pl.LazyFrame, columns: List[str]) -> pl.LazyF
     if "localFriction" in columns and "coneResistance" in columns:
         return lf.with_columns(
             (
-                pl.col("localFriction")
-                / pl.when(pl.col("coneResistance") == 0.0)
-                .then(None)
-                .otherwise(pl.col("coneResistance"))
-                * 100.0
+                    pl.col("localFriction")
+                    / pl.when(pl.col("coneResistance") == 0.0)
+                    .then(None)
+                    .otherwise(pl.col("coneResistance"))
+                    * 100.0
             ).alias("frictionRatioComputed")
         )
     return lf
 
 
 def _calculate_depth_with_respect_to_offset(
-    lf: pl.LazyFrame, offset: float | None, columns: List[str]
+        lf: pl.LazyFrame, offset: float | None, columns: List[str]
 ) -> pl.LazyFrame:
     """Post-process function for CPT data creates a new column with the elevation with respect to offset"""
     if offset is None:
