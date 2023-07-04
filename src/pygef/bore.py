@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import copy
 import pprint
-from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
 import polars as pl
+from pydantic import BaseModel, Field, computed_field
 
 from pygef.broxml.mapping import MAPPING_PARAMETERS
 from pygef.common import Location, depth_to_offset
 
 
-@dataclass(frozen=True)
-class BoreData:
+class BoreData(BaseModel):
     """
     The Bore dataclass holds the information from the BHRgt object.
 
@@ -73,7 +72,7 @@ class BoreData:
     bore_hole_completed: bool
     data: pl.DataFrame
 
-    alias: str | None = field(default=None)
+    alias: str | None = Field(default=None)
 
     def __post_init__(self):
         # post-processing of the data
@@ -91,11 +90,19 @@ class BoreData:
         # bypass FrozenInstanceError
         object.__setattr__(self, "data", df)
 
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {
+            pl.DataFrame: lambda df: df.to_dict(orient="records"),
+        }
+
+    @computed_field
     @property
     def columns(self) -> list[str]:
         """Columns names for the DataFrame"""
         return self.data.columns
 
+    @computed_field
     @property
     def groundwater_level_offset(self) -> float | None:
         """groundwater level wrt offset"""
@@ -103,6 +110,7 @@ class BoreData:
             self.groundwater_level, offset=self.delivered_vertical_position_offset
         )
 
+    @computed_field
     @property
     def final_sample_depth_offset(self) -> float | None:
         """final sample depth wrt offset"""
@@ -110,6 +118,7 @@ class BoreData:
             self.final_sample_depth, offset=self.delivered_vertical_position_offset
         )
 
+    @computed_field
     @property
     def final_depth_offset(self) -> float | None:
         """final depth wrt offset"""
