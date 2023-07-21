@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
+from typing import List, overload
 
 import polars as pl
+from numpy.typing import NDArray
 
 
 @dataclass
@@ -52,7 +53,19 @@ def kpa_to_mpa(df: pl.DataFrame, columns: List[str]) -> pl.DataFrame:
     return assign_multiple_columns(df, columns, df[columns] * 10**-3)
 
 
-def offset_to_depth(ref: float | None, offset: float | None) -> float | None:
+@overload
+def offset_to_depth(ref: float, offset: float) -> float:
+    ...
+
+
+@overload
+def offset_to_depth(ref: NDArray, offset: float) -> NDArray:
+    ...
+
+
+def offset_to_depth(
+    ref: float | None | NDArray, offset: float | None
+) -> float | None | NDArray:
     """
     Transform depth with respect to reference level to depth
 
@@ -65,7 +78,19 @@ def offset_to_depth(ref: float | None, offset: float | None) -> float | None:
     return -(ref - offset)
 
 
+@overload
 def depth_to_offset(depth: float | None, offset: float | None) -> float | None:
+    ...
+
+
+@overload
+def depth_to_offset(depth: NDArray, offset: float) -> NDArray:
+    ...
+
+
+def depth_to_offset(
+    depth: float | None | NDArray, offset: float | None
+) -> float | None | NDArray:
     """
     Transform depth to depth with respect to reference level
 
