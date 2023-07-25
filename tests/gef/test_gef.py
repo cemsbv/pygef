@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os.path
 from datetime import datetime
+from typing import Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,6 +12,7 @@ import pytest
 
 import pygef.gef.utils as utils
 from pygef import common, exceptions, plotting, read_bore, read_cpt
+from pygef.cpt import CPTData
 from pygef.gef.gef import parse_all_columns_info, replace_column_void
 from pygef.gef.mapping import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 from pygef.gef.parse_bore import _GefBore
@@ -19,17 +21,22 @@ from pygef.gef.parse_cpt import _GefCpt, correct_pre_excavated_depth
 BasePath = os.path.dirname(__file__)
 
 
-def test_cpt_smoke():
+@pytest.mark.parametrize(
+    "cpt_name",
+    [
+        "cpt_gef_1",
+        "cpt_gef_2",
+        "cpt_gef_3",
+        "cpt_gef_4",
+    ],
+)
+def test_cpt_smoke(valid_gef_cpt_paths: Dict[str, str], cpt_name: str):
     """
     Smoke test to see if no errors occur during creation of the Cpt object for valid
     CPTs.
     """
-
-    read_cpt(os.path.join(BasePath, "../test_files/example.gef"))
-    gef = read_cpt(os.path.join(BasePath, "../test_files/cpt.gef"))
-    read_cpt(os.path.join(BasePath, "../test_files/cpt2.gef"))
-    read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
-    read_cpt(os.path.join(BasePath, "../test_files/cpt4.gef"))
+    gef = read_cpt(valid_gef_cpt_paths[cpt_name])
+    assert isinstance(gef, CPTData)
 
     axes = plotting.plot_cpt(gef)
     assert isinstance(axes[0], plt.Axes)
@@ -51,13 +58,13 @@ def test_bore_cpt_smoke():
     Bore files.
     """
     gef1 = read_bore(os.path.join(BasePath, "../test_files/example_bore.gef"))
-    gef2 = read_cpt(os.path.join(BasePath, "../test_files/cpt.gef"))
+    gef2 = read_cpt(os.path.join(BasePath, "../test_files/cpt_gef/cpt.gef"))
     fig, axes = plotting.plot_merge(gef1, gef2)
     assert isinstance(axes[0], plt.Axes)
 
 
 def test_xy():
-    cpt3 = read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
+    cpt3 = read_cpt(os.path.join(BasePath, "../test_files/cpt_gef/cpt3.gef"))
     np.testing.assert_almost_equal(cpt3.delivered_location.x, 110885)
     np.testing.assert_almost_equal(cpt3.delivered_location.y, 493345)
 

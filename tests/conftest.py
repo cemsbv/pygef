@@ -1,5 +1,6 @@
 import os
 from io import BytesIO
+from typing import Dict
 
 from pytest import fixture
 
@@ -23,7 +24,7 @@ def cpt_xml() -> str:
 
 @fixture()
 def cpt_gef_1() -> str:
-    return os.path.join(TEST_FILES, "cpt.gef")
+    return os.path.join(TEST_FILES, "cpt_gef", "cpt.gef")
 
 
 @fixture()
@@ -42,14 +43,24 @@ def cpt_gef_1_string(cpt_gef_1) -> str:
 
 @fixture()
 def cpt_gef_2() -> str:
-    return os.path.join(TEST_FILES, "cpt2.gef")
+    return os.path.join(TEST_FILES, "cpt_gef", "cpt2.gef")
 
 
 @fixture()
 def cpt_gef_3() -> str:
-    return os.path.join(TEST_FILES, "cpt3.gef")
+    return os.path.join(TEST_FILES, "cpt_gef", "cpt3.gef")
 
 
 @fixture()
 def cpt_gef_4() -> str:
-    return os.path.join(TEST_FILES, "cpt4.gef")
+    return os.path.join(TEST_FILES, "cpt_gef", "cpt4.gef")
+
+
+@fixture
+def valid_gef_cpt_paths(cpt_gef_1, cpt_gef_2, cpt_gef_3, cpt_gef_4) -> Dict[str, str]:
+    return {
+        "cpt_gef_1": cpt_gef_1,
+        "cpt_gef_2": cpt_gef_2,
+        "cpt_gef_3": cpt_gef_3,
+        "cpt_gef_4": cpt_gef_4,
+    }
