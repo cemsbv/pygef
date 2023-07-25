@@ -22,7 +22,7 @@ backcall==0.2.0
     # via ipython
 black==23.1.0
     # via pygef (pyproject.toml)
-certifi==2022.12.7
+certifi==2023.7.22
     # via
     #   rasterio
     #   requests
