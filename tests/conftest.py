@@ -56,11 +56,19 @@ def cpt_gef_4() -> str:
     return os.path.join(TEST_FILES, "cpt_gef", "cpt4.gef")
 
 
+@fixture()
+def cpt_gef_5() -> str:
+    return os.path.join(TEST_FILES, "cpt_gef", "cpt5.GEF")
+
+
 @fixture
-def valid_gef_cpt_paths(cpt_gef_1, cpt_gef_2, cpt_gef_3, cpt_gef_4) -> Dict[str, str]:
+def valid_gef_cpt_paths(
+    cpt_gef_1, cpt_gef_2, cpt_gef_3, cpt_gef_4, cpt_gef_5
+) -> Dict[str, str]:
     return {
         "cpt_gef_1": cpt_gef_1,
         "cpt_gef_2": cpt_gef_2,
         "cpt_gef_3": cpt_gef_3,
         "cpt_gef_4": cpt_gef_4,
+        "cpt_gef_5": cpt_gef_5,
     }

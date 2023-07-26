@@ -28,6 +28,7 @@ BasePath = os.path.dirname(__file__)
         "cpt_gef_2",
         "cpt_gef_3",
         "cpt_gef_4",
+        "cpt_gef_5",
     ],
 )
 def test_cpt_smoke(valid_gef_cpt_paths: Dict[str, str], cpt_name: str):
