@@ -144,7 +144,7 @@ pure-eval==0.2.2
     # via stack-data
 pyarrow==11.0.0
     # via polars
-pygments==2.14.0
+pygments==2.15.1
     # via
     #   ipython
     #   sphinx
