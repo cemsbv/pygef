@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from lxml.etree import XMLSyntaxError
 
@@ -49,7 +51,7 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
         "final_depth": 20.0,
         "predrilled_depth": 0.0,
         "quality_class": QualityClass(2),
-        "research_report_date": None,
+        "research_report_date": datetime(2019, 2, 13).date(),
         "standardized_location": None,
         "delivered_location": Location(
             srs_name="urn:ogc:def:crs:EPSG::28992", x=79578.38, y=424838.97
