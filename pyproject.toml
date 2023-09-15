@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygef"
-version = "0.8.2"
+version = "0.8.3"
 description = "Parse soil measurument data."
 dependencies = [
     "polars[pyarrow]>0.16.14,<0.19",
