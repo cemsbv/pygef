@@ -14,6 +14,7 @@ from pygef.common import Location, VerticalDatumClass, depth_to_offset
 
 class QualityClass(Enum):
     Unknown = -1
+    Class0 = 0
     Class1 = 1
     Class2 = 2
     Class3 = 3
