@@ -7,6 +7,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
+import polars.testing as pl_test
 import pytest
 
 import pygef.gef.utils as utils
@@ -19,20 +20,25 @@ from pygef.gef.parse_cpt import _GefCpt, correct_pre_excavated_depth
 BasePath = os.path.dirname(__file__)
 
 
-def test_cpt_smoke():
+@pytest.mark.parametrize(
+    "filename",
+    ["example.gef", "cpt.gef", "cpt.gef", "cpt2.gef", "cpt3.gef", "cpt4.gef"],
+)
+def test_cpt_smoke(filename):
     """
     Smoke test to see if no errors occur during creation of the Cpt object for valid
     CPTs.
     """
 
-    read_cpt(os.path.join(BasePath, "../test_files/example.gef"))
-    gef = read_cpt(os.path.join(BasePath, "../test_files/cpt.gef"))
-    read_cpt(os.path.join(BasePath, "../test_files/cpt2.gef"))
-    read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
-    read_cpt(os.path.join(BasePath, "../test_files/cpt4.gef"))
+    gef = read_cpt(os.path.join(BasePath, "../test_files/", filename))
 
     axes = plotting.plot_cpt(gef)
     assert isinstance(axes[0], plt.Axes)
+
+    pl_test.assert_series_equal(
+        gef.data.get_column("penetrationLength"),
+        gef.data.get_column("penetrationLength").abs(),
+    )
 
 
 def test_bore_smoke():

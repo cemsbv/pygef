@@ -141,6 +141,7 @@ class _GefCpt(_Gef):
             .pipe(replace_column_void, self.columns_info.description_to_void_mapping)
             # Remove the rows with null values
             .drop_nulls()
+            .with_columns(pl.col("penetrationLength").abs().alias("penetrationLength"))
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(correct_depth_with_inclination, self.columns_info.descriptions)
             .collect()
