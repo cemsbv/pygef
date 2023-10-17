@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  <dispatchDataResponseType xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:brocom="http://www.broservices.nl/xsd/brocommon/3.0" xmlns:cptcommon="http://www.broservices.nl/xsd/cptcommon/1.1" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:om="http://www.opengis.net/om/2.0" xmlns:sampling="http://www.opengis.net/sampling/2.0" xmlns:ns9="http://www.isotc211.org/2005/gco" xmlns:ns10="http://www.isotc211.org/2005/gmd" xmlns:ns11="http://www.broservices.nl/xsd/dscpt/1.1">
+  <dispatchDataResponse xmlns="http://www.broservices.nl/xsd/dscpt/1.1" xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:brocom="http://www.broservices.nl/xsd/brocommon/3.0" xmlns:cptcommon="http://www.broservices.nl/xsd/cptcommon/1.1" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:om="http://www.opengis.net/om/2.0" xmlns:sampling="http://www.opengis.net/sampling/2.0" xmlns:ns9="http://www.isotc211.org/2005/gco" xmlns:ns10="http://www.isotc211.org/2005/gmd">
     <brocom:responseType>dispatch</brocom:responseType>
     <brocom:requestReference>Mijn-object-aanvraag-000001</brocom:requestReference>
-    <brocom:dispatchTime>2023-10-04T09:03:20+02:00</brocom:dispatchTime>
-    <ns11:dispatchDocument>
-      <ns11:CPT_O gml:id="BRO_0010">
+    <brocom:dispatchTime>2023-10-17T15:40:57+02:00</brocom:dispatchTime>
+    <dispatchDocument>
+      <CPT_O gml:id="BRO_0010">
         <brocom:broId>CPT000000155283</brocom:broId>
         <brocom:deliveryAccountableParty>30277172</brocom:deliveryAccountableParty>
         <brocom:qualityRegime>IMBRO</brocom:qualityRegime>
-        <ns11:deliveryContext codeSpace="urn:bro:cpt:DeliveryContext">publiekeTaak</ns11:deliveryContext>
-        <ns11:surveyPurpose codeSpace="urn:bro:cpt:SurveyPurpose">infrastructuurLand</ns11:surveyPurpose>
-        <ns11:researchReportDate>
+        <deliveryContext codeSpace="urn:bro:cpt:DeliveryContext">publiekeTaak</deliveryContext>
+        <surveyPurpose codeSpace="urn:bro:cpt:SurveyPurpose">infrastructuurLand</surveyPurpose>
+        <researchReportDate>
           <brocom:date>2020-07-15</brocom:date>
-        </ns11:researchReportDate>
-        <ns11:cptStandard codeSpace="urn:bro:cpt:CPTStandard">ISO22476D1</ns11:cptStandard>
-        <ns11:additionalInvestigationPerformed>nee</ns11:additionalInvestigationPerformed>
-        <ns11:standardizedLocation>
+        </researchReportDate>
+        <cptStandard codeSpace="urn:bro:cpt:CPTStandard">ISO22476D1</cptStandard>
+        <additionalInvestigationPerformed>nee</additionalInvestigationPerformed>
+        <standardizedLocation>
           <brocom:location srsName="urn:ogc:def:crs:EPSG::4258" gml:id="BRO_0001">
             <gml:pos>52.020180200 5.063525960</gml:pos>
           </brocom:location>
           <brocom:coordinateTransformation codeSpace="urn:bro:CoordinateTransformation">RDNAPTRANS2008</brocom:coordinateTransformation>
-        </ns11:standardizedLocation>
-        <ns11:deliveredLocation>
+        </standardizedLocation>
+        <deliveredLocation>
           <cptcommon:location srsName="urn:ogc:def:crs:EPSG::28992" gml:id="BRO_0002">
             <gml:pos>132782.520 448030.340</gml:pos>
           </cptcommon:location>
@@ -29,8 +29,8 @@
             <brocom:date>2020-03-09</brocom:date>
           </cptcommon:horizontalPositioningDate>
           <cptcommon:horizontalPositioningMethod codeSpace="urn:bro:cpt:HorizontalPositioningMethod">RTKGPS5tot10cm</cptcommon:horizontalPositioningMethod>
-        </ns11:deliveredLocation>
-        <ns11:deliveredVerticalPosition>
+        </deliveredLocation>
+        <deliveredVerticalPosition>
           <cptcommon:localVerticalReferencePoint codeSpace="urn:bro:cpt:LocalVerticalReferencePoint">maaiveld</cptcommon:localVerticalReferencePoint>
           <cptcommon:offset uom="m">0.090</cptcommon:offset>
           <cptcommon:verticalDatum codeSpace="urn:bro:cpt:VerticalDatum">NAP</cptcommon:verticalDatum>
@@ -38,8 +38,8 @@
             <brocom:date>2020-03-09</brocom:date>
           </cptcommon:verticalPositioningDate>
           <cptcommon:verticalPositioningMethod codeSpace="urn:bro:cpt:VerticalPositioningMethod">RTKGPS4tot10cm</cptcommon:verticalPositioningMethod>
-        </ns11:deliveredVerticalPosition>
-        <ns11:conePenetrometerSurvey gml:id="BRO_0009">
+        </deliveredVerticalPosition>
+        <conePenetrometerSurvey gml:id="BRO_0009">
           <sampling:sampledFeature xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
           <cptcommon:dissipationTestPerformed>ja</cptcommon:dissipationTestPerformed>
           <cptcommon:finalProcessingDate>
@@ -150,8 +150,8 @@
             <cptcommon:porePressureU3>nee</cptcommon:porePressureU3>
             <cptcommon:frictionRatio>ja</cptcommon:frictionRatio>
           </cptcommon:parameters>
-        </ns11:conePenetrometerSurvey>
-        <ns11:registrationHistory>
+        </conePenetrometerSurvey>
+        <registrationHistory>
           <brocom:objectRegistrationTime>2020-10-28T14:47:59+01:00</brocom:objectRegistrationTime>
           <brocom:registrationStatus codeSpace="urn:bro:RegistrationStatus">voltooid</brocom:registrationStatus>
           <brocom:registrationCompletionTime>2020-10-28T14:47:59+01:00</brocom:registrationCompletionTime>
@@ -159,7 +159,7 @@
           <brocom:underReview>nee</brocom:underReview>
           <brocom:deregistered>nee</brocom:deregistered>
           <brocom:reregistered>nee</brocom:reregistered>
-        </ns11:registrationHistory>
-      </ns11:CPT_O>
-    </ns11:dispatchDocument>
-  </dispatchDataResponseType>
+        </registrationHistory>
+      </CPT_O>
+    </dispatchDocument>
+  </dispatchDataResponse>
