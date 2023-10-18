@@ -19,6 +19,12 @@ def read_xml(
     namespaces = root.nsmap
     dd = root.find(payload_root, namespaces)
 
+    # test xml has the correct payload root
+    if dd is None:
+        raise SyntaxError(
+            "Could not read BRO XML file, incorrect payload root. Did you obtain the data from the BRO RESTful API?"
+        )
+
     out: list[T] = []
 
     payloads = dd.findall("./*")
