@@ -24,7 +24,7 @@ certifi==2023.7.22
     # via
     #   rasterio
     #   requests
-charset-normalizer==3.3.0
+charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via
