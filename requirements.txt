@@ -169,7 +169,7 @@ snowballstemmer==2.2.0
     # via sphinx
 snuggs==1.4.7
     # via rasterio
-sphinx==6.1.3
+sphinx==7.2.6
     # via
     #   asteroid-sphinx-theme
     #   pygef (pyproject.toml)
