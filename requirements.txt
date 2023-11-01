@@ -215,7 +215,7 @@ urllib3==2.0.6
     # via requests
 wcwidth==0.2.8
     # via prompt-toolkit
-xyzservices==2023.10.0
+xyzservices==2023.10.1
     # via contextily
 zipp==3.17.0
     # via
