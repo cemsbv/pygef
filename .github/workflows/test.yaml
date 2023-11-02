@@ -38,9 +38,20 @@ jobs:
         run: coverage run -m pytest
 
       - name: Post coverage results
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: coveralls --service=github
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: run-${{ matrix.python-version }}
+          parallel: true
+
+  finish:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
 
   lint:
     name: Formatting check
