@@ -9,7 +9,7 @@ from lxml import etree
 
 from pygef.bore import BoreData
 from pygef.broxml import resolvers
-from pygef.broxml.xml_parser import read_xml
+from pygef.broxml.xml_parser import BaseParser, read_xml
 
 # maps keyword argument to:
 # xpath: query passed to elementree.find
@@ -136,9 +136,9 @@ BORE_ATTRIBS_V2 = {
 
 def read_bore(file: io.BytesIO | Path | str) -> list[BoreData]:
     if isinstance(file, str) and not os.path.exists(file):
-        root = etree.fromstring(file).getroot()
+        root = etree.fromstring(file, parser=BaseParser).getroot()
     else:
-        root = etree.parse(file).getroot()
+        root = etree.parse(file, parser=BaseParser).getroot()
     match = re.compile(r"xsd/.*/(\d\.\d)")
     matched = match.search(root.nsmap["bhrgtcom"])
 

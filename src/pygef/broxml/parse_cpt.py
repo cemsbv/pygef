@@ -7,7 +7,7 @@ from pathlib import Path
 from lxml import etree
 
 from pygef.broxml import resolvers
-from pygef.broxml.xml_parser import read_xml
+from pygef.broxml.xml_parser import BaseParser, read_xml
 from pygef.cpt import CPTData
 
 # maps keyword argument to:
@@ -196,7 +196,7 @@ CPT_ATTRIBS = {
 
 def read_cpt(file: io.BytesIO | Path | str) -> list[CPTData]:
     if isinstance(file, str) and not os.path.exists(file):
-        root = etree.fromstring(file).getroot()
+        root = etree.fromstring(file, parser=BaseParser).getroot()
     else:
-        root = etree.parse(file).getroot()
+        root = etree.parse(file, parser=BaseParser).getroot()
     return read_xml(root, CPTData, CPT_ATTRIBS, "dispatchDocument")

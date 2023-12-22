@@ -9,6 +9,8 @@ from pygef.cpt import CPTData
 
 T = TypeVar("T", CPTData, BoreData)
 
+BaseParser = etree.XMLParser(resolve_entities=False, dtd_validation=False)
+
 
 def read_xml(
     root: etree.Element,
