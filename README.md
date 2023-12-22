@@ -203,3 +203,10 @@ To update the requirements within the defined ranges, run:
 ```bash
 pip-compile --upgrade --extra=test --extra=docs --extra=lint --extra=map --output-file=requirements.txt pyproject.toml
 ```
+
+Automatically upgrade your Polars code so it's compatible with future versions.
+
+```bash
+pip install -U polars-upgrade
+polars-upgrade src/pygef tests --target-version=0.19.19
+```

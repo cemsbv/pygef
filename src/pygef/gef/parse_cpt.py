@@ -176,7 +176,7 @@ def correct_depth_with_inclination(
             pl.when(pl.arange(0, corrected_depth.count()) == 0)
             .then(pl.col("penetrationLength"))
             .otherwise(corrected_depth)
-            .cumsum()
+            .cum_sum()
             .alias("depth")
         )
 

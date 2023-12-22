@@ -169,7 +169,7 @@ def replace_column_void(
                 .then(None)
                 .otherwise(pl.col(col))
                 .interpolate()
-                .keep_name()
+                .name.keep()
                 for col in lf.columns
             ]
         )

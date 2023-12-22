@@ -406,14 +406,14 @@ def test_parse_data():
     df_parsed = _GefCpt.parse_data(
         data_s, ",", "\n", column_names=["col1", "col2", "col3"]
     )
-    assert df_parsed.frame_equal(df, null_equal=True)
+    assert df_parsed.equals(df, null_equal=True)
 
     # Test terribly formatted columns
     data_s = "\n 1  1 1 \n2 2 2  \n3 3 3\n"
     df_parsed = _GefCpt.parse_data(
         data_s, " ", "\n", column_names=["col1", "col2", "col3"]
     )
-    assert df_parsed.frame_equal(df, null_equal=True)
+    assert df_parsed.equals(df, null_equal=True)
 
     # Test terribly formatted columns
     # header_s = "#RECORDSEPARATOR=!"
@@ -421,7 +421,7 @@ def test_parse_data():
     df_parsed = _GefCpt.parse_data(
         data_s, " ", "!", column_names=["col1", "col2", "col3"]
     )
-    assert df_parsed.frame_equal(df, null_equal=True)
+    assert df_parsed.equals(df, null_equal=True)
 
 
 def test_parse_column_separator():
@@ -493,14 +493,14 @@ def test_parse_add_info_as_string():
     ]
 
     df_parsed = _GefBore.parse_add_info_as_string(pl.DataFrame({}), data_s)
-    assert df_parsed.frame_equal(df, null_equal=True)
+    assert df_parsed.equals(df, null_equal=True)
 
 
 def test_parse_data_soil_code():
     df = pl.DataFrame({"geotechnicalSoilCode": ["Kz", "Kz1", "Kz2"]})
     data_s = [["'Kz'", "''"], ["'Kz1'", "''"], ["'Kz2'", "''"]]
     df_parsed = _GefBore.parse_data_soil_code(pl.DataFrame({}), data_s)
-    assert df_parsed.frame_equal(df, null_equal=True)
+    assert df_parsed.equals(df, null_equal=True)
 
 
 def test_parse_column_void():
@@ -529,7 +529,7 @@ def test_pre_excavated_depth():
     df = pl.DataFrame(
         {"penetrationLength": [2.0, 3.0, 4.0], "coneResistance": [0.6, 0.7, 0.8]}
     )
-    assert df_calculated.frame_equal(df, null_equal=True)
+    assert df_calculated.equals(df, null_equal=True)
 
 
 def test_replace_column_void():
@@ -548,7 +548,7 @@ def test_replace_column_void():
             "coneResistance": [None, 0.5, 0.6, 0.7, 0.8],
         }
     )
-    assert df_calculated.frame_equal(df, null_equal=True)
+    assert df_calculated.equals(df, null_equal=True)
 
     df1 = pl.DataFrame(
         {
@@ -558,7 +558,7 @@ def test_replace_column_void():
     )
 
     df_calculated = replace_column_void(df1, column_void)
-    assert df_calculated.frame_equal(df, null_equal=True)
+    assert df_calculated.equals(df, null_equal=True)
 
 
 def test_parse_cpt():
@@ -604,9 +604,7 @@ def test_parse_cpt():
 
     for column in df.columns:
         assert (
-            df_calculated[column]
-            .round(4)
-            .series_equal(df[column].round(4), null_equal=True)
+            df_calculated[column].round(4).equals(df[column].round(4), null_equal=True)
         )
 
 
@@ -676,7 +674,7 @@ def test_parse_bore():
             ],
         },
     )
-    assert df.frame_equal(expected, null_equal=True)
+    assert df.equals(expected, null_equal=True)
 
 
 def test_parse_pre_excavated_dept_with_void_inclination():
@@ -718,9 +716,7 @@ def test_parse_pre_excavated_dept_with_void_inclination():
 
     for column in cpt.df.columns:
         assert (
-            expected[column]
-            .round(4)
-            .series_equal(cpt.df[column].round(4), null_equal=True)
+            expected[column].round(4).equals(cpt.df[column].round(4), null_equal=True)
         )
 
 
@@ -732,7 +728,7 @@ def test_assign_multiple_columns():
     df = pl.DataFrame(
         {"soil_pressure": [0.0, 0.25, 0.75], "water_pressure": [0.0, 0.0, 4.905]}
     )
-    assert v.frame_equal(df, null_equal=True)
+    assert v.equals(df, null_equal=True)
 
 
 def test_kpa_to_mpa():
@@ -749,7 +745,7 @@ def test_kpa_to_mpa():
     # TODO: replace with frame_equal when rounding is supported
     # assert df_calculated.frame_equal(df, null_equal=True)
     for column in df.columns:
-        assert v[column].round(6).series_equal(df[column])
+        assert v[column].round(6).equals(df[column])
 
 
 def test_bug_depth():
