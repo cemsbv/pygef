@@ -9,8 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: pypi
-      url: https://pypi.org/p/pygef
+      name: release
 
     # Mandatory permission for trusted publishing to PyPi
     permissions:
@@ -38,6 +37,3 @@ jobs:
 
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
