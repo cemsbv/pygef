@@ -175,7 +175,7 @@ docker run \
 --env PYTHON_ISORT_CONFIG_FILE=pyproject.toml \
 --env PYTHON_MYPY_CONFIG_FILE=pyproject.toml \
 --env PYTHON_FLAKE8_CONFIG_FILE=.flake8 \
--v $(pwd):/tmp/lint github/super-linter:v4
+-v $(pwd):/tmp/lint ghcr.io/super-linter/super-linter:v6
 ```
 
 ## UnitTest

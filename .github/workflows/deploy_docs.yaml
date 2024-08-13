@@ -5,17 +5,20 @@ on:
     branches:
       - master
 
+permissions: read-all
+
 jobs:
   deploy_docs:
     name: Deploy docs
     runs-on: ubuntu-20.04
+    permissions: write-all
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install python 3.9
+      - name: Install python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |

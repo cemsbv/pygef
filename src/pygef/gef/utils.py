@@ -503,9 +503,11 @@ def parse_add_info(headers):
             if string:
                 add_info += "{}) ".format(i + 1) + "".join(
                     [
-                        dict_add_info[string_split]
-                        if string_split in dict_add_info
-                        else string_split + " "
+                        (
+                            dict_add_info[string_split]
+                            if string_split in dict_add_info
+                            else string_split + " "
+                        )
                         for string_split in string.split(" ")
                     ]
                 )
