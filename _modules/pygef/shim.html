@@ -1,20 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pygef.shim &mdash; pygef 0.10.1 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/index.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/index.css?v=6c0e5716" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=261ea15a"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -107,7 +111,9 @@
     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not find the GEF file.&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="read_bore"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_bore">[docs]</a><span class="k">def</span> <span class="nf">read_bore</span><span class="p">(</span>
+<div class="viewcode-block" id="read_bore">
+<a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_bore">[docs]</a>
+<span class="k">def</span> <span class="nf">read_bore</span><span class="p">(</span>
     <span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">engine</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;gef&quot;</span><span class="p">,</span> <span class="s2">&quot;xml&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
@@ -132,7 +138,10 @@
     <span class="k">return</span> <span class="n">read_bore_xml</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="read_cpt"><a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_cpt">[docs]</a><span class="k">def</span> <span class="nf">read_cpt</span><span class="p">(</span>
+
+<div class="viewcode-block" id="read_cpt">
+<a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_cpt">[docs]</a>
+<span class="k">def</span> <span class="nf">read_cpt</span><span class="p">(</span>
     <span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">engine</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;gef&quot;</span><span class="p">,</span> <span class="s2">&quot;xml&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
@@ -156,6 +165,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">_GefCpt</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">file</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">read_cpt_xml</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="n">index</span><span class="p">]</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">convert_height_system_to_vertical_datum</span><span class="p">(</span><span class="n">height_system</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -190,58 +200,58 @@
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_surface_area&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">nom_surface_area_cone_tip</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_diameter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_surface_quotient&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">net_surface_area_quotient_of_the_cone_tip</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;cone_to_friction_sleeve_distance&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">distance_between_cone_and_centre_of_friction_casing</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_to_friction_sleeve_distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">distance_between_cone_and_centre_of_friction_casing</span>
+    <span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_to_friction_sleeve_surface_area&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;cone_to_friction_sleeve_surface_quotient&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">net_surface_area_quotient_of_the_friction_casing</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cone_to_friction_sleeve_surface_quotient&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">net_surface_area_quotient_of_the_friction_casing</span>
+    <span class="p">)</span>
 
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_cone_resistance_before&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_cone_before_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_cone_resistance_after&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_cone_after_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_inclination_ew_before&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ew_before_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_inclination_ew_after&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ew_after_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_inclination_ns_before&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ns_before_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_inclination_ns_after&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ns_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_cone_resistance_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_cone_before_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_cone_resistance_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_cone_after_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_ew_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ew_before_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_ew_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ew_after_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_ns_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ns_before_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_ns_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_inclination_ns_after_penetration_test</span>
+    <span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_resultant_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_inclination_resultant_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_local_friction_before&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_friction_before_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_local_friction_after&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_friction_after_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_pore_pressure_u1_before&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u1_before_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_pore_pressure_u2_before&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u2_before_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_pore_pressure_u3_before&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u3_before_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_pore_pressure_u1_after&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u1_after_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_pore_pressure_u2_after&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u2_after_penetration_test</span>
-    <span class="n">kwargs</span><span class="p">[</span>
-        <span class="s2">&quot;zlm_pore_pressure_u3_after&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u3_after_penetration_test</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_local_friction_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_friction_before_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_local_friction_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_friction_after_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_pore_pressure_u1_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u1_before_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_pore_pressure_u2_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u2_before_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_pore_pressure_u3_before&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u3_before_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_pore_pressure_u1_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u1_after_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_pore_pressure_u2_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u2_after_penetration_test</span>
+    <span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zlm_pore_pressure_u3_after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zero_measurement_ppt_u3_after_penetration_test</span>
+    <span class="p">)</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_offset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gef_cpt</span><span class="o">.</span><span class="n">zid</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_vertical_position_datum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">VerticalDatumClass</span><span class="p">(</span>
         <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">gef_cpt</span><span class="o">.</span><span class="n">height_system</span><span class="p">))</span>

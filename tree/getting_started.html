@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installing pygef &mdash; pygef 0.10.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/index.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/index.css?v=6c0e5716" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=261ea15a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -88,7 +92,7 @@
            <div itemprop="articleBody">
              
   <section id="installing-pygef">
-<h1>Installing pygef<a class="headerlink" href="#installing-pygef" title="Permalink to this heading"></a></h1>
+<h1>Installing pygef<a class="headerlink" href="#installing-pygef" title="Link to this heading"></a></h1>
 <p>To install <code class="code docutils literal notranslate"><span class="pre">pygef</span></code>, we strongly recommend using Python Package Index (PyPI).
 You can install <code class="code docutils literal notranslate"><span class="pre">pygef</span></code> with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pygef<span class="o">[</span>map<span class="o">]</span>
@@ -98,14 +102,14 @@ You can install <code class="code docutils literal notranslate"><span class="pre
 and thereby enable additional functionality.</p>
 </section>
 <section id="how-to-import-pygef">
-<h1>How to import pygef<a class="headerlink" href="#how-to-import-pygef" title="Permalink to this heading"></a></h1>
+<h1>How to import pygef<a class="headerlink" href="#how-to-import-pygef" title="Link to this heading"></a></h1>
 <p>Getting started with pygef is easy done by importing the <code class="code docutils literal notranslate"><span class="pre">pygef</span></code> library:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pygef</span>
 </pre></div>
 </div>
 <p>or any equivalent <code class="code docutils literal notranslate"><span class="pre">import</span></code> statement.</p>
 <section id="load-a-cpt-bore-file">
-<h2>Load a Cpt/Bore file<a class="headerlink" href="#load-a-cpt-bore-file" title="Permalink to this heading"></a></h2>
+<h2>Load a Cpt/Bore file<a class="headerlink" href="#load-a-cpt-bore-file" title="Link to this heading"></a></h2>
 <p>The classes <code class="code docutils literal notranslate"><span class="pre">read_cpt</span></code> and <code class="code docutils literal notranslate"><span class="pre">read_bore</span></code> accept two possible inputs:</p>
 <ul class="simple">
 <li><p>the <code class="code docutils literal notranslate"><span class="pre">path</span></code> of the file</p></li>
@@ -124,7 +128,7 @@ and thereby enable additional functionality.</p>
 </div>
 </section>
 <section id="access-the-attributes">
-<h2>Access the attributes<a class="headerlink" href="#access-the-attributes" title="Permalink to this heading"></a></h2>
+<h2>Access the attributes<a class="headerlink" href="#access-the-attributes" title="Link to this heading"></a></h2>
 <p>Accessing the attributes of a pygef object is quite easy.
 If for example we want to know the (x, y, z) coordinates of the gef we can simply do:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [5]: </span><span class="n">coordinates</span> <span class="o">=</span> <span class="p">(</span>
@@ -144,7 +148,7 @@ accessible as attribute of the <code class="code docutils literal notranslate"><
 <p>A common and very useful attribute is <code class="code docutils literal notranslate"><span class="pre">CPTData.data</span></code>, this is a <code class="code docutils literal notranslate"><span class="pre">polars.DataFrame</span></code> that contains all the rows and
 columns defined in the file.</p>
 <section id="cpt">
-<h3>CPT<a class="headerlink" href="#cpt" title="Permalink to this heading"></a></h3>
+<h3>CPT<a class="headerlink" href="#cpt" title="Link to this heading"></a></h3>
 <p>If we call <code class="code docutils literal notranslate"><span class="pre">CPTData.data</span></code> on a <code class="code docutils literal notranslate"><span class="pre">CPTData</span></code> object we will get something like this:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">cpt</span><span class="o">.</span><span class="n">data</span>
 <span class="gh">Out[7]: </span>
@@ -160,7 +164,9 @@ columns defined in the file.</p>
 <span class="go">│ 0.04       ┆ 0.039 ┆ 13.0       ┆ 4.29       ┆ … ┆ 0.039     ┆ 0.8       ┆ 4.371     ┆ 0.909091  │</span>
 <span class="go">│ 0.06       ┆ 0.059 ┆ 15.0       ┆ 5.124      ┆ … ┆ 0.045     ┆ 0.9       ┆ 4.351     ┆ 0.87822   │</span>
 <span class="go">│ 0.08       ┆ 0.079 ┆ 17.0       ┆ 5.45       ┆ … ┆ 0.049     ┆ 1.0       ┆ 4.331     ┆ 0.899083  │</span>
+<span class="go">│ 0.1        ┆ 0.099 ┆ 19.0       ┆ 5.41       ┆ … ┆ 0.056     ┆ 1.0       ┆ 4.311     ┆ 1.03512   │</span>
 <span class="go">│ …          ┆ …     ┆ …          ┆ …          ┆ … ┆ …         ┆ …         ┆ …         ┆ …         │</span>
+<span class="go">│ 7.36       ┆ 7.359 ┆ 519.0      ┆ 10.815     ┆ … ┆ null      ┆ 0.0       ┆ -2.949    ┆ null      │</span>
 <span class="go">│ 7.38       ┆ 7.379 ┆ 520.0      ┆ 10.576     ┆ … ┆ null      ┆ 0.0       ┆ -2.969    ┆ null      │</span>
 <span class="go">│ 7.4        ┆ 7.399 ┆ 521.0      ┆ 10.235     ┆ … ┆ null      ┆ 0.0       ┆ -2.989    ┆ null      │</span>
 <span class="go">│ 7.42       ┆ 7.419 ┆ 522.0      ┆ 9.714      ┆ … ┆ null      ┆ 0.0       ┆ -3.009    ┆ null      │</span>
@@ -173,7 +179,7 @@ columns defined in the file.</p>
 <p>Suggestion: Instead of using the column <code class="code docutils literal notranslate"><span class="pre">penetration_length</span></code> use the column <code class="code docutils literal notranslate"><span class="pre">depth</span></code> since this one is corrected with the inclination (if present).</p>
 </section>
 <section id="borehole">
-<h3>Borehole<a class="headerlink" href="#borehole" title="Permalink to this heading"></a></h3>
+<h3>Borehole<a class="headerlink" href="#borehole" title="Link to this heading"></a></h3>
 <p>If we call <code class="code docutils literal notranslate"><span class="pre">BoreData.data</span></code> on a <code class="code docutils literal notranslate"><span class="pre">BoreData</span></code> object we will get something like this:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [8]: </span><span class="n">path_bore</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
 <span class="gp">   ...: </span>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../tests/test_files/bore_xml/DP14+074_MB_KR.xml&quot;</span>
@@ -204,7 +210,13 @@ columns defined in the file.</p>
 <span class="go">│ 2.0       ┆ 3.0       ┆ zwakZandi ┆ standaard ┆ … ┆ null      ┆ 8.773     ┆ 7.773     ┆ [0.0,    │</span>
 <span class="go">│           ┆           ┆ geKlei    ┆ Grijs     ┆   ┆           ┆           ┆           ┆ 0.0, …   │</span>
 <span class="go">│           ┆           ┆           ┆           ┆   ┆           ┆           ┆           ┆ 0.0]     │</span>
+<span class="go">│ 3.0       ┆ 4.0       ┆ zwakZandi ┆ donkergri ┆ … ┆ null      ┆ 7.773     ┆ 6.773     ┆ [0.0,    │</span>
+<span class="go">│           ┆           ┆ geKlei    ┆ js        ┆   ┆           ┆           ┆           ┆ 0.0, …   │</span>
+<span class="go">│           ┆           ┆           ┆           ┆   ┆           ┆           ┆           ┆ 0.0]     │</span>
 <span class="go">│ …         ┆ …         ┆ …         ┆ …         ┆ … ┆ …         ┆ …         ┆ …         ┆ …        │</span>
+<span class="go">│ 7.0       ┆ 8.0       ┆ siltigZan ┆ lichtgrij ┆ … ┆ fijn150to ┆ 3.773     ┆ 2.773     ┆ [0.0,    │</span>
+<span class="go">│           ┆           ┆ d         ┆ s         ┆   ┆ t200um    ┆           ┆           ┆ 0.0, …   │</span>
+<span class="go">│           ┆           ┆           ┆           ┆   ┆           ┆           ┆           ┆ 0.0]     │</span>
 <span class="go">│ 8.0       ┆ 9.0       ┆ siltigZan ┆ standaard ┆ … ┆ fijn150to ┆ 2.773     ┆ 1.773     ┆ [0.0,    │</span>
 <span class="go">│           ┆           ┆ d         ┆ Grijs     ┆   ┆ t200um    ┆           ┆           ┆ 0.0, …   │</span>
 <span class="go">│           ┆           ┆           ┆           ┆   ┆           ┆           ┆           ┆ 0.0]     │</span>
@@ -223,10 +235,10 @@ columns defined in the file.</p>
 </section>
 </section>
 <section id="plot-a-gef-file">
-<h2>Plot a gef file<a class="headerlink" href="#plot-a-gef-file" title="Permalink to this heading"></a></h2>
+<h2>Plot a gef file<a class="headerlink" href="#plot-a-gef-file" title="Link to this heading"></a></h2>
 <p>We can plot a gef file using the method <code class="code docutils literal notranslate"><span class="pre">.plot()</span></code>, check the reference to know which are the arguments of the method.</p>
 <section id="id1">
-<h3>CPT<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<h3>CPT<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">cpt</span></code> object we get:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [11]: </span><span class="n">pygef</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">plot_cpt</span><span class="p">(</span><span class="n">cpt</span><span class="p">,</span> <span class="n">use_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gh">Out[11]: </span>
@@ -235,19 +247,19 @@ columns defined in the file.</p>
 <span class="go"> &lt;Axes: xlabel=&#39;$R_f$ [%]&#39;&gt;)</span>
 </pre></div>
 </div>
-<img alt="../_images/cpt_plot.png" src="../_images/cpt_plot.png" />
+<img alt="savefig/cpt_plot.png" src="savefig/cpt_plot.png" />
 </section>
 <section id="id2">
-<h3>Borehole<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<h3>Borehole<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p>If we use the method without arguments on a <code class="code docutils literal notranslate"><span class="pre">BoreData</span></code> object we get:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [12]: </span><span class="n">pygef</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">plot_bore</span><span class="p">(</span><span class="n">bore</span><span class="p">)</span>
 <span class="gh">Out[12]: </span><span class="go">&lt;Axes: xlabel=&#39;cumulative soil fraction [-]&#39;, ylabel=&#39;depth [m]&#39;&gt;</span>
 </pre></div>
 </div>
-<img alt="../_images/bore_plot.png" src="../_images/bore_plot.png" />
+<img alt="savefig/bore_plot.png" src="savefig/bore_plot.png" />
 </section>
 <section id="combine-borehole-an-cpt">
-<h3>Combine Borehole an CPT<a class="headerlink" href="#combine-borehole-an-cpt" title="Permalink to this heading"></a></h3>
+<h3>Combine Borehole an CPT<a class="headerlink" href="#combine-borehole-an-cpt" title="Link to this heading"></a></h3>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="go"># parse BRO bhrgt XML</span>
 <span class="gp">In [13]: </span><span class="n">path_bore</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
 <span class="gp">   ....: </span>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../tests/test_files/bore_xml/BHR000000336600.xml&quot;</span>
@@ -272,7 +284,7 @@ columns defined in the file.</p>
 <span class="go">  &lt;Axes: &gt;])</span>
 </pre></div>
 </div>
-<img alt="../_images/bore_cpt_plot.png" src="../_images/bore_cpt_plot.png" />
+<img alt="savefig/bore_cpt_plot.png" src="savefig/bore_cpt_plot.png" />
 </section>
 </section>
 </section>
