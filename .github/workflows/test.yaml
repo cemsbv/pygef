@@ -10,6 +10,8 @@ on:
       - "docs/**"
       - "**.md"
 
+permissions: read-all
+
 jobs:
   test:
     name: Unit test

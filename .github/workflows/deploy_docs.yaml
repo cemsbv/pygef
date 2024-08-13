@@ -5,10 +5,13 @@ on:
     branches:
       - master
 
+permissions: read-all
+
 jobs:
   deploy_docs:
     name: Deploy docs
     runs-on: ubuntu-20.04
+    permissions: write-all
     steps:
       - uses: actions/checkout@v3
 
