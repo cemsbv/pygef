@@ -7,7 +7,7 @@ name = "pygef"
 version = "0.10.1"
 description = "Parse soil measurument data."
 dependencies = [
-    "polars[pyarrow]>1,<2",
+    "polars>1,<2",
     "matplotlib>=3.6,<4.0",
     "lxml>=5,<6.0",
     "gef-file-to-map>=0.1,<0.2",

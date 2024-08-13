@@ -101,7 +101,6 @@ numpy==2.0.1
     # via
     #   contourpy
     #   matplotlib
-    #   pyarrow
     #   rasterio
     #   snuggs
 packaging==24.1
@@ -124,18 +123,14 @@ platformdirs==4.2.2
     # via black
 pluggy==1.5.0
     # via pytest
-polars[pyarrow]==1.4.1
-    # via
-    #   polars
-    #   pygef (pyproject.toml)
+polars==1.4.1
+    # via pygef (pyproject.toml)
 prompt-toolkit==3.0.47
     # via ipython
 ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
     # via stack-data
-pyarrow==17.0.0
-    # via polars
 pygments==2.18.0
     # via
     #   ipython
