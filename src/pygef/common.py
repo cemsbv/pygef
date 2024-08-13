@@ -54,13 +54,11 @@ def kpa_to_mpa(df: pl.DataFrame, columns: List[str]) -> pl.DataFrame:
 
 
 @overload
-def offset_to_depth(ref: float, offset: float) -> float:
-    ...
+def offset_to_depth(ref: float, offset: float) -> float: ...
 
 
 @overload
-def offset_to_depth(ref: NDArray, offset: float) -> NDArray:
-    ...
+def offset_to_depth(ref: NDArray, offset: float) -> NDArray: ...
 
 
 def offset_to_depth(
@@ -79,13 +77,11 @@ def offset_to_depth(
 
 
 @overload
-def depth_to_offset(depth: float | None, offset: float | None) -> float | None:
-    ...
+def depth_to_offset(depth: float | None, offset: float | None) -> float | None: ...
 
 
 @overload
-def depth_to_offset(depth: NDArray, offset: float) -> NDArray:
-    ...
+def depth_to_offset(depth: NDArray, offset: float) -> NDArray: ...
 
 
 def depth_to_offset(

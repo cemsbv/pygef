@@ -117,58 +117,58 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs["cone_surface_area"] = gef_cpt.nom_surface_area_cone_tip
     kwargs["cone_diameter"] = None
     kwargs["cone_surface_quotient"] = gef_cpt.net_surface_area_quotient_of_the_cone_tip
-    kwargs[
-        "cone_to_friction_sleeve_distance"
-    ] = gef_cpt.distance_between_cone_and_centre_of_friction_casing
+    kwargs["cone_to_friction_sleeve_distance"] = (
+        gef_cpt.distance_between_cone_and_centre_of_friction_casing
+    )
     kwargs["cone_to_friction_sleeve_surface_area"] = None
-    kwargs[
-        "cone_to_friction_sleeve_surface_quotient"
-    ] = gef_cpt.net_surface_area_quotient_of_the_friction_casing
+    kwargs["cone_to_friction_sleeve_surface_quotient"] = (
+        gef_cpt.net_surface_area_quotient_of_the_friction_casing
+    )
 
-    kwargs[
-        "zlm_cone_resistance_before"
-    ] = gef_cpt.zero_measurement_cone_before_penetration_test
-    kwargs[
-        "zlm_cone_resistance_after"
-    ] = gef_cpt.zero_measurement_cone_after_penetration_test
-    kwargs[
-        "zlm_inclination_ew_before"
-    ] = gef_cpt.zero_measurement_inclination_ew_before_penetration_test
-    kwargs[
-        "zlm_inclination_ew_after"
-    ] = gef_cpt.zero_measurement_inclination_ew_after_penetration_test
-    kwargs[
-        "zlm_inclination_ns_before"
-    ] = gef_cpt.zero_measurement_inclination_ns_before_penetration_test
-    kwargs[
-        "zlm_inclination_ns_after"
-    ] = gef_cpt.zero_measurement_inclination_ns_after_penetration_test
+    kwargs["zlm_cone_resistance_before"] = (
+        gef_cpt.zero_measurement_cone_before_penetration_test
+    )
+    kwargs["zlm_cone_resistance_after"] = (
+        gef_cpt.zero_measurement_cone_after_penetration_test
+    )
+    kwargs["zlm_inclination_ew_before"] = (
+        gef_cpt.zero_measurement_inclination_ew_before_penetration_test
+    )
+    kwargs["zlm_inclination_ew_after"] = (
+        gef_cpt.zero_measurement_inclination_ew_after_penetration_test
+    )
+    kwargs["zlm_inclination_ns_before"] = (
+        gef_cpt.zero_measurement_inclination_ns_before_penetration_test
+    )
+    kwargs["zlm_inclination_ns_after"] = (
+        gef_cpt.zero_measurement_inclination_ns_after_penetration_test
+    )
     kwargs["zlm_inclination_resultant_before"] = None
     kwargs["zlm_inclination_resultant_after"] = None
-    kwargs[
-        "zlm_local_friction_before"
-    ] = gef_cpt.zero_measurement_friction_before_penetration_test
-    kwargs[
-        "zlm_local_friction_after"
-    ] = gef_cpt.zero_measurement_friction_after_penetration_test
-    kwargs[
-        "zlm_pore_pressure_u1_before"
-    ] = gef_cpt.zero_measurement_ppt_u1_before_penetration_test
-    kwargs[
-        "zlm_pore_pressure_u2_before"
-    ] = gef_cpt.zero_measurement_ppt_u2_before_penetration_test
-    kwargs[
-        "zlm_pore_pressure_u3_before"
-    ] = gef_cpt.zero_measurement_ppt_u3_before_penetration_test
-    kwargs[
-        "zlm_pore_pressure_u1_after"
-    ] = gef_cpt.zero_measurement_ppt_u1_after_penetration_test
-    kwargs[
-        "zlm_pore_pressure_u2_after"
-    ] = gef_cpt.zero_measurement_ppt_u2_after_penetration_test
-    kwargs[
-        "zlm_pore_pressure_u3_after"
-    ] = gef_cpt.zero_measurement_ppt_u3_after_penetration_test
+    kwargs["zlm_local_friction_before"] = (
+        gef_cpt.zero_measurement_friction_before_penetration_test
+    )
+    kwargs["zlm_local_friction_after"] = (
+        gef_cpt.zero_measurement_friction_after_penetration_test
+    )
+    kwargs["zlm_pore_pressure_u1_before"] = (
+        gef_cpt.zero_measurement_ppt_u1_before_penetration_test
+    )
+    kwargs["zlm_pore_pressure_u2_before"] = (
+        gef_cpt.zero_measurement_ppt_u2_before_penetration_test
+    )
+    kwargs["zlm_pore_pressure_u3_before"] = (
+        gef_cpt.zero_measurement_ppt_u3_before_penetration_test
+    )
+    kwargs["zlm_pore_pressure_u1_after"] = (
+        gef_cpt.zero_measurement_ppt_u1_after_penetration_test
+    )
+    kwargs["zlm_pore_pressure_u2_after"] = (
+        gef_cpt.zero_measurement_ppt_u2_after_penetration_test
+    )
+    kwargs["zlm_pore_pressure_u3_after"] = (
+        gef_cpt.zero_measurement_ppt_u3_after_penetration_test
+    )
     kwargs["delivered_vertical_position_offset"] = gef_cpt.zid
     kwargs["delivered_vertical_position_datum"] = VerticalDatumClass(
         str(int(gef_cpt.height_system))
