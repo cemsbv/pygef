@@ -16,7 +16,7 @@ attrs==24.2.0
     # via rasterio
 babel==2.16.0
     # via sphinx
-black==24.8.0
+black==24.4.2
     # via pygef (pyproject.toml)
 certifi==2024.7.4
     # via
@@ -35,7 +35,7 @@ click-plugins==1.1.1
     # via rasterio
 cligj==0.7.2
     # via rasterio
-contextily==1.6.0
+contextily==1.6.1
     # via pygef (pyproject.toml)
 contourpy==1.2.1
     # via matplotlib

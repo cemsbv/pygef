@@ -33,8 +33,10 @@ docs = [
     "sphinx_rtd_theme"
 ]
 lint = [
-    "black",
-    "isort",
+    # https://github.com/super-linter/super-linter/blob/main/dependencies/python/black.txt
+    "black==24.4.2",
+    # https://github.com/super-linter/super-linter/blob/main/dependencies/python/isort.txt
+    "isort==5.13.2",
 ]
 map = ["contextily>=1.3.0"]
 
