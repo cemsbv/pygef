@@ -170,7 +170,7 @@ def replace_column_void(
                 .otherwise(pl.col(col))
                 .interpolate()
                 .name.keep()
-                for col in lf.columns
+                for col in lf.collect_schema().names()
             ]
         )
     )
