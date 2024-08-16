@@ -2,16 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.2] - 2024-08-16
+
+### Bug Fixes
+
+- *(ci)* Use proper authentication in release pipeline
+
+### Performance
+
+- Resolve polars performance warning
+
 ## [0.10.1] - 2023-12-22
-
-### Features
-
-- *(xml)* Dont resolve entities when parsing xml
 
 ### Bug Fixes
 
 - Resolve pkg_resources deprecation warning
 - Resolve polars deprecation warning
+
+### Features
+
+- *(xml)* Dont resolve entities when parsing xml
 
 ### Miscellaneous Tasks
 
@@ -23,33 +33,33 @@ All notable changes to this project will be documented in this file.
 
 ## [0.10.0] - 2023-10-19
 
-### Miscellaneous Tasks
-
-- [**breaking**] Update xpath and add exception (#358)
-
 ### Bug Fixes
 
 - [**breaking**] Make sure that penetrationLength is positive (#357)
 
-## [0.9.0] - 2023-10-09
-
 ### Miscellaneous Tasks
 
-- Release 0.9.0
+- [**breaking**] Update xpath and add exception (#358)
+
+## [0.9.0] - 2023-10-09
 
 ### Bug Fixes
 
 - Resolve #354 update xpath
 
-## [0.8.4] - 2023-10-02
-
 ### Miscellaneous Tasks
 
-- Release 0.8.4
+- Release 0.9.0
+
+## [0.8.4] - 2023-10-02
 
 ### Features
 
 - Add class zero to QualityClass (#355)
+
+### Miscellaneous Tasks
+
+- Release 0.8.4
 
 ## [0.8.3] - 2023-09-15
 
@@ -61,14 +71,14 @@ All notable changes to this project will be documented in this file.
 
 ## [0.8.2] - 2023-06-08
 
+### Bug Fixes
+
+- Overwrite dtypes to Float64 (#330)
+
 ### Miscellaneous Tasks
 
 - Release 0.8.2 (#332)
 - *(ci)* Add python version matrix in test job (#331)
-
-### Bug Fixes
-
-- Overwrite dtypes to Float64 (#330)
 
 ## [0.8.1] - 2023-06-02
 
@@ -86,15 +96,6 @@ All notable changes to this project will be documented in this file.
 
 ## [0.8.0] - 2023-03-15
 
-### Miscellaneous Tasks
-
-- Release 0.8.0
-
-### Features
-
-- Update soil distribution (#300)
-- Add groundwater level property to cpt (#296)
-
 ### Bug Fixes
 
 - *(parsing)* Provide parsing engine (#298)
@@ -104,12 +105,28 @@ All notable changes to this project will be documented in this file.
 
 - Add attributes to docstring (#295)
 
+### Features
+
+- Update soil distribution (#300)
+- Add groundwater level property to cpt (#296)
+
+### Miscellaneous Tasks
+
+- Release 0.8.0
+
 ## [0.8.0-alpha.5] - 2023-03-07
 
 ### Bug Fixes
 
 - *(ci)* Trigger release on every tag (#293)
 - *(ci)* Release to pypi trigger
+- *(CI)* Install pytest
+- *(CI)* Install pygef
+
+### Chore
+
+- Add linting, rm old GEF functions, update docs
+- Add linting, rm old GEF functions, update docs
 
 ### Features
 
@@ -121,25 +138,15 @@ All notable changes to this project will be documented in this file.
 - *(pytest)* Use pytest for all test, omit tests in cov report
 - *(pytest)* Use pytest for all test, omit tests in cov report
 
-### Chore
-
-- Add linting, rm old GEF functions, update docs
-
 ## [0.8.0-alpha.4] - 2023-03-02
+
+### Bug Fixes
+
+- *(doc)* Sphinx documentation references
 
 ### Miscellaneous Tasks
 
 - Add linting, rm old GEF functions, update docs (#290)
-
-### Bug Fixes
-
-- *(CI)* Install pytest
-- *(CI)* Install pygef
-- *(doc)* Sphinx documentation references
-
-### Chore
-
-- Add linting, rm old GEF functions, update docs
 
 ## [0.8.0-alpha.3] - 2023-02-27
 
