@@ -135,7 +135,7 @@ pygments==2.18.0
     # via
     #   ipython
     #   sphinx
-pyparsing==3.1.2
+pyparsing==3.1.4
     # via
     #   matplotlib
     #   snuggs
