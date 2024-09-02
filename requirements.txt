@@ -18,7 +18,7 @@ babel==2.16.0
     # via sphinx
 black==24.4.2
     # via pygef (pyproject.toml)
-certifi==2024.7.4
+certifi==2024.8.30
     # via
     #   rasterio
     #   requests
