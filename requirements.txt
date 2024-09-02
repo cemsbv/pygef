@@ -123,7 +123,7 @@ platformdirs==4.2.2
     # via black
 pluggy==1.5.0
     # via pytest
-polars==1.4.1
+polars==1.6.0
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.47
     # via ipython
