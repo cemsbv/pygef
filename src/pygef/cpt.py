@@ -4,21 +4,11 @@ import copy
 import pprint
 from dataclasses import dataclass, field
 from datetime import date
-from enum import Enum
 from typing import Any, List
 
 import polars as pl
 
 from pygef.common import Location, VerticalDatumClass, depth_to_offset
-
-
-class QualityClass(Enum):
-    Unknown = -1
-    Class0 = 0
-    Class1 = 1
-    Class2 = 2
-    Class3 = 3
-    Class4 = 4
 
 
 @dataclass(frozen=True)
@@ -37,7 +27,7 @@ class CPTData:
         delivered_vertical_position_reference_point (str): delivered vertical position reference point
         cpt_standard (str | None): cpt standard
         dissipationtest_performed (bool | None): dissipationtest performed
-        quality_class (QualityClass): quality class
+        quality_class (int | None): quality class. None if the value in the source file was invalid or missing.
         predrilled_depth (float): predrilled depth
         final_depth (float): final depth
         groundwater_level (float | None): groundwater level
@@ -115,7 +105,7 @@ class CPTData:
     standardized_location: Location | None
     # conepenetrometersurvey
     dissipationtest_performed: bool | None
-    quality_class: QualityClass
+    quality_class: int | None
     predrilled_depth: float
     final_depth: float
     groundwater_level: float | None

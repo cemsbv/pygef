@@ -9,7 +9,7 @@ import polars as pl
 from lxml import etree
 
 from pygef.common import Location, VerticalDatumClass
-from pygef.cpt import QualityClass
+from pygef.gef.utils import parse_regex_cast
 
 
 def lower_text(val: str, **kwargs: dict[Any, Any]) -> str:
@@ -211,20 +211,10 @@ def parse_gml_location(el: etree.Element, **kwargs: dict[Any, Any]) -> Location:
     return Location(srs_name=srs_name, x=x, y=y)
 
 
-def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> QualityClass:
+def parse_quality_class(val: str, **kwargs: dict[Any, Any]) -> int | None:
     val = val.lower().replace(" ", "")
-    if val == "klasse1" or val == "class1":
-        return QualityClass.Class1
-    if val == "klasse2" or val == "class2":
-        return QualityClass.Class2
-    if val == "klasse3" or val == "class3":
-        return QualityClass.Class3
-    if val == "klasse4" or val == "class4":
-        return QualityClass.Class4
-    if val == "onbekend" or val == "unknown":
-        return QualityClass.Unknown
-    warn(f"quality class '{val}' is unknown")
-    return QualityClass.Unknown
+
+    return parse_regex_cast(r"^.*?(klasse|class|kl.).*?(\d{1})", val, int, 2)
 
 
 def parse_local_vertical_reference_point_class(

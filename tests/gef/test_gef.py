@@ -22,7 +22,15 @@ BasePath = os.path.dirname(__file__)
 
 @pytest.mark.parametrize(
     "filename",
-    ["example.gef", "cpt.gef", "cpt.gef", "cpt2.gef", "cpt3.gef", "cpt4.gef"],
+    [
+        "example.gef",
+        "cpt.gef",
+        "cpt.gef",
+        "cpt2.gef",
+        "cpt3.gef",
+        "cpt4.gef",
+        "cpt_class_high.gef",
+    ],
 )
 def test_cpt_smoke(filename):
     """
