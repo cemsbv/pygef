@@ -2,20 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2024-09-23
+
+### Features
+
+- *(cpt_class)* Remove cpt-class validation
+
+### Miscellaneous Tasks
+
+- *(lint)* Fix linting
+
 ## [0.10.2] - 2024-08-16
-
-### Bug Fixes
-
-- *(ci)* Use proper authentication in release pipeline
 
 ### Performance
 
 - Resolve polars performance warning
 
-## [0.10.1] - 2023-12-22
+## [0.10.1] - 2024-01-03
 
 ### Bug Fixes
 
+- *(ci)* Use proper authentication in release pipeline
 - Resolve pkg_resources deprecation warning
 - Resolve polars deprecation warning
 
