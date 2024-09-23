@@ -5,7 +5,7 @@ from lxml.etree import XMLSyntaxError
 
 from pygef import read_cpt
 from pygef.common import Location, VerticalDatumClass
-from pygef.cpt import CPTData, QualityClass
+from pygef.cpt import CPTData
 
 
 def test_engine(cpt_gef_1) -> None:
@@ -50,7 +50,7 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
         "dissipationtest_performed": None,
         "final_depth": 20.0,
         "predrilled_depth": 0.0,
-        "quality_class": QualityClass(2),
+        "quality_class": int(2),
         "research_report_date": datetime(2019, 2, 13).date(),
         "standardized_location": None,
         "delivered_location": Location(

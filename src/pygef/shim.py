@@ -9,7 +9,7 @@ from pygef.bore import BoreData
 from pygef.broxml.parse_bore import read_bore as read_bore_xml
 from pygef.broxml.parse_cpt import read_cpt as read_cpt_xml
 from pygef.common import Location, VerticalDatumClass
-from pygef.cpt import CPTData, QualityClass
+from pygef.cpt import CPTData
 from pygef.gef.parse_bore import _GefBore
 from pygef.gef.parse_cpt import _GefCpt
 
@@ -109,7 +109,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs["cpt_standard"] = None
     kwargs["groundwater_level"] = gef_cpt.groundwater_level
     kwargs["dissipationtest_performed"] = None
-    kwargs["quality_class"] = QualityClass(gef_cpt.cpt_class)
+    kwargs["quality_class"] = gef_cpt.cpt_class
     kwargs["predrilled_depth"] = gef_cpt.pre_excavated_depth
     kwargs["final_depth"] = gef_cpt.end_depth_of_penetration_test
     kwargs["cpt_description"] = ""

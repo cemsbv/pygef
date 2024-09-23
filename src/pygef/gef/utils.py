@@ -187,7 +187,7 @@ def parse_cone_id(headers):
             return None
 
 
-def parse_cpt_class(headers):
+def parse_cpt_class(headers) -> int | None:
     """
     Function that returns the class of the cpt as an int.
     The word class or klasse has to be defined in the parsed string.
@@ -207,6 +207,7 @@ def parse_cpt_class(headers):
         return parse_regex_cast(
             r"^.*?(klasse|class|kl.).*?(\d{1})", all_definition.lower(), int, 2
         )
+    return None
 
 
 def parse_project_type(headers, gef_type):

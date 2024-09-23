@@ -31,8 +31,7 @@ class _GefCpt(_Gef):
         self.project_id = utils.parse_project_type(self._headers, "cpt")
         self.cone_id = utils.parse_cone_id(self._headers)
 
-        cpt_class = utils.parse_cpt_class(self._headers)
-        self.cpt_class = -1 if cpt_class is None else cpt_class
+        self.cpt_class = utils.parse_cpt_class(self._headers)
 
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(
             self._headers, 1
