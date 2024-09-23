@@ -408,7 +408,6 @@ def test_parse_all_column_info():
 
 
 def test_parse_data():
-    header_s = "This is an header"
     df = pl.DataFrame({"col1": [1, 2, 3], "col2": [1, 2, 3], "col3": [1, 2, 3]})
     data_s = "\n1,1,1\n2,2,2\n3,3,3\n"
     df_parsed = _GefCpt.parse_data(
@@ -424,7 +423,6 @@ def test_parse_data():
     assert df_parsed.equals(df, null_equal=True)
 
     # Test terribly formatted columns
-    # header_s = "#RECORDSEPARATOR=!"
     data_s = "!\n 1  1 1 !\n2 2 2 ! \n3 3 3\n!"
     df_parsed = _GefCpt.parse_data(
         data_s, " ", "!", column_names=["col1", "col2", "col3"]
