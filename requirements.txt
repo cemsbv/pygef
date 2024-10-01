@@ -6,7 +6,7 @@
 #
 affine==2.4.0
     # via rasterio
-alabaster==0.7.16
+alabaster==1.0.0
     # via sphinx
 asteroid-sphinx-theme==0.0.3
     # via pygef (pyproject.toml)
