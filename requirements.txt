@@ -55,7 +55,7 @@ docutils==0.20.1
     # via
     #   sphinx
     #   sphinx-rtd-theme
-executing==2.0.1
+executing==2.1.0
     # via stack-data
 fonttools==4.53.1
     # via matplotlib
