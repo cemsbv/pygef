@@ -37,7 +37,7 @@ cligj==0.7.2
     # via rasterio
 contextily==1.6.1
     # via pygef (pyproject.toml)
-contourpy==1.2.1
+contourpy==1.3.0
     # via matplotlib
 coverage[toml]==7.6.1
     # via
