@@ -97,7 +97,7 @@ mercantile==1.2.1
     # via contextily
 mypy-extensions==1.0.0
     # via black
-numpy==2.1.0
+numpy==2.1.2
     # via
     #   contourpy
     #   matplotlib
