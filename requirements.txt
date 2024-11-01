@@ -71,7 +71,7 @@ imagesize==1.4.1
     # via sphinx
 iniconfig==2.0.0
     # via pytest
-ipython==8.26.0
+ipython==8.29.0
     # via pygef (pyproject.toml)
 isort==5.13.2
     # via pygef (pyproject.toml)
