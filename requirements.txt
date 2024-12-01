@@ -165,7 +165,7 @@ sphinx==7.4.7
     #   sphinx-autodoc-typehints
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
-sphinx-autodoc-typehints==2.3.0
+sphinx-autodoc-typehints==2.5.0
     # via pygef (pyproject.toml)
 sphinx-rtd-theme==2.0.0
     # via pygef (pyproject.toml)
