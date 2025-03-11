@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from datetime import date
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Optional, Union
 
 import numpy as np
 
