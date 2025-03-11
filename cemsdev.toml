@@ -1,0 +1,3 @@
+[python.env]
+MODULES = "src"
+EXTRA_REQUIREMENTS = "docs --extra=plot --extra=lint --extra=map --extra=test"
