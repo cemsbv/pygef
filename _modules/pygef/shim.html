@@ -1,24 +1,22 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pygef.shim &mdash; pygef 0.11.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/index.css?v=6c0e5716" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -75,25 +73,25 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pygef.shim</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">pygef.bore</span> <span class="kn">import</span> <span class="n">BoreData</span>
-<span class="kn">from</span> <span class="nn">pygef.broxml.parse_bore</span> <span class="kn">import</span> <span class="n">read_bore</span> <span class="k">as</span> <span class="n">read_bore_xml</span>
-<span class="kn">from</span> <span class="nn">pygef.broxml.parse_cpt</span> <span class="kn">import</span> <span class="n">read_cpt</span> <span class="k">as</span> <span class="n">read_cpt_xml</span>
-<span class="kn">from</span> <span class="nn">pygef.common</span> <span class="kn">import</span> <span class="n">Location</span><span class="p">,</span> <span class="n">VerticalDatumClass</span>
-<span class="kn">from</span> <span class="nn">pygef.cpt</span> <span class="kn">import</span> <span class="n">CPTData</span>
-<span class="kn">from</span> <span class="nn">pygef.gef.parse_bore</span> <span class="kn">import</span> <span class="n">_GefBore</span>
-<span class="kn">from</span> <span class="nn">pygef.gef.parse_cpt</span> <span class="kn">import</span> <span class="n">_GefCpt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygef.bore</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoreData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygef.broxml.parse_bore</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_bore</span> <span class="k">as</span> <span class="n">read_bore_xml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygef.broxml.parse_cpt</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_cpt</span> <span class="k">as</span> <span class="n">read_cpt_xml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygef.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Location</span><span class="p">,</span> <span class="n">VerticalDatumClass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygef.cpt</span><span class="w"> </span><span class="kn">import</span> <span class="n">CPTData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygef.gef.parse_bore</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GefBore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygef.gef.parse_cpt</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GefCpt</span>
 
 <span class="n">GEF_ID</span> <span class="o">=</span> <span class="s2">&quot;#GEFID&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_gef_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    gef files start with &#39;#GEFID&#39; so we check the content</span>
 <span class="sd">    of the file</span>
@@ -113,7 +111,7 @@
 
 <div class="viewcode-block" id="read_bore">
 <a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_bore">[docs]</a>
-<span class="k">def</span> <span class="nf">read_bore</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_bore</span><span class="p">(</span>
     <span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">engine</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;gef&quot;</span><span class="p">,</span> <span class="s2">&quot;xml&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
@@ -141,7 +139,7 @@
 
 <div class="viewcode-block" id="read_cpt">
 <a class="viewcode-back" href="../../tree/reference.html#pygef.shim.read_cpt">[docs]</a>
-<span class="k">def</span> <span class="nf">read_cpt</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_cpt</span><span class="p">(</span>
     <span class="n">file</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">engine</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;gef&quot;</span><span class="p">,</span> <span class="s2">&quot;xml&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
@@ -168,14 +166,14 @@
 
 
 
-<span class="k">def</span> <span class="nf">convert_height_system_to_vertical_datum</span><span class="p">(</span><span class="n">height_system</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_height_system_to_vertical_datum</span><span class="p">(</span><span class="n">height_system</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">height_system</span> <span class="o">==</span> <span class="mf">31000.0</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;nap&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">height_system</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">gef_cpt</span><span class="p">:</span> <span class="n">_GefCpt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gef_cpt_to_cpt_data</span><span class="p">(</span><span class="n">gef_cpt</span><span class="p">:</span> <span class="n">_GefCpt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CPTData</span><span class="p">:</span>
     <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span>
@@ -263,7 +261,7 @@
     <span class="k">return</span> <span class="n">CPTData</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">gef_bore</span><span class="p">:</span> <span class="n">_GefBore</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoreData</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gef_bore_to_bore_data</span><span class="p">(</span><span class="n">gef_bore</span><span class="p">:</span> <span class="n">_GefBore</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoreData</span><span class="p">:</span>
     <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;delivered_location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span>

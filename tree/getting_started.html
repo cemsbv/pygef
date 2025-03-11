@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
@@ -5,21 +7,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installing pygef &mdash; pygef 0.11.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
       <link rel="stylesheet" type="text/css" href="../_static/css/index.css?v=6c0e5716" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=f3b36f1a"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f3b36f1a"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -104,7 +102,7 @@ and thereby enable additional functionality.</p>
 <section id="how-to-import-pygef">
 <h1>How to import pygef<a class="headerlink" href="#how-to-import-pygef" title="Link to this heading"></a></h1>
 <p>Getting started with pygef is easy done by importing the <code class="code docutils literal notranslate"><span class="pre">pygef</span></code> library:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pygef</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">pygef</span>
 </pre></div>
 </div>
 <p>or any equivalent <code class="code docutils literal notranslate"><span class="pre">import</span></code> statement.</p>
@@ -116,7 +114,7 @@ and thereby enable additional functionality.</p>
 <li><p>the <code class="code docutils literal notranslate"><span class="pre">BytesIO</span></code> of the file</p></li>
 </ul>
 <p>If you want to use the <code class="code docutils literal notranslate"><span class="pre">path</span></code> then your code should look like this:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [2]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="gp">In [3]: </span><span class="n">path_cpt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
 <span class="gp">   ...: </span>    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DOC_PATH&quot;</span><span class="p">),</span> <span class="s2">&quot;../tests/test_files/cpt_xml/example.xml&quot;</span>
@@ -247,7 +245,7 @@ columns defined in the file.</p>
 <span class="go"> &lt;Axes: xlabel=&#39;$R_f$ [%]&#39;&gt;)</span>
 </pre></div>
 </div>
-<img alt="savefig/cpt_plot.png" src="savefig/cpt_plot.png" />
+<img alt="../_images/cpt_plot.png" src="../_images/cpt_plot.png" />
 </section>
 <section id="id2">
 <h3>Borehole<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
@@ -256,7 +254,7 @@ columns defined in the file.</p>
 <span class="gh">Out[12]: </span><span class="go">&lt;Axes: xlabel=&#39;cumulative soil fraction [-]&#39;, ylabel=&#39;depth [m]&#39;&gt;</span>
 </pre></div>
 </div>
-<img alt="savefig/bore_plot.png" src="savefig/bore_plot.png" />
+<img alt="../_images/bore_plot.png" src="../_images/bore_plot.png" />
 </section>
 <section id="combine-borehole-an-cpt">
 <h3>Combine Borehole an CPT<a class="headerlink" href="#combine-borehole-an-cpt" title="Link to this heading"></a></h3>
@@ -284,7 +282,7 @@ columns defined in the file.</p>
 <span class="go">  &lt;Axes: &gt;])</span>
 </pre></div>
 </div>
-<img alt="savefig/bore_cpt_plot.png" src="savefig/bore_cpt_plot.png" />
+<img alt="../_images/bore_cpt_plot.png" src="../_images/bore_cpt_plot.png" />
 </section>
 </section>
 </section>
