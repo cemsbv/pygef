@@ -18,3 +18,4 @@ data/
 /docs/savefig/
 /.pytest_cache/
 */super-linter.log
+.cemsdev
