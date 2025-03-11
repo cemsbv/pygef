@@ -185,7 +185,7 @@ Test the software with the use of coverage:
 ```bash
 python -m pip install --upgrade pip setuptools
 pip install -r requirements.txt
-pip install .
+pip install .[test] .[map]
 
 coverage run -m pytest
 ```
@@ -202,11 +202,4 @@ To update the requirements within the defined ranges, run:
 
 ```bash
 pip-compile --upgrade --extra=test --extra=docs --extra=lint --extra=map --output-file=requirements.txt pyproject.toml
-```
-
-Automatically upgrade your Polars code so it's compatible with future versions.
-
-```bash
-pip install -U polars-upgrade
-polars-upgrade src/pygef tests --target-version=0.19.19
 ```
