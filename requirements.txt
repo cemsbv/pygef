@@ -131,7 +131,7 @@ pygments==2.19.1
     #   ipython
     #   ipython-pygments-lexers
     #   sphinx
-pyparsing==3.2.1
+pyparsing==3.2.3
     # via
     #   matplotlib
     #   rasterio
