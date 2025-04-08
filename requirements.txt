@@ -69,7 +69,7 @@ ipython==9.1.0
     # via pygef (pyproject.toml)
 ipython-pygments-lexers==1.1.1
     # via ipython
-isort==6.0.0
+isort==6.0.1
     # via pygef (pyproject.toml)
 jedi==0.19.2
     # via ipython
