@@ -98,7 +98,7 @@ numpy==2.2.5
     #   contourpy
     #   matplotlib
     #   rasterio
-packaging==24.2
+packaging==25.0
     # via
     #   black
     #   matplotlib
