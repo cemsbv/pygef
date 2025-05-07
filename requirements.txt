@@ -14,11 +14,11 @@ babel==2.17.0
     # via sphinx
 black==25.1.0
     # via pygef (pyproject.toml)
-certifi==2025.1.31
+certifi==2025.4.26
     # via
     #   rasterio
     #   requests
-charset-normalizer==3.4.1
+charset-normalizer==3.4.2
     # via requests
 click==8.1.8
     # via
@@ -65,7 +65,7 @@ imagesize==1.4.1
     # via sphinx
 iniconfig==2.1.0
     # via pytest
-ipython==9.1.0
+ipython==9.2.0
     # via pygef (pyproject.toml)
 ipython-pygments-lexers==1.1.1
     # via ipython
@@ -75,7 +75,7 @@ jedi==0.19.2
     # via ipython
 jinja2==3.1.6
     # via sphinx
-joblib==1.4.2
+joblib==1.5.0
     # via contextily
 kiwisolver==1.4.8
     # via matplotlib
@@ -118,7 +118,7 @@ platformdirs==4.3.7
     # via black
 pluggy==1.5.0
     # via pytest
-polars==1.27.1
+polars==1.29.0
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.51
     # via ipython
@@ -159,7 +159,7 @@ sphinx==8.2.3
     #   sphinx-autodoc-typehints
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
-sphinx-autodoc-typehints==3.1.0
+sphinx-autodoc-typehints==3.2.0
     # via pygef (pyproject.toml)
 sphinx-rtd-theme==3.0.2
     # via pygef (pyproject.toml)
@@ -187,5 +187,5 @@ urllib3==2.4.0
     # via requests
 wcwidth==0.2.13
     # via prompt-toolkit
-xyzservices==2025.1.0
+xyzservices==2025.4.0
     # via contextily
