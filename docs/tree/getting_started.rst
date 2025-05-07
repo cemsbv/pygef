@@ -10,7 +10,7 @@ You can install :code:`pygef` with:
 
 .. code-block:: bash
 
-    pip install pygef[map]
+    pip install pygef[map,plot]
 
 We installed the `map` variant of :code:`pygef` which include additional dependencies,
 and thereby enable additional functionality.
@@ -23,6 +23,7 @@ Getting started with pygef is easy done by importing the :code:`pygef` library:
 .. ipython:: python
 
     import pygef
+    from pygef.plotting import plot_bore, plot_cpt, plot_merge
 
 or any equivalent :code:`import` statement.
 
