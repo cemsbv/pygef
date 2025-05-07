@@ -21,7 +21,10 @@ TickLoc = plticker.MultipleLocator(base=0.5)
 
 
 def plot_cpt(
-    data: CPTData, ax: plt.Axes | None = None, dpi: int = 100, use_offset: bool = False
+    data: CPTData,
+    ax: plt.Axes | None = None,
+    dpi: int = 100,
+    use_offset: bool = False,
 ) -> Tuple[plt.Axes, plt.Axes, plt.Axes]:
     """
     Create a plot with three axes.
@@ -190,7 +193,14 @@ def plot_bore(
     cum_soil_dist = soil_dist.cumsum(axis=1)
 
     # peat, clay, silt, sand, gravel, rocks
-    legend_colors = ["#a76b29", "#578E57", "#0078C1", "#DBAD4B", "#708090", "#59626b"]
+    legend_colors = [
+        "#a76b29",
+        "#578E57",
+        "#0078C1",
+        "#DBAD4B",
+        "#708090",
+        "#59626b",
+    ]
     legend_names = ["peat", "clay", "silt", "sand", "gravel", "rocks"]
     if not use_offset:
         ax.invert_yaxis()
