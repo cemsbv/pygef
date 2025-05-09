@@ -150,7 +150,7 @@ roman-numerals-py==3.1.0
     # via sphinx
 six==1.17.0
     # via python-dateutil
-snowballstemmer==2.2.0
+snowballstemmer==3.0.1
     # via sphinx
 sphinx==8.2.3
     # via
