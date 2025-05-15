@@ -20,7 +20,7 @@ certifi==2025.4.26
     #   requests
 charset-normalizer==3.4.2
     # via requests
-click==8.1.8
+click==8.2.0
     # via
     #   black
     #   click-plugins
@@ -51,7 +51,7 @@ docutils==0.21.2
     #   sphinx-rtd-theme
 executing==2.2.0
     # via stack-data
-fonttools==4.57.0
+fonttools==4.58.0
     # via matplotlib
 gef-file-to-map==0.2.0
     # via pygef (pyproject.toml)
@@ -83,7 +83,7 @@ lxml==5.4.0
     # via pygef (pyproject.toml)
 markupsafe==3.0.2
     # via jinja2
-matplotlib==3.10.1
+matplotlib==3.10.3
     # via
     #   pygef (pyproject.toml)
     #   contextily
@@ -114,9 +114,9 @@ pillow==11.2.1
     # via
     #   contextily
     #   matplotlib
-platformdirs==4.3.7
+platformdirs==4.3.8
     # via black
-pluggy==1.5.0
+pluggy==1.6.0
     # via pytest
 polars==1.29.0
     # via pygef (pyproject.toml)
