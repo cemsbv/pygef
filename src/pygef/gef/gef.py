@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Literal, Sequence, Tuple, Union
 
 import polars as pl
 from gef_file_to_map import gef_to_map
@@ -162,18 +162,115 @@ def replace_column_void(
 ) -> pl.LazyFrame:
     return (
         # Get all values matching column_void and change them to null
-        # Interpolate all null values
         lf.select(
             [
                 pl.when(pl.col(col) == pl.lit(col_name_to_void_mapping[col]))
                 .then(None)
                 .otherwise(pl.col(col))
-                .interpolate()
                 .name.keep()
                 for col in lf.collect_schema().names()
             ]
         )
     )
+
+
+def interpolate_nulls(
+    lf: pl.LazyFrame, interpolate_strategy: Literal["linear", "nearest"] | None = None
+) -> pl.LazyFrame:
+    """
+    Interpolates the null values in the DataFrame.
+
+    Parameters
+    ----------
+    lf : pl.LazyFrame
+        The LazyFrame to interpolate.
+    interpolate_strategy : {'linear', 'nearest'}, optional
+        The interpolation strategy to use.
+        If None, no interpolation is done.
+        If 'linear', linear interpolation is used.
+        If 'nearest', nearest neighbor interpolation is used.
+        Default is None.
+
+    Returns
+    -------
+    pl.LazyFrame
+        The interpolated LazyFrame.
+    """
+    if interpolate_strategy is None:
+        return lf
+
+    if interpolate_strategy in ["linear", "nearest"]:
+        return lf.select(
+            [
+                pl.col(col).interpolate(
+                    method="linear",
+                ).alias(col)
+                for col in lf.collect_schema().names()
+            ]
+        )
+    else:
+        raise ValueError(
+            f"Unknown interpolation strategy: {interpolate_strategy}. "
+            "Use 'linear' or 'nearest'."
+        )
+
+
+def drop_nulls(
+    lf: pl.LazyFrame,
+    drop_nulls_strategy: Literal["any", "all"] | Sequence[str] | None = None,
+) -> pl.LazyFrame:
+    """
+    Drops null values from the DataFrame.
+
+    Parameters
+    ----------
+    lf : pl.LazyFrame
+        The LazyFrame to drop nulls from.
+    drop_nulls_strategy : {'any', 'all'} | Sequence[str] | None, optional
+        The strategy to use for dropping nulls.
+        If None, no nulls are dropped.
+        If 'any', rows with any null value are dropped.
+        If 'all', rows with all null values are dropped.
+        If a sequence of column names is provided, only those columns are checked for null values.
+        Default is None.
+
+    Returns
+    -------
+    pl.LazyFrame
+        The LazyFrame with null values dropped.
+    """
+    if drop_nulls_strategy is None:
+        return lf
+    
+    if isinstance(drop_nulls_strategy, str):
+        if drop_nulls_strategy not in ["any", "all"]:
+            raise ValueError(
+                f"Unknown drop_nulls_strategy: {drop_nulls_strategy}. "
+                "Use None, 'any', 'all' or a sequence of column names."
+            )
+            
+        elif drop_nulls_strategy == "any":
+            return lf.drop_nulls()
+        else:  # drop_nulls_strategy == "all":
+            return lf.filter(~pl.all_horizontal(pl.all().is_null()))
+    
+    elif isinstance(drop_nulls_strategy, Sequence):
+        if len(drop_nulls_strategy) == 0:
+            return lf
+        
+        # If a sequence of column names is provided, only those columns are checked for null values
+        if not all(isinstance(col, str) for col in drop_nulls_strategy):
+            raise ValueError(
+                "drop_nulls_strategy must be a sequence of column names (strings)."
+            )
+            
+        # Use the subset parameter to drop nulls only in the specified columns
+        return lf.drop_nulls(subset=drop_nulls_strategy)
+    else:
+        raise ValueError(
+            f"Unknown drop_nulls_strategy: {drop_nulls_strategy}. "
+            "Use None, 'any', 'all' or a sequence of column names."
+        )
 
 
 def parse_all_columns_info_from_dict(

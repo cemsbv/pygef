@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 import os
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Sequence
 
 from pygef.bore import BoreData
 from pygef.broxml.parse_bore import read_bore as read_bore_xml
@@ -63,6 +63,8 @@ def read_cpt(
     file: io.BytesIO | Path | str,
     index: int = 0,
     engine: Literal["auto", "gef", "xml"] = "auto",
+    drop_nulls_strategy: Literal["any", "all"] | Sequence[str] | None = None,
+    interpolate_nulls_strategy: Literal["linear", "nearest"] | None = None,
 ) -> CPTData:
     """
     Parse the cpt file. Can either be BytesIO, Path or str
@@ -79,7 +81,7 @@ def read_cpt(
         if isinstance(file, io.BytesIO):
             return gef_cpt_to_cpt_data(_GefCpt(string=file.read().decode()))
         if os.path.exists(file):
-            return gef_cpt_to_cpt_data(_GefCpt(path=file))
+            return gef_cpt_to_cpt_data(_GefCpt(path=file, drop_nulls_strategy=drop_nulls_strategy, interpolate_nulls_strategy=interpolate_nulls_strategy))
         else:
             return gef_cpt_to_cpt_data(_GefCpt(string=file))
     return read_cpt_xml(file)[index]

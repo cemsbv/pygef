@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Sequence, Literal
 
 import numpy as np
 import polars as pl
 
 from pygef.gef import utils
-from pygef.gef.gef import _Gef, parse_all_columns_info, replace_column_void
+from pygef.gef.gef import _Gef, drop_nulls, interpolate_nulls, parse_all_columns_info, replace_column_void
 from pygef.gef.mapping import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 
 
 class _GefCpt(_Gef):
-    def __init__(self, path=None, string=None):
+    def __init__(self, path=None, string=None, drop_nulls_strategy: Literal["any", "all"] | Sequence[str] | None = None, interpolate_nulls_strategy: Literal["linear", "nearest"] | None = None):
         """
         Parser of the cpt file.
 
@@ -21,6 +21,17 @@ class _GefCpt(_Gef):
             Path to the *.gef file.
         string: str
             String version of the *.gef file.
+        drop_nulls_strategy: Literal["any", "all"] | Sequence[str] | None
+            Strategy to drop null values. If None, no nulls are dropped.
+            If "any", rows with any null value are dropped.
+            If "all", rows with all null values are dropped.
+            If a sequence of column names is provided, only those columns are checked for null values.
+            Default is None.
+        interpolate_nulls_strategy: Literal["linear", "nearest"] | None
+            Strategy to interpolate null values. If None, no interpolation is done.
+            If "linear", linear interpolation is used.
+            If "nearest", nearest neighbor interpolation is used.
+            Default is None.
         """
         super().__init__(path=path, string=string)
         if not self.type == "cpt":
@@ -138,13 +149,16 @@ class _GefCpt(_Gef):
             )
             .lazy()
             .pipe(replace_column_void, self.columns_info.description_to_void_mapping)
+            .pipe(interpolate_nulls, interpolate_nulls_strategy)
             # Remove the rows with null values
-            .drop_nulls()
+            .pipe(drop_nulls, drop_nulls_strategy)
             .with_columns(pl.col("penetrationLength").abs().alias("penetrationLength"))
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
             .pipe(correct_depth_with_inclination, self.columns_info.descriptions)
             .collect()
         )
+        
+        print()
 
 
 def correct_pre_excavated_depth(lf: pl.LazyFrame, pre_excavated_depth) -> pl.LazyFrame:

@@ -38,7 +38,7 @@ def test_cpt_smoke(filename):
     CPTs.
     """
 
-    gef = read_cpt(os.path.join(BasePath, "../test_files/", filename))
+    gef = read_cpt(os.path.join(BasePath, "../test_files/", filename), drop_nulls_strategy=None, interpolate_nulls_strategy=None)
 
     axes = plotting.plot_cpt(gef)
     assert isinstance(axes[0], plt.Axes)
