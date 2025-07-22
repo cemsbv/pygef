@@ -382,6 +382,48 @@ def test_xyid():
     assert v == "32000"
 
 
+def test_xyid_gml():
+    # 31000 = RD: coordinate system = Cartesian, date= RD1918,
+    # projection method = stereographic
+    s = r"#XYID= 31000, 142735.75, 470715.91, 0.000, 0.000"
+    code = utils.parse_coordinate_code(s)
+    assert (
+        common.convert_coordinate_system_to_gml(code) == "urn:ogc:def:crs:EPSG::28992"
+    )
+
+    # 31001 = UTM-3N: coordinate system = Cartesian, date =
+    # ED50, projection method = Mercator, central meridian = 3°OL
+    s = r"#XYID= 31001, 500000.0, 4649776.22, 0.000, 0.000"
+    code = utils.parse_coordinate_code(s)
+    assert (
+        common.convert_coordinate_system_to_gml(code) == "urn:ogc:def:crs:EPSG::32603"
+    )
+
+    # 31002 = UTM-9N: coordinate system = Cartesian, date =
+    # ED50, projection method = Mercator, central meridian = 9°OL
+    s = r"#XYID= 31002, 500000.0, 4649776.22, 0.000, 0.000"
+    code = utils.parse_coordinate_code(s)
+    assert (
+        common.convert_coordinate_system_to_gml(code) == "urn:ogc:def:crs:EPSG::32609"
+    )
+
+    # 32000 = Belgian Bessel: coordinate system = geographic,
+    # date = BD72, projection method = Belgian Lambert
+    s = r"#XYID= 32000, 155763.88, 132693.38, 0.000, 0.000"
+    code = utils.parse_coordinate_code(s)
+    assert (
+        common.convert_coordinate_system_to_gml(code) == "urn:ogc:def:crs:EPSG::31370"
+    )
+
+    # 49000 = Gauss-Krüger: coordinate system = Cartesian, date =
+    # Potsdam, projection method = Transversal Mercator
+    s = r"#XYID= 49000, 601463.66, 5672671.03, 0.000, 0.000"
+    code = utils.parse_coordinate_code(s)
+    assert (
+        common.convert_coordinate_system_to_gml(code) == "urn:ogc:def:crs:EPSG::31467"
+    )
+
+
 def test_columns_number():
     s = (
         r"#COLUMNINFO = 1, m, Diepte bovenkant laag, 1 #COLUMNINFO = 2, m, Diepte onderkant laag, 2"
