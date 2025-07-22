@@ -78,6 +78,7 @@ jobs:
           VALIDATE_PYTHON_PYLINT: false
           VALIDATE_NATURAL_LANGUAGE: false
           VALIDATE_MARKDOWN: false
+          VALIDATE_MARKDOWN_PRETTIER: false
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

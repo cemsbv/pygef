@@ -186,6 +186,7 @@ docker run \
 --env VALIDATE_PYTHON_PYLINT=false \
 --env VALIDATE_NATURAL_LANGUAGE=false \
 --env VALIDATE_MARKDOWN=false \
+--env VALIDATE_MARKDOWN_PRETTIER=false \
 --env LINTER_RULES_PATH=/ \
 --env PYTHON_BLACK_CONFIG_FILE=pyproject.toml \
 --env PYTHON_ISORT_CONFIG_FILE=pyproject.toml \
