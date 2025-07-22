@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from datetime import date
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 
@@ -386,7 +386,7 @@ def parse_columns_number(headers: Union[dict, str]) -> int:
 def get_description(
     quantity_number: int,
     custom_description: str,
-    dictionary: Optional[Dict[int, str]] = None,
+    dictionary: Dict[int, str] | None = None,
 ) -> str:
     """
     Returns the default description of a quantity number if available in the

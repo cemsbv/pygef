@@ -14,20 +14,20 @@ babel==2.17.0
     # via sphinx
 black==25.1.0
     # via pygef (pyproject.toml)
-certifi==2025.4.26
+certifi==2025.7.14
     # via
     #   rasterio
     #   requests
 charset-normalizer==3.4.2
     # via requests
-click==8.1.8
+click==8.2.1
     # via
     #   black
     #   click-plugins
     #   cligj
     #   mercantile
     #   rasterio
-click-plugins==1.1.1
+click-plugins==1.1.1.2
     # via rasterio
 cligj==0.7.2
     # via rasterio
@@ -51,9 +51,9 @@ docutils==0.21.2
     #   sphinx-rtd-theme
 executing==2.2.0
     # via stack-data
-fonttools==4.57.0
+fonttools==4.59.0
     # via matplotlib
-gef-file-to-map==0.2.0
+gef-file-to-map==0.2.1
     # via pygef (pyproject.toml)
 geographiclib==2.0
     # via geopy
@@ -65,7 +65,7 @@ imagesize==1.4.1
     # via sphinx
 iniconfig==2.1.0
     # via pytest
-ipython==9.2.0
+ipython==9.4.0
     # via pygef (pyproject.toml)
 ipython-pygments-lexers==1.1.1
     # via ipython
@@ -75,15 +75,15 @@ jedi==0.19.2
     # via ipython
 jinja2==3.1.6
     # via sphinx
-joblib==1.5.0
+joblib==1.5.1
     # via contextily
 kiwisolver==1.4.8
     # via matplotlib
-lxml==5.4.0
+lxml==6.0.0
     # via pygef (pyproject.toml)
 markupsafe==3.0.2
     # via jinja2
-matplotlib==3.10.1
+matplotlib==3.10.3
     # via
     #   pygef (pyproject.toml)
     #   contextily
@@ -93,7 +93,7 @@ mercantile==1.2.1
     # via contextily
 mypy-extensions==1.1.0
     # via black
-numpy==2.2.5
+numpy==2.3.1
     # via
     #   contourpy
     #   matplotlib
@@ -110,15 +110,15 @@ pathspec==0.12.1
     # via black
 pexpect==4.9.0
     # via ipython
-pillow==11.2.1
+pillow==11.3.0
     # via
     #   contextily
     #   matplotlib
-platformdirs==4.3.7
+platformdirs==4.3.8
     # via black
-pluggy==1.5.0
+pluggy==1.6.0
     # via pytest
-polars==1.29.0
+polars==1.31.0
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.51
     # via ipython
@@ -126,22 +126,23 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
     # via stack-data
-pygments==2.19.1
+pygments==2.19.2
     # via
     #   ipython
     #   ipython-pygments-lexers
+    #   pytest
     #   sphinx
 pyparsing==3.2.3
     # via
     #   matplotlib
     #   rasterio
-pytest==8.3.5
+pytest==8.4.1
     # via pygef (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via matplotlib
 rasterio==1.4.3
     # via contextily
-requests==2.32.3
+requests==2.32.4
     # via
     #   contextily
     #   coveralls
@@ -150,7 +151,7 @@ roman-numerals-py==3.1.0
     # via sphinx
 six==1.17.0
     # via python-dateutil
-snowballstemmer==2.2.0
+snowballstemmer==3.0.1
     # via sphinx
 sphinx==8.2.3
     # via
@@ -183,7 +184,7 @@ traitlets==5.14.3
     # via
     #   ipython
     #   matplotlib-inline
-urllib3==2.4.0
+urllib3==2.5.0
     # via requests
 wcwidth==0.2.13
     # via prompt-toolkit
