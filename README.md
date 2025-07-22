@@ -190,7 +190,7 @@ docker run \
 --env PYTHON_ISORT_CONFIG_FILE=pyproject.toml \
 --env PYTHON_MYPY_CONFIG_FILE=pyproject.toml \
 --env PYTHON_FLAKE8_CONFIG_FILE=.flake8 \
--v $(pwd):/tmp/lint ghcr.io/super-linter/super-linter:v7
+-v $(pwd):/tmp/lint ghcr.io/super-linter/super-linter:v8
 ```
 
 ## UnitTest
@@ -200,7 +200,7 @@ Test the software with the use of coverage:
 ```bash
 python -m pip install --upgrade pip setuptools
 pip install -r requirements.txt
-pip install .[test] .[map] .[plot]
+pip install -e .[test] .[map] .[plot]
 
 coverage run -m pytest
 ```
