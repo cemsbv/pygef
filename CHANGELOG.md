@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.1] - 2025-07-22
+
+### Features
+
+#### Parser
+
+- Parse coordinate system code to gml (#433)
+
+
 ## [0.12.0] - 2025-07-22
 
 ### Bug Fixes
@@ -61,16 +70,19 @@ All notable changes to this project will be documented in this file.
 
 ## [0.10.2] - 2024-08-16
 
-### Performance
-
-
-## [0.10.1] - 2024-01-03
-
 ### Bug Fixes
 
 #### Ci
 
 - Use proper authentication in release pipeline
+
+
+### Performance
+
+
+## [0.10.1] - 2023-12-22
+
+### Bug Fixes
 
 
 ### Features
