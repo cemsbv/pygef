@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.0] - 2025-07-22
+
+### Bug Fixes
+
+#### Deps
+
+- Apply fix from gef-file-to-map not parsing empty array values in headers (#432)
+- Update all non-major dependencies (#412)
+
+
+### Miscellaneous Tasks
+
+#### Ci
+
+- Move from dependabot to renovate
+
+
+### Refactor
+
+#### Plot
+
+- [**breaking**] Put `[plot]` behind a feature flag (#406)
+
+
 ## [0.11.1] - 2025-04-08
 
 ### Bug Fixes
