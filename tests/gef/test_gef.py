@@ -74,7 +74,7 @@ def test_xy():
     cpt3 = read_cpt(os.path.join(BasePath, "../test_files/cpt3.gef"))
     np.testing.assert_almost_equal(cpt3.delivered_location.x, 110885)
     np.testing.assert_almost_equal(cpt3.delivered_location.y, 493345)
-
+    assert cpt3.delivered_location.srs_name == "urn:ogc:def:crs:EPSG::28992"
 
 def test_measurement_var_with_minus_sign():
     s = r"#MEASUREMENTVAR= 41, -15.000000, "
@@ -355,6 +355,30 @@ def test_xyid():
     y = utils.parse_yid_as_float(h)
     np.testing.assert_almost_equal(x, 132127.181)
     np.testing.assert_almost_equal(y, 458102.351)
+
+    # Belgian Bessel: coordinate system = geographic,
+    # date = BD72, projection method = Belgian Lambert
+    s = r"#XYID= 32000, 148484.599, 173046.501, 0.011, 0.011"
+    v = utils.parse_xid_as_float(s)
+    np.testing.assert_almost_equal(v, 148484.599)
+
+    v = utils.parse_yid_as_float(s)
+    np.testing.assert_almost_equal(v, 173046.501)
+
+    v = utils.parse_coordinate_code(s)
+    assert v == "32000"
+
+    h = {
+        "XYID": [["32000", "148484.599", "173046.501"]],
+    }
+    v = utils.parse_xid_as_float(h)
+    np.testing.assert_almost_equal(v, 148484.599)
+
+    v = utils.parse_yid_as_float(h)
+    np.testing.assert_almost_equal(v, 173046.501)
+
+    v = utils.parse_coordinate_code(h)
+    assert v == "32000"
 
 
 def test_columns_number():

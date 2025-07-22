@@ -293,6 +293,20 @@ def parse_yid_as_float(headers):
             r"#XYID[=\s+]*.*?,\s*(\d*\s*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, float, 3
         )
 
+def parse_coordinate_code(headers):
+    """
+    Function that returns the coordinate system code.
+
+    :param headers:(Union[Dict,str]) Dictionary or string of headers.
+    :return:(str) coordinate system type.
+    """
+    if isinstance(headers, dict):
+        return first_header_value(headers, "XYID", index=0)
+    else:
+        return parse_regex_cast(
+            r"#XYID[=\s+](\d*.*?),\s*(\d*\s*(\.|\d)*),\s*(\d*(\.|\d)*)", headers, lambda x: x.lower(), 1
+        ).strip()
+
 
 def parse_gef_type(headers):
     """

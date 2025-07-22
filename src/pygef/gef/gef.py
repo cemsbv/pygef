@@ -52,6 +52,7 @@ class _Gef:
         self.height_system = utils.parse_height_system(self._headers)
         self.x = utils.parse_xid_as_float(self._headers)
         self.y = utils.parse_yid_as_float(self._headers)
+        self.coordinate_system = utils.parse_coordinate_code(self._headers)
         self.file_date = utils.parse_file_date(self._headers)
         self.test_id = utils.parse_test_id(self._headers)
         self.type = utils.parse_gef_type(self._headers)
