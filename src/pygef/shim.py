@@ -8,7 +8,7 @@ from typing import Any, Literal
 from pygef.bore import BoreData
 from pygef.broxml.parse_bore import read_bore as read_bore_xml
 from pygef.broxml.parse_cpt import read_cpt as read_cpt_xml
-from pygef.common import Location, VerticalDatumClass
+from pygef.common import Location, VerticalDatumClass, convert_coordinate_system_to_gml
 from pygef.cpt import CPTData
 from pygef.gef.parse_bore import _GefBore
 from pygef.gef.parse_cpt import _GefCpt
@@ -97,7 +97,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
 
     kwargs["delivered_location"] = Location(
         # all gef files are RD new
-        srs_name="urn:ogc:def:crs:EPSG::28992",
+        srs_name=convert_coordinate_system_to_gml(gef_cpt.coordinate_system),
         x=gef_cpt.x,
         y=gef_cpt.y,
     )
@@ -185,7 +185,7 @@ def gef_bore_to_bore_data(gef_bore: _GefBore) -> BoreData:
 
     kwargs["delivered_location"] = Location(
         # all gef files are RD new
-        srs_name="urn:ogc:def:crs:EPSG::28992",
+        srs_name=convert_coordinate_system_to_gml(gef_bore.coordinate_system),
         x=gef_bore.x,
         y=gef_bore.y,
     )
