@@ -173,7 +173,8 @@ directory:
 
 ```bash
 docker run \
---env VALIDATE_ALL_CODEBASE=false \
+--env VALIDATE_ALL_CODEBASE=true \
+--env DEFAULT_BRANCH=master \
 --env RUN_LOCAL=true \
 --env FIX_PYTHON_ISORT=true \
 --env FIX_PYTHON_BLACK=true \

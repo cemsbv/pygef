@@ -76,6 +76,7 @@ def test_xy():
     np.testing.assert_almost_equal(cpt3.delivered_location.y, 493345)
     assert cpt3.delivered_location.srs_name == "urn:ogc:def:crs:EPSG::28992"
 
+
 def test_measurement_var_with_minus_sign():
     s = r"#MEASUREMENTVAR= 41, -15.000000, "
     v = utils.parse_measurement_var_as_float(s, 41)

@@ -7,7 +7,8 @@ from typing import List, overload
 import polars as pl
 from numpy.typing import NDArray
 
-def convert_coordinate_system_to_gml(value:str) -> str:
+
+def convert_coordinate_system_to_gml(value: str) -> str:
     """function that maps the coordinate system code to standardized location information"""
 
     if value == "31000":
@@ -24,6 +25,7 @@ def convert_coordinate_system_to_gml(value:str) -> str:
     # 00001 = Geographic Coordinate System
     # 01000 = SPCS
     return "urn:ogc:def:crs:EPSG::404000"
+
 
 @dataclass
 class Location:
