@@ -20,7 +20,7 @@ certifi==2025.7.14
     #   requests
 charset-normalizer==3.4.2
     # via requests
-click==8.2.1
+click==8.2.2
     # via
     #   black
     #   click-plugins
@@ -45,7 +45,7 @@ decorator==5.2.1
     # via ipython
 docopt==0.6.2
     # via coveralls
-docutils==0.21.2
+docutils==0.22
     # via
     #   sphinx
     #   sphinx-rtd-theme
@@ -83,7 +83,7 @@ lxml==6.0.0
     # via pygef (pyproject.toml)
 markupsafe==3.0.2
     # via jinja2
-matplotlib==3.10.3
+matplotlib==3.10.5
     # via
     #   pygef (pyproject.toml)
     #   contextily
@@ -118,7 +118,7 @@ platformdirs==4.3.8
     # via black
 pluggy==1.6.0
     # via pytest
-polars==1.31.0
+polars==1.32.0
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.51
     # via ipython
