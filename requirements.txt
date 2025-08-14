@@ -14,11 +14,11 @@ babel==2.17.0
     # via sphinx
 black==25.1.0
     # via pygef (pyproject.toml)
-certifi==2025.7.14
+certifi==2025.8.3
     # via
     #   rasterio
     #   requests
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via requests
 click==8.2.1
     # via
@@ -45,13 +45,13 @@ decorator==5.2.1
     # via ipython
 docopt==0.6.2
     # via coveralls
-docutils==0.21.2
+docutils==0.22
     # via
     #   sphinx
     #   sphinx-rtd-theme
 executing==2.2.0
     # via stack-data
-fonttools==4.59.0
+fonttools==4.59.1
     # via matplotlib
 gef-file-to-map==0.2.1
     # via pygef (pyproject.toml)
@@ -77,13 +77,13 @@ jinja2==3.1.6
     # via sphinx
 joblib==1.5.1
     # via contextily
-kiwisolver==1.4.8
+kiwisolver==1.4.9
     # via matplotlib
 lxml==6.0.0
     # via pygef (pyproject.toml)
 markupsafe==3.0.2
     # via jinja2
-matplotlib==3.10.3
+matplotlib==3.10.5
     # via
     #   pygef (pyproject.toml)
     #   contextily
@@ -118,7 +118,7 @@ platformdirs==4.3.8
     # via black
 pluggy==1.6.0
     # via pytest
-polars==1.31.0
+polars==1.32.3
     # via pygef (pyproject.toml)
 prompt-toolkit==3.0.51
     # via ipython
