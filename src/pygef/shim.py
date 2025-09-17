@@ -171,7 +171,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     )
     kwargs["delivered_vertical_position_offset"] = gef_cpt.zid
     kwargs["delivered_vertical_position_datum"] = VerticalDatumClass(
-        str(int(gef_cpt.height_system))
+        f"{int(gef_cpt.height_system):05d}"
     )
 
     # TODO! parse measurementtext 9 in gef?
