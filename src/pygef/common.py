@@ -45,6 +45,9 @@ class VerticalDatumClass(Enum):
     MSL = "49000"  # Mean Sea Level
     LAT = "00001"  # Lowest Astronomical Tide
     TAW = "32001"  # (GEF)
+    OCS = "00000"  # Own Coordinate System
+    GCS = "00001"  # Geographic Coordinate System
+    SPCS = "01000"  # SPCS
 
 
 def assign_multiple_columns(
