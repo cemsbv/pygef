@@ -89,7 +89,7 @@ def convert_height_system_to_vertical_datum(height_system: float) -> str:
     if height_system == 31000.0:
         return "nap"
     else:
-        return str(int(height_system))
+        return f"{int(height_system):05d}"
 
 
 def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
