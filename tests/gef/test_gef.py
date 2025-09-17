@@ -29,6 +29,7 @@ BasePath = os.path.dirname(__file__)
         "cpt2.gef",
         "cpt3.gef",
         "cpt4.gef",
+        "cpt5.gef",
         "cpt_class_high.gef",
     ],
 )
