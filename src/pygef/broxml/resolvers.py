@@ -227,6 +227,12 @@ def parse_local_vertical_reference_point_class(
         return VerticalDatumClass.MSL
     if val == "lat":
         return VerticalDatumClass.LAT
+    if val == "ocs":
+        return VerticalDatumClass.OCS
+    if val == "gcs":
+        return VerticalDatumClass.GCS
+    if val == "spcs":
+        return VerticalDatumClass.SPCS
     warn(f"vertical datum class '{val}' is unknown")
     return VerticalDatumClass.Unknown
 
