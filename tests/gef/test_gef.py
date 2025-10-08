@@ -722,9 +722,7 @@ def test_parse_cpt_with_replace_column_voids_enabled():
 """
     )
     df_calculated = cpt.data
-    assert (
-        df_calculated.shape == (4, 4)
-    )
+    assert df_calculated.shape == (4, 4)
 
     df = pl.DataFrame(
         {
@@ -780,18 +778,23 @@ def test_parse_cpt_with_replace_column_voids_disabled():
 00.07; 14.766; 14.808;
 00.09;-999999;-999999;
 """,
-        replace_column_voids=False
+        replace_column_voids=False,
     )
     df_calculated = cpt.data
-    assert (
-        df_calculated.shape == (6, 4)
-    )
+    assert df_calculated.shape == (6, 4)
 
     df = pl.DataFrame(
         {
             "penetrationLength": [0.00, 0.01, 0.03, 0.05, 0.07, 0.09],
             "coneResistance": [-999999.0, 0.013, -999999.0, 2.493, 14.766, -999999.0],
-            "correctedConeResistance": [-999999.0,0.013, 0.696, 2.496, 14.808, -999999.0],
+            "correctedConeResistance": [
+                -999999.0,
+                0.013,
+                0.696,
+                2.496,
+                14.808,
+                -999999.0,
+            ],
             "depthOffset": [-0.09, -0.10, -0.12, -0.14, -0.16, -0.18],
         }
     )

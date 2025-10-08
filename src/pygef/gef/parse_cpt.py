@@ -132,17 +132,17 @@ class _GefCpt(_Gef):
             column_voids=utils.parse_column_void(self._headers),
         )
 
-        lazy_df = (
-            self.parse_data(
-                self._data,
-                self.columns_info.col_separator,
-                self.columns_info.rec_separator,
-                self.columns_info.descriptions,
-            ).lazy()
-        )
+        lazy_df = self.parse_data(
+            self._data,
+            self.columns_info.col_separator,
+            self.columns_info.rec_separator,
+            self.columns_info.descriptions,
+        ).lazy()
 
         if replace_column_voids:
-            lazy_df = lazy_df.pipe(replace_column_void, self.columns_info.description_to_void_mapping)
+            lazy_df = lazy_df.pipe(
+                replace_column_void, self.columns_info.description_to_void_mapping
+            )
 
         self.df = (
             lazy_df

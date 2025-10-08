@@ -79,11 +79,20 @@ def read_cpt(
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):
-            return gef_cpt_to_cpt_data(_GefCpt(string=file.read().decode(), replace_column_voids=replace_column_voids))
+            return gef_cpt_to_cpt_data(
+                _GefCpt(
+                    string=file.read().decode(),
+                    replace_column_voids=replace_column_voids,
+                )
+            )
         if os.path.exists(file):
-            return gef_cpt_to_cpt_data(_GefCpt(path=file, replace_column_voids=replace_column_voids))
+            return gef_cpt_to_cpt_data(
+                _GefCpt(path=file, replace_column_voids=replace_column_voids)
+            )
         else:
-            return gef_cpt_to_cpt_data(_GefCpt(string=file, replace_column_voids=replace_column_voids))
+            return gef_cpt_to_cpt_data(
+                _GefCpt(string=file, replace_column_voids=replace_column_voids)
+            )
     return read_cpt_xml(file)[index]
 
 
