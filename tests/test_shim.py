@@ -44,6 +44,18 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
         "groundwater_level": None,
         "cpt_type": 4.0,
         "data": (999, 12),
+        "column_void_mapping": {
+            'coneResistance': -999999.0,
+            'correctedConeResistance': -999999.0,
+            'depth': -999999.0,
+            'frictionRatio': -999999.0,
+            'inclinationEW': -999999.0,
+            'inclinationNS': -999999.0,
+            'inclinationResultant': -999999.0,
+            'localFriction': -999999.0,
+            'penetrationLength': -9999.0,
+            'porePressureU2': -999999.0
+        },
         "delivered_vertical_position_datum": VerticalDatumClass("31000"),
         "delivered_vertical_position_offset": -0.09,
         "delivered_vertical_position_reference_point": "unknown",

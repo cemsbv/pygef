@@ -11,7 +11,7 @@ from pygef.gef.mapping import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 
 
 class _GefCpt(_Gef):
-    def __init__(self, path=None, string=None):
+    def __init__(self, path=None, string=None, replace_column_voids=True):
         """
         Parser of the cpt file.
 
@@ -21,6 +21,9 @@ class _GefCpt(_Gef):
             Path to the *.gef file.
         string: str
             String version of the *.gef file.
+        replace_column_voids: boolean
+            If True (default) column voids will be replaced either by interpolated
+            value, or by Null value. If False, then column void data is left unchanged.
         """
         super().__init__(path=path, string=string)
         if not self.type == "cpt":
@@ -129,16 +132,21 @@ class _GefCpt(_Gef):
             column_voids=utils.parse_column_void(self._headers),
         )
 
-        self.df = (
+        lazy_df = (
             self.parse_data(
                 self._data,
                 self.columns_info.col_separator,
                 self.columns_info.rec_separator,
                 self.columns_info.descriptions,
-            )
-            .lazy()
-            .pipe(replace_column_void, self.columns_info.description_to_void_mapping)
-            # Remove the rows with null values
+            ).lazy()
+        )
+
+        if replace_column_voids:
+            lazy_df = lazy_df.pipe(replace_column_void, self.columns_info.description_to_void_mapping)
+
+        self.df = (
+            lazy_df
+            # Remove any rows with null values
             .drop_nulls()
             .with_columns(pl.col("penetrationLength").abs().alias("penetrationLength"))
             .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
