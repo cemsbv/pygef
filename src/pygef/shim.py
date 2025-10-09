@@ -103,7 +103,7 @@ def convert_height_system_to_vertical_datum(height_system: float) -> str:
         return f"{int(height_system):05d}"
 
 
-def gef_cpt_to_cpt_data(gef_cpt: _GefCpt, replace_column_voids: bool = True) -> CPTData:
+def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs: dict[str, Any] = {}
 
     kwargs["delivered_location"] = Location(
