@@ -681,6 +681,58 @@ def test_parse_cpt():
         )
 
 
+def test_parse_cpt_with_replace_column_voids_enabled():
+    cpt = read_cpt(
+        os.path.join(BasePath, "../test_files/cpt_voids.gef"),
+    )
+    df_calculated = cpt.data
+    assert df_calculated.shape == (4, 4)
+
+    df = pl.DataFrame(
+        {
+            "penetrationLength": [0.01, 0.03, 0.05, 0.07],
+            "coneResistance": [0.013, 1.253, 2.493, 14.766],
+            "correctedConeResistance": [0.013, 0.696, 2.496, 14.808],
+            "depthOffset": [-0.10, -0.12, -0.14, -0.16],
+        }
+    )
+
+    for column in df.columns:
+        assert (
+            df_calculated[column].round(4).equals(df[column].round(4), null_equal=True)
+        )
+
+
+def test_parse_cpt_with_replace_column_voids_disabled():
+    cpt = read_cpt(
+        os.path.join(BasePath, "../test_files/cpt_voids.gef"),
+        replace_column_voids=False,
+    )
+    df_calculated = cpt.data
+    assert df_calculated.shape == (6, 4)
+
+    df = pl.DataFrame(
+        {
+            "penetrationLength": [0.00, 0.01, 0.03, 0.05, 0.07, 0.09],
+            "coneResistance": [-999999.0, 0.013, -999999.0, 2.493, 14.766, -999999.0],
+            "correctedConeResistance": [
+                -999999.0,
+                0.013,
+                0.696,
+                2.496,
+                14.808,
+                -999999.0,
+            ],
+            "depthOffset": [-0.09, -0.10, -0.12, -0.14, -0.16, -0.18],
+        }
+    )
+
+    for column in df.columns:
+        assert (
+            df_calculated[column].round(4).equals(df[column].round(4), null_equal=True)
+        )
+
+
 def test_parse_bore():
     cpt = _GefBore(
         string="""

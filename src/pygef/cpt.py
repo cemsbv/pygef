@@ -55,6 +55,7 @@ class CPTData:
         zlm_pore_pressure_u1_after (float | None): zlm_pore_pressure_u1_after
         zlm_pore_pressure_u2_after (float | None): zlm_pore_pressure_u2_after
         zlm_pore_pressure_u3_after (float | None): zlm_pore_pressure_u3_after
+        column_void_mapping (dict | None): column_void_mapping
         data (pl.DataFrame): DataFrame
             columns:
 
@@ -138,6 +139,7 @@ class CPTData:
     delivered_vertical_position_offset: float | None
     delivered_vertical_position_datum: VerticalDatumClass
     delivered_vertical_position_reference_point: str
+    column_void_mapping: dict | None
     data: pl.DataFrame
 
     alias: str | None = field(default=None)

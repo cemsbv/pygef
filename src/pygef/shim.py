@@ -63,6 +63,7 @@ def read_cpt(
     file: io.BytesIO | Path | str,
     index: int = 0,
     engine: Literal["auto", "gef", "xml"] = "auto",
+    replace_column_voids=True,
 ) -> CPTData:
     """
     Parse the cpt file. Can either be BytesIO, Path or str
@@ -70,6 +71,7 @@ def read_cpt(
     :param file: bore file
     :param index: only valid for xml files
     :param engine: default is "auto". parsing engine.
+    :param replace_column_voids: if true replace void values with nulls or interpolate; else retain value.
         Please note that auto engine checks if the files starts with `#GEFID`.
     """
 
@@ -77,11 +79,20 @@ def read_cpt(
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
         if isinstance(file, io.BytesIO):
-            return gef_cpt_to_cpt_data(_GefCpt(string=file.read().decode()))
+            return gef_cpt_to_cpt_data(
+                _GefCpt(
+                    string=file.read().decode(),
+                    replace_column_voids=replace_column_voids,
+                )
+            )
         if os.path.exists(file):
-            return gef_cpt_to_cpt_data(_GefCpt(path=file))
+            return gef_cpt_to_cpt_data(
+                _GefCpt(path=file, replace_column_voids=replace_column_voids)
+            )
         else:
-            return gef_cpt_to_cpt_data(_GefCpt(string=file))
+            return gef_cpt_to_cpt_data(
+                _GefCpt(string=file, replace_column_voids=replace_column_voids)
+            )
     return read_cpt_xml(file)[index]
 
 
@@ -105,6 +116,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs["bro_id"] = None
     kwargs["alias"] = gef_cpt.test_id
     kwargs["data"] = gef_cpt.df
+    kwargs["column_void_mapping"] = gef_cpt.columns_info.description_to_void_mapping
     kwargs["research_report_date"] = gef_cpt.file_date
     kwargs["cpt_standard"] = None
     kwargs["groundwater_level"] = gef_cpt.groundwater_level
