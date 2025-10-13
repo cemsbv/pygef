@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.0] - 2025-10-13
+
+### Bug Fixes
+
+#### Linter
+
+- Disable many unused / conflicting linters
+
+#### Parsing
+
+- Add missing height_system values
+
+
+### Features
+
+#### Parsing
+
+- Make replace columnvoids optional (#441)
+
+
+### Styling
+
+#### Super-linter
+
+- Exclude VALIDATE_MARKDOWN_PRETTIER
+
+
 ## [0.12.1] - 2025-07-22
 
 ### Features
