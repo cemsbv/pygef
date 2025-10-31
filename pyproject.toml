@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "pygef"
 version = "0.13.0"
 description = "Parse soil measurument data."
-dependencies = ["polars>=1,<2", "lxml>=5,<7.0", "gef-file-to-map>=0.2.1,<0.3"]
-requires-python = ">=3.9"
+dependencies = ["polars>=1,<2", "lxml>=5,<7", "gef-file-to-map>=1,<2"]
+requires-python = ">=3.11,<3.14"
 license = { file = "LICENSE.txt" }
 readme = "README.md"
 keywords = ["gef"]
@@ -16,8 +16,8 @@ keywords = ["gef"]
 repository = "https://github.com/cemsbv/pygef"
 
 [project.optional-dependencies]
-plot = ["matplotlib>=3.6,<4.0"]
-test = ["coveralls", "pytest"]
+plot = ["matplotlib>=3.6,<4"]
+test = ["coveralls>=3,<4", "pytest>=8,<9"]
 docs = [
   "Sphinx",
   "sphinx-autodoc-typehints",
