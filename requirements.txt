@@ -53,7 +53,7 @@ executing==2.2.0
     # via stack-data
 fonttools==4.59.0
     # via matplotlib
-gef-file-to-map==0.2.1
+gef-file-to-map==1.0.0
     # via pygef (pyproject.toml)
 geographiclib==2.0
     # via geopy
