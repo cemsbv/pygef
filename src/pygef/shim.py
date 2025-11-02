@@ -63,7 +63,7 @@ def read_cpt(
     file: io.BytesIO | Path | str,
     index: int = 0,
     engine: Literal["auto", "gef", "xml"] = "auto",
-    replace_column_voids=True,
+    replace_column_voids: bool = True,
 ) -> CPTData:
     """
     Parse the cpt file. Can either be BytesIO, Path or str
@@ -71,8 +71,9 @@ def read_cpt(
     :param file: bore file
     :param index: only valid for xml files
     :param engine: default is "auto". parsing engine.
-    :param replace_column_voids: if true replace void values with nulls or interpolate; else retain value.
         Please note that auto engine checks if the files starts with `#GEFID`.
+    :param replace_column_voids: default True. How to handle rows with void values.
+        If true, replace void values with nulls or interpolate; else retain value.
     """
 
     if engine == "gef" or is_gef_file(file) and engine == "auto":
