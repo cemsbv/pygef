@@ -64,6 +64,7 @@ def read_cpt(
     index: int = 0,
     engine: Literal["auto", "gef", "xml"] = "auto",
     replace_column_voids: bool = True,
+    remove_pre_excavated_rows: bool = True,
 ) -> CPTData:
     """
     Parse the cpt file. Can either be BytesIO, Path or str
@@ -74,6 +75,8 @@ def read_cpt(
         Please note that auto engine checks if the files starts with `#GEFID`.
     :param replace_column_voids: default True. How to handle rows with void values.
         If true, replace void values with nulls or interpolate; else retain value.
+    :param remove_pre_excavated_rows: default True. How to handle pre-excavated row values.
+        If true, drop rows above pre-excavated depth; else retain.
     """
 
     if engine == "gef" or is_gef_file(file) and engine == "auto":
@@ -84,15 +87,24 @@ def read_cpt(
                 _GefCpt(
                     string=file.read().decode(),
                     replace_column_voids=replace_column_voids,
+                    remove_pre_excavated_rows=remove_pre_excavated_rows,
                 )
             )
         if os.path.exists(file):
             return gef_cpt_to_cpt_data(
-                _GefCpt(path=file, replace_column_voids=replace_column_voids)
+                _GefCpt(
+                    path=file,
+                    replace_column_voids=replace_column_voids,
+                    remove_pre_excavated_rows=remove_pre_excavated_rows,
+                )
             )
         else:
             return gef_cpt_to_cpt_data(
-                _GefCpt(string=file, replace_column_voids=replace_column_voids)
+                _GefCpt(
+                    string=file,
+                    replace_column_voids=replace_column_voids,
+                    remove_pre_excavated_rows=remove_pre_excavated_rows,
+                )
             )
     return read_cpt_xml(file)[index]
 
