@@ -140,7 +140,7 @@ pyparsing==3.3.0a1
     # via
     #   matplotlib
     #   rasterio
-pytest==8.4.2
+pytest==9.0.0
     # via pygef (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via matplotlib
