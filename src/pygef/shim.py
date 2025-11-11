@@ -117,6 +117,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs["alias"] = gef_cpt.test_id
     kwargs["data"] = gef_cpt.df
     kwargs["column_void_mapping"] = gef_cpt.columns_info.description_to_void_mapping
+    kwargs["headers"] = gef_cpt._headers
     kwargs["research_report_date"] = gef_cpt.file_date
     kwargs["cpt_standard"] = None
     kwargs["groundwater_level"] = gef_cpt.groundwater_level

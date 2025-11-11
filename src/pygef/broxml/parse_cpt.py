@@ -59,6 +59,9 @@ CPT_ATTRIBS = {
     "column_void_mapping": {
         "xpath": "./dummyTag",
     },
+    "headers": {
+        "xpath": "./dummyTag",
+    },
     "data": {
         "xpath": "./conePenetrometerSurvey",
         "resolver": resolvers.process_cpt_result,
