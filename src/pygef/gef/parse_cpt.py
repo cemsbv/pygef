@@ -11,7 +11,13 @@ from pygef.gef.mapping import MAP_QUANTITY_NUMBER_COLUMN_NAME_CPT
 
 
 class _GefCpt(_Gef):
-    def __init__(self, path=None, string=None, replace_column_voids=True):
+    def __init__(
+        self,
+        path=None,
+        string=None,
+        replace_column_voids=True,
+        remove_pre_excavated_rows=True,
+    ):
         """
         Parser of the cpt file.
 
@@ -21,9 +27,11 @@ class _GefCpt(_Gef):
             Path to the *.gef file.
         string: str
             String version of the *.gef file.
-        replace_column_voids: boolean
+        :param replace_column_voids: boolean, default True.
             If True (default) column voids will be replaced either by interpolated
             value, or by Null value. If False, then column void data is left unchanged.
+        :param remove_pre_excavated_rows: boolean, default True.
+            How to handle pre-excavated row values. If true, drop rows above pre-excavated depth; else retain.
         """
         super().__init__(path=path, string=string)
         if not self.type == "cpt":
@@ -35,6 +43,8 @@ class _GefCpt(_Gef):
         self.cone_id = utils.parse_cone_id(self._headers)
 
         self.cpt_class = utils.parse_cpt_class(self._headers)
+        self.replace_column_voids = replace_column_voids
+        self.remove_pre_excavated_rows = remove_pre_excavated_rows
 
         self.nom_surface_area_cone_tip = utils.parse_measurement_var_as_float(
             self._headers, 1
@@ -144,15 +154,23 @@ class _GefCpt(_Gef):
                 replace_column_void, self.columns_info.description_to_void_mapping
             )
 
-        self.df = (
+        pipeline = (
             lazy_df
             # Remove any rows with null values
-            .drop_nulls()
-            .with_columns(pl.col("penetrationLength").abs().alias("penetrationLength"))
-            .pipe(correct_pre_excavated_depth, self.pre_excavated_depth)
-            .pipe(correct_depth_with_inclination, self.columns_info.descriptions)
-            .collect()
+            .drop_nulls().with_columns(
+                pl.col("penetrationLength").abs().alias("penetrationLength")
+            )
         )
+
+        if self.remove_pre_excavated_rows:
+            pipeline = pipeline.pipe(
+                correct_pre_excavated_depth, self.pre_excavated_depth
+            )
+
+        pipeline = pipeline.pipe(
+            correct_depth_with_inclination, self.columns_info.descriptions
+        )
+        self.df = pipeline.collect()
 
 
 def correct_pre_excavated_depth(lf: pl.LazyFrame, pre_excavated_depth) -> pl.LazyFrame:

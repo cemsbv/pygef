@@ -590,7 +590,7 @@ def test_parse_column_void():
         utils.parse_column_void(header)
 
 
-def test_pre_excavated_depth():
+def test_correct_pre_excavated_depth():
     df1 = pl.DataFrame(
         {
             "penetrationLength": [0.0, 1.0, 2.0, 3.0, 4.0],
@@ -954,3 +954,32 @@ def test_bore_with_reduced_columns():
 2.6000e+000;3.2000e+000;'Zs1g1';'ZUF';'LI GR';;;!
 """
     )
+
+
+def test_pre_excavated_default_removes_rows_below_threshold():
+    # Default behaviour should remove rows with depth < pre-excavated depth
+    cpt = _GefCpt(
+        path=os.path.join(BasePath, "../test_files/cpt_pre_excavated.gef"),
+    )
+    df = cpt.df
+    # A single row exists beyond pre-excavated depth
+    assert isinstance(df, pl.DataFrame)
+    assert df.shape[0] == 1
+    assert pytest.approx(df["penetrationLength"].to_list(), rel=1e-6) == [2.0]
+    assert pytest.approx(df["coneResistance"].to_list(), rel=1e-6) == [15]
+
+
+def test_pre_excavated_keep_preserves_rows():
+    # If remove_pre_excavated_rows=False, does not remove rows with depth < pre-excavated depth.
+    cpt = _GefCpt(
+        path=os.path.join(BasePath, "../test_files/cpt_pre_excavated.gef"),
+        remove_pre_excavated_rows=False,
+    )
+    df = cpt.df
+    # Two rows exist
+    assert isinstance(df, pl.DataFrame)
+    assert df.shape[0] == 2
+    depths = sorted(df["penetrationLength"].to_list())
+    assert pytest.approx(depths, rel=1e-6) == [0.5, 2.0]
+    resistances = sorted(df["coneResistance"].to_list())
+    assert pytest.approx(resistances, rel=1e-6) == [10, 15]
