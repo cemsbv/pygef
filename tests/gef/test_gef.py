@@ -66,7 +66,7 @@ def test_bore_cpt_smoke():
     """
     gef1 = read_bore(os.path.join(BasePath, "../test_files/example_bore.gef"))
     gef2 = read_cpt(os.path.join(BasePath, "../test_files/cpt.gef"))
-    fig, axes = plotting.plot_merge(gef1, gef2)
+    fig, axes = plotting.plot_merge(gef1, gef2, basemap=False)
     assert isinstance(axes[0], plt.Axes)
 
 
