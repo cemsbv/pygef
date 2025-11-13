@@ -133,6 +133,7 @@
 <span class="sd">        zlm_pore_pressure_u2_after (float | None): zlm_pore_pressure_u2_after</span>
 <span class="sd">        zlm_pore_pressure_u3_after (float | None): zlm_pore_pressure_u3_after</span>
 <span class="sd">        column_void_mapping (dict | None): column_void_mapping</span>
+<span class="sd">        raw_headers (dict): headers</span>
 <span class="sd">        data (pl.DataFrame): DataFrame</span>
 <span class="sd">            columns:</span>
 
@@ -220,6 +221,7 @@
     <span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
 
     <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">raw_headers</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># post-processing of the data</span>
