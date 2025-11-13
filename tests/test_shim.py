@@ -84,7 +84,7 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
         "zlm_pore_pressure_u2_before": -0.028,
         "zlm_pore_pressure_u3_after": None,
         "zlm_pore_pressure_u3_before": None,
-        "headers": {
+        "raw_headers": {
             "COLUMN": [["10"]],
             "COLUMNINFO": [
                 ["1", "m", "Sondeerlengte", "1"],

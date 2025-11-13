@@ -56,7 +56,7 @@ class CPTData:
         zlm_pore_pressure_u2_after (float | None): zlm_pore_pressure_u2_after
         zlm_pore_pressure_u3_after (float | None): zlm_pore_pressure_u3_after
         column_void_mapping (dict | None): column_void_mapping
-        headers (dict | None): headers
+        raw_headers (dict): headers
         data (pl.DataFrame): DataFrame
             columns:
 
@@ -141,10 +141,10 @@ class CPTData:
     delivered_vertical_position_datum: VerticalDatumClass
     delivered_vertical_position_reference_point: str
     column_void_mapping: dict | None
-    headers: dict | None
     data: pl.DataFrame
 
     alias: str | None = field(default=None)
+    raw_headers: dict = field(default_factory=dict)
 
     def __post_init__(self):
         # post-processing of the data

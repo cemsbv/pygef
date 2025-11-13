@@ -59,7 +59,7 @@ CPT_ATTRIBS = {
     "column_void_mapping": {
         "xpath": "./dummyTag",
     },
-    "headers": {
+    "raw_headers": {
         "xpath": "./dummyTag",
     },
     "data": {

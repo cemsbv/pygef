@@ -9,7 +9,6 @@ import numpy as np
 import polars as pl
 import polars.testing as pl_test
 import pytest
-from numpy.ma.testutils import assert_equal
 
 import pygef.gef.utils as utils
 from pygef import common, exceptions, plotting, read_bore, read_cpt
@@ -711,8 +710,8 @@ def test_parse_cpt_headers():
 1.0600e+000 6.9000e-001 3.9000e-002
 """
     )
-    assert len(cpt.headers) == 15
-    assert cpt.headers["MEASUREMENTTEXT"][0][1] == "030919"
+    assert len(cpt.raw_headers) == 15
+    assert cpt.raw_headers["MEASUREMENTTEXT"][0][1] == "030919"
 
 
 def test_parse_cpt_with_replace_column_voids_enabled():
