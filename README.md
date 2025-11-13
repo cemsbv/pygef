@@ -2,15 +2,13 @@
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPi Version](https://img.shields.io/pypi/v/pygef.svg)](https://pypi.org/project/pygef)
-[![GitHub stars](https://img.shields.io/github/stars/ritchie46/pygef.svg?logo=github&label=Stars&logoColor=white)](https://github.com/ritchie46/pygef)
+[![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fcemsbv%2Fpygef%2Fmaster%2Fpyproject.toml)](https://github.com/cemsbv/pygef/blob/master/pyproject.toml)
 [![Coverage Status](https://coveralls.io/repos/github/cemsbv/pygef/badge.svg?branch=master)](https://coveralls.io/github/cemsbv/pygef?branch=master)
 
-Simple parser for \*.gef files. These are ASCII based files used for soil
-properties measurements. Compatible with Python 3.9.
+Simple parser for \*.GEF and BRO XML files. These are files used for soil
+property measurements.
 
-Recently added the parsing of xml boreholes file, the xml parsing is still in a
-preliminary phase, not all the files are supported. If you find a file that
-doesn't work with pygef, please make an issue about it or PR :)
+If you find a file that doesn't work with pygef, please make an issue about it or a PR :)
 
 ## Installation
 
