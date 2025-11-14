@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygef"
-version = "0.13.0"
+version = "0.14.0"
 description = "Parse soil measurument data."
 dependencies = ["polars>=1,<2", "lxml>=5,<7", "gef-file-to-map>=1,<2"]
 requires-python = ">=3.11,<3.15"
