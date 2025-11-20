@@ -24,7 +24,7 @@ jobs:
           - "3.13"
           - "3.14"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
@@ -60,7 +60,7 @@ jobs:
     name: Formatting check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           # Full git history is needed to get a proper list of changed test_files within `super-linter`
           fetch-depth: 0
@@ -116,7 +116,7 @@ jobs:
     name: Test docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install python 3.13
         uses: actions/setup-python@v6
