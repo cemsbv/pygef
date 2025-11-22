@@ -27,7 +27,7 @@ docs = [
 ]
 lint = [
   # https://github.com/super-linter/super-linter/blob/main/dependencies/python/black.txt
-  "black==25.1.0",
+  "black==25.11.0",
   # https://github.com/super-linter/super-linter/blob/main/dependencies/python/isort.txt
   "isort==7.0.0",
 ]

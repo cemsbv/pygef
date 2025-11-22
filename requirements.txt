@@ -6,7 +6,7 @@ alabaster==1.0.0
     # via sphinx
 asteroid-sphinx-theme==0.0.3
     # via pygef (pyproject.toml)
-asttokens==3.0.0
+asttokens==3.0.1
     # via stack-data
 attrs==25.4.0
     # via
@@ -14,15 +14,15 @@ attrs==25.4.0
     #   rasterio
 babel==2.17.0
     # via sphinx
-black==25.1.0
+black==25.11.0
     # via pygef (pyproject.toml)
-certifi==2025.10.5
+certifi==2025.11.12
     # via
     #   rasterio
     #   requests
 charset-normalizer==3.4.4
     # via requests
-click==8.3.0
+click==8.3.1
     # via
     #   black
     #   click-plugins
@@ -47,7 +47,7 @@ decorator==5.2.1
     # via ipython
 docopt==0.6.2
     # via coveralls
-docutils==0.21.2
+docutils==0.22.3
     # via
     #   sphinx
     #   sphinx-rtd-theme
@@ -67,7 +67,7 @@ imagesize==1.4.1
     # via sphinx
 iniconfig==2.3.0
     # via pytest
-ipython==9.6.0
+ipython==9.7.0
     # via pygef (pyproject.toml)
 ipython-pygments-lexers==1.1.1
     # via ipython
@@ -95,7 +95,7 @@ mercantile==1.2.1
     # via contextily
 mypy-extensions==1.1.0
     # via black
-numpy==2.3.4
+numpy==2.3.5
     # via
     #   contourpy
     #   matplotlib
@@ -120,9 +120,9 @@ platformdirs==4.5.0
     # via black
 pluggy==1.6.0
     # via pytest
-polars==1.35.1
+polars==1.35.2
     # via pygef (pyproject.toml)
-polars-runtime-32==1.35.1
+polars-runtime-32==1.35.2
     # via polars
 prompt-toolkit==3.0.52
     # via ipython
@@ -140,7 +140,7 @@ pyparsing==3.3.0a1
     # via
     #   matplotlib
     #   rasterio
-pytest==9.0.0
+pytest==9.0.1
     # via pygef (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via matplotlib
@@ -192,5 +192,5 @@ urllib3==2.5.0
     # via requests
 wcwidth==0.2.14
     # via prompt-toolkit
-xyzservices==2025.10.0
+xyzservices==2025.11.0
     # via contextily
