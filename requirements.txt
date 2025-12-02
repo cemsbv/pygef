@@ -53,7 +53,7 @@ docutils==0.21.2
     #   sphinx-rtd-theme
 executing==2.2.1
     # via stack-data
-fonttools==4.60.1
+fonttools==4.61.0
     # via matplotlib
 gef-file-to-map==1.0.0
     # via pygef (pyproject.toml)
