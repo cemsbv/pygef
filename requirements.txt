@@ -151,7 +151,7 @@ requests==2.32.5
     #   contextily
     #   coveralls
     #   sphinx
-roman-numerals-py==3.1.0
+roman-numerals-py==4.1.0
     # via sphinx
 six==1.17.0
     # via python-dateutil
