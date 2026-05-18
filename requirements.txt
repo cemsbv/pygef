@@ -14,7 +14,7 @@ attrs==25.4.0
     #   rasterio
 babel==2.17.0
     # via sphinx
-black==25.1.0
+black==26.5.1
     # via pygef (pyproject.toml)
 certifi==2025.10.5
     # via
