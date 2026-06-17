@@ -1,16 +1,18 @@
 from datetime import datetime
+from io import BytesIO
+from pathlib import Path
 
 import pytest
-from lxml.etree import XMLSyntaxError
 
-from pygef import read_cpt
+from pygef import ParseGefError, read_cpt
 from pygef.common import Location, VerticalDatumClass
 from pygef.cpt import CPTData
 
 
 def test_engine(cpt_gef_1) -> None:
-    # read test with force incorrect engine
-    with pytest.raises(XMLSyntaxError):
+    # Forcing the wrong engine on a GEF file raises a clear mismatch error
+    # (previously this surfaced as lxml's XMLSyntaxError).
+    with pytest.raises(ValueError, match="engine='xml'"):
         read_cpt(cpt_gef_1, engine="xml")
     # read test with force engine
     gef = read_cpt(cpt_gef_1, engine="gef")
@@ -185,3 +187,87 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
             "ZID": [["31000", "-0.09", "0.05"]],
         },
     }
+
+
+# -------------------- new validation tests --------------------
+
+
+@pytest.mark.parametrize("engine", ["auto", "gef", "xml"])
+def test_missing_path_str_raises_valueerror(engine) -> None:
+    """Issues #1 and #2: a non-existing path passed as a ``str`` is
+    unparseable (it isn't GEF content, isn't XML content, and doesn't exist
+    on disk), so it raises a clear ``ValueError`` regardless of the engine.
+    Previously surfaced as ``XMLSyntaxError`` or as a misleading
+    ``ValueError("not a cpt")``. Callers who want ``FileNotFoundError`` for
+    a missing file should pass a ``pathlib.Path``."""
+    with pytest.raises(ValueError, match="Could not interpret string input"):
+        read_cpt("non/existing/file.gef", engine=engine)
+
+
+@pytest.mark.parametrize("engine", ["auto", "gef", "xml"])
+def test_missing_path_pathlib_raises_filenotfound(engine) -> None:
+    """A pathlib.Path to a non-existing file raises FileNotFoundError
+    regardless of the engine selected."""
+    with pytest.raises(FileNotFoundError):
+        read_cpt(Path("non/existing/file.gef"), engine=engine)
+
+
+@pytest.mark.parametrize("engine", ["auto", "gef"])
+def test_erroneous_gef_file_raises_parsegeferror(erroneous_gef, engine) -> None:
+    """Issue #3: a GEF-shaped but corrupt file raises ParseGefError both for
+    engine='auto' (detected as GEF by the header heuristic) and engine='gef'
+    (explicitly forced). Previously engine='gef' silently returned a
+    CPTData(bro_id=None, ...)."""
+    with pytest.raises(ParseGefError):
+        read_cpt(erroneous_gef, engine=engine)
+
+
+def test_garbage_string_raises_valueerror() -> None:
+    """A string that is neither GEF content, nor XML content, nor an
+    existing filesystem path raises a generic ValueError."""
+    with pytest.raises(ValueError, match="Could not interpret string input"):
+        read_cpt("totally not gef and not xml either")
+
+
+def test_engine_xml_on_gef_content_raises_mismatch(cpt_gef_1_string) -> None:
+    """Passing GEF content with engine='xml' raises a clear mismatch error
+    instead of letting lxml fail with XMLSyntaxError."""
+    with pytest.raises(ValueError, match="engine='xml'"):
+        read_cpt(cpt_gef_1_string, engine="xml")
+
+
+def test_engine_gef_on_xml_content_raises_mismatch(cpt_xml) -> None:
+    """Passing an XML file with engine='gef' raises a clear mismatch error
+    instead of feeding it to the lenient GEF parser."""
+    with pytest.raises(ValueError, match="engine='gef'"):
+        read_cpt(cpt_xml, engine="gef")
+
+
+def test_gef_heuristic_accepts_non_gefid_header() -> None:
+    """The GEF detection heuristic must accept any #KEY=VALUE header, not
+    only #GEFID. We verify by calling the classifier directly."""
+    from pygef.shim import _classify_input
+
+    _, fmt, _ = _classify_input("#PROJECTID= CPT, 42\n#REPORTCODE= GEF-CPT-Report\n")
+    assert fmt == "gef"
+
+    # Whitespace tolerance — leading spaces before the header.
+    _, fmt, _ = _classify_input("   #FILEOWNER= someone\n")
+    assert fmt == "gef"
+
+
+def test_bytesio_with_unknown_content_raises_valueerror() -> None:
+    """BytesIO containing content that matches neither GEF nor XML markers
+    raises a clear format-detection error."""
+    bio = BytesIO(b"this is neither GEF nor XML")
+    with pytest.raises(ValueError, match="Could not detect file format"):
+        read_cpt(bio)
+
+
+def test_existing_file_with_unknown_content_raises_valueerror(tmp_path) -> None:
+    """A real file on disk whose content matches neither GEF nor XML markers
+    raises a clear format-detection error instead of XMLSyntaxError."""
+    unknown = tmp_path / "unknown.dat"
+    unknown.write_text("this is neither GEF nor XML\n")
+    with pytest.raises(ValueError, match="Could not detect file format"):
+        read_cpt(str(unknown))

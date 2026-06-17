@@ -1,0 +1,6 @@
+#GEFID= 1, 1, 0
+#COMPANYID= ErroneousCorp
+#FILEDATE= 2026, 06, 17
+#COMMENT= This file is intentionally corrupt: it begins with a GEF header
+#COMMENT= but is missing REPORTCODE/PROCEDURECODE and column metadata.
+not a valid GEF data section

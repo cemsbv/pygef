@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import io
 import os
+import re
+from enum import Enum
 from pathlib import Path
 from typing import Any, Literal
 
@@ -10,28 +12,115 @@ from pygef.broxml.parse_bore import read_bore as read_bore_xml
 from pygef.broxml.parse_cpt import read_cpt as read_cpt_xml
 from pygef.common import Location, VerticalDatumClass, convert_coordinate_system_to_gml
 from pygef.cpt import CPTData
+from pygef.exceptions import ParseGefError
 from pygef.gef.parse_bore import _GefBore
 from pygef.gef.parse_cpt import _GefCpt
 
-GEF_ID = "#GEFID"
+# A GEF header line looks like "#KEY= value" or "#KEY = value". Accepting any
+# such line (not only #GEFID) makes string-vs-path disambiguation robust to
+# GEF files that don't put #GEFID first.
+_GEF_HEADER_RE = re.compile(r"^\s*#[A-Z][A-Z0-9]*\s*=")
+
+_PEEK_BYTES = 128
 
 
-def is_gef_file(file: io.BytesIO | Path | str) -> bool:
+class _InputKind(Enum):
+    BYTES = "bytes"
+    PATH = "path"
+    GEF_TEXT = "gef_text"
+    XML_TEXT = "xml_text"
+
+
+class _DetectedFormat(str, Enum):
+    GEF = "gef"
+    XML = "xml"
+
+
+_LSTRIP_CHARS = " \t\r\n﻿"  # whitespace + optional UTF-8 BOM
+
+# A string looks like a filesystem path if it contains a path separator OR ends
+# with a short alphanumeric extension. Bare random words ("foo bar baz") fail
+# this test and so are reported as ambiguous input rather than missing files.
+_PATH_LIKE_RE = re.compile(r"[/\\]|\.[A-Za-z0-9]{1,8}$")
+
+
+def _looks_like_gef(head: str) -> bool:
+    return bool(_GEF_HEADER_RE.match(head.lstrip(_LSTRIP_CHARS)))
+
+
+def _looks_like_xml(head: str) -> bool:
+    return head.lstrip(_LSTRIP_CHARS).startswith("<")
+
+
+def _detect_format(head: str, source: str) -> _DetectedFormat:
+    if _looks_like_gef(head):
+        return _DetectedFormat.GEF
+    if _looks_like_xml(head):
+        return _DetectedFormat.XML
+    raise ValueError(
+        f"Could not detect file format of {source}: content matches neither "
+        "the GEF header pattern (#KEY=...) nor the XML root element pattern "
+        "(starting with '<')."
+    )
+
+
+def _classify_input(
+    file: io.BytesIO | Path | str,
+) -> tuple[_InputKind, _DetectedFormat, Any]:
     """
-    gef files start with '#GEFID' so we check the content
-    of the file
+    Classify ``file`` into one of the four input kinds and detect whether the
+    content looks like GEF or XML.
+
+    Returns ``(kind, detected_format, payload)`` where ``payload`` is the value
+    to hand off to the chosen parser (BytesIO/Path/string).
+
+    Raises ``FileNotFoundError`` if ``file`` resolves to a path that doesn't
+    exist on disk; raises ``ValueError`` if the content cannot be classified
+    as GEF or XML.
     """
     if isinstance(file, io.BytesIO):
         pos = file.tell()
-        is_gef = file.read(6).decode().startswith(GEF_ID)
+        head = file.read(_PEEK_BYTES).decode(errors="ignore")
         file.seek(pos)
-        return is_gef
-    if os.path.exists(file):
-        with open(file, errors="ignore") as f:
-            return f.read(6).startswith(GEF_ID)
+        return _InputKind.BYTES, _detect_format(head, "BytesIO input"), file
+
+    if isinstance(file, Path):
+        if not file.exists():
+            raise FileNotFoundError(f"File not found: {file}")
+        with open(file, encoding="utf-8", errors="ignore") as f:
+            head = f.read(_PEEK_BYTES)
+        return _InputKind.PATH, _detect_format(head, str(file)), file
+
     if isinstance(file, str):
-        return file[:6].startswith(GEF_ID)
-    raise FileNotFoundError("Could not find the GEF file.")
+        if _looks_like_gef(file):
+            return _InputKind.GEF_TEXT, _DetectedFormat.GEF, file
+        if _looks_like_xml(file):
+            return _InputKind.XML_TEXT, _DetectedFormat.XML, file
+        if os.path.exists(file):
+            with open(file, encoding="utf-8", errors="ignore") as f:
+                head = f.read(_PEEK_BYTES)
+            return _InputKind.PATH, _detect_format(head, file), file
+
+        raise ValueError(
+            "Could not interpret string input: it does not look like GEF or "
+            "XML and is not an existing filesystem path."
+        )
+
+    raise TypeError(
+        f"Unsupported file type {type(file).__name__}; "
+        "expected io.BytesIO, pathlib.Path, or str."
+    )
+
+
+def _check_engine_match(engine: str, detected_format: _DetectedFormat) -> None:
+    """Raise if the user-forced engine doesn't match the detected format."""
+    if engine == "auto":
+        return
+    if engine != detected_format:
+        raise ValueError(
+            f"engine={engine!r} but file content looks like {detected_format!r}; "
+            "refusing to parse."
+        )
 
 
 def read_bore(
@@ -42,21 +131,32 @@ def read_bore(
     """
     Parse the bore file. Can either be BytesIO, Path or str
 
-    :param file: bore file
+    :param file: bore file. A ``str`` argument is interpreted as raw file
+        content if it starts with a GEF header line (``#KEY=...``) or with
+        ``<`` (XML); otherwise it is treated as a filesystem path.
     :param index: only valid for xml files
-    :param engine: default is "auto". parsing engine.
-        Please note that auto engine checks if the files starts with `#GEFID`.
+    :param engine: default is "auto". Parsing engine.
+        When set to "gef" or "xml" the engine must match the detected file
+        content, otherwise a ValueError is raised.
     """
-    if engine == "gef" or is_gef_file(file) and engine == "auto":
+    kind, detected_format, payload = _classify_input(file)
+    _check_engine_match(engine, detected_format)
+
+    if detected_format == "gef":
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
-        if isinstance(file, io.BytesIO):
-            return gef_bore_to_bore_data(_GefBore(string=file.read().decode()))
-        if os.path.exists(file):
-            return gef_bore_to_bore_data(_GefBore(path=file))
-        else:
-            return gef_bore_to_bore_data(_GefBore(string=file))
-    return read_bore_xml(file)[index]
+        try:
+            if kind is _InputKind.BYTES:
+                gef_bore = _GefBore(string=payload.read().decode())
+            elif kind is _InputKind.PATH:
+                gef_bore = _GefBore(path=payload)
+            else:
+                gef_bore = _GefBore(string=payload)
+        except ValueError as e:
+            raise ParseGefError(str(e)) from e
+        return gef_bore_to_bore_data(gef_bore)
+
+    return read_bore_xml(payload)[index]
 
 
 def read_cpt(
@@ -69,44 +169,48 @@ def read_cpt(
     """
     Parse the cpt file. Can either be BytesIO, Path or str
 
-    :param file: bore file
+    :param file: cpt file. A ``str`` argument is interpreted as raw file
+        content if it starts with a GEF header line (``#KEY=...``) or with
+        ``<`` (XML); otherwise it is treated as a filesystem path.
     :param index: only valid for xml files
-    :param engine: default is "auto". parsing engine.
-        Please note that auto engine checks if the files starts with `#GEFID`.
+    :param engine: default is "auto". Parsing engine.
+        When set to "gef" or "xml" the engine must match the detected file
+        content, otherwise a ValueError is raised.
     :param replace_column_voids: default True. How to handle rows with void values.
         If true, replace void values with nulls or interpolate; else retain value.
     :param remove_pre_excavated_rows: default True. How to handle pre-excavated row values.
         If true, drop rows above pre-excavated depth; else retain.
     """
+    kind, detected_format, payload = _classify_input(file)
+    _check_engine_match(engine, detected_format)
 
-    if engine == "gef" or is_gef_file(file) and engine == "auto":
+    if detected_format == "gef":
         if index > 0:
             raise ValueError("an index > 0 not supported for GEF files")
-        if isinstance(file, io.BytesIO):
-            return gef_cpt_to_cpt_data(
-                _GefCpt(
-                    string=file.read().decode(),
+        try:
+            if kind is _InputKind.BYTES:
+                gef = _GefCpt(
+                    string=payload.read().decode(),
                     replace_column_voids=replace_column_voids,
                     remove_pre_excavated_rows=remove_pre_excavated_rows,
                 )
-            )
-        if os.path.exists(file):
-            return gef_cpt_to_cpt_data(
-                _GefCpt(
-                    path=file,
+            elif kind is _InputKind.PATH:
+                gef = _GefCpt(
+                    path=payload,
                     replace_column_voids=replace_column_voids,
                     remove_pre_excavated_rows=remove_pre_excavated_rows,
                 )
-            )
-        else:
-            return gef_cpt_to_cpt_data(
-                _GefCpt(
-                    string=file,
+            else:
+                gef = _GefCpt(
+                    string=payload,
                     replace_column_voids=replace_column_voids,
                     remove_pre_excavated_rows=remove_pre_excavated_rows,
                 )
-            )
-    return read_cpt_xml(file)[index]
+        except ValueError as e:
+            raise ParseGefError(str(e)) from e
+        return gef_cpt_to_cpt_data(gef)
+
+    return read_cpt_xml(payload)[index]
 
 
 def convert_height_system_to_vertical_datum(height_system: float) -> str:
