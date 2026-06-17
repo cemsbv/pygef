@@ -19,3 +19,4 @@ data/
 /.pytest_cache/
 */super-linter.log
 .cemsdev
+.cems-box
