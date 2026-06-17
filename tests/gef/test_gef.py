@@ -635,8 +635,7 @@ def test_replace_column_void():
 
 
 def test_parse_cpt():
-    cpt = read_cpt(
-        """#GEFID= 1, 1, 0
+    cpt = read_cpt("""#GEFID= 1, 1, 0
 #FILEOWNER= Wagen 2
 #FILEDATE= 2004, 1, 14
 #PROJECTID= CPT, 146203
@@ -661,8 +660,7 @@ def test_parse_cpt():
 1.0200e+000 7.1000e-001 4.6500e-002
 1.0400e+000 7.3000e-001 4.2750e-002
 1.0600e+000 6.9000e-001 3.9000e-002
-"""
-    )
+""")
     df_calculated = cpt.data
 
     df = pl.DataFrame(
@@ -682,8 +680,7 @@ def test_parse_cpt():
 
 
 def test_parse_cpt_headers():
-    cpt = read_cpt(
-        """#GEFID= 1, 1, 0
+    cpt = read_cpt("""#GEFID= 1, 1, 0
 #FILEOWNER= Wagen 2
 #FILEDATE= 2004, 1, 14
 #PROJECTID= CPT, 146203
@@ -708,8 +705,7 @@ def test_parse_cpt_headers():
 1.0200e+000 7.1000e-001 4.6500e-002
 1.0400e+000 7.3000e-001 4.2750e-002
 1.0600e+000 6.9000e-001 3.9000e-002
-"""
-    )
+""")
     assert len(cpt.raw_headers) == 15
     assert cpt.raw_headers["MEASUREMENTTEXT"][0][1] == "030919"
 
@@ -767,8 +763,7 @@ def test_parse_cpt_with_replace_column_voids_disabled():
 
 
 def test_parse_bore():
-    cpt = _GefBore(
-        string="""
+    cpt = _GefBore(string="""
 #GEFID = 1,1,0
 #COLUMNTEXT = 1, aan
 #COLUMNSEPARATOR = ;
@@ -806,8 +801,7 @@ def test_parse_bore():
 0.00;1.20;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zgh2';'TGR GE';'ZMFO';'CA3';!
 1.20;3.10;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Zg';'ON';'ZMGO';'FN2';'CA2';!
 3.10;5.00;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;-9999.99;'Vz';'TBR ZW';'ZMO';'CA1';!
-"""
-    )
+""")
 
     df = cpt.df
     # No need to check beyond parse result
@@ -836,8 +830,7 @@ def test_parse_bore():
 
 
 def test_parse_pre_excavated_dept_with_void_inclination():
-    cpt = _GefCpt(
-        string="""
+    cpt = _GefCpt(string="""
 #COLUMN= 6
 #COLUMNINFO= 1, m, Sondeerlengte, 1
 #COLUMNINFO= 2, MPa, Conuswaarde, 2
@@ -858,8 +851,7 @@ def test_parse_pre_excavated_dept_with_void_inclination():
 0.0000e+000 -9.9990e+003 -9.9990e+003 -9.9990e+003 -9.9990e+003 -9.9990e+003
 1.5100e+000 9.1800e+000 5.3238e-002 5.8398e-001 5.7314e-001 3.0107e-003
 1.5300e+000 9.3044e+000 5.3803e-002 8.2007e-001 5.7986e-001 3.3362e-003
-"""
-    )
+""")
     expected = pl.DataFrame(
         {
             "penetrationLength": [1.51, 1.53],
@@ -961,8 +953,7 @@ def test_bug_depth():
 
 
 def test_bore_with_reduced_columns():
-    _GefBore(
-        string="""
+    _GefBore(string="""
 #GEFID = 1,1,0
 #PROJECTID= redacted, 1234, -
 #COLUMN= 2
@@ -985,8 +976,7 @@ def test_bore_with_reduced_columns():
 1.4000e+000;2.2000e+000;'Zs1';'ZUF';'LI BR';'Restante BZB.: PR (zwak)';;!
 2.2000e+000;2.6000e+000;'Zs1g1';'ZUF';'LI TBE BR';'Restante BZB.: PR (zwak)';;!
 2.6000e+000;3.2000e+000;'Zs1g1';'ZUF';'LI GR';;;!
-"""
-    )
+""")
 
 
 def test_pre_excavated_default_removes_rows_below_threshold():

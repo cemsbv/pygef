@@ -207,7 +207,7 @@ def parse_gml_location(el: etree.Element, **kwargs: dict[Any, Any]) -> Location:
     """Resolver for standardizedLocation/brocom:location"""
     srs_name = el.attrib["srsName"]
     pos = next(el.iterfind("./gml:pos", namespaces=kwargs["namespaces"])).text
-    (x, y) = parse_position(pos)
+    x, y = parse_position(pos)
     return Location(srs_name=srs_name, x=x, y=y)
 
 
