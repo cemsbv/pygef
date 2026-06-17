@@ -63,7 +63,9 @@ src/pygef/
     resolvers.py   # Value resolvers (unit conversions, void handling)
 ```
 
-**Data flow:** `shim.read_cpt(file)` → detects format via `is_gef_file()` → calls either `_GefCpt` or `read_cpt_xml` → converts to `CPTData` via `gef_cpt_to_cpt_data()` or directly.
+**Data flow:** `shim.read_cpt(file)` → `_classify_input()` returns `(kind, format, payload)` → dispatches to `_GefCpt` (GEF) or `read_cpt_xml` (XML). GEF parser `ValueError`s are wrapped into `ParseGefError`.
+
+**Input classification** (`_classify_input` in `shim.py`): `io.BytesIO` and `pathlib.Path` are routed by sniffing the first ~128 bytes (`#KEY=` → GEF, `<` → XML). A `str` is GEF content if it starts with `#KEY=`, XML content if it starts with `<`, an existing filesystem path if `os.path.exists()` returns True, and otherwise unparseable (`ValueError`). A missing `pathlib.Path` raises `FileNotFoundError`; a missing `str` does not — it falls through to the same `ValueError`. When `engine` is `"gef"` or `"xml"`, it must match the detected format or `ValueError` is raised.
 
 **Key design notes:**
 - `CPTData.__post_init__` runs post-processing on the DataFrame (computes `frictionRatioComputed`, `depthOffset`, sorts by `penetrationLength`). Because the dataclass is frozen, it uses `object.__setattr__` to replace `data`.

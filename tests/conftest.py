@@ -53,3 +53,8 @@ def cpt_gef_3() -> str:
 @fixture()
 def cpt_gef_4() -> str:
     return os.path.join(TEST_FILES, "cpt4.gef")
+
+
+@fixture()
+def erroneous_gef() -> str:
+    return os.path.join(TEST_FILES, "erroneous.gef")
