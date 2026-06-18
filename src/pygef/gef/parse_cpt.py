@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import List
 
-import numpy as np
 import polars as pl
 
 from pygef.gef import utils
@@ -189,8 +188,8 @@ def correct_depth_with_inclination(
         return lf.with_columns(pl.col("depth").abs().alias("depth"))
     elif "inclinationResultant" in columns:
         # every different in depth needs to be corrected with the angle
-        correction_factor = np.cos(
-            np.radians(pl.col("inclinationResultant").cast(pl.Float32).fill_null(0))
+        correction_factor = (
+            pl.col("inclinationResultant").cast(pl.Float32).fill_null(0).radians().cos()
         )
 
         delta_height = pl.col("penetrationLength").diff()

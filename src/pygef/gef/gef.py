@@ -145,9 +145,10 @@ class _Gef:
         # Also remove the last trailing line
         regex = rf"[\s{re.escape(col_separator)}]+"
         new_data = "\n".join(
-            re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line))
+            stripped
             for line in new_data.split(rec_separator)
-        ).rstrip()
+            if (stripped := re.sub(f"{regex}$", "", re.sub(f"^{regex}", "", line)))
+        )
 
         return pl.read_csv(
             new_data.encode(),

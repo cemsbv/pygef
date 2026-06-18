@@ -61,7 +61,7 @@ def assign_multiple_columns(
     :param partial_df: updated Dataframe
     :return: DataFrame
     """
-    return df.drop(columns).hstack(partial_df[columns])
+    return df.with_columns([partial_df[col] for col in columns])
 
 
 def kpa_to_mpa(df: pl.DataFrame, columns: List[str]) -> pl.DataFrame:
