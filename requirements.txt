@@ -12,7 +12,7 @@ attrs==26.1.0
     # via rasterio
 babel==2.18.0
     # via sphinx
-black==25.1.0
+black==26.5.1
     # via pygef (pyproject.toml)
 certifi==2026.6.17
     # via
@@ -69,7 +69,7 @@ ipython==9.14.1
     # via pygef (pyproject.toml)
 ipython-pygments-lexers==1.1.1
     # via ipython
-isort==7.0.0
+isort==8.0.1
     # via pygef (pyproject.toml)
 jedi==0.20.0
     # via ipython
@@ -145,6 +145,8 @@ pytest==9.1.0
     # via pygef (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via matplotlib
+pytokens==0.4.1
+    # via black
 rasterio==1.4.4
     # via contextily
 requests==2.34.2
@@ -189,8 +191,6 @@ traitlets==5.15.1
     # via
     #   ipython
     #   matplotlib-inline
-typing-extensions==4.15.0
-    # via ipython
 urllib3==2.7.0
     # via requests
 wcwidth==0.8.1
