@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.1] - 2026-07-03
+
+### Bug Fixes
+- *Gef*: Restore compatibility with polars 1.x
+
+### Miscellaneous Tasks
+- Disable codespell validation in super-linter
+- Update lint dependencies
+- Update sandbox dir name in gitignore
+- Fix typos
+- Formatting
+- Upgrade dependency pins
+
 ## [0.14.0] - 2025-11-14
 
 ### Bug Fixes
@@ -172,16 +185,11 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- *CI*:
-    - Install pytest
-    - Install pygef
-
 - *Ci*:
     - Trigger release on every tag (#293)
     - Release to pypi trigger
 
 ### Chore
-- Add linting, rm old GEF functions, update docs
 - Add linting, rm old GEF functions, update docs
 
 ### Features
@@ -197,7 +205,14 @@ All notable changes to this project will be documented in this file.
 ## [0.8.0-alpha.4] - 2023-03-02
 
 ### Bug Fixes
+
+- *CI*:
+    - Install pytest
+    - Install pygef
 - *Doc*: Sphinx documentation references
+
+### Chore
+- Add linting, rm old GEF functions, update docs
 
 ### Miscellaneous Tasks
 - Add linting, rm old GEF functions, update docs (#290)
@@ -221,6 +236,12 @@ All notable changes to this project will be documented in this file.
     - Upload to pypi step
     - Release to pypi
 
+### DeprecationWarning
+- The 'warn' method is deprecated, use 'warning' instead
+
+### Fix
+- Find columns_number by counting columns instead of taking maximum value of column numbers
+
 ### Miscellaneous Tasks
 - Release 0.8.0-alpha as 0.8.0a0 on pypi
 - Don't automatically release from master (#244)
@@ -234,15 +255,5 @@ All notable changes to this project will be documented in this file.
 
 ### Testing
 - Move tests to dedicated folder (#243)
-
-## [0.7.4] - 2022-08-01
-
-### Fix
-- Find columns_number by counting columns instead of taking maximum value of column numbers
-
-## [0.4.1] - 2021-06-01
-
-### DeprecationWarning
-- The 'warn' method is deprecated, use 'warning' instead
 
 <!-- CEMS BV. -->
