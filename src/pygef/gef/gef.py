@@ -185,7 +185,7 @@ def parse_all_columns_info_from_dict(
     Function that parses and returns all COLUMNINFO header data from a dictionary.
 
     :param headers:(str) String of headers.
-    :param quantity_dict: (dict) Dictionary that maps quanity numbers to descriptions
+    :param quantity_dict: (dict) Dictionary that maps quantity numbers to descriptions
     :return: (List[Tuple[int, str, str, int]]) List of Tuples with the COLUMNINFO header values
     """
 
@@ -218,7 +218,7 @@ def parse_all_columns_info_from_str(
     Function that parses and returns all COLUMNINFO header data from a string.
 
     :param headers:(dict) Dictionary of headers.
-    :param quantity_dict: (dict) Dictionary that maps quanity numbers to descriptions
+    :param quantity_dict: (dict) Dictionary that maps quantity numbers to descriptions
     :return: (List[Tuple[int, str, str, int]]) List of Tuples with the COLUMNINFO header values
     """
 
@@ -257,7 +257,7 @@ def parse_all_columns_info(
     Function that parses and returns all COLUMNINFO header data from a string or dictionary.
 
     :param headers:(Union[Dict,str]) Dictionary or string of headers.
-    :param quantity_dict: (dict) Dictionary that maps quanity numbers to descriptions
+    :param quantity_dict: (dict) Dictionary that maps quantity numbers to descriptions
     :return: Tuple with lists of column_numbers, units, descriptions and column_quantities, sorted by column_numbers
     """
 
