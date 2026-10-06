@@ -119,7 +119,7 @@ platformdirs==4.10.0
     # via black
 pluggy==1.6.0
     # via pytest
-polars==1.41.2
+polars==2.0.0
     # via pygef (pyproject.toml)
 polars-runtime-32==1.41.2
     # via polars
