@@ -121,7 +121,7 @@ pluggy==1.6.0
     # via pytest
 polars==1.41.2
     # via pygef (pyproject.toml)
-polars-runtime-32==1.41.2
+polars-runtime-32==2.0.0
     # via polars
 prompt-toolkit==3.0.52
     # via ipython
