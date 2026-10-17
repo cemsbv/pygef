@@ -111,7 +111,7 @@ pathspec==1.1.1
     # via black
 pexpect==4.9.0
     # via ipython
-pillow==12.2.0
+pillow==13.0.0
     # via
     #   contextily
     #   matplotlib
