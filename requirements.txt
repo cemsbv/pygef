@@ -143,7 +143,7 @@ pyparsing==3.3.2
     #   rasterio
 pytest==9.1.0
     # via pygef (pyproject.toml)
-python-dateutil==2.9.0.post0
+python-dateutil==3.0.0
     # via matplotlib
 pytokens==0.4.1
     # via black
