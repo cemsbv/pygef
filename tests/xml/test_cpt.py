@@ -19,6 +19,7 @@ def test_cpt_attributes(cpt_xml: str) -> None:
     )
     assert not cpt.dissipationtest_performed
     assert cpt.predrilled_depth == 0.0
+    assert cpt.removed_layers.shape == (0, 0)
     assert cpt.final_depth == 7.439
     assert cpt.cpt_description == "Hyson"
     assert cpt.cpt_type == "I-CFXY-15/190206"

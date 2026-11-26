@@ -184,4 +184,5 @@ def test_gef_to_cpt_data(_type, cpt_gef_1, cpt_gef_1_bytes, cpt_gef_1_string) ->
             "XYID": [["31000", "79578.38", "424838.97", "0.02", "0.02"]],
             "ZID": [["31000", "-0.09", "0.05"]],
         },
+        "removed_layers": (0, 0),
     }
