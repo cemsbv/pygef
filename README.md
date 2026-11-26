@@ -64,6 +64,19 @@ e ┆ -9.99999e5 ┆ ... ┆ -999999    ┆ -999999    ┆ -9.99999e5 ┆ -9.999
 └────────────┴───────┴───────────┴────────────┴─────┴────────────┴────────────┴────────────┴────────────┘
 ```
 
+Removed layers are available as a Polars DataFrame:
+
+```python
+cpt_data = read_cpt("./my-cpt.xml")
+cpt_data.removed_layers
+```
+
+For BRO XML, the DataFrame contains fields present in the XML: `sequence_number`,
+`upper_boundary`, `lower_boundary`, and `description`. 
+
+For GEF, `SPECIMENVAR` records provide `sequence_number`, `upper_boundary`,
+`vertical_unit`, and `description`. A lower boundary is not inferred.
+
 ## Bore files
 
 ```python

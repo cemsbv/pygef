@@ -129,6 +129,7 @@ def gef_cpt_to_cpt_data(gef_cpt: _GefCpt) -> CPTData:
     kwargs["bro_id"] = None
     kwargs["alias"] = gef_cpt.test_id
     kwargs["data"] = gef_cpt.df
+    kwargs["removed_layers"] = gef_cpt.removed_layers
     kwargs["column_void_mapping"] = gef_cpt.columns_info.description_to_void_mapping
     kwargs["raw_headers"] = gef_cpt._headers
     kwargs["research_report_date"] = gef_cpt.file_date

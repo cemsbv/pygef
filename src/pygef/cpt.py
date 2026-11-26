@@ -4,11 +4,20 @@ import copy
 import pprint
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, List
+from typing import Any, List, TypedDict
 
 import polars as pl
 
 from pygef.common import Location, VerticalDatumClass, depth_to_offset
+
+
+class RemovedLayer(TypedDict, total=False):
+    """Fields parsed from a removed layer in the source XML from BRO."""
+
+    sequence_number: int | None
+    upper_boundary: float | None
+    lower_boundary: float | None
+    description: str | None
 
 
 @dataclass(frozen=True)
@@ -29,6 +38,7 @@ class CPTData:
         dissipationtest_performed (bool | None): dissipationtest performed
         quality_class (int | None): quality class. None if the value in the source file was invalid or missing.
         predrilled_depth (float): predrilled depth
+        removed_layers (pl.DataFrame): layers removed before the CPT was performed. Fields absent from all layers are omitted; missing values are null.
         final_depth (float): final depth
         groundwater_level (float | None): groundwater level
         cpt_description (str): cpt description
@@ -145,6 +155,7 @@ class CPTData:
 
     alias: str | None = field(default=None)
     raw_headers: dict = field(default_factory=dict)
+    removed_layers: pl.DataFrame = field(default_factory=pl.DataFrame)
 
     def __post_init__(self):
         # post-processing of the data
@@ -197,6 +208,7 @@ class CPTData:
         """
         attribs = copy.copy(self.__dict__)
         attribs["data"] = attribs["data"].shape
+        attribs["removed_layers"] = attribs["removed_layers"].shape
         return attribs
 
     def display_attributes(self) -> str:

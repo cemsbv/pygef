@@ -9,6 +9,7 @@ import polars as pl
 from lxml import etree
 
 from pygef.common import Location, VerticalDatumClass
+from pygef.cpt import RemovedLayer
 from pygef.gef.utils import parse_regex_cast
 
 
@@ -26,6 +27,39 @@ def parse_int(val: str | None, **kwargs: dict[Any, Any]) -> int | None:
     if isinstance(val, (str, int, float)):
         return int(val)
     return None
+
+
+def parse_removed_layers(el: etree._Element, **kwargs: dict[Any, Any]) -> pl.DataFrame:
+    namespaces = kwargs["namespaces"]
+    layers = el.findall(
+        "./additionalInvestigation/cptcommon:removedLayer", namespaces=namespaces
+    )
+    result: list[RemovedLayer] = []
+    for layer in layers:
+        removed_layer: RemovedLayer = {}
+        sequence = layer.find("cptcommon:sequenceNumber", namespaces=namespaces)
+        upper = layer.find("cptcommon:upperBoundary", namespaces=namespaces)
+        lower = layer.find("cptcommon:lowerBoundary", namespaces=namespaces)
+        description = layer.find("cptcommon:description", namespaces=namespaces)
+        if sequence is not None:
+            removed_layer["sequence_number"] = parse_int(sequence.text)
+        if upper is not None:
+            removed_layer["upper_boundary"] = parse_float(upper.text)
+        if lower is not None:
+            removed_layer["lower_boundary"] = parse_float(lower.text)
+        if description is not None:
+            removed_layer["description"] = description.text
+        result.append(removed_layer)
+    return pl.DataFrame(
+        result,
+        infer_schema_length=None,
+        schema_overrides={
+            "sequence_number": pl.Int64,
+            "upper_boundary": pl.Float64,
+            "lower_boundary": pl.Float64,
+            "description": pl.String,
+        },
+    )
 
 
 def parse_date(val: str, **kwargs: dict[Any, Any]) -> date:

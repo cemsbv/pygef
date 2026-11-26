@@ -62,6 +62,10 @@ CPT_ATTRIBS = {
     "raw_headers": {
         "xpath": "./dummyTag",
     },
+    "removed_layers": {
+        "xpath": ".",
+        "resolver": resolvers.parse_removed_layers,
+    },
     "data": {
         "xpath": "./conePenetrometerSurvey",
         "resolver": resolvers.process_cpt_result,
